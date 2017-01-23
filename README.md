@@ -1,8 +1,8 @@
 # Team Project- B.1 
 
-##Git
+## Git
 
-####Git structure:
+#### Git structure:
 bomber.AI
 bomber.UI
 bomber.audio
@@ -11,7 +11,7 @@ bomber.networking
 bomber.physics
 bomber.renderer
 
-####Working with git
+#### Working with git
 
 After you clone the project for the first time do:
 ```
@@ -35,4 +35,3 @@ Make sure you are in your paticular branch e.g. networking and do:
 ```
 git merge dev
 ```
-# Team Project- B.1 
