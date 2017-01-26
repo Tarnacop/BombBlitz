@@ -45,12 +45,12 @@ public Block[][] getPixelMap(){
 	return this.pixelMap;//get the larger pixel representation of the map
 }
 
-Block getGridBlockAt(int x, int y){
+public Block getGridBlockAt(int x, int y){
 	
 	return this.gridMap[x][y];
 }	//get the block value of a grid space at the specified coords
 
-Block getPixelBlockAt(int x, int y){
+public Block getPixelBlockAt(int x, int y){
 	
 	return this.pixelMap[x][y];
 }

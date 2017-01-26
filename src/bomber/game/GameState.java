@@ -8,7 +8,7 @@ public class GameState {
 	private List<Player> players;		
 	private List<Bomb> bombs;		
 
-	public GameState(Map map, List<Player> players){	
+	public GameState(Map map, List<Player> players, List<Bomb> bombs){	
 		
 		this.map = map;
 		this.players = players;

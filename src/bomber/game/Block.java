@@ -6,5 +6,5 @@ public enum Block {
 	//BLANK - nothing
 	//SOLID - indestructible block
 	//SOFT - destructible block
-	//BLAST - explostion blast
+	//BLAST - explosion blast
 }
