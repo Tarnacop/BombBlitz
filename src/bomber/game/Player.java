@@ -18,6 +18,9 @@ public class Player {
 		this.pos = pos;
 		this.lives = lives;
 		this.speed = speed;
+		
+		this.isAlive = true;
+		this.keyState = new KeyboardState();
 	}
 
 	public String getName(){

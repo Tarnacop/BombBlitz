@@ -12,6 +12,22 @@ public class KeyboardState {
 		return this.bomb;//return true if the player has placed the bomb press key
 	}
 		
+	public boolean isBomb() {
+		return bomb;
+	}
+
+	public void setBomb(boolean bomb) {
+		this.bomb = bomb;
+	}
+
+	public Movement getKey() {
+		return key;
+	}
+
+	public void setKey(Movement key) {
+		this.key = key;
+	}
+
 	public Movement getMovement(){
 		
 		return this.key;
