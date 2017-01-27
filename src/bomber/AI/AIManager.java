@@ -36,6 +36,7 @@ public class AIManager extends Thread {
 			}
 			else
 			{
+				
 				System.out.print("danger");
 				break;
 			}
