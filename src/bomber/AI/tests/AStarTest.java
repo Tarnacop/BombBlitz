@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import bomber.AI.GameAI;
 import bomber.AI.RouteFinder;
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -58,12 +59,18 @@ public class AStarTest {
 
 	@Test
 	public void test() {
-		RouteFinder finder = new RouteFinder(state);
+		GameAI ai = new GameAI("ai",new Point(2,3),3,10,state);
+		Player ai2 = new GameAI("ai",new Point(6,5),3,10,state);
+		players.add(ai);
+		players.add(ai2);
+		state.setPlayers(players);
+		((GameAI) ai).begin();
+		RouteFinder finder = new RouteFinder(state,ai);
 		List<Movement> moves = finder.findRoute(new Point(0,0), new Point(12,12));
-//		for(Movement m : moves)
-//		{
-//			System.out.print(m + " ");
-//		}
+		for(Movement m : moves)
+		{
+			System.out.print(m + " ");
+		}
 	}
 
 }

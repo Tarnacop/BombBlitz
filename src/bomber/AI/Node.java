@@ -19,6 +19,13 @@ public class Node implements Comparator<Node>, Comparable<Node>{
 		this.fValue = gValue + hValue;
 	}
 	
+	public Node(Node parent, Point coordinates)
+	{
+		this.parent = parent;
+		this.coord = coordinates;
+	}
+	
+	
 	public Point getCoord() {
 		return coord;
 	}
