@@ -200,5 +200,10 @@ public class RouteFinder {
 		}
 		return positionSafety(newPosition);
 	}
+	
+	private boolean isEnemyInBombRange()
+	{
+		
+	}
 
 }
