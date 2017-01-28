@@ -20,7 +20,7 @@ public class AIManager extends Thread {
 	public AIManager(GameAI ai, GameState gameState) {
 		this.gameAI = ai;
 		this.gameState = gameState;
-		this.escapeState = new EscapeState();
+		this.escapeState = new EscapeState(this);
 		this.findState = new FindState();
 		this.attackState = new AttackState();
 		this.currentState = findState;
@@ -31,6 +31,7 @@ public class AIManager extends Thread {
 		{
 			if(inDanger())
 			{
+				
 				System.out.print("not");
 				break;
 			}
@@ -42,7 +43,7 @@ public class AIManager extends Thread {
 			}
 		}
 	}
-
+	
 	//return if the player is in range of the bomb explosion
 	//and can be affeected by that
 	private boolean inDanger() {

@@ -13,7 +13,7 @@ public class GameAI extends Player	{
 		super(name, pos, lives, speed);
 		super.setAlive(true);
 		this.state = gameState;
-		
+	
 	}
 	
 	public void begin()

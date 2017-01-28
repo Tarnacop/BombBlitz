@@ -2,6 +2,13 @@ package bomber.AI;
 
 public class EscapeState implements AIState{
 
+	private AIManager mainAI;
+	
+	public EscapeState( AIManager mainAI)
+	{
+		this.mainAI = mainAI;
+	}
+	
 	@Override
 	public void updateState() {
 		// TODO Auto-generated method stub
@@ -10,8 +17,7 @@ public class EscapeState implements AIState{
 
 	@Override
 	public void toEscapeState() {
-		// TODO Auto-generated method stub
-		
+		//empty current state
 	}
 
 	@Override
