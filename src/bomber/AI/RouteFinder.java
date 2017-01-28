@@ -47,20 +47,6 @@ public class RouteFinder {
 			for (Point p : getNeighbours(temp)) {
 				checkNeighbour(temp, goal, temp.getgValue() + 1, p, open, closed);
 			}
-			// int x = temp.getCoord().x;
-			// int y = temp.getCoord().y;
-			// Point p1 = new Point(x + 1, y);
-			// checkNeighbour(temp, goal, temp.getgValue() + 1, p1, open,
-			// closed);
-			// Point p2 = new Point(x - 1, y);
-			// checkNeighbour(temp, goal, temp.getgValue() + 1, p2, open,
-			// closed);
-			// Point p3 = new Point(x, y + 1);
-			// checkNeighbour(temp, goal, temp.getgValue() + 1, p3, open,
-			// closed);
-			// Point p4 = new Point(x, y - 1);
-			// checkNeighbour(temp, goal, temp.getgValue() + 1, p4, open,
-			// closed);
 
 			closed.add(temp);
 

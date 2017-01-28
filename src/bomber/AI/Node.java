@@ -5,7 +5,6 @@ import java.util.Comparator;
 
 public class Node implements Comparator<Node>, Comparable<Node>{
 	private int gValue;
-	private int hValue;
 	private int fValue;
 	private Node parent;
 	private Point coord;
@@ -14,7 +13,6 @@ public class Node implements Comparator<Node>, Comparable<Node>{
 
 		this.coord = coordinates;
 		this.gValue = gValue;
-		this.hValue = hValue;
 		this.parent = parent;
 		this.fValue = gValue + hValue;
 	}
@@ -24,7 +22,6 @@ public class Node implements Comparator<Node>, Comparable<Node>{
 		this.parent = parent;
 		this.coord = coordinates;
 	}
-	
 	
 	public Point getCoord() {
 		return coord;

@@ -16,23 +16,15 @@ public class AIManager extends Thread {
 
 	private GameAI gameAI;
 	private GameState gameState;
-	private AIState currentState;
-	private AIState escapeState;
-	private AIState findState;
-	private AIState attackState;
-	
 	public AIManager(GameAI ai, GameState gameState) {
 		this.gameAI = ai;
 		this.gameState = gameState;
-		this.escapeState = new EscapeState(this);
-		this.findState = new FindState();
-		this.attackState = new AttackState();
-		this.currentState = findState;
 	}
 
 	public void run(){
 		while(gameAI.isAlive())
 		{
+			
 		}
 	}
 	
