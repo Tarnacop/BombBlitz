@@ -1,8 +1,14 @@
 package bomber.AI;
 
 import java.awt.Point;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
 
+import bomber.game.Block;
 import bomber.game.GameState;
+import bomber.game.Movement;
 import bomber.game.Player;
 
 
@@ -20,6 +26,6 @@ public class GameAI extends Player	{
 	{
 		(new AIManager(this, state)).start();	
 	}
-
+	
 	
 }
