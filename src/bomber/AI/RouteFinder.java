@@ -22,7 +22,7 @@ public class RouteFinder {
 		this.state = state;
 		this.gameAI = gameAI;
 	}
-	
+
 	// finds the fastest route to the certain tile place in the map
 	public List<Movement> findRoute(Point start, Point goal) {
 		PriorityQueue<Node> open = new PriorityQueue<>();

@@ -76,7 +76,7 @@ public class AIManagerTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-	
+
 	@Test
 	public void test() throws InterruptedException {
 		GameAI ai = new GameAI("ai",new Point(2,3),3,10,state);
