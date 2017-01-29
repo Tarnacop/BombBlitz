@@ -8,7 +8,8 @@ public class Player {
 	private Point pos;			
 	private int lives;			
 	private double speed;			
-
+	private int bombRange;
+	
 	private KeyboardState keyState;		
 	private boolean isAlive;
 	
@@ -18,6 +19,18 @@ public class Player {
 		this.pos = pos;
 		this.lives = lives;
 		this.speed = speed;
+		this.bombRange = 3; //setting the initial bomb range
+		
+		this.isAlive = true;
+		this.keyState = new KeyboardState();
+	}
+
+	public int getBombRange() {
+		return bombRange;
+	}
+
+	public void setBombRange(int bombRange) {
+		this.bombRange = bombRange;
 	}
 
 	public String getName(){
