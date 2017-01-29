@@ -31,28 +31,28 @@ public class ProtocolConstant {
 	// Network connection
 	public static final byte MSG_C_NET_CONNECT = 0x00;
 	public static final byte MSG_C_NET_DISCONNECT = 0x01;
-	public static final byte MSG_C_NET_PING = 0x11;
-	public static final byte MSG_C_NET_ACK = 0x02;
+	public static final byte MSG_C_NET_PING = 0x02;
+	public static final byte MSG_C_NET_ACK = 0x03;
 
 	// In lobby
-	public static final byte MSG_C_LOBBY_GETROOMLIST = 0x03;
-	public static final byte MSG_C_LOBBY_GETPLAYERLIST = 0x04;
-	public static final byte MSG_C_LOBBY_GETLEADERBOARD = 0x05;
-	public static final byte MSG_C_LOBBY_CREATEROOM = 0x06;
-	public static final byte MSG_C_LOBBY_JOINROOM = 0x07;
-	public static final byte MSG_C_LOBBY_GETROOMINFO = 0x08;
-	public static final byte MSG_C_LOBBY_SENDTEXT = 0x09;
+	public static final byte MSG_C_LOBBY_GETROOMLIST = 0x04;
+	public static final byte MSG_C_LOBBY_GETPLAYERLIST = 0x05;
+	public static final byte MSG_C_LOBBY_GETLEADERBOARD = 0x06;
+	public static final byte MSG_C_LOBBY_CREATEROOM = 0x07;
+	public static final byte MSG_C_LOBBY_JOINROOM = 0x08;
+	public static final byte MSG_C_LOBBY_GETROOMINFO = 0x09;
+	public static final byte MSG_C_LOBBY_SENDTEXT = 0x0a;
 
 	// In room
-	public static final byte MSG_C_ROOM_LEAVE = 0x0a;
-	public static final byte MSG_C_ROOM_SETINFO = 0x0b;
-	public static final byte MSG_C_ROOM_GETINFO = 0x0c;
-	public static final byte MSG_C_ROOM_SENDTEXT = 0x0d;
+	public static final byte MSG_C_ROOM_LEAVE = 0x0b;
+	public static final byte MSG_C_ROOM_SETINFO = 0x0c;
+	public static final byte MSG_C_ROOM_GETINFO = 0x0d;
+	public static final byte MSG_C_ROOM_SENDTEXT = 0x0e;
 
 	// In game
-	public static final byte MSG_C_GAME_LEAVE = 0x0e;
-	public static final byte MSG_C_GAME_SENDMOVE = 0x0f;
-	public static final byte MSG_C_GAME_SENDTEXT = 0x10;
+	public static final byte MSG_C_GAME_LEAVE = 0x0f;
+	public static final byte MSG_C_GAME_SENDMOVE = 0x10;
+	public static final byte MSG_C_GAME_SENDTEXT = 0x11;
 
 	// Server to Client message types
 	// Range from 0x40 to 0x7f
@@ -60,10 +60,10 @@ public class ProtocolConstant {
 	// Network connection
 	public static final byte MSG_S_NET_ACCEPT = 0x40;
 	public static final byte MSG_S_NET_REJECT = 0x41;
-	public static final byte MSG_S_NET_ALREADYCONNECTED = 0x44;
-	public static final byte MSG_S_NET_NOTCONNECTED = 0x45;
-	public static final byte MSG_S_NET_DISCONNECTED = 0x46;
-	public static final byte MSG_S_NET_PING = 0x42;
-	public static final byte MSG_S_NET_ACK = 0x43;
+	public static final byte MSG_S_NET_ALREADYCONNECTED = 0x42;
+	public static final byte MSG_S_NET_NOTCONNECTED = 0x43;
+	public static final byte MSG_S_NET_DISCONNECTED = 0x44;
+	public static final byte MSG_S_NET_PING = 0x45;
+	public static final byte MSG_S_NET_ACK = 0x46;
 
 }
