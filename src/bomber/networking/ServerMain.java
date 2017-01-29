@@ -1,16 +1,27 @@
 package bomber.networking;
 
+import java.net.SocketException;
 import java.util.Scanner;
 
 public class ServerMain {
 
 	public static void main(String[] args) {
-		int port = 1423;
+		int port = -1;
 		if (args.length > 0) {
 			port = Integer.parseInt(args[0]);
+		} else {
+			System.out.println("Usage: <port>");
+			System.exit(1);
 		}
 
-		ServerThread server = new ServerThread(port);
+		ServerThread server = null;
+		try {
+			server = new ServerThread(port);
+		} catch (SocketException e) {
+			System.err.println(e);
+			System.exit(1);
+		}
+
 		Thread serverThread = new Thread(server);
 		serverThread.start();
 
