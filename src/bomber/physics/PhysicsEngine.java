@@ -1,38 +1,9 @@
-/*
-Game Logic
-{
-	- KeyListeners that put flags
-	- Starts the Physics Engine
-	- Starts the Rendering Engine
-}
-
-Dependencies for PhysicsEngine
-{
-	- a parameter for the speed of the robot (it could change in the case of powerups)
-    - the time when the bomb has been planted should be transmitted through networking in order to sync
-}
-
-The Physics engine subsystem should be able to keep track of the positions of objects and players in the game world.
-This includes different types of blocks (explodable and non-explodable), bombs and power-ups.
-It must be able to change the players' positions (when it is requested by other subsystems) and place bombs according to inputs sent from the keyboard or other subsystems.
-Bombs should explode after a predetermined amount of time and with that kill players and destroy soft blocks inside the radius of the explosion.
-The subsystem should take care of collisions, making sure that the players don't go through blocks and can pick up power-ups.
-
-The Map class should keep track of the different types of blocks present in the game and change due to explosions.
-The Player class should keep track of a player's position on the map and speed, as well as whether he/she is alive.
-The MapBuilder class should be able to build a screen resolution sized map using predetermined models.
-The Bomb class should be able to keep track of a bomb's position and explosion radius, as well as the time it has been planted
-*/
-
 package bomber.physics;
 
-import bomber.game.Bomb;
-import bomber.game.GameState;
-import bomber.game.Movement;
-import bomber.game.Player;
+import bomber.game.*;
 
 import java.awt.*;
-import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * Created by Alexandruro on 15.01.2017.
@@ -40,7 +11,10 @@ import java.util.Iterator;
 public class PhysicsEngine
 {
 
-    GameState gameState;
+    public static final int playerPixelWidth = 50;
+    public static final int playerPixelHeight = 50;
+
+    private GameState gameState;
 
     /**
      * Creates an engine using a GameState
@@ -81,9 +55,18 @@ public class PhysicsEngine
     }
     */
 
+    /**
+     * Gets the player corresponding to a certain name
+     * Assumes there is at most one player named that way
+     * @param name The name
+     * @return The player object
+     */
     public Player getPlayerNamed(String name)
     {
-        Iterator<Player> iterator = gameState.getPlayers().iterator();
+        Optional<Player> maybePlayer =  gameState.getPlayers().stream().filter(p -> p.getName().equals(name)).findAny();
+        return maybePlayer.orElse(null);
+
+        /*Iterator<Player> iterator = gameState.getPlayers().iterator();
         while(iterator.hasNext())
         {
             Player player = iterator.next();
@@ -91,7 +74,7 @@ public class PhysicsEngine
                 return player;
         }
         return null;
-    }
+*/    }
 
 
     public void plantBomb(String playerName, int time, int radius)
@@ -105,23 +88,57 @@ public class PhysicsEngine
         int speed = (int)player.getSpeed();
         Point pos = player.getPos();
         Movement movement = player.getKeyState().getMovement();
+        Point fromDirection = null;
         switch (movement)
         {
             case UP:
                 pos.translate(0, -speed);
+                fromDirection = new Point(0, 1);
                 break;
             case DOWN:
                 pos.translate(0, speed);
+                fromDirection = new Point(0, -1);
                 break;
             case LEFT:
                 pos.translate(-speed, 0);
+                fromDirection = new Point(1, 0);
                 break;
             case RIGHT:
                 pos.translate(speed, 0);
+                fromDirection = new Point(-1, 0);
         }
+
+        // collision detection
+        Map map = gameState.getMap();
+
+        translatePoint(pos, revertPositionDelta(fromDirection, map, pos)); // check up-left corner
+
+        Point upRightCorner = new Point(pos.x+playerPixelWidth, pos.y);
+        translatePoint(pos, revertPositionDelta(fromDirection, map, upRightCorner));
+
+        Point downLeftCorner = new Point(pos.x, pos.y + playerPixelHeight);
+        translatePoint(pos, revertPositionDelta(fromDirection, map, downLeftCorner));
+
+        Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
+        translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
+
         player.setPos(pos);
     }
 
+    private void translatePoint(Point point, Point delta)
+    {
+        point.translate(delta.x, delta.y);
+    }
+
+    private Point revertPositionDelta(Point fromDirection, Map map, Point initialCorner)
+    {
+        Point corner = new Point(initialCorner);
+        while(map.getPixelBlockAt((int)corner.getX(), (int)corner.getY()) == Block.SOLID || map.getPixelBlockAt((int)corner.getX(), (int)corner.getY()) == Block.SOFT)
+            corner.translate((int)fromDirection.getX(), (int)fromDirection.getY());
+        return new Point(corner.x-initialCorner.x, corner.y-initialCorner.y);
+    }
+
+    // TODO
     private boolean bombExplodes(Bomb bomb)
     {
         return false;
@@ -129,7 +146,7 @@ public class PhysicsEngine
 
     public void updateAll()
     {
-        gameState.getPlayers().forEach(p -> updatePlayer(p));
+        gameState.getPlayers().forEach(this::updatePlayer);
     }
 
 }
