@@ -8,7 +8,7 @@ public class Bomb {
 	private Point pos;			
 	private int time;			
 	private int radius;			
-	
+
 	public Bomb(String playerName, Point pos, int time, int radius){
 		
 		this.playerName = playerName;
