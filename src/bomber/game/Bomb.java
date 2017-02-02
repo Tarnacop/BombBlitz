@@ -32,6 +32,11 @@ public class Bomb {
 		return this.time;
 	}
 
+	public void setTime(int time) 
+	{
+		this.time = time;		
+	}
+
 	public int getRadius(){
 		
 		return this.radius;
