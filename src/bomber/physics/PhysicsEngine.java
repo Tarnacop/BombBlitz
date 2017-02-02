@@ -138,15 +138,40 @@ public class PhysicsEngine
         return new Point(corner.x-initialCorner.x, corner.y-initialCorner.y);
     }
 
-    // TODO
-    private boolean bombExplodes(Bomb bomb)
-    {
-        return false;
-    }
-
-    public void updateAll()
+    public synchronized void updateAll()
     {
         gameState.getPlayers().forEach(this::updatePlayer);
+        gameState.getBombs().forEach(this::updateBomb);
+    }
+
+    private void updateBomb(Bomb bomb)
+    {
+        decreaseBombTimer(bomb);
+        if(bomb.getTime()<=0)
+        {
+            Point pos = bomb.getPos();
+            int radius = bomb.getRadius();
+            gameState.getBombs().remove(bomb);
+            addBlast(pos, radius);
+        }
+
+    }
+
+    private void addBlast(Point pos, int radius)
+    {
+        /*
+        if(true) // TODO: if in bounds
+
+        if(gameState.getMap().getGridBlockAt(pos.x, pos.y)==Block.SOLID || radius==0)
+            return;
+        gameState.getMap().setGridBlockAt(pos, Block.BLAST);
+        addBlast(pos);
+        */
+    }
+
+    private void decreaseBombTimer(Bomb bomb)
+    {
+        //TODO: add setTimer in Bomb class
     }
 
 }
