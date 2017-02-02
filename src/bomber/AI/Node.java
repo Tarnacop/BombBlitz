@@ -8,7 +8,7 @@ public class Node implements Comparator<Node>, Comparable<Node>{
 	private int fValue;
 	private Node parent;
 	private Point coord;
-	
+
 	public Node(int gValue, int hValue, Node parent, Point coordinates) {
 
 		this.coord = coordinates;

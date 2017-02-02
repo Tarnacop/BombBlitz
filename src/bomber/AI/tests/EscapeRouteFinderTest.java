@@ -10,7 +10,7 @@ import org.junit.Test;
 import bomber.game.Movement;
 
 public class EscapeRouteFinderTest extends MainTestTemplate {
-
+	
 	@Test
 	public void test() {
 

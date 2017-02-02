@@ -24,7 +24,7 @@ public class RouteFinder {
 	}
 
 	// finds the fastest route to the certain tile place in the map
-	public List<Movement> findRoute(Point start, Point goal) {
+	public LinkedList<Movement> findRoute(Point start, Point goal) {
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
 
@@ -96,7 +96,7 @@ public class RouteFinder {
 
 	// return exact moves from the final Node
 	// backtracks the route
-	private List<Movement> getMovesFromPoints(Node finish) {
+	private LinkedList<Movement> getMovesFromPoints(Node finish) {
 		LinkedList<Movement> moves = new LinkedList<>();
 
 		while (finish.getParent() != null) {
@@ -157,7 +157,7 @@ public class RouteFinder {
 	}
 
 	// find the route for escaping from bomb explotion
-	public List<Movement> escapeFromExplotion(ArrayList<Point> dangerTiles) {
+	public LinkedList<Movement> escapeFromExplotion(ArrayList<Point> dangerTiles) {
 		Point pos = gameAI.getPos();
 		LinkedList<Node> open = new LinkedList<>();
 		HashSet<Node> closed = new HashSet<>();
@@ -189,6 +189,37 @@ public class RouteFinder {
 
 		return getMovesFromPoints(finish);
 
+	}
+	
+	
+	public Point getNearestEnemy()
+	{
+		Point aiPos = gameAI.getPos();
+		Point pos = null;
+		int distance = Integer.MAX_VALUE;
+		for(Player p : state.getPlayers())
+		{
+			if(!p.equals(gameAI) && (Math.abs(aiPos.x - p.getPos().x)+ Math.abs(aiPos.y -p.getPos().y)) < distance)
+			{
+				distance = (Math.abs(aiPos.x - p.getPos().x)+ Math.abs(aiPos.y -p.getPos().y));
+				pos = p.getPos();
+			}
+		}
+		
+		return pos;
+	}
+	
+	
+	
+	public int getNumberOfSoftBlocksToEnemy(Point start, Point goal)
+	{
+		
+		
+		// TODO 
+		
+		
+		return 0;
+		
 	}
 
 }

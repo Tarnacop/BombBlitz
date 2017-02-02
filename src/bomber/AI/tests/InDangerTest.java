@@ -12,7 +12,7 @@ import org.junit.Test;
 import bomber.game.Bomb;
 
 public class InDangerTest extends MainTestTemplate {
-
+	
 	@Test
 	public void test() {
 		ai.setPos(new Point(2, 3));
