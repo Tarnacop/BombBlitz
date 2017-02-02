@@ -17,20 +17,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ServerThread implements Runnable {
+	private int port;
 	private PrintStream printStream;
 
-	private int port;
-	// time out value for clients
-	// currently 25 seconds only, for testing
-	private long clientTimeOut = 25;
-	private long keepAliveInterval = 10;
-	// unacknowledged packets will be detected and retransmitted every 500ms
-	private long retransmitInterval = 500;
-	// maximum number of retransmissions per packet
-	private int maxRetransmitCount = 10;
+	private ServerConfiguration config;
 
-	// the socket for server
 	private DatagramSocket socket;
+
 	// table for storing client info
 	private ConcurrentHashMap<SocketAddress, ServerClientInfo> clientTable = new ConcurrentHashMap<SocketAddress, ServerClientInfo>();
 
@@ -55,11 +48,34 @@ public class ServerThread implements Runnable {
 	 *            the UDP port on which the server listens
 	 * @param printStream
 	 *            the stream to which the server prints log messages
+	 * @param config
+	 *            the configuration of the server
 	 * @throws SocketException
 	 */
-	public ServerThread(int port, PrintStream printStream) throws SocketException {
+	public ServerThread(int port, PrintStream printStream, ServerConfiguration config) throws SocketException {
 		this.port = port;
 		this.printStream = printStream;
+		this.config = config;
+
+		// open socket
+		socket = new DatagramSocket(port);
+		socket.setSoTimeout(0);
+
+	}
+
+	/**
+	 * Create a Runnable server object for use as a thread
+	 * 
+	 * @param port
+	 *            the UDP port on which the server listens
+	 * @param config
+	 *            the configuration of the server
+	 * @throws SocketException
+	 */
+	public ServerThread(int port, ServerConfiguration config) throws SocketException {
+		this.port = port;
+		this.printStream = System.out;
+		this.config = config;
 
 		// open socket
 		socket = new DatagramSocket(port);
@@ -77,6 +93,7 @@ public class ServerThread implements Runnable {
 	public ServerThread(int port) throws SocketException {
 		this.port = port;
 		this.printStream = System.out;
+		this.config = new ServerConfiguration();
 
 		// open socket
 		socket = new DatagramSocket(port);
@@ -92,7 +109,7 @@ public class ServerThread implements Runnable {
 		Runnable keepAliveTask = () -> {
 			Instant now = Instant.now();
 			for (Entry<SocketAddress, ServerClientInfo> e : clientTable.entrySet()) {
-				if (now.getEpochSecond() - e.getValue().getTimeStamp() > clientTimeOut) {
+				if (now.getEpochSecond() - e.getValue().getTimeStamp() > config.getClientTimeOut()) {
 					pServerf("keepAliveTask: removing %s due to timeout\n", e.getKey());
 					// TODO need to remove every reference of the client on the
 					// server(client table, room list, game sessions, etc)
@@ -109,7 +126,8 @@ public class ServerThread implements Runnable {
 				}
 			}
 		};
-		scheduledExecutor.scheduleWithFixedDelay(keepAliveTask, keepAliveInterval, keepAliveInterval, TimeUnit.SECONDS);
+		scheduledExecutor.scheduleWithFixedDelay(keepAliveTask, config.getKeepAliveInterval(),
+				config.getKeepAliveInterval(), TimeUnit.SECONDS);
 		// client packet acknowledgement checking and retransmission task
 		Runnable retransmitTask = () -> {
 			// Instant now = Instant.now();
@@ -118,7 +136,7 @@ public class ServerThread implements Runnable {
 				// pServer("retransmitTask: checking client " + e.getKey());
 				ArrayList<PacketHistoryEntry> packetList = e.getValue().getPacketHistoryList();
 				for (PacketHistoryEntry f : packetList) {
-					if (f != null && !f.isAcked() && f.getRetransmissionCount() < maxRetransmitCount) {
+					if (f != null && !f.isAcked() && f.getRetransmissionCount() < config.getMaxRetransmitCount()) {
 						pServerf(
 								"retransmitTask: retransmit packet %d created at %d with length %d and retransmission count %d to client %s\n",
 								f.getSequence(), f.getCreationTimeStamp(), f.getPacketLength(),
@@ -132,8 +150,8 @@ public class ServerThread implements Runnable {
 				}
 			}
 		};
-		scheduledExecutor.scheduleWithFixedDelay(retransmitTask, retransmitInterval, retransmitInterval,
-				TimeUnit.MILLISECONDS);
+		scheduledExecutor.scheduleWithFixedDelay(retransmitTask, config.getRetransmitInterval(),
+				config.getRetransmitInterval(), TimeUnit.MILLISECONDS);
 
 		// main loop
 		while (true) {
@@ -277,6 +295,11 @@ public class ServerThread implements Runnable {
 					}
 				}
 			}
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_C_LOBBY_GETROOMLIST: {
 
 			break;
 		}

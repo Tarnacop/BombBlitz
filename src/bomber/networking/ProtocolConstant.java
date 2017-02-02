@@ -1,7 +1,7 @@
 package bomber.networking;
 
 public class ProtocolConstant {
-	// Protocol constants
+	// Protocol constants and documentation
 
 	/*
 	 * All integers transmitted over the network should be in network byte order
@@ -9,9 +9,9 @@ public class ProtocolConstant {
 	 */
 
 	/*
-	 * All strings transmitted over the network should use UTF-8 encoding
-	 * Usually there is a byte indicating the number of bytes of the string
-	 * before the actual bytes of the string, which are NOT null terminated
+	 * All strings transmitted over the network should use UTF-8 encoding. There
+	 * should be a byte indicating the number of bytes of the string before the
+	 * actual bytes of the string, which are NOT null terminated
 	 */
 
 	/*
@@ -26,7 +26,7 @@ public class ProtocolConstant {
 	public static final byte MSG_B_HASSEQUENCE = (byte) 0x80;
 
 	// Client to Server message types
-	// Range from 0x00 to 0x3f
+	// Range from 0x00 to 0x3f (up to 64 types of message)
 
 	// Network connection
 	public static final byte MSG_C_NET_CONNECT = 0x00;
@@ -55,7 +55,7 @@ public class ProtocolConstant {
 	public static final byte MSG_C_GAME_SENDTEXT = 0x11;
 
 	// Server to Client message types
-	// Range from 0x40 to 0x7f
+	// Range from 0x40 to 0x7f (up to 64 types of message)
 
 	// Network connection
 	public static final byte MSG_S_NET_ACCEPT = 0x40;
