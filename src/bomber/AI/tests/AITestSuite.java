@@ -8,7 +8,9 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
 	AStarRouteFinderTest.class,
 	EscapeRouteFinderTest .class,
-	EnemyCheckTest.class
+	EnemyCheckTest.class,
+	InDangerTest.class,
+	MoveSafetyTest.class
 })
 
 

@@ -31,8 +31,9 @@ public class SafetyChecker {
 		Point playerPos = gameAI.getPos();
 		return positionSafety(playerPos);
 	}
-
+	
 	// checks if the move from a particular position is safe
+	//if true then safe
 	public boolean checkMoveSafety(Movement move) {
 		Point playerPos = gameAI.getPos();
 		Point newPosition = null;
@@ -53,9 +54,9 @@ public class SafetyChecker {
 			newPosition = playerPos;
 			break;
 		}
-		return positionSafety(newPosition);
+		return !positionSafety(newPosition);
 	}
-
+	
 	// checks if the position is safe (no bombs are coming)
 	private boolean positionSafety(Point position) {
 		
@@ -94,7 +95,7 @@ public class SafetyChecker {
 		for (int i = 0; i < points.size(); i++) {
 			x = points.get(i).x;
 			y = points.get(i).y;
-			if ((x < 0) || (y < 0) || map[x][y] == Block.SOFT || map[x][y] == Block.SOLID) {
+			if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT || map[x][y] == Block.SOLID) {
 				points.remove(i);
 				i--;
 			}
@@ -120,7 +121,7 @@ public class SafetyChecker {
 		}
 		return false;
 	}
-
+	
 	// helper function for checking if there exists enenmy in the bomb distance
 	private boolean isStraightDistance(Point p1, Point p2, int range) {
 		Block[][] map = getMap();
@@ -134,9 +135,8 @@ public class SafetyChecker {
 				else if ((p1.y == p2.y + sign * i))
 					return true;
 			}
-
 		}
-
+		
 		else if (p1.y == p2.y) {
 			int sign = 1;
 			if (p1.x < p2.x)

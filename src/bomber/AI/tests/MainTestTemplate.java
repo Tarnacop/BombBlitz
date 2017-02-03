@@ -20,7 +20,7 @@ public abstract class MainTestTemplate {
 	private Map map;
 	private List<Bomb> bombs;
 	protected List<Player> players;
-	private GameState state;	
+	protected GameState state;	
 	protected GameAI ai;
 	protected RouteFinder finder;
 	protected SafetyChecker checker;
@@ -56,7 +56,7 @@ public abstract class MainTestTemplate {
 				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK},
 				  {Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK}};	
-
+		
 		map = new Map(blocks);
 
 		bombs = new ArrayList<>();
@@ -73,7 +73,7 @@ public abstract class MainTestTemplate {
 		finder = new RouteFinder(state, ai);
 		checker = new SafetyChecker(state, ai);
 	}
-
+	
 	@Test
 	public abstract void test() ;
 
