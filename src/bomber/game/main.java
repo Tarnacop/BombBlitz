@@ -23,39 +23,26 @@ public class main {
 		list.add(p1);
 		
 		ArrayList<Bomb> bombs = new ArrayList<Bomb>();
-		bombs.add(new Bomb("Player1", new Point(0,0), 0, 0));
 		
 		GameState g = new GameState(map, list, bombs);
 		
 		
 		HashMap<Integer, Response> keymap = new HashMap<Integer, Response>();
 		keymap.put(KeyEvent.VK_RIGHT, Response.RIGHT_MOVE);
+		keymap.put(KeyEvent.VK_LEFT, Response.LEFT_MOVE);
+		keymap.put(KeyEvent.VK_UP, Response.UP_MOVE);
+		keymap.put(KeyEvent.VK_DOWN, Response.DOWN_MOVE);
+		keymap.put(KeyEvent.VK_SPACE, Response.PLACE_BOMB);
 		
 		KeyboardUpdater updater = new KeyboardUpdater(keymap, p1);
 		
-		EventQueue.invokeLater(() -> {
-            UserInterface ui = new UserInterface();
-            ui.setVisible(true);
-        });
+		UserInterface ui = new UserInterface();
+        ui.addKeyListener(updater);
+        ui.setVisible(true);
+        ui.setFocusable(true);
+        
 		
-		boolean noMove = true;
-		
-		while(noMove){
-			
-			Movement move = p1.getKeyState().getKey();
-			if(move == Movement.RIGHT){
-				noMove = false;
-			}
-			
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
-		
-		System.out.println("Moved right");
 	}
 
-}
+

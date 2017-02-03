@@ -60,7 +60,7 @@ public class KeyboardUpdater implements KeyListener{
 		
 		Optional<Response> request = getResponse(e);
 		
-		if(request.isPresent() & (request.get() != Response.PLACE_BOMB)){
+		if(request.isPresent() && (request.get() != Response.PLACE_BOMB)){
 			
 			KeyboardState keyState = this.player.getKeyState();
 			
