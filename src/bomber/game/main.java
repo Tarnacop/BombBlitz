@@ -12,9 +12,9 @@ public class main {
 
 	public static void main(String[] args) {
 		
-		Block[][] gridMap = new Block[][]{{Block.SOLID, Block.BLANK},{Block.SOFT, Block.BLAST}};
-		//	SOLID	SOFT
-		//	BLANK	BLAST
+		Block[][] gridMap = new Block[][]{{Block.SOLID, Block.BLANK},{Block.SOLID, Block.BLANK}};
+		//	SOLID	SOLID
+		//	BLANK	BLANK
 		
 		Map map = new Map(gridMap);
 		
@@ -24,8 +24,7 @@ public class main {
 		
 		ArrayList<Bomb> bombs = new ArrayList<Bomb>();
 		
-		GameState g = new GameState(map, list, bombs);
-		
+		GameState gameState = new GameState(map, list, bombs);
 		
 		HashMap<Integer, Response> keymap = new HashMap<Integer, Response>();
 		keymap.put(KeyEvent.VK_RIGHT, Response.RIGHT_MOVE);
@@ -41,7 +40,18 @@ public class main {
         ui.setVisible(true);
         ui.setFocusable(true);
         
-		
+        //ui.addComponent(Renderer.create())
+        
+        //new Physics(gameState...)
+        
+        while(!gameState.gameOver()){
+        	
+        	
+        	
+        	//Physics.update()
+        	//Renderer.update()
+        }
+        
 		}
 	}
 
