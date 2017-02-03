@@ -26,6 +26,8 @@ public class KeyboardUpdater implements KeyListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		
+		
+		System.out.println("Got keypressed event");
 		Optional<Response> request = getResponse(e);
 		
 		if(request.isPresent()){
@@ -33,13 +35,22 @@ public class KeyboardUpdater implements KeyListener{
 			Response response = request.get();
 			KeyboardState keyState = this.player.getKeyState();
 			
-			Movement move;
+			if(response == Response.PLACE_BOMB){
+				
+				keyState.setBomb(true);
+			}
+			else{
+				
+				Movement move = Movement.NONE;
 			
-			switch(response){
-			case LEFT_MOVE: move = Movement.LEFT;break;
-			case RIGHT_MOVE: move = Movement.RIGHT; break;
-			case UP_MOVE: move = Movement.UP; break;
-			case DOWN_MOVE: move = Movement.DOWN; break;
+				switch(response){
+				case LEFT_MOVE: move = Movement.LEFT; break;
+				case RIGHT_MOVE: move = Movement.RIGHT; break;
+				case UP_MOVE: move = Movement.UP; break;
+				case DOWN_MOVE: move = Movement.DOWN; break; 
+				}
+			
+				keyState.setKey(move); 
 			}
 		}
 	}
@@ -47,6 +58,14 @@ public class KeyboardUpdater implements KeyListener{
 	@Override
 	public void keyReleased(KeyEvent e) {
 		
+		Optional<Response> request = getResponse(e);
+		
+		if(request.isPresent() & (request.get() != Response.PLACE_BOMB)){
+			
+			KeyboardState keyState = this.player.getKeyState();
+			
+			keyState.setKey(Movement.NONE);
+		}
 	}
 
 	@Override
