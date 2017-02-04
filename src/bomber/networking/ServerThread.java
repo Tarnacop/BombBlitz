@@ -11,35 +11,35 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ServerThread implements Runnable {
-	private int port;
-	private PrintStream printStream;
+	private final int port;
 
-	private ServerConfiguration config;
+	private final PrintStream printStream;
 
-	private DatagramSocket socket;
+	private final ServerConfiguration config;
+
+	private final DatagramSocket socket;
 
 	// table for storing client info
-	private ConcurrentHashMap<SocketAddress, ServerClientInfo> clientTable = new ConcurrentHashMap<SocketAddress, ServerClientInfo>();
+	private final ServerClientTable clientTable;
 
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
-	private byte[] recvBuffer = new byte[recvBufferLen];
-	private ByteBuffer recvByteBuffer = ByteBuffer.wrap(recvBuffer);
-	private DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
+	private final byte[] recvBuffer = new byte[recvBufferLen];
+	private final ByteBuffer recvByteBuffer = ByteBuffer.wrap(recvBuffer);
+	private final DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
 
 	// 2000 bytes of sending buffer
 	private final int sendBufferLen = 2000;
-	private byte[] sendBuffer = new byte[sendBufferLen];
-	private ByteBuffer sendByteBuffer = ByteBuffer.wrap(sendBuffer);
+	private final byte[] sendBuffer = new byte[sendBufferLen];
+	private final ByteBuffer sendByteBuffer = ByteBuffer.wrap(sendBuffer);
 
 	// scheduled executor for client keep alive and packet retransmission
-	ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
+	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
 	/**
 	 * Create a Runnable server object for use as a thread
@@ -56,10 +56,11 @@ public class ServerThread implements Runnable {
 		this.port = port;
 		this.printStream = printStream;
 		this.config = config;
+		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 
 		// open socket
 		socket = new DatagramSocket(port);
-		socket.setSoTimeout(0);
+		// socket.setSoTimeout(0);
 
 	}
 
@@ -76,10 +77,11 @@ public class ServerThread implements Runnable {
 		this.port = port;
 		this.printStream = System.out;
 		this.config = config;
+		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 
 		// open socket
 		socket = new DatagramSocket(port);
-		socket.setSoTimeout(0);
+		// socket.setSoTimeout(0);
 
 	}
 
@@ -94,10 +96,11 @@ public class ServerThread implements Runnable {
 		this.port = port;
 		this.printStream = System.out;
 		this.config = new ServerConfiguration();
+		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 
 		// open socket
 		socket = new DatagramSocket(port);
-		socket.setSoTimeout(0);
+		// socket.setSoTimeout(0);
 
 	}
 
@@ -215,10 +218,17 @@ public class ServerThread implements Runnable {
 			if (packet.getLength() < 5) {
 				return;
 			}
+
+			// name length check
 			byte nameLength = recvByteBuffer.get(3);
 			if (1 + 2 + 1 + nameLength != packet.getLength()) {
 				return;
 			}
+			if (nameLength > config.getMaxNameLength()) {
+				return;
+			}
+
+			// only valid packets can reach here
 
 			// existence check
 			if (clientInfo != null) {
@@ -226,31 +236,48 @@ public class ServerThread implements Runnable {
 				 * when the client exists, tell the client that it has already
 				 * connected to the server
 				 */
-
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_NET_ALREADYCONNECTED, true);
 
 				return;
 			}
 
+			// only new clients can reach here
+
+			/*
+			 * a client may be rejected when server is full or there is
+			 * duplicate name
+			 */
+
+			// server full check
+			if (clientTable.size() >= config.getMaxPlayer()) {
+				// TODO should reject with a reason in the message
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
+				return;
+			}
+
 			// get name from packet
 			String name = new String(recvBuffer, 4, nameLength, "UTF-8");
-			pServer("new client with name " + name + " from " + sockAddr);
+
+			// duplicate name check
+			if (clientTable.contains(name)) {
+				// TODO should reject with a reason in the message
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
+				return;
+			}
 
 			// create and add client
-			ServerClientInfo client = new ServerClientInfo(sockAddr);
-			client.setName(name);
-
-			clientTable.put(sockAddr, client);
+			ServerClientInfo client = new ServerClientInfo(sockAddr, name);
+			clientTable.put(client);
 
 			// tell the client that the connection has been accepted
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_NET_ACCEPT, true);
 
-			/*
-			 * TODO a client may be rejected when server is full or there is
-			 * duplicate name
-			 */
+			pServerf("added new client with name %s, id %d from %s\n", client.getName(), client.getID(),
+					client.getSocketAddress());
 
 			break;
 		}
@@ -300,7 +327,7 @@ public class ServerThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_C_LOBBY_GETROOMLIST: {
-
+			// TODO
 			break;
 		}
 

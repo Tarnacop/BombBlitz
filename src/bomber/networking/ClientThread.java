@@ -16,12 +16,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ClientThread implements Runnable {
-	private PrintStream printStream;
+	private final PrintStream printStream;
 
 	// private String hostname;
 	// private int port;
-	private InetSocketAddress serverSockAddr;
+	private final InetSocketAddress serverSockAddr;
 
+	// TODO wrap the variables below into a configuration object
 	// time out value for server
 	// currently 25 seconds only, for testing
 	private long serverTimeOut = 25;
@@ -32,31 +33,31 @@ public class ClientThread implements Runnable {
 	private int maxRetransmitCount = 10;
 
 	// the socket for client
-	private DatagramSocket socket;
+	private final DatagramSocket socket;
 
 	// history of packets sent to server
-	private ClientServerInfo serverInfo;
+	private final ClientServerInfo serverInfo;
 
 	// whether the connection has been established
 	private boolean connected = false;
 
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
-	private byte[] recvBuffer = new byte[recvBufferLen];
-	private ByteBuffer recvByteBuffer = ByteBuffer.wrap(recvBuffer);
-	private DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
+	private final byte[] recvBuffer = new byte[recvBufferLen];
+	private final ByteBuffer recvByteBuffer = ByteBuffer.wrap(recvBuffer);
+	private final DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
 
 	// 2000 bytes of sending buffer
 	private final int sendBufferLen = 2000;
-	private byte[] sendBuffer = new byte[sendBufferLen];
-	private ByteBuffer sendByteBuffer = ByteBuffer.wrap(sendBuffer);
+	private final byte[] sendBuffer = new byte[sendBufferLen];
+	private final ByteBuffer sendByteBuffer = ByteBuffer.wrap(sendBuffer);
 
 	// sending buffer for public methods
-	private byte[] publicSendBuffer = new byte[sendBufferLen];
-	private ByteBuffer publicSendByteBuffer = ByteBuffer.wrap(publicSendBuffer);
+	private final byte[] publicSendBuffer = new byte[sendBufferLen];
+	private final ByteBuffer publicSendByteBuffer = ByteBuffer.wrap(publicSendBuffer);
 
 	// scheduled executor for server keep alive and packet retransmission
-	ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
+	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
 	public ClientThread(String hostname, int port, PrintStream printStream) throws SocketException {
 		// this.hostname = hostname;

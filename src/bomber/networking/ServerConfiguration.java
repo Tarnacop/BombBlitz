@@ -11,6 +11,8 @@ public class ServerConfiguration {
 
 	private final int maxPlayer;
 
+	private final int maxNameLength = 11;
+
 	/**
 	 * Construct a configuration for the server before running
 	 * 
@@ -26,7 +28,8 @@ public class ServerConfiguration {
 	 *            The max number of times the server will attempt to retransmit
 	 *            an unacknowledged packet
 	 * @param maxPlayer
-	 *            The max number of players allowed on the server
+	 *            The max number of players allowed on the server in the range
+	 *            [1,32]
 	 */
 	public ServerConfiguration(long clientTimeOut, long keepAliveInterval, long retransmitInterval,
 			int maxRetransmitCount, int maxPlayer) {
@@ -34,7 +37,11 @@ public class ServerConfiguration {
 		this.keepAliveInterval = keepAliveInterval;
 		this.retransmitInterval = retransmitInterval;
 		this.maxRetransmitCount = maxRetransmitCount;
-		this.maxPlayer = maxPlayer;
+		if (maxPlayer < 1 || maxPlayer > 32) {
+			this.maxPlayer = 32;
+		} else {
+			this.maxPlayer = maxPlayer;
+		}
 	}
 
 	/**
@@ -47,14 +54,19 @@ public class ServerConfiguration {
 	 *            The max number of times the server will attempt to retransmit
 	 *            an unacknowledged packet
 	 * @param maxPlayer
-	 *            The max number of players allowed on the server
+	 *            The max number of players allowed on the server in the range
+	 *            [1,32]
 	 */
 	public ServerConfiguration(long clientTimeOut, int maxRetransmitCount, int maxPlayer) {
 		this.clientTimeOut = clientTimeOut;
 		this.keepAliveInterval = 10;
 		this.retransmitInterval = 500;
 		this.maxRetransmitCount = maxRetransmitCount;
-		this.maxPlayer = maxPlayer;
+		if (maxPlayer < 1 || maxPlayer > 32) {
+			this.maxPlayer = 32;
+		} else {
+			this.maxPlayer = maxPlayer;
+		}
 	}
 
 	/**
@@ -135,11 +147,20 @@ public class ServerConfiguration {
 	}
 
 	/**
-	 * The max number of players allowed on the server
+	 * The max number of players allowed on the server in the range [1,32]
 	 * 
 	 * @return the max number of players
 	 */
 	public int getMaxPlayer() {
 		return maxPlayer;
+	}
+
+	/**
+	 * The max allowed length of the name of players
+	 * 
+	 * @return the max allowed name length
+	 */
+	public int getMaxNameLength() {
+		return maxNameLength;
 	}
 }
