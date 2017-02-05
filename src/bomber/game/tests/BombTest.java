@@ -2,9 +2,13 @@ package bomber.game.tests;
 
 import static org.junit.Assert.*;
 
+import java.awt.Point;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import bomber.game.Bomb;
 
 public class BombTest {
 
@@ -18,7 +22,23 @@ public class BombTest {
 
 	@Test
 	public void test() {
-		fail("Not yet implemented");
+		
+		Point pos = new Point(); //(0,0)
+		Bomb bomb = new Bomb("player1", pos, 5, 3);
+		
+		assertNotNull(bomb);
+		
+		assertNotNull(bomb.getPlayerName());
+		assertEquals(bomb.getPlayerName(), "player1");
+		
+		assertNotNull(bomb.getPos());
+		assertEquals(bomb.getPos(), new Point(0, 0));
+		
+		assertNotNull(bomb.getRadius());
+		assertEquals(bomb.getRadius(), 3);
+		
+		assertNotNull(bomb.getTime());
+		assertEquals(bomb.getTime(), 5);
 	}
 
 }
