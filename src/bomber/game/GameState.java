@@ -15,6 +15,24 @@ public class GameState {
 		this.bombs = bombs;
 	}
 
+	public boolean gameOver(){
+		
+		int living = 0;
+		for(Player p : this.players){
+			
+			if(p.isAlive()){
+				living++;
+			}
+		}
+		
+		if(living <= 1){
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public Map getMap(){
 		
 		return this.map;
