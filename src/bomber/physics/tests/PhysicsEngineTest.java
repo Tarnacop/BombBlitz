@@ -12,6 +12,7 @@ import static bomber.game.Block.*;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by Alexandruro on 26.01.2017.
@@ -23,15 +24,20 @@ public class PhysicsEngineTest
     private ArrayList<Player> players;
     private GameState gameState;
     private PhysicsEngine engine;
+    private Player buddy;
 
 
     @Before
     public void setUp() throws Exception
     {
-        Block[][] blocks = {{BLANK, BLANK, BLANK, SOLID, SOFT}, {BLANK, BLANK, SOFT, BLANK, SOLID}, {BLANK, BLANK, BLANK, BLANK, SOFT}, {SOLID, SOFT, SOLID, SOFT, SOLID}};
+        Block[][] blocks = {{BLANK, BLANK, BLANK, SOLID, SOFT, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT},
+                            {BLANK, BLANK, SOFT, BLANK, SOLID, SOLID, SOLID, SOFT, BLANK, SOFT, SOLID},
+                            {BLANK, BLANK, BLANK, BLANK, SOFT, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT},
+                            {SOLID, SOFT, SOLID, SOFT, SOLID, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT}};
         map = new Map(blocks);
         players = new ArrayList<>();
-        players.add(new Player("Buddy", new Point(5,5), 3, 10));
+        buddy = new Player("Buddy", new Point(5,5), 3, 10);
+        players.add(buddy);
         gameState = new GameState(map, players, new ArrayList<>());
         engine = new PhysicsEngine(gameState);
     }
@@ -57,14 +63,13 @@ public class PhysicsEngineTest
     @Test
     public void collisions() throws Exception
     {
-        Player buddy = engine.getPlayerNamed("Buddy");
         KeyboardState kState = buddy.getKeyState();
         kState.setKey(Movement.RIGHT);
 
         for(int i=0; i<20; i++)
         {
             engine.updateAll();
-            System.out.println(buddy.getPos());
+            //System.out.println(buddy.getPos());
             assertTrue("Collision was not detected successfully (problem at a right corner)", buddy.getPos().x+PhysicsEngine.playerPixelWidth<192);
         }
 
@@ -72,7 +77,7 @@ public class PhysicsEngineTest
         for(int i=0; i<20; i++)
         {
             engine.updateAll();
-            System.out.println(buddy.getPos());
+            //System.out.println(buddy.getPos());
             assertTrue("Collision was not detected successfully (problem at a down corner)", buddy.getPos().y+PhysicsEngine.playerPixelHeight<256);
         }
 
@@ -80,7 +85,7 @@ public class PhysicsEngineTest
         for(int i=0; i<20; i++)
         {
             engine.updateAll();
-            System.out.println(buddy.getPos());
+            //System.out.println(buddy.getPos());
             assertTrue("Collision was not detected successfully (problem at a left corner)", buddy.getPos().x>63);
         }
 
@@ -88,21 +93,43 @@ public class PhysicsEngineTest
         for(int i=0; i<20; i++)
         {
             engine.updateAll();
-            System.out.println(buddy.getPos());
+            //System.out.println(buddy.getPos());
             assertTrue("Collision was not detected successfully (problem at an up corner)", buddy.getPos().y>191);
         }
-
-
 
     }
 
     @Test
-    public void plantBomb() throws Exception {}
+    public void plantBomb() throws Exception
+    {
+
+        buddy.getKeyState().setKey(Movement.RIGHT);
+        buddy.setPos(new Point(66, 8*64+1));
+        buddy.setSpeed(0);
+        engine.plantBomb("Buddy", 0, 3);
+
+        assertTrue("Bomb was not planted.", 1==gameState.getBombs().size());
+
+        engine.updateAll();
+
+        assertTrue("Bomb did not explode.", 0==gameState.getBombs().size());
+        assertEquals("Blast expected at the place of an explosion.",BLAST, gameState.getMap().getGridBlockAt(1, 8));
+
+        engine.updateAll();
+
+        assertEquals("Bomb blast did not turn to Blank after a frame", BLANK, gameState.getMap().getGridBlockAt(1, 8));
+
+        Map map = gameState.getMap();
+        int width = gameState.getMap().getGridMap().length;
+        int height = gameState.getMap().getGridMap()[0].length;
+        for(int x=0; x<width; x++)
+            for(int y=0; y<height; y++)
+                assertNotEquals("Bomb blast did not clear after a frame", Block.BLAST, map.getGridBlockAt(x,y));
+    }
 
     @Test
     public void updateAll() throws Exception
     {
-        Player buddy = engine.getPlayerNamed("Buddy");
         KeyboardState kState = buddy.getKeyState();
 
         kState.setKey(Movement.DOWN);
