@@ -21,6 +21,7 @@ public class GameAI extends Player	{
 	
 	}
 	
+	//run this when the game starts
 	public void begin()
 	{
 		(new AIManager(this, state)).start();	
