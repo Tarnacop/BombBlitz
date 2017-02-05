@@ -11,6 +11,7 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +41,9 @@ public class ClientThread implements Runnable {
 
 	// whether the connection has been established
 	private boolean connected = false;
+
+	// list of players connected to the server
+	private List<ClientServerPlayer> playerList = new ArrayList<ClientServerPlayer>();
 
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
@@ -166,7 +170,8 @@ public class ClientThread implements Runnable {
 		SocketAddress sockAddr = packet.getSocketAddress();
 
 		if (sockAddr.equals(serverSockAddr)) {
-			pClient("received message from " + sockAddr + " with length " + packet.getLength());
+			// pClient("received message from " + sockAddr + " with length " +
+			// packet.getLength());
 			serverInfo.updateTimeStamp();
 		} else {
 			pClient("unexpected packet from " + sockAddr);
@@ -250,7 +255,8 @@ public class ClientThread implements Runnable {
 
 			for (PacketHistoryEntry e : serverInfo.getPacketHistoryList()) {
 				if (e != null && !e.isAcked() && e.getSequence() == recvByteBuffer.getShort(3)) {
-					pClientf("setting ACK to true for packet %d to server %s\n", e.getSequence(), sockAddr);
+					// pClientf("setting ACK to true for packet %d to server
+					// %s\n", e.getSequence(), sockAddr);
 					e.setAcked(true);
 				}
 			}
@@ -258,7 +264,20 @@ public class ClientThread implements Runnable {
 			break;
 		}
 
-		// testing case
+		case ProtocolConstant.MSG_S_LOBBY_PLAYERLIST: {
+			pClient("received player list from server");
+
+			try {
+				playerList = ClientPacketEncoder.decodePlayerList(recvBuffer, packet.getLength());
+			} catch (IOException e) {
+				pClient("failed to decode player list: " + e);
+				return;
+			}
+
+			break;
+		}
+
+		// TODO testing case
 		case 'm': {
 
 			String msg = new String(recvBuffer, 3, packet.getLength() - 3);
@@ -298,7 +317,8 @@ public class ClientThread implements Runnable {
 			serverInfo.insertPacket(sequence, packet);
 
 			// send the packet
-			pClientf("sending with sequence %d to %s\n", sequence, packet.getSocketAddress());
+			// pClientf("sending with sequence %d to %s\n", sequence,
+			// packet.getSocketAddress());
 			socket.send(packet);
 
 		} else {
@@ -318,7 +338,7 @@ public class ClientThread implements Runnable {
 		printStream.printf("Client: " + string, args);
 	}
 
-	public void sendRaw(byte[] data) throws IOException {
+	public synchronized void sendRaw(byte[] data) throws IOException {
 		DatagramPacket packet = new DatagramPacket(data, data.length, serverSockAddr);
 		socket.send(packet);
 	}
@@ -340,6 +360,11 @@ public class ClientThread implements Runnable {
 		sendPacket(p, ProtocolConstant.MSG_C_NET_CONNECT, true);
 	}
 
+	public synchronized void updatePlayerList() throws IOException {
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_GETPLAYERLIST, true);
+	}
+
 	public synchronized void disconnect() throws IOException {
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_NET_DISCONNECT, true);
@@ -349,7 +374,11 @@ public class ClientThread implements Runnable {
 		return connected;
 	}
 
-	public void exit() {
+	public List<ClientServerPlayer> getPlayerList() {
+		return playerList;
+	}
+
+	public synchronized void exit() {
 		socket.close();
 	}
 

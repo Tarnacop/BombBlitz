@@ -192,11 +192,13 @@ public class ServerThread implements Runnable {
 			sendPacket(p, ProtocolConstant.MSG_S_NET_ACK);
 		}
 
-		pServer("received message from " + sockAddr + " with length " + packet.getLength());
+		// pServer("received message from " + sockAddr + " with length " +
+		// packet.getLength());
 
 		ServerClientInfo clientInfo = clientTable.get(sockAddr);
 		if (clientInfo != null) {
-			pServer("existing client " + sockAddr + ", rtd: " + clientInfo.getRoundTripDelay());
+			// pServer("existing client " + sockAddr + ", rtd: " +
+			// clientInfo.getRoundTripDelay());
 			clientInfo.updateTimeStamp();
 		} else {
 			/*
@@ -224,7 +226,7 @@ public class ServerThread implements Runnable {
 			if (1 + 2 + 1 + nameLength != packet.getLength()) {
 				return;
 			}
-			if (nameLength > config.getMaxNameLength()) {
+			if (nameLength < 1 || nameLength > config.getMaxNameLength()) {
 				return;
 			}
 
@@ -316,7 +318,8 @@ public class ServerThread implements Runnable {
 			if (clientInfo != null) {
 				for (PacketHistoryEntry e : clientInfo.getPacketHistoryList()) {
 					if (e != null && !e.isAcked() && e.getSequence() == recvByteBuffer.getShort(3)) {
-						pServerf("setting ACK to true for packet %d to client %s\n", e.getSequence(), sockAddr);
+						// pServerf("setting ACK to true for packet %d to client
+						// %s\n", e.getSequence(), sockAddr);
 						e.setAcked(true);
 						clientInfo.setRoundTripDelay(System.currentTimeMillis() - e.getCreationTimeStamp());
 					}
@@ -326,12 +329,24 @@ public class ServerThread implements Runnable {
 			break;
 		}
 
-		case ProtocolConstant.MSG_C_LOBBY_GETROOMLIST: {
-			// TODO
+		case ProtocolConstant.MSG_C_LOBBY_GETPLAYERLIST: {
+			pServer("sending player list to " + sockAddr);
+
+			int len = 0;
+			try {
+				len = ServerPacketEncoder.encodePlayerList(clientTable, sendBuffer);
+			} catch (IOException e) {
+				pServer("failed to encode player list: " + e);
+				return;
+			}
+
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, len, sockAddr);
+			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_PLAYERLIST, true);
+
 			break;
 		}
 
-		// testing case
+		// TODO testing case
 		case 's': {
 			pServer("message type 's', table size: " + clientTable.size());
 
@@ -347,7 +362,7 @@ public class ServerThread implements Runnable {
 			break;
 		}
 
-		// testing case
+		// TODO testing case
 		case 't': {
 			long time = System.currentTimeMillis();
 
@@ -399,10 +414,12 @@ public class ServerThread implements Runnable {
 				clientInfo.insertPacket(sequence, packet);
 
 				// send the packet
-				pServerf("sending with sequence %d to %s\n", sequence, packet.getSocketAddress());
+				// pServerf("sending with sequence %d to %s\n", sequence,
+				// packet.getSocketAddress());
 				socket.send(packet);
 			} else {
-				pServer("recipient does not exist in client table but tryRetransmit is set to true");
+				// TODO pServer("recipient does not exist in client table but
+				// tryRetransmit is set to true");
 				sendPacket(packet, type);
 			}
 		} else {
@@ -426,11 +443,11 @@ public class ServerThread implements Runnable {
 		socket.close();
 	}
 
-	public String toHex(byte[] data, int length) {
+	public static String toHex(byte[] data, int length) {
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < length; i++) {
-			sb.append(String.format("%02x", data[i]));
+			sb.append(String.format("%02x ", data[i]));
 		}
 
 		return sb.toString();

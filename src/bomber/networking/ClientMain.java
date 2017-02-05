@@ -2,6 +2,7 @@ package bomber.networking;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.List;
 import java.util.Scanner;
 
 public class ClientMain {
@@ -51,6 +52,18 @@ public class ClientMain {
 
 						client.disconnect();
 
+					} else if (cmds[0].equals("updateplayerlist")) {
+
+						client.updatePlayerList();
+
+					} else if (cmds[0].equals("printplayerlist")) {
+
+						List<ClientServerPlayer> playerList = client.getPlayerList();
+						System.out.printf("Size: %d\n", playerList.size());
+						for (ClientServerPlayer p : playerList) {
+							System.out.printf("ID: %d, Name: %s\n", p.getID(), p.getName());
+						}
+
 					} else {
 
 						pInvalid();
@@ -91,6 +104,7 @@ public class ClientMain {
 
 		scanner.close();
 		client.exit();
+
 	}
 
 	private static void pInvalid() {

@@ -50,7 +50,9 @@ public class ProtocolConstant {
 	// 1 byte message type + 2 byte sequence + 2 byte acknowledged sequence
 
 	// In lobby
-	public static final byte MSG_C_LOBBY_GETPLAYERLIST = 0x04;
+	public static final byte MSG_C_LOBBY_GETPLAYERLIST = 0x04; // Bit set
+	// 1 byte message type + 2 byte sequence
+
 	public static final byte MSG_C_LOBBY_GETROOMLIST = 0x05;
 	public static final byte MSG_C_LOBBY_GETLEADERBOARD = 0x06;
 	public static final byte MSG_C_LOBBY_CREATEROOM = 0x07;
@@ -96,15 +98,18 @@ public class ProtocolConstant {
 	public static final byte MSG_S_NET_ACK = 0x46; // Bit not set
 	// 1 byte message type + 2 byte sequence + 2 byte acknowledged sequence
 
-	public static final byte MSG_S_LOBBY_PLAYERLIST = 0x47;
+	public static final byte MSG_S_LOBBY_PLAYERLIST = 0x47; // Bit set
 	/*
 	 * 1 byte message type + 2 byte sequence + 4 byte total number of players +
-	 * 4 byte start player id + 4 byte number of players in this packet + array
-	 * of player IDs and name pairs(4 byte id + 1 byte name length + bytes of
-	 * name string)
+	 * 4 byte packet index + 4 byte max index + 4 byte number of players in this
+	 * packet + array of player IDs and name pairs(4 byte id + 1 byte name
+	 * length + bytes of name string)
 	 */
-	// TODO currently start player id is hard-coded to 0 and number of players
-	// in this packet to total number of players(we don't
-	// expect to have the number of players one packet does not fit)
+	/*
+	 * TODO currently packet index and max index are hard-coded to 0 and number
+	 * of players in this packet to total number of players since we don't
+	 * expect to have the number of players one packet does not fit(32 players)
+	 */
+	/* TODO we encode player IDs and names only */
 
 }
