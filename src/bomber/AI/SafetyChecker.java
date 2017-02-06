@@ -114,6 +114,7 @@ public class SafetyChecker {
 	 * @return the tiles which are affected by a single bomb
 	 */
 	public ArrayList<Point> getBombCoverage(Bomb bomb) {
+		//TODO need to solve the issue
 		ArrayList<Point> points = new ArrayList<>();
 		points.add(bomb.getPos());
 		Point temp = bomb.getPos();
@@ -126,7 +127,7 @@ public class SafetyChecker {
 			points.add(new Point(bombX, (bombY + i)));
 
 		}
-
+		
 		Block[][] map = getMap();
 		int x, y;
 		for (int i = 0; i < points.size(); i++) {
@@ -139,7 +140,7 @@ public class SafetyChecker {
 			}
 
 		}
-
+		System.out.println(points);
 		return points;
 	}
 

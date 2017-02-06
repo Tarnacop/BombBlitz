@@ -215,7 +215,6 @@ public class RouteFinder {
 
 			finish = finish.getParent();
 		}
-
 		return moves;
 	}
 
@@ -311,7 +310,6 @@ public class RouteFinder {
 
 		if (finish == null)
 			return null;
-
 		return getMovesFromPoints(finish);
 
 	}
@@ -352,26 +350,28 @@ public class RouteFinder {
 		case UP:
 			if (map[aiPos.x][aiPos.y - 1] == Block.SOFT)
 				return true;
-			aiPos.setLocation(aiPos.x, aiPos.y - 1);
+//			aiPos.setLocation(aiPos.x, aiPos.y - 1);
 			break;
 		case DOWN:
 			if (map[aiPos.x][aiPos.y + 1] == Block.SOFT)
 				return true;
-			aiPos.setLocation(aiPos.x, aiPos.y + 1);
+//			System.out.println("lol");
+//			aiPos.setLocation(aiPos.x, aiPos.y + 1);
 			break;
 		case LEFT:
 			if (map[aiPos.x - 1][aiPos.y] == Block.SOFT)
 				return true;
-			aiPos.setLocation(aiPos.x - 1, aiPos.y);
+//			aiPos.setLocation(aiPos.x - 1, aiPos.y);
 			break;
 		case RIGHT:
 			if (map[aiPos.x + 1][aiPos.y] == Block.SOFT)
 				return true;
-			aiPos.setLocation(aiPos.x + 1, aiPos.y);
+//			aiPos.setLocation(aiPos.x + 1, aiPos.y);
 			break;
 		default:
 			break;
 		}
+		System.out.println(aiPos);
 		return false;
 	}
 
@@ -448,7 +448,6 @@ public class RouteFinder {
 		default:
 			break;
 		}
-
 		map[pos.x][pos.y] = Block.BLANK;
 	}
 
@@ -461,21 +460,27 @@ public class RouteFinder {
 	 *            the position of ai
 	 * @return the planned actions of the AI including bomb placement and moves.
 	 */
-	private LinkedList<AIActions> getPathWithBombs(LinkedList<AIActions> movesWithoutObstacles, Point pos) {
+	private LinkedList<AIActions> getPathWithBombs(LinkedList<AIActions> movesWithoutObstacles, Point position) {
 		Block[][] map = getMap().clone();
 		// TODO finish not implemented
 		LinkedList<AIActions> realMoves = new LinkedList<>();
-
+		Point pos = (Point) position.clone();
 		AIActions move = null;
-		while ((move = movesWithoutObstacles.removeFirst()) != null) {
+		while ((move = movesWithoutObstacles.peek()) != null) {
+			movesWithoutObstacles.removeFirst();
+			//			System.out.println(move);
 			if (isSoftBlockAfterMove(move, pos, map)) {
 				realMoves.add(AIActions.BOMB);
 				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(
-						safetyCh.getBombCoverage(new Bomb(null, pos, 0, gameAI.getBombRange()))));
+						safetyCh.getBombCoverage(new Bomb(null, pos, 0, gameAI.getBombRange())), pos));
+				
+				
 				realMoves.addAll(escapeMoves);
 				realMoves.add(AIActions.NONE);
 				realMoves.addAll(reverseMoves(escapeMoves));
+				
 			}
+			
 			realMoves.addLast(move);
 			updatePositionAndMap(move, pos, map);
 		}
@@ -520,13 +525,48 @@ public class RouteFinder {
 			}
 
 			closed.add(temp);
-
+			
 		}
 
 		if (finish == null)
 			return null;
-
 		return getPathWithBombs(getMovesFromPoints(finish), start);
+
+	}
+	
+	
+	//change this method
+	private LinkedList<AIActions> escapeFromExplotion(ArrayList<Point> dangerTiles, Point pos) {
+		LinkedList<Node> open = new LinkedList<>();
+		HashSet<Node> closed = new HashSet<>();
+
+		Node startNode = new Node(null, pos);
+		open.add(startNode);
+
+		// loop until the queue is not empty
+		Node finish = null;
+		while (!open.isEmpty()) {
+
+			// take the head of the queue
+			Node temp = open.poll();
+
+			// if the head is final position we finish
+			if (!dangerTiles.contains(temp.getCoord())) {
+				finish = temp;
+				break;
+			}
+
+			for (Point p : getNeighbours(temp)) {
+				checkNeighbour(temp, p, open, closed);
+			}
+
+			// else we loop through all the neighbours
+			closed.add(temp);
+		}
+
+		if (finish == null)
+			return null;
+		return getMovesFromPoints(finish);
 
 	}
 
