@@ -11,4 +11,7 @@ public interface GameLogicInterface {
 	// Render graphics on the given screen
 	public void render(ScreenInterface screen);
 	
+	// Dispose the resources used
+	public void dispose();
+	
 } // END OF GameLogicInterface

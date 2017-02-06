@@ -26,6 +26,7 @@ public class TestGame implements GameLogicInterface {
 	@Override
 	public void update(float interval) {
 
+		/*
 		if (sign == true)
 			colour = colour + 0.01f;
 		else
@@ -40,18 +41,25 @@ public class TestGame implements GameLogicInterface {
 			colour = 0f;
 			sign = true;
 		}
-
+		 */
 	} // END OF update METHOD
 
 	@Override
 	public void render(ScreenInterface screen) {
 		
+		/*
 		if (screen.isResized()) {
 			screen.setViewport(0, 0, screen.getWidth(), screen.getHeight());
 			screen.setResized(false);
 		}
 		
-		screen.setClearColour(colour, colour, colour, 0.0f);
-		renderer.clear();
+		screen.setClearColour(colour, colour, colour, 0.0f);*/
+		renderer.render(screen);
 	}
+	
+	@Override
+	public void dispose() {
+		
+		renderer.dispose();
+	} // END OF dispose METHOD
 } // END OF TestGame CLASS

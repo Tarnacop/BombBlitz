@@ -41,7 +41,7 @@ public class Game implements GameInterface {
 			ex.printStackTrace();
 		} finally {
 			
-			// Whatever the outcome, dispose the resources
+			dispose();
 		}
 		
 	} // END OF run METHOD
@@ -124,4 +124,10 @@ public class Game implements GameInterface {
 		}
 		
 	} // END OF sync METHOD
+	
+	@Override
+	public void dispose() {
+		
+		gameLogic.dispose();
+	} // END OF dispose METHOD
 } // END OF Application
