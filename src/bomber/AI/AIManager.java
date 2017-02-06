@@ -22,8 +22,9 @@ public class AIManager extends Thread {
 	public AIManager(GameAI ai, GameState gameState) {
 		this.gameAI = ai;
 		this.gameState = gameState;
-		this.finder = new RouteFinder(gameState, ai);
 		this.safetyCh = new SafetyChecker(gameState, ai);
+		this.finder = new RouteFinder(gameState, ai, safetyCh);
+		
 	}
 
 	public void run() {

@@ -17,10 +17,12 @@ public class RouteFinder {
 
 	private GameState state;
 	private GameAI gameAI;
-	
-	public RouteFinder(GameState state, GameAI gameAI) {
+	private SafetyChecker safetyCh;
+
+	public RouteFinder(GameState state, GameAI gameAI, SafetyChecker safetyCh) {
 		this.state = state;
 		this.gameAI = gameAI;
+		this.safetyCh = safetyCh;
 	}
 
 	// finds the fastest route to the certain tile place in the map
@@ -94,6 +96,34 @@ public class RouteFinder {
 
 	}
 
+	private void checkNeighbourWithSoftTiles(Node parent, Point goal, int cost, Point neigh, PriorityQueue<Node> open,
+			HashSet<Node> closed) {
+		int x = neigh.x;
+		int y = neigh.y;
+		Block[][] map = getMap();
+
+		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOLID)
+			return;
+
+		for (Node nd : closed)
+			if (nd.getCoord().equals(neigh))
+				return;
+
+		for (Node nd : open) {
+			if (nd.getCoord().equals(neigh) && cost < nd.getgValue()) {
+				open.remove(nd);
+				int hValue = Math.abs(goal.x - neigh.x) + Math.abs(goal.y - neigh.y);
+				Node neighNode = new Node(cost, hValue, parent, neigh);
+				open.add(neighNode);
+				return;
+			}
+		}
+
+		int hValue = Math.abs(goal.x - neigh.x) + Math.abs(goal.y - neigh.y);
+		Node neighNode = new Node(cost, hValue, parent, neigh);
+		open.add(neighNode);
+	}
+
 	// return exact moves from the final Node
 	// backtracks the route
 	private LinkedList<Movement> getMovesFromPoints(Node finish) {
@@ -119,7 +149,7 @@ public class RouteFinder {
 
 		return moves;
 	}
-	
+
 	// return the neighbour points of the map
 	private ArrayList<Point> getNeighbours(Node parent) {
 		int x = parent.getCoord().x;
@@ -190,36 +220,137 @@ public class RouteFinder {
 		return getMovesFromPoints(finish);
 
 	}
-	
-	
-	public Point getNearestEnemy()
-	{
+
+	public Point getNearestEnemy() {
 		Point aiPos = gameAI.getPos();
 		Point pos = null;
 		int distance = Integer.MAX_VALUE;
-		for(Player p : state.getPlayers())
-		{
-			if(!p.equals(gameAI) && (Math.abs(aiPos.x - p.getPos().x)+ Math.abs(aiPos.y -p.getPos().y)) < distance)
-			{
-				distance = (Math.abs(aiPos.x - p.getPos().x)+ Math.abs(aiPos.y -p.getPos().y));
+		for (Player p : state.getPlayers()) {
+			if (!p.equals(gameAI) && (Math.abs(aiPos.x - p.getPos().x) + Math.abs(aiPos.y - p.getPos().y)) < distance) {
+				distance = (Math.abs(aiPos.x - p.getPos().x) + Math.abs(aiPos.y - p.getPos().y));
 				pos = p.getPos();
 			}
 		}
-		
+
 		return pos;
+	}
+
+	private boolean isSoftBlockAfterMove(Movement move, Point aiPos) {
+		Block[][] map = getMap();
+
+		switch (move) {
+		case UP:
+			if (map[aiPos.x][aiPos.y - 1] == Block.SOFT)
+				return true;
+			aiPos.setLocation(aiPos.x, aiPos.y - 1);
+			break;
+		case DOWN:
+			if (map[aiPos.x][ aiPos.y + 1] == Block.SOFT)
+				return true;
+			aiPos.setLocation(aiPos.x, aiPos.y + 1);
+			break;
+		case LEFT:
+			if (map[aiPos.x - 1][ aiPos.y] == Block.SOFT)
+				return true;
+			aiPos.setLocation(aiPos.x - 1, aiPos.y);
+			break;
+		case RIGHT:
+			if (map[aiPos.x + 1][ aiPos.y] == Block.SOFT)
+				return true;
+			aiPos.setLocation(aiPos.x + 1, aiPos.y);
+			break;
+		default:
+			break;
+		}
+		return false;
+	}
+
+	
+	
+	private LinkedList<AIActions> fromMovememntToAIActions(LinkedList<Movement> moves)
+	{
+		LinkedList<AIActions> newMoves = new LinkedList<>();
+		for(Movement m: moves)
+		{
+			switch(m)
+			{
+			case UP:
+				newMoves.add(AIActions.UP);
+				break;
+			case DOWN:
+				newMoves.add(AIActions.DOWN);
+				break;
+			case LEFT:
+				newMoves.add(AIActions.LEFT);
+				break;
+			case RIGHT:
+				newMoves.add(AIActions.RIGHT);
+				break;
+			case default:
+				break;
+			}
+		}
+		
+		return newMoves;
 	}
 	
 	
-	
-	public int getNumberOfSoftBlocksToEnemy(Point start, Point goal)
+	private LinkedList<Movement> getPathWithBombs(LinkedList<Movement> movesWithoutObstacles, Point pos)
 	{
+		// TODO finish not implemented
+		LinkedList<AIActions> realMoves = new LinkedList<>();
 		
+		Movement move = null;
+		while( (move = movesWithoutObstacles.removeFirst()) != null)
+		{
+			if(isSoftBlockAfterMove(move, pos))
+			{
+				realMoves.add(AIActions.BOMB);
+				LinkedList escapeMoves = (escapeFromExplotion(safetyCh.getBombCoverage(new Bomb(null, pos, 0, gameAI.getBombRange()))));
+				realMoves.addAll(fromMovememntToAIActions(escapeMoves));
+				realMoves.add(AIActions.NONE);
+				
+			}
+		}
+	}
+
+	public LinkedList<Movement> getPlanToEnemy(Point start, Point goal) {
+
 		
-		// TODO 
+		// TODO finish not implemented
 		
-		
-		return 0;
-		
+		PriorityQueue<Node> open = new PriorityQueue<>();
+		HashSet<Node> closed = new HashSet<>();
+
+		int hValue = Math.abs(goal.x - start.x) + Math.abs(goal.y - start.y);
+		Node startNode = new Node(0, hValue, null, start);
+		open.add(startNode);
+
+		// loop until the queue is not empty
+		Node finish = null;
+		while (!open.isEmpty()) {
+			// take the head of the queu
+			Node temp = open.poll();
+			// if the head is final position we finish
+			if (temp.getCoord().equals(goal)) {
+				finish = temp;
+				break;
+			}
+			// else we loop through all the neighbours
+
+			for (Point p : getNeighbours(temp)) {
+				checkNeighbourWithSoftTiles(temp, goal, temp.getgValue() + 1, p, open, closed);
+			}
+
+			closed.add(temp);
+
+		}
+
+		if (finish == null)
+			return null;
+
+		return getMovesFromPoints(finish);
+
 	}
 
 }
