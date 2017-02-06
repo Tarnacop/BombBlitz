@@ -3,9 +3,13 @@ package bomber.game;
 public class KeyboardState {
 
 	private boolean bomb;			//true if the bomb key is pressed
-	private Movement key;			//the current movement key pressed
+	private Movement key;			//the current movement key pressed, default NONE
 	
-	public KeyboardState(){}
+	public KeyboardState(){
+		
+		this.key = Movement.NONE;
+		this.bomb = false;
+	}
 
 	public boolean placeBomb(){
 		
