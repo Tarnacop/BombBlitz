@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import bomber.game.Movement;
+import bomber.AI.AIActions;
 
 public class AStarRouteFinderTest extends MainTestTemplate {
 
@@ -18,7 +18,7 @@ public class AStarRouteFinderTest extends MainTestTemplate {
 		int yStart = 0;
 		int xEnd = 12;
 		int yEnd = 12;
-		List<Movement> moves = finder.findRoute(new Point(xStart, yStart), new Point(xEnd, yEnd));
+		List<AIActions> moves = finder.findRoute(new Point(xStart, yStart), new Point(xEnd, yEnd));
 		assertEquals(moves.size(), (Math.abs(xStart - xEnd) + Math.abs(yStart - yEnd)));
 
 		xStart = 2;

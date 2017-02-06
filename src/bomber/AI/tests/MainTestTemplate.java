@@ -70,8 +70,9 @@ public abstract class MainTestTemplate {
 
 		ai = new GameAI("ai", new Point(4,4), 3, 10, state);
 		players.add(ai);
-		finder = new RouteFinder(state, ai);
 		checker = new SafetyChecker(state, ai);
+		finder = new RouteFinder(state, ai,checker);
+		
 	}
 	
 	@Test

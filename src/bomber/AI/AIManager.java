@@ -1,39 +1,59 @@
 package bomber.AI;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
 
-import bomber.game.Block;
-import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Movement;
 
+/**
+ * The Class AIManager for making moves.
+ */
 public class AIManager extends Thread {
 
+	/** The game AI. */
 	private GameAI gameAI;
-	private GameState gameState;
+
+	/** The finder for finding the route. */
 	private RouteFinder finder;
+
+	/** The safety checker for AI. */
 	private SafetyChecker safetyCh;
 
+	/**
+	 * Instantiates a new AI manager.
+	 *
+	 * @param ai
+	 *            the AI
+	 * @param gameState
+	 *            the game state
+	 */
 	public AIManager(GameAI ai, GameState gameState) {
 		this.gameAI = ai;
-		this.gameState = gameState;
 		this.safetyCh = new SafetyChecker(gameState, ai);
 		this.finder = new RouteFinder(gameState, ai, safetyCh);
-		
+
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
 	public void run() {
 		while (gameAI.isAlive()) {
 			move();
 		}
 	}
 
-	private Point updatedPos(Movement move) {
+	/**
+	 * Updated position.
+	 *
+	 * @param move
+	 *            the move
+	 * @return the position
+	 */
+	private Point updatedPos(AIActions move) {
 		Point aiPos = (Point) gameAI.getPos().clone();
 
 		switch (move) {
@@ -44,10 +64,10 @@ public class AIManager extends Thread {
 			aiPos.setLocation(aiPos.x, aiPos.y + 1);
 			break;
 		case LEFT:
-			aiPos.setLocation(aiPos.x-1, aiPos.y );
+			aiPos.setLocation(aiPos.x - 1, aiPos.y);
 			break;
 		case RIGHT:
-			aiPos.setLocation(aiPos.x+1, aiPos.y );
+			aiPos.setLocation(aiPos.x + 1, aiPos.y);
 			break;
 		default:
 			break;
@@ -55,43 +75,93 @@ public class AIManager extends Thread {
 		return aiPos;
 	}
 
-	private void makeSingleMove(Movement move) {
-		Point updatedPos = updatedPos(move);
-		gameAI.getKeyState().setKey(move);
-		while (gameAI.getPos().equals(updatedPos)) {
+	/**
+	 * From AI moves to game moves.
+	 *
+	 * @param action
+	 *            the move to be made
+	 * @return move in Movement representation
+	 */
+	private Movement FromAIMovesToGameMoves(AIActions action) {
+		Movement m = null;
+		switch (action) {
+		case UP:
+			m = Movement.UP;
+			break;
+		case DOWN:
+			m = Movement.DOWN;
+			break;
+		case LEFT:
+			m = Movement.LEFT;
+			break;
+		case RIGHT:
+			m = Movement.RIGHT;
+			break;
+		default:
+			break;
 		}
-		gameAI.getKeyState().setKey(Movement.NONE);
+
+		return m;
 	}
 
-	private void performMoves(LinkedList<Movement> moves, boolean inDanger) {
+	/**
+	 * Make single move.
+	 *
+	 * @param move
+	 *            the move
+	 */
+	private void makeSingleMove(AIActions move) {
+		Point updatedPos = updatedPos(move);
+		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
+		while (gameAI.getPos().equals(updatedPos)) {
+		}
+		gameAI.getKeyState().setMovement(Movement.NONE);
+	}
+
+	/**
+	 * Perform sequence of moves.
+	 *
+	 * @param moves
+	 *            the list of moves
+	 * @param inDanger
+	 *            the variable determining if the escape moves are passed
+	 */
+	private void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
 			while (!moves.isEmpty()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
-			while (!moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek()) && !safetyCh.isEnemyInBombRange() ) {
+			while (!moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
+					&& !safetyCh.isEnemyInBombRange()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		move();
 	}
 
+	/**
+	 * Main method for controlling what moves to make
+	 */
 	private void move() {
-		LinkedList<Movement> moves;
-		//if AI is in danger then find the escape route
+		LinkedList<AIActions> moves;
+		
+		// if AI is in danger then find the escape route
 		if (safetyCh.inDanger()) {
 			moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 			performMoves(moves, true);
 		}
-		//if enemy is in bomb range then place the bomb and go to the safe location
-		else if(safetyCh.isEnemyInBombRange())
-		{
+		
+		// if enemy is in bomb range then place the bomb and go to the safe
+		// location
+		else if (safetyCh.isEnemyInBombRange()) {
 			gameAI.getKeyState().placeBomb();
 			moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-			performMoves(moves,true);
+			performMoves(moves, true);
 		}
-		//if enemy is accessable(no boxes are blocking the path) then find a route to it and make moves
-		else if( (moves = finder.findRoute(gameAI.getPos(), finder.getNearestEnemy())) != null)
-		{
+		
+		// if enemy is accessible(no boxes are blocking the path) then find a
+		// route to it and make moves
+		else if ((moves = finder.findRoute(gameAI.getPos(), finder.getNearestEnemy())) != null) {
 			performMoves(moves, false);
 		}
 	}
