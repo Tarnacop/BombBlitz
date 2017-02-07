@@ -123,7 +123,15 @@ public class PhysicsEngine
         Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
         translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
 
-        player.setPos(pos);
+        //player.setPos(pos); // should work without this
+
+        // check if player is killed
+        if (map.getPixelBlockAt(pos.x, pos.y)==Block.BLAST)
+        {
+            // TODO: tell gameLogic and/or audio
+            player.setAlive(false);
+            player.setLives(Math.max(player.getLives()-1,0));
+        }
     }
 
     private void translatePoint(Point point, Point delta)
@@ -139,7 +147,7 @@ public class PhysicsEngine
         return new Point(corner.x-initialCorner.x, corner.y-initialCorner.y);
     }
 
-    public synchronized void updateAll()
+    public synchronized void update()
     {
         // update map
         Map map = gameState.getMap();
@@ -150,13 +158,15 @@ public class PhysicsEngine
                 if (map.getGridBlockAt(x,y) == Block.BLAST)
                     map.setGridBlockAt(new Point(x,y), Block.BLANK);
 
-        // update players
-        gameState.getPlayers().forEach(this::updatePlayer);
-
         // update bombs
         ArrayList<Bomb> toBeDeleted = new ArrayList<>();
         gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted));
         toBeDeleted.forEach(b -> gameState.getBombs().remove(b));
+
+        // update players
+        gameState.getPlayers().forEach(this::updatePlayer);
+
+
     }
 
     private void updateBomb(Bomb bomb, ArrayList<Bomb> toBeDeleted)

@@ -12,6 +12,7 @@ import static bomber.game.Block.*;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 /**
@@ -35,6 +36,10 @@ public class PhysicsEngineTest
                             {BLANK, BLANK, BLANK, BLANK, SOFT, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT},
                             {SOLID, SOFT, SOLID, SOFT, SOLID, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT}};
         map = new Map(blocks);
+
+        System.out.println();
+
+
         players = new ArrayList<>();
         buddy = new Player("Buddy", new Point(5,5), 3, 10);
         players.add(buddy);
@@ -64,35 +69,35 @@ public class PhysicsEngineTest
     public void collisions() throws Exception
     {
         KeyboardState kState = buddy.getKeyState();
-        kState.setKey(Movement.RIGHT);
+        kState.setMovement(Movement.RIGHT);
 
         for(int i=0; i<20; i++)
         {
-            engine.updateAll();
+            engine.update();
             //System.out.println(buddy.getPos());
             assertTrue("Collision was not detected successfully (problem at a right corner)", buddy.getPos().x+PhysicsEngine.playerPixelWidth<192);
         }
 
-        kState.setKey(Movement.DOWN);
+        kState.setMovement(Movement.DOWN);
         for(int i=0; i<20; i++)
         {
-            engine.updateAll();
+            engine.update();
             //System.out.println(buddy.getPos());
             assertTrue("Collision was not detected successfully (problem at a down corner)", buddy.getPos().y+PhysicsEngine.playerPixelHeight<256);
         }
 
-        kState.setKey(Movement.LEFT);
+        kState.setMovement(Movement.LEFT);
         for(int i=0; i<20; i++)
         {
-            engine.updateAll();
+            engine.update();
             //System.out.println(buddy.getPos());
             assertTrue("Collision was not detected successfully (problem at a left corner)", buddy.getPos().x>63);
         }
 
-        kState.setKey(Movement.UP);
+        kState.setMovement(Movement.UP);
         for(int i=0; i<20; i++)
         {
-            engine.updateAll();
+            engine.update();
             //System.out.println(buddy.getPos());
             assertTrue("Collision was not detected successfully (problem at an up corner)", buddy.getPos().y>191);
         }
@@ -103,19 +108,19 @@ public class PhysicsEngineTest
     public void plantBomb() throws Exception
     {
 
-        buddy.getKeyState().setKey(Movement.RIGHT);
+        buddy.getKeyState().setMovement(Movement.RIGHT);
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
         engine.plantBomb("Buddy", 0, 3);
 
         assertTrue("Bomb was not planted.", 1==gameState.getBombs().size());
 
-        engine.updateAll();
+        engine.update();
 
         assertTrue("Bomb did not explode.", 0==gameState.getBombs().size());
         assertEquals("Blast expected at the place of an explosion.",BLAST, gameState.getMap().getGridBlockAt(1, 8));
 
-        engine.updateAll();
+        engine.update();
 
         assertEquals("Bomb blast did not turn to Blank after a frame", BLANK, gameState.getMap().getGridBlockAt(1, 8));
 
@@ -128,27 +133,45 @@ public class PhysicsEngineTest
     }
 
     @Test
+    public void playerKill() throws Exception
+    {
+        buddy.setPos(new Point(66, 8*64+1));
+        buddy.setSpeed(0);
+        engine.plantBomb("Buddy", 0, 3);
+        engine.update();
+
+        assertFalse("The player was not killed by standing on a bomb", buddy.isAlive());
+        assertEquals("The number of lives of the player did not decrease", 2, buddy.getLives());
+
+        buddy.setLives(0);
+        buddy.setAlive(true);
+        engine.plantBomb("Buddy", 0, 3);
+        engine.update();
+        assertEquals("The number of lives of the player changed even though it was 0", 0, buddy.getLives());
+    }
+
+    @Test
     public void updateAll() throws Exception
     {
         KeyboardState kState = buddy.getKeyState();
 
-        kState.setKey(Movement.DOWN);
-        engine.updateAll();
+        kState.setMovement(Movement.DOWN);
+        engine.update();
         assertEquals("The position of the player after update does not match expected value", new Point(5, 15), buddy.getPos());
 
-        kState.setKey(Movement.RIGHT);
+        kState.setMovement(Movement.RIGHT);
         buddy.setSpeed(30);
-        engine.updateAll();
+        engine.update();
         assertEquals("The position of the player after update does not match expected value", new Point(35, 15), buddy.getPos());
 
-        kState.setKey(Movement.UP);
+        kState.setMovement(Movement.UP);
         buddy.setSpeed(5);
-        engine.updateAll();
+        engine.update();
         assertEquals("The position of the player after update does not match expected value", new Point(35, 10), buddy.getPos());
 
-        kState.setKey(Movement.LEFT);
+        kState.setMovement(Movement.LEFT);
         buddy.setSpeed(20);
-        engine.updateAll();
+        engine.update();
         assertEquals("The position of the player after update does not match expected value", new Point(15, 10), buddy.getPos());
     }
 
