@@ -11,6 +11,8 @@ import java.io.IOException;
 public class MusicPlayer extends Thread
 {
 
+    public static final String musicFilename = "01_A_Night_Of_Dizzy_Spells.wav";
+
     private Clip clip;
 
     public MusicPlayer()
@@ -18,7 +20,7 @@ public class MusicPlayer extends Thread
         try {
             clip = AudioSystem.getClip();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    Main.class.getResourceAsStream("/bomber/audio/01_A_Night_Of_Dizzy_Spells.wav"));
+                    Main.class.getResourceAsStream(AudioManager.audioFilesPath + musicFilename));
             clip.open(inputStream);
         } catch (UnsupportedAudioFileException e) {
             e.printStackTrace();

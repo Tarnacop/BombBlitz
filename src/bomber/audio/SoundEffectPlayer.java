@@ -11,9 +11,13 @@ import java.io.IOException;
 public class SoundEffectPlayer extends Thread
 {
 
+    public static final String explosionFilename = "sfx_exp_medium3.wav";
+
+
+
     public void playExplosion()
     {
-        playSound("sfx_exp_medium3.wav");
+        playSound(explosionFilename);
     }
 
     private void playSound(String fileName)
