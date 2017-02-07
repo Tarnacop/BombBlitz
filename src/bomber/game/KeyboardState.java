@@ -3,11 +3,19 @@ package bomber.game;
 public class KeyboardState {
 
 	private boolean bomb;			//true if the bomb key is pressed
+<<<<<<< HEAD
 	private Movement key;			//the current movement key pressed, default NONE
 	
 	public KeyboardState(){
 		
 		this.key = Movement.NONE;
+=======
+	private Movement movement;			//the current movement key pressed, default NONE
+	
+	public KeyboardState(){
+		
+		this.movement = Movement.NONE;
+>>>>>>> dev
 		this.bomb = false;
 	}
 
@@ -24,16 +32,12 @@ public class KeyboardState {
 		this.bomb = bomb;
 	}
 
-	public Movement getKey() {
-		return key;
-	}
-
-	public void setKey(Movement key) {
-		this.key = key;
+	public void setMovement(Movement movement) {
+		this.movement = movement;
 	}
 
 	public Movement getMovement(){
 		
-		return this.key;
+		return this.movement;
 	}
 }
