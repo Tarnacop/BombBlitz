@@ -10,7 +10,7 @@ public class Bomb {
 	private Point pos;			
 	private int time;			
 	private int radius;			
-	private int scalar;
+	private int scalar = 64;
 	private Point gridPos;
 	public Bomb(String playerName, Point pos, int time, int radius){
 		
