@@ -47,7 +47,7 @@ public class SafetyChecker {
 	 * @return true, if AI is in danger
 	 */
 	public boolean inDanger() {
-		Point playerPos = gameAI.getPos();
+		Point playerPos = gameAI.getGridPos();
 		return positionSafety(playerPos);
 	}
 
@@ -59,7 +59,7 @@ public class SafetyChecker {
 	 * @return true, if move is safe
 	 */
 	public boolean checkMoveSafety(AIActions move) {
-		Point playerPos = gameAI.getPos();
+		Point playerPos = gameAI.getGridPos();
 		Point newPosition = null;
 		switch (move) {
 		case UP:
@@ -150,12 +150,12 @@ public class SafetyChecker {
 	 * @return true, if enemy is in bomb range
 	 */
 	public boolean isEnemyInBombRange() {
-		Point playerPos = gameAI.getPos();
+		Point playerPos = gameAI.getGridPos();
 		int bombRange = gameAI.getBombRange();
 		for (Player p : state.getPlayers()) {
 			if (p == gameAI)
 				continue;
-			if (isStraightDistance(playerPos, p.getPos(), bombRange))
+			if (isStraightDistance(playerPos, p.getGridPos(), bombRange))
 				return true;
 
 		}

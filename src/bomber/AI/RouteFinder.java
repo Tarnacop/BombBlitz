@@ -280,7 +280,7 @@ public class RouteFinder {
 	 * @return the list of moves to be made to escape from explotion.
 	 */
 	public LinkedList<AIActions> escapeFromExplotion(ArrayList<Point> dangerTiles) {
-		Point pos = gameAI.getPos();
+		Point pos = gameAI.getGridPos();
 		LinkedList<Node> open = new LinkedList<>();
 		HashSet<Node> closed = new HashSet<>();
 
@@ -320,13 +320,13 @@ public class RouteFinder {
 	 * @return the nearest enemy of the AI.
 	 */
 	public Point getNearestEnemy() {
-		Point aiPos = gameAI.getPos();
+		Point aiPos = gameAI.getGridPos();
 		Point pos = null;
 		int distance = Integer.MAX_VALUE;
 		for (Player p : state.getPlayers()) {
-			if (!p.equals(gameAI) && (Math.abs(aiPos.x - p.getPos().x) + Math.abs(aiPos.y - p.getPos().y)) < distance) {
-				distance = (Math.abs(aiPos.x - p.getPos().x) + Math.abs(aiPos.y - p.getPos().y));
-				pos = p.getPos();
+			if (!p.equals(gameAI) && (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
+				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
+				pos = p.getGridPos();
 			}
 		}
 

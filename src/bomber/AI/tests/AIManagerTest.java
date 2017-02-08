@@ -25,6 +25,7 @@ public class AIManagerTest {
 	private List<Bomb> bombs;
 	private List<Player> players;
 	private GameState state;	
+	private final static int scalar = 64;
 	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 //	Map
 /*
@@ -61,8 +62,8 @@ public class AIManagerTest {
 	
 		bombs = new ArrayList<>();
 		bombs.add(new Bomb("",new Point(0,0),5,5));
-		bombs.add(new Bomb("",new Point(2,2),5,5));
-		bombs.add(new Bomb("",new Point(4,4),5,5));
+		bombs.add(new Bomb("",new Point(2*scalar,2*scalar),5,5));
+		bombs.add(new Bomb("",new Point(4*scalar,4*scalar),5,5));
 		
 		players = new ArrayList<>();
 		
@@ -79,8 +80,8 @@ public class AIManagerTest {
 
 	@Test
 	public void test() throws InterruptedException {
-		GameAI ai = new GameAI("ai",new Point(2,3),3,10,state);
-		Player ai2 = new GameAI("ai",new Point(6,5),3,10,state);
+		GameAI ai = new GameAI("ai",new Point(2*scalar,3*scalar),3,10,state);
+		Player ai2 = new GameAI("ai",new Point(6*scalar,5*scalar),3,10,state);
 		players.add(ai);
 		players.add(ai2);
 		state.setPlayers(players);

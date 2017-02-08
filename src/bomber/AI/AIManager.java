@@ -19,7 +19,7 @@ public class AIManager extends Thread {
 
 	/** The safety checker for AI. */
 	private SafetyChecker safetyCh;
-
+	private final int scalar = 64;
 	/**
 	 * Instantiates a new AI manager.
 	 *
@@ -54,20 +54,20 @@ public class AIManager extends Thread {
 	 * @return the position
 	 */
 	private Point updatedPos(AIActions move) {
-		Point aiPos = (Point) gameAI.getPos().clone();
+		Point aiPos = (Point) gameAI.getGridPos().clone();
 
 		switch (move) {
 		case UP:
-			aiPos.setLocation(aiPos.x, aiPos.y - 1);
+			aiPos.setLocation(aiPos.x*scalar, (aiPos.y - 1)*scalar);
 			break;
 		case DOWN:
-			aiPos.setLocation(aiPos.x, aiPos.y + 1);
+			aiPos.setLocation(aiPos.x, (aiPos.y + 1)*scalar);
 			break;
 		case LEFT:
-			aiPos.setLocation(aiPos.x - 1, aiPos.y);
+			aiPos.setLocation((aiPos.x - 1)*scalar, aiPos.y);
 			break;
 		case RIGHT:
-			aiPos.setLocation(aiPos.x + 1, aiPos.y);
+			aiPos.setLocation((aiPos.x + 1)*scalar, aiPos.y);
 			break;
 		default:
 			break;
@@ -113,7 +113,7 @@ public class AIManager extends Thread {
 	private void makeSingleMove(AIActions move) {
 		Point updatedPos = updatedPos(move);
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
-		while (gameAI.getPos().equals(updatedPos)) {
+		while (gameAI.getGridPos().equals(updatedPos)) {
 		}
 		gameAI.getKeyState().setMovement(Movement.NONE);
 	}
@@ -161,7 +161,7 @@ public class AIManager extends Thread {
 		
 		// if enemy is accessible(no boxes are blocking the path) then find a
 		// route to it and make moves
-		else if ((moves = finder.findRoute(gameAI.getPos(), finder.getNearestEnemy())) != null) {
+		else if ((moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
 			performMoves(moves, false);
 		}
 	}

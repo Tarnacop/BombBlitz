@@ -8,13 +8,16 @@ public class Bomb {
 	private Point pos;			
 	private int time;			
 	private int radius;			
-
+	private int scalar;
+	private Point gridPos;
 	public Bomb(String playerName, Point pos, int time, int radius){
 		
 		this.playerName = playerName;
 		this.pos = pos;
 		this.time = time;
 		this.radius = radius;
+		this.gridPos = new Point();
+		updatePos();
 	}
 
 	public String getPlayerName(){
@@ -25,6 +28,16 @@ public class Bomb {
 	public Point getPos(){
 		
 		return this.pos;
+	}
+	
+	public Point getGridPos()
+	{
+		return this.gridPos;
+	}
+	
+	private void updatePos()
+	{
+		this.gridPos.setLocation((pos.x/scalar),(pos.y/scalar) );
 	}
 	
 	public int getTime(){
