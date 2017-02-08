@@ -1,15 +1,18 @@
 package bomber.game;
 
+
+
 import java.awt.Point;
 
 public class Player {
 
 	private String name;			
-	private Point pos;			
+	private Point pos;	
+	private Point gridPos;
 	private int lives;			
 	private double speed;			
 	private int bombRange;
-	
+	private final int scalar = 64;
 	private KeyboardState keyState;		
 	private boolean isAlive;
 	
@@ -23,8 +26,14 @@ public class Player {
 		
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
+		this.gridPos = new Point();
+		updatePos();
 	}
 
+	public void begin(){
+		
+	}
+	
 	public int getBombRange() {
 		return bombRange;
 	}
@@ -46,6 +55,17 @@ public class Player {
 	public Point getPos(){
 		
 		return this.pos;
+	}
+	
+	public Point getGridPos()
+	{
+		return gridPos;
+	}
+	
+	
+	private void updatePos()
+	{
+		this.gridPos.setLocation((pos.x/scalar),(pos.y/scalar) );
 	}
 
 	public int getLives() {
@@ -82,6 +102,7 @@ public class Player {
 
 	public void setPos(Point pos) {
 		this.pos = pos;
+		updatePos();
 	}
 	
 	
