@@ -73,15 +73,22 @@ public class Map {
 		return false;
 	}
 	
-public String toStringWithPlayers(List<Player> players){
+public String toStringWithPlayersBombs(List<Player> players, List<Bomb> bombs){
 		
 	//System.out.println("Drawing map");
-		ArrayList<Point> positions = new ArrayList<>();
+		ArrayList<Point> playerPositions = new ArrayList<>();
 	
 		for(Player player : players){
 			
-			positions.add(new Point(player.getPos().x/64, player.getPos().y/64));
+			playerPositions.add(new Point(player.getPos().x/64, player.getPos().y/64));
 			//System.out.println("Player at : " + new Point(player.getPos().x/64, player.getPos().y/64).toString());
+		}
+		
+		ArrayList<Point> bombPositions = new ArrayList<>();
+		
+		for(Bomb bomb : bombs){
+			
+			bombPositions.add(new Point(bomb.getPos().x/64, bomb.getPos().y/64));
 		}
 	
 		String s = "";
@@ -93,9 +100,12 @@ public String toStringWithPlayers(List<Player> players){
 			for(int x = 0; x < this.gridMap.length; x++){
 			
 				//System.out.println("Checking for player at: " + new Point(x, y).toString());
-				if(positions.contains(new Point(i, j))){
+				if(playerPositions.contains(new Point(i, j))){
 				
 					s += "PP";
+				}else if(bombPositions.contains(new Point(i, j))){
+				
+					s += "o*";
 				}else{
 					switch(this.gridMap[x][y]){
 					case BLANK: s += "  ";

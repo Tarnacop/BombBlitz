@@ -82,7 +82,7 @@ public class PhysicsEngine
     public void plantBomb(String playerName, int time, int radius)
     {
         Point playerPos = getPlayerNamed(playerName).getPos();
-        Point newPos = new Point(playerPos.x, playerPos.y);
+        Point newPos = new Point(playerPos.x+32, playerPos.y+32);
         gameState.getBombs().add(new Bomb(playerName,  newPos, time, radius));
     }
 
