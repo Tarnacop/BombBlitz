@@ -116,8 +116,8 @@ public class SafetyChecker {
 	public ArrayList<Point> getBombCoverage(Bomb bomb) {
 		//TODO need to solve the issue
 		ArrayList<Point> points = new ArrayList<>();
-		points.add(bomb.getPos());
-		Point temp = bomb.getPos();
+		points.add(bomb.getGridPos());
+		Point temp = bomb.getGridPos();
 		int bombX = temp.x;
 		int bombY = temp.y;
 		for (int i = 1; i <= bomb.getRadius(); i++) {
