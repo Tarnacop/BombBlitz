@@ -62,8 +62,8 @@ public abstract class MainTestTemplate {
 
 		bombs = new ArrayList<>();
 		bombs.add(new Bomb("", new Point(0, 0), 5, 5));
-		bombs.add(new Bomb("", new Point(2, 2), 5, 5));
-		bombs.add(new Bomb("", new Point(4, 4), 5, 5));
+		bombs.add(new Bomb("", new Point(2*scalar, 2*scalar), 5, 5));
+		bombs.add(new Bomb("", new Point(4*scalar, 4*scalar), 5, 5));
 
 		players = new ArrayList<>();
 

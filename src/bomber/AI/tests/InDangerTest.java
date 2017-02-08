@@ -26,7 +26,7 @@ public class InDangerTest extends MainTestTemplate {
 
 		ai.setPos(new Point(12*scalar, 12*scalar));
 		List<Bomb> bombs = new ArrayList<>();
-		bombs.add(new Bomb("name", new Point(12, 9), 5, 4));
+		bombs.add(new Bomb("name", new Point(12*scalar, 9*scalar), 5, 4));
 		state.setBombs(bombs);
 
 		assertTrue(checker.inDanger());

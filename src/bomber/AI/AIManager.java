@@ -154,7 +154,7 @@ public class AIManager extends Thread {
 		// if enemy is in bomb range then place the bomb and go to the safe
 		// location
 		else if (safetyCh.isEnemyInBombRange()) {
-			gameAI.getKeyState().placeBomb();
+			gameAI.getKeyState().setBomb(true);
 			moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 			performMoves(moves, true);
 		}
