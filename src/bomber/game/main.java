@@ -56,7 +56,7 @@ public class main {
 
 		Map map = new Map(gridMap);
 		
-		Player p1 = new Player("Player1", new Point(64,64), 1, 5);
+		Player p1 = new Player("Player1", new Point(64,64), 5, 3);
 		
 		ArrayList<Player> list = new ArrayList<Player>();
 		list.add(p1);
@@ -65,7 +65,7 @@ public class main {
 		
 		GameState gameState = new GameState(map, list, bombs);
 
-		Player ai = new GameAI("Player2", new Point(128, 128), 1, 5, gameState);
+		Player ai = new GameAI("Player2", new Point(128, 128), 5, 3, gameState);
 		
 		gameState.getPlayers().add(ai);
 		
@@ -106,27 +106,11 @@ public class main {
 		   
 			glfwSwapBuffers(window);
 			glfwPollEvents();
-			
-//			if(keyState.isBomb()){
-//				System.out.println("X");
-//			}
-//			
-//			if(keyState.getMovement() == Movement.UP){
-//				System.out.println("^");
-//				System.out.println("|");
-//			}
-//			if(keyState.getMovement() == Movement.DOWN){
-//				System.out.println("|");
-//				System.out.println("v");
-//			}
-//			if(keyState.getMovement() == Movement.LEFT){
-//				System.out.println("<-");
-//			}
-//			if(keyState.getMovement() == Movement.RIGHT){
-//				System.out.println("->");
-//			}
-//			
+
 			physics.update();
+			
+			
+			
 			System.out.println(gameState);
 			keyState.setBomb(false);
 			keyState.setMovement(Movement.NONE);
