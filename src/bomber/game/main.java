@@ -30,15 +30,27 @@ public class main {
 		
 		Block[][] gridMap = new Block[][]{{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID},
 										{Block.SOLID,Block.BLANK,Block.BLANK,Block.BLANK,Block.SOLID},
-										{Block.SOLID,Block.BLANK,Block.SOLID,Block.BLANK,Block.SOLID},
-										{Block.SOLID,Block.BLANK,Block.SOFT,Block.BLANK,Block.SOLID},
+										{Block.SOLID,Block.BLANK,Block.BLANK,Block.BLANK,Block.SOLID},
+										{Block.SOLID,Block.BLANK,Block.BLANK,Block.BLANK,Block.SOLID},
+										{Block.SOLID,Block.SOFT,Block.SOFT,Block.SOFT,Block.SOLID},
+										
+										{Block.SOLID,Block.SOLID,Block.SOFT,Block.SOLID,Block.SOLID},
+										{Block.SOLID,Block.SOLID,Block.SOFT,Block.SOLID,Block.SOLID},
+										{Block.SOLID,Block.SOLID,Block.BLANK,Block.SOLID,Block.SOLID},
+										{Block.SOLID,Block.SOLID,Block.BLANK,Block.SOLID,Block.SOLID},
+										{Block.SOLID,Block.SOLID,Block.BLANK,Block.SOLID,Block.SOLID},
+										
+										{Block.SOLID,Block.SOFT,Block.SOFT,Block.SOFT,Block.SOLID},
+										{Block.SOLID,Block.BLANK,Block.BLANK,Block.SOFT,Block.SOLID},
+										{Block.SOLID,Block.BLANK,Block.BLANK,Block.SOFT,Block.SOLID},
+										{Block.SOLID,Block.SOFT,Block.BLANK,Block.SOFT,Block.SOLID},
 										{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID}};
 		
-		//		HHHHHHHHHH		HHHHHHHHHH
-		//		HH      HHHHHHHHHH		HH
-		//		HH      				HH
-		//		HH      HHHHHHHHHH		HH
-		//		HHHHHHHHHH		HHHHHHHHHH
+		//		HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+		//		HH      OOHHHHHHHHHHOO    OOHH
+		//		HH      OOOOOO      OO	    HH
+		//		HH      OOHHHHHHHHHHOOOOOO  HH
+		//		HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 
 		Map map = new Map(gridMap);
 		
