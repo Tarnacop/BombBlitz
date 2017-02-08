@@ -3,7 +3,7 @@ package bomber.renderer.interfaces;
 public interface GameLogicInterface {
 
 	// Initialization part
-	public void init() throws Exception;
+	public void init(ScreenInterface screen) throws Exception;
 	
 	// Update the game logic at an interval
 	public void update(float interval);

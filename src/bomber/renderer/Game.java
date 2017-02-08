@@ -51,7 +51,7 @@ public class Game implements GameInterface {
 		
 		screen.init();
 		timer.init();
-		gameLogic.init();
+		gameLogic.init(screen);
 	} // END OF init METHOD
 	
 	// Update method
