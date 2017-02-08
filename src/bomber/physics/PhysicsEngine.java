@@ -109,25 +109,33 @@ public class PhysicsEngine
             case RIGHT:
                 pos.translate(speed, 0);
                 fromDirection = new Point(-1, 0);
+                break;
         }
+
+
+        Map map = gameState.getMap();
 
         // check for bomb placement
         if(player.getKeyState().isBomb())
+        {
             plantBomb(player.getName(), default_time, player.getBombRange());
+        }
 
         // collision detection
-        Map map = gameState.getMap();
+        // TODO refactor (put this test up higher and test speed & direction)
+        if (fromDirection != null)
+        {
+            translatePoint(pos, revertPositionDelta(fromDirection, map, pos)); // check up-left corner
 
-        translatePoint(pos, revertPositionDelta(fromDirection, map, pos)); // check up-left corner
+            Point upRightCorner = new Point(pos.x + playerPixelWidth, pos.y);
+            translatePoint(pos, revertPositionDelta(fromDirection, map, upRightCorner));
 
-        Point upRightCorner = new Point(pos.x+playerPixelWidth, pos.y);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, upRightCorner));
+            Point downLeftCorner = new Point(pos.x, pos.y + playerPixelHeight);
+            translatePoint(pos, revertPositionDelta(fromDirection, map, downLeftCorner));
 
-        Point downLeftCorner = new Point(pos.x, pos.y + playerPixelHeight);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, downLeftCorner));
-
-        Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
+            Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
+            translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
+        }
 
         //player.setPos(pos); // should work without this
 
