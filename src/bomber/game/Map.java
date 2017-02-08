@@ -72,53 +72,6 @@ public class Map {
 			return true;
 		return false;
 	}
-
-	@Override
-	public String toString(){
-		
-		String s = "";
-		
-		for(Block[] column : this.gridMap){
-			
-			for(Block row : column){
-				
-				switch(row){
-				case BLANK: s += "  ";
-					break;
-				case BLAST: s += "XX";
-					break;
-				case SOFT:	s += "OO";
-					break;
-				case SOLID:	s += "HH";
-					break;
-				}
-				
-				
-			}
-			
-			s += "\n";
-		}
-		
-		return s;
-	}
-	
-	public static Block[][] transposeMatrix(Block[][] matrix)
-	{
-	    int m = matrix.length;
-	    int n = matrix[0].length;
-
-	    Block[][] transposedMatrix = new Block[n][m];
-
-	    for(int x = 0; x < n; x++)
-	    {
-	        for(int y = 0; y < m; y++)
-	        {
-	            transposedMatrix[x][y] = matrix[y][x];
-	        }
-	    }
-
-	    return transposedMatrix;
-	}	
 	
 public String toStringWithPlayers(List<Player> players){
 		

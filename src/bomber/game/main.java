@@ -19,10 +19,7 @@ import bomber.game.Response;
 import bomber.physics.PhysicsEngine;
 
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryUtil;
-
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class main {

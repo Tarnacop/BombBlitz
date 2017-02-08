@@ -1,18 +1,9 @@
 package bomber.game;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.Optional;
 
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWKeyCallback;
-
-import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryUtil;
-
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
 
 public class KeyboardUpdater extends Thread{
 

@@ -107,23 +107,27 @@ public class PhysicsEngine
             case RIGHT:
                 pos.translate(speed, 0);
                 fromDirection = new Point(-1, 0);
+                break;
         }
-
-        // collision detection
+        
         Map map = gameState.getMap();
-
-        translatePoint(pos, revertPositionDelta(fromDirection, map, pos)); // check up-left corner
-
-        Point upRightCorner = new Point(pos.x+playerPixelWidth, pos.y);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, upRightCorner));
-
-        Point downLeftCorner = new Point(pos.x, pos.y + playerPixelHeight);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, downLeftCorner));
-
-        Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
-
-        //player.setPos(pos); // should work without this
+        if (fromDirection!=null)
+        {
+	        // collision detection
+	
+	        translatePoint(pos, revertPositionDelta(fromDirection, map, pos)); // check up-left corner
+	
+	        Point upRightCorner = new Point(pos.x+playerPixelWidth, pos.y);
+	        translatePoint(pos, revertPositionDelta(fromDirection, map, upRightCorner));
+	
+	        Point downLeftCorner = new Point(pos.x, pos.y + playerPixelHeight);
+	        translatePoint(pos, revertPositionDelta(fromDirection, map, downLeftCorner));
+	
+	        Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
+	        translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
+	
+	        //player.setPos(pos); // should work without this
+        }
 
         // check if player is killed
         if (map.getPixelBlockAt(pos.x, pos.y)==Block.BLAST)
