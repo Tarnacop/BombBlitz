@@ -81,8 +81,9 @@ public class PhysicsEngine
 
     public void plantBomb(String playerName, int time, int radius)
     {
-        Point pos = getPlayerNamed(playerName).getPos();
-        gameState.getBombs().add(new Bomb(playerName,  pos, time, radius));
+        Point playerPos = getPlayerNamed(playerName).getPos();
+        Point newPos = new Point(playerPos.x, playerPos.y);
+        gameState.getBombs().add(new Bomb(playerName,  newPos, time, radius));
     }
 
     private void updatePlayer(Player player)
