@@ -14,6 +14,7 @@ public class PhysicsEngine
 
     public static final int playerPixelWidth = 50;
     public static final int playerPixelHeight = 50;
+    public static final int default_time = 200;
 
     private GameState gameState;
 
@@ -109,7 +110,12 @@ public class PhysicsEngine
                 fromDirection = new Point(-1, 0);
                 break;
         }
-        
+
+        // check for bomb placement
+        if(player.getKeyState().isBomb())
+            plantBomb(player.getName(), default_time, player.getBombRange());
+
+        // collision detection
         Map map = gameState.getMap();
         if (fromDirection!=null)
         {
