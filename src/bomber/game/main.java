@@ -34,12 +34,12 @@ public class main {
 										{Block.SOLID,Block.BLANK,Block.SOFT,Block.BLANK,Block.SOLID},
 										{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID}};
 		
-		//		SOLID SOLID SOLID SOLID SOLID
-		//		SOLID BLANK BLANK BLANK SOLID
-		//		SOLID BLANK SOLID BLANK SOLID
-		//		SOLID BLANK BLANK BLANK SOLID
-		//		SOLID SOLID SOLID SOLID SOLID
-		
+		//		HHHHHHHHHH		HHHHHHHHHH
+		//		HH      HHHHHHHHHH		HH
+		//		HH      				HH
+		//		HH      HHHHHHHHHH		HH
+		//		HHHHHHHHHH		HHHHHHHHHH
+
 		Map map = new Map(gridMap);
 		
 		Player p1 = new Player("Player1", new Point(64,64), 5, 5);
