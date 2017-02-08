@@ -76,7 +76,7 @@ public class GameState {
 			s += "\nOwner: " + bomb.getPlayerName() + "Pos: " + bomb.getPos() + ", Radius: " + bomb.getRadius() + ", Detonation Time: " + bomb.getTime(); 
 		}
 		
-		s += "\nAnd Map:\n" + this.map.toString();
+		s += "\nAnd Map:\n" + this.map.toStringWithPlayers(players);
 		
 		return s;
 	}

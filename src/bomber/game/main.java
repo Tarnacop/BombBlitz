@@ -16,6 +16,7 @@ import bomber.game.Map;
 import bomber.game.Movement;
 import bomber.game.Player;
 import bomber.game.Response;
+import bomber.physics.PhysicsEngine;
 
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
@@ -30,13 +31,21 @@ public class main {
 	
 	public static void main(String[] args) {
 		
-		Block[][] gridMap = new Block[][]{{Block.SOLID, Block.BLANK},{Block.SOLID, Block.BLANK}};
-		//	SOLID	SOLID
-		//	BLANK	BLANK
+		Block[][] gridMap = new Block[][]{{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID},
+										{Block.SOLID,Block.BLANK,Block.BLANK,Block.BLANK,Block.SOLID},
+										{Block.SOLID,Block.BLANK,Block.SOLID,Block.BLANK,Block.SOLID},
+										{Block.SOLID,Block.BLANK,Block.SOFT,Block.BLANK,Block.SOLID},
+										{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID}};
+		
+		//		SOLID SOLID SOLID SOLID SOLID
+		//		SOLID BLANK BLANK BLANK SOLID
+		//		SOLID BLANK SOLID BLANK SOLID
+		//		SOLID BLANK BLANK BLANK SOLID
+		//		SOLID SOLID SOLID SOLID SOLID
 		
 		Map map = new Map(gridMap);
 		
-		Player p1 = new Player("Player1", new Point(0,0), 0, 0);
+		Player p1 = new Player("Player1", new Point(64,64), 5, 5);
 		ArrayList<Player> list = new ArrayList<Player>();
 		list.add(p1);
 		
@@ -71,6 +80,9 @@ public class main {
 		KeyboardState keyState = p1.getKeyState();
 		
 		KeyboardUpdater updater = new KeyboardUpdater(window, keymap, p1);
+		
+		PhysicsEngine physics = new PhysicsEngine(gameState);
+		
 		updater.start();
 		
 		while (!glfwWindowShouldClose(window)) {
@@ -78,25 +90,27 @@ public class main {
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 			
-			if(keyState.isBomb()){
-				System.out.println("X");
-			}
-			
-			if(keyState.getMovement() == Movement.UP){
-				System.out.println("^");
-				System.out.println("|");
-			}
-			if(keyState.getMovement() == Movement.DOWN){
-				System.out.println("|");
-				System.out.println("v");
-			}
-			if(keyState.getMovement() == Movement.LEFT){
-				System.out.println("<-");
-			}
-			if(keyState.getMovement() == Movement.RIGHT){
-				System.out.println("->");
-			}
-			
+//			if(keyState.isBomb()){
+//				System.out.println("X");
+//			}
+//			
+//			if(keyState.getMovement() == Movement.UP){
+//				System.out.println("^");
+//				System.out.println("|");
+//			}
+//			if(keyState.getMovement() == Movement.DOWN){
+//				System.out.println("|");
+//				System.out.println("v");
+//			}
+//			if(keyState.getMovement() == Movement.LEFT){
+//				System.out.println("<-");
+//			}
+//			if(keyState.getMovement() == Movement.RIGHT){
+//				System.out.println("->");
+//			}
+//			
+			physics.update();
+			System.out.println(gameState);
 			keyState.setBomb(false);
 			keyState.setMovement(Movement.NONE);
 			
