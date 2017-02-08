@@ -3,6 +3,7 @@ package bomber.game;
 public class KeyboardState {
 
 	private boolean bomb;			//true if the bomb key is pressed
+
 	private Movement movement;			//the current movement key pressed, default NONE
 	
 	public KeyboardState(){

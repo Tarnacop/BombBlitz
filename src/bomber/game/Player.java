@@ -1,5 +1,7 @@
 package bomber.game;
 
+
+
 import java.awt.Point;
 
 public class Player {

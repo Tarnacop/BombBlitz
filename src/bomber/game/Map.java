@@ -1,7 +1,8 @@
 package bomber.game;
 
-import bomber.game.*;
-import java.awt.*;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Map {
 
@@ -71,5 +72,49 @@ public class Map {
 			return true;
 		return false;
 	}
-
+	
+public String toStringWithPlayers(List<Player> players){
+		
+	//System.out.println("Drawing map");
+		ArrayList<Point> positions = new ArrayList<>();
+	
+		for(Player player : players){
+			
+			positions.add(new Point(player.getPos().x/64, player.getPos().y/64));
+			//System.out.println("Player at : " + new Point(player.getPos().x/64, player.getPos().y/64).toString());
+		}
+	
+		String s = "";
+		int i = 0;
+		int j = 0;
+		
+		for(int y = 0; y < this.gridMap[0].length; y++){
+			
+			for(int x = 0; x < this.gridMap.length; x++){
+			
+				//System.out.println("Checking for player at: " + new Point(x, y).toString());
+				if(positions.contains(new Point(i, j))){
+				
+					s += "PP";
+				}else{
+					switch(this.gridMap[x][y]){
+					case BLANK: s += "  ";
+						break;
+					case BLAST: s += "XX";
+						break;
+					case SOFT:	s += "OO";
+						break;
+					case SOLID:	s += "HH";
+						break;
+					}
+				}
+				i++;
+			}
+			j++;
+			i=0;
+			s += "\n";
+		}
+		
+		return s;
+	}
 }

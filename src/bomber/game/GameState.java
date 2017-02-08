@@ -58,5 +58,26 @@ public class GameState {
 		this.map = map;
 	}
 	
-
+	@Override
+	public String toString(){
+		
+		String s = "Gamestate of: \nPlayers:\n";
+		
+		for(Player player : this.players){
+			
+			s += "\nName: " + player.getName() + ", Pos: " + player.getPos() + ", Speed: " + player.getSpeed() + ", Lives: " + player.getLives() + ", Bomb Range: " + player.getBombRange();
+			s += "\nWith Keyboard State = " + (player.getKeyState().isBomb()?"BOMB":"NO BOMB") + ", Current Movement: " + player.getKeyState().getMovement();
+		}
+		
+		s += "\nBombs:\n";
+		
+		for(Bomb bomb : this.bombs){
+			
+			s += "\nOwner: " + bomb.getPlayerName() + "Pos: " + bomb.getPos() + ", Radius: " + bomb.getRadius() + ", Detonation Time: " + bomb.getTime(); 
+		}
+		
+		s += "\nAnd Map:\n" + this.map.toStringWithPlayers(players);
+		
+		return s;
+	}
 }
