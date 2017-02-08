@@ -30,6 +30,10 @@ public class Player {
 		updatePos();
 	}
 
+	public void begin(){
+		
+	}
+	
 	public int getBombRange() {
 		return bombRange;
 	}
