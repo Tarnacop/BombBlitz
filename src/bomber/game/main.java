@@ -18,6 +18,7 @@ import bomber.game.Movement;
 import bomber.game.Player;
 import bomber.game.Response;
 import bomber.physics.PhysicsEngine;
+import bomber.renderer.Screen;
 
 import org.lwjgl.opengl.GL;
 
@@ -76,40 +77,22 @@ public class main {
 		keymap.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		keymap.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);
 		
-		glfwSetErrorCallback(errorCallback);
-		glfwInit();
-		if (!glfwInit()) {
-		    throw new IllegalStateException("Unable to initialize GLFW");
-		}
-		
-		long window = glfwCreateWindow(640, 480, "Bomb Blitz", NULL, NULL);
-		if (window == NULL) {
-		    glfwTerminate();
-		    throw new RuntimeException("Failed to create the GLFW window");
-		}
-		
-		glfwSetKeyCallback(window, keyCallback);
-		
-		glfwMakeContextCurrent(window);
-		GL.createCapabilities();
+		Screen screen  = new Screen(600, 600, "Bomb Blitz", false);
 		
 		KeyboardState keyState = p1.getKeyState();
 		
-		KeyboardUpdater updater = new KeyboardUpdater(window, keymap, p1);
+		KeyboardUpdater updater = new KeyboardUpdater(screen.getScreenID(), keymap, p1);
 		
 		PhysicsEngine physics = new PhysicsEngine(gameState);
 		
 		updater.start();
 		ai.begin();
 		
-		while (!glfwWindowShouldClose(window)) {
+		while (!screen.screenShouldClose()) {
 		   
-			glfwSwapBuffers(window);
-			glfwPollEvents();
+			screen.update();
 
 			physics.update();
-			
-			
 			
 			System.out.println(gameState);
 			keyState.setBomb(false);
@@ -125,22 +108,13 @@ public class main {
 		}
 		
 		updater.die();
-		
-		glfwDestroyWindow(window);
-		keyCallback.free();
-		
-		glfwTerminate();
-		errorCallback.free();
+		screen.close();
+//		glfwDestroyWindow(window);
+//		keyCallback.free();
+//		
+//		glfwTerminate();
+//		errorCallback.free();
 	}
-	
-	private static GLFWKeyCallback keyCallback = new GLFWKeyCallback() {
-	    @Override
-	    public void invoke(long window, int key, int scancode, int action, int mods) {
-	        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-	            glfwSetWindowShouldClose(window, true);
-	        }
-	    }
-	};
 }
 
 //		keymap.put(Response.RIGHT_MOVE, Keyboard.KEY_RIGHT);
