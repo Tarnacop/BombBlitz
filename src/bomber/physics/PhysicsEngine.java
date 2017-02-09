@@ -3,6 +3,7 @@ package bomber.physics;
 import bomber.game.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -13,6 +14,7 @@ public class PhysicsEngine
 
     public static final int playerPixelWidth = 50;
     public static final int playerPixelHeight = 50;
+    public static final int default_time = 200;
 
     private GameState gameState;
 
@@ -79,8 +81,9 @@ public class PhysicsEngine
 
     public void plantBomb(String playerName, int time, int radius)
     {
-        Point pos = getPlayerNamed(playerName).getPos();
-        gameState.getBombs().add(new Bomb(playerName,  pos, time, radius));
+        Point playerPos = getPlayerNamed(playerName).getPos();
+        Point newPos = new Point(playerPos.x+32, playerPos.y+32);
+        gameState.getBombs().add(new Bomb(playerName,  newPos, time, radius));
     }
 
     private void updatePlayer(Player player)
@@ -106,23 +109,44 @@ public class PhysicsEngine
             case RIGHT:
                 pos.translate(speed, 0);
                 fromDirection = new Point(-1, 0);
+                break;
+        }
+
+
+        Map map = gameState.getMap();
+
+        // check for bomb placement
+        if(player.getKeyState().isBomb())
+        {
+            plantBomb(player.getName(), default_time, player.getBombRange());
         }
 
         // collision detection
-        Map map = gameState.getMap();
+        
+        // TODO refactor (put this test up higher and test speed & direction)
+        if (fromDirection != null)
+        {
+            translatePoint(pos, revertPositionDelta(fromDirection, map, pos)); // check up-left corner
 
-        translatePoint(pos, revertPositionDelta(fromDirection, map, pos)); // check up-left corner
+            Point upRightCorner = new Point(pos.x + playerPixelWidth, pos.y);
+            translatePoint(pos, revertPositionDelta(fromDirection, map, upRightCorner));
 
-        Point upRightCorner = new Point(pos.x+playerPixelWidth, pos.y);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, upRightCorner));
+            Point downLeftCorner = new Point(pos.x, pos.y + playerPixelHeight);
+            translatePoint(pos, revertPositionDelta(fromDirection, map, downLeftCorner));
 
-        Point downLeftCorner = new Point(pos.x, pos.y + playerPixelHeight);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, downLeftCorner));
+            Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
+            translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
+        }
 
-        Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
-        translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
+        //player.setPos(pos); // should work without this
 
-        player.setPos(pos);
+        // check if player is killed
+        if (map.getPixelBlockAt(pos.x, pos.y)==Block.BLAST)
+        {
+            // TODO: tell gameLogic and/or audio
+            player.setAlive(false);
+            player.setLives(Math.max(player.getLives()-1,0));
+        }
     }
 
     private void translatePoint(Point point, Point delta)
@@ -138,40 +162,75 @@ public class PhysicsEngine
         return new Point(corner.x-initialCorner.x, corner.y-initialCorner.y);
     }
 
-    public synchronized void updateAll()
+    public synchronized void update()
     {
+        // update map
+        Map map = gameState.getMap();
+        int width = gameState.getMap().getGridMap().length;
+        int height = gameState.getMap().getGridMap()[0].length;
+        for(int x=0; x<width; x++)
+            for(int y=0; y<height; y++)
+                if (map.getGridBlockAt(x,y) == Block.BLAST)
+                    map.setGridBlockAt(new Point(x,y), Block.BLANK);
+
+        // update bombs
+        ArrayList<Bomb> toBeDeleted = new ArrayList<>();
+        gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted));
+        toBeDeleted.forEach(b -> gameState.getBombs().remove(b));
+
+        // update players
         gameState.getPlayers().forEach(this::updatePlayer);
-        gameState.getBombs().forEach(this::updateBomb);
+
+
     }
 
-    private void updateBomb(Bomb bomb)
+    private void updateBomb(Bomb bomb, ArrayList<Bomb> toBeDeleted)
     {
         decreaseBombTimer(bomb);
         if(bomb.getTime()<=0)
         {
+            toBeDeleted.add(bomb);
             Point pos = bomb.getPos();
             int radius = bomb.getRadius();
-            gameState.getBombs().remove(bomb);
-            addBlast(pos, radius);
+            addBlast(pos.x/64, pos.y/64, radius, 0);
         }
-
     }
 
-    private void addBlast(Point pos, int radius)
+    // direction: 0 all, 1 up, 2 right, 3 down, 4 left
+    private void addBlast(int x, int y, int radius, int direction)
     {
-        /*
-        if(true) // TODO: if in bounds
-
-        if(gameState.getMap().getGridBlockAt(pos.x, pos.y)==Block.SOLID || radius==0)
+        Point pos = new Point(x, y);
+        if(!gameState.getMap().isInGridBounds(pos))
+            return;
+        if(radius==0 || gameState.getMap().getGridBlockAt(x, y)==Block.SOLID)
             return;
         gameState.getMap().setGridBlockAt(pos, Block.BLAST);
-        addBlast(pos);
-        */
+        switch (direction)
+        {
+            case 0:
+                addBlast(x, y-1, radius-1, 1);
+                addBlast(x+1, y, radius-1, 2);
+                addBlast(x, y+1, radius-1, 3);
+                addBlast(x-1, y, radius-1, 4);
+                break;
+            case 1:
+                addBlast(x, y-1, radius-1, 1);
+                break;
+            case 2:
+                addBlast(x+1, y, radius-1, 2);
+                break;
+            case 3:
+                addBlast(x, y+1, radius-1, 3);
+                break;
+            case 4:
+                addBlast(x-1, y, radius-1, 4);
+                break;
+        }
     }
 
     private void decreaseBombTimer(Bomb bomb)
     {
-        //TODO: add setTimer in Bomb class
+        bomb.setTime(bomb.getTime()-1);
     }
 
 }

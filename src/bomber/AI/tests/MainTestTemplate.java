@@ -24,6 +24,7 @@ public abstract class MainTestTemplate {
 	protected GameAI ai;
 	protected RouteFinder finder;
 	protected SafetyChecker checker;
+	protected final int scalar = 64;
 	@Before
 	public void setUp() throws Exception {
 		
@@ -68,10 +69,11 @@ public abstract class MainTestTemplate {
 
 		state = new GameState(map, players, bombs);
 
-		ai = new GameAI("ai", new Point(4,4), 3, 10, state);
+		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state);
 		players.add(ai);
-		finder = new RouteFinder(state, ai);
 		checker = new SafetyChecker(state, ai);
+		finder = new RouteFinder(state, ai,checker);
+		
 	}
 	
 	@Test

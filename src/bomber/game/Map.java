@@ -1,7 +1,8 @@
 package bomber.game;
 
-import bomber.game.*;
-import java.awt.*;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Map {
 
@@ -71,5 +72,59 @@ public class Map {
 			return true;
 		return false;
 	}
-
+	
+public String toStringWithPlayersBombs(List<Player> players, List<Bomb> bombs){
+		
+	//System.out.println("Drawing map");
+		ArrayList<Point> playerPositions = new ArrayList<>();
+	
+		for(Player player : players){
+			
+			playerPositions.add(new Point(player.getPos().x/64, player.getPos().y/64));
+			//System.out.println("Player at : " + new Point(player.getPos().x/64, player.getPos().y/64).toString());
+		}
+		
+		ArrayList<Point> bombPositions = new ArrayList<>();
+		
+		for(Bomb bomb : bombs){
+			
+			bombPositions.add(new Point(bomb.getPos().x/64, bomb.getPos().y/64));
+		}
+	
+		String s = "";
+		int i = 0;
+		int j = 0;
+		
+		for(int y = 0; y < this.gridMap[0].length; y++){
+			
+			for(int x = 0; x < this.gridMap.length; x++){
+			
+				//System.out.println("Checking for player at: " + new Point(x, y).toString());
+				if(playerPositions.contains(new Point(i, j))){
+				
+					s += "PP";
+				}else if(bombPositions.contains(new Point(i, j))){
+				
+					s += "o*";
+				}else{
+					switch(this.gridMap[x][y]){
+					case BLANK: s += "  ";
+						break;
+					case BLAST: s += "XX";
+						break;
+					case SOFT:	s += "OO";
+						break;
+					case SOLID:	s += "HH";
+						break;
+					}
+				}
+				i++;
+			}
+			j++;
+			i=0;
+			s += "\n";
+		}
+		
+		return s;
+	}
 }

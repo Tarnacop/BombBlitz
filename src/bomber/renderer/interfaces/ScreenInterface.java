@@ -2,24 +2,42 @@ package bomber.renderer.interfaces;
 
 public interface ScreenInterface {
 
-	// Render graphics given a delta time
-	void render(float deltaTime);
+	// Method to initialize the screen
+	public void init();
 	
-	// Resize the game
-	void resize(int width, int height);
+	// Method to set clear color
+	public void setClearColour(float red, float green, float blue, float alpha);
 	
-	// Pause method 
-	void pause();
+	// public boolean isKeyPressed(int keyCode) - maybe useful
 	
-	// Resume method
-	void resume();
+	// Check if the screen should close
+	public boolean screenShouldClose();
 	
-	// Show method
-	void show();
+	// Get the screen title
+	public String getTitle();
 	
-	// Hide method
-	void hide();
+	// Get the screen width
+	public int getWidth();
 	
-	// Dispose method
-	void dispose();
+	// Get the screen height
+	public int getHeight();
+
+	// Check if the Screen is resized
+	public boolean isResized();
+	
+	// Check if V-sync is on
+	public boolean isVsyncOn();
+	
+	// Set if a Screen is resized;
+	public void setResized(boolean resized);
+	
+	// Set if V-sync is on
+	public void setVsyncOn(boolean vSync);
+	
+	// Set the viewport
+	public void setViewport(int originX, int originY, int width, int height);
+	
+	// Method to update the Screen as needed
+	public void update();
+
 } // END OF ScreenInterface

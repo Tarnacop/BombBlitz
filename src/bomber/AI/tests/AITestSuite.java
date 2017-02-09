@@ -10,11 +10,11 @@ import org.junit.runners.Suite;
 	EscapeRouteFinderTest .class,
 	EnemyCheckTest.class,
 	InDangerTest.class,
-	MoveSafetyTest.class
+	MoveSafetyTest.class,
+	NereastNeighbourTest.class
 })
 
 
 public class AITestSuite {
-
 	
 }
