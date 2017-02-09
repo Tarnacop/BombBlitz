@@ -29,7 +29,7 @@ public class Screen {
 	private HashMap<Response, Integer> controlScheme;
 	private Player player;
 
-	public Screen(int width, int height, String title, boolean vSync, HashMap<Response, Integer> controls, Player player) {
+	public Screen(String title, int width, int height, boolean vSync, HashMap<Response, Integer> controls, Player player) {
 
 		this.player = player;
 		this.controlScheme = controls;
