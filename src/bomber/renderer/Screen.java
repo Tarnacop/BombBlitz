@@ -151,6 +151,16 @@ public class Screen implements ScreenInterface {
 		glViewport(originX, originY, width, height);
 	} // END OF setViewport METHOD
 	
+	public long getScreenID() {
+		
+		return screenID;
+	} // END OF getScreenID METHOD
+	
+	public void close() {
+		
+		glfwSetWindowShouldClose(screenID, true);
+	} // END OF close METHOD
+	
 	@Override
 	public void update() {
 		
