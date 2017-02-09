@@ -2,16 +2,22 @@ package bomber.renderer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.glfw.GLFW.*;
-import org.lwjgl.system.MemoryUtil;
 
+import java.util.HashMap;
+import java.util.Optional;
+
+import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
-import bomber.renderer.interfaces.ScreenInterface;
+import bomber.game.KeyboardState;
+import bomber.game.Movement;
+import bomber.game.Player;
+import bomber.game.Response;
 
-public class Screen implements ScreenInterface {
+public class Screen {
 
 	private final String title;
 	private int width;
@@ -20,16 +26,19 @@ public class Screen implements ScreenInterface {
 	private boolean resized;
 	private boolean vSync;
 	private GLFWVidMode vidmode;
+	private HashMap<Response, Integer> controlScheme;
+	private Player player;
 
-	public Screen(int width, int height, String title, boolean vSync) {
+	public Screen(String title, int width, int height, boolean vSync, HashMap<Response, Integer> controls, Player player) {
 
+		this.player = player;
+		this.controlScheme = controls;
 		this.width = width;
 		this.height = height;
 		this.title = title;
 		this.vSync = vSync;
 	} // END OF CONSTRUCTOR
 
-	@Override
 	public void init() {
 
 		// Setup an error callback. The default implementation
@@ -89,69 +98,141 @@ public class Screen implements ScreenInterface {
 		GL.createCapabilities();
 		
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		
+		glfwSetInputMode(this.screenID, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+		
 	} // END OF init METHOD
 
-	@Override
+	public boolean input(boolean bombPressed){
+		
+		System.out.println("polling the keyboard");
+		
+		KeyboardState keyState = this.player.getKeyState();
+		
+		int state = GLFW_RELEASE;
+			
+			//System.out.println("Checking again...");
+			
+			//check for bomb
+			if(getKey(Response.PLACE_BOMB).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.PLACE_BOMB).get());
+			}
+			if(state == GLFW_PRESS && !bombPressed){
+			    keyState.setBomb(true);
+			    bombPressed = true;
+			    state = GLFW_RELEASE;
+			}else if(state == GLFW_RELEASE && bombPressed){
+				bombPressed = false;
+			}
+			
+			//Check for up
+			
+			if(getKey(Response.UP_MOVE).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.UP_MOVE).get());
+			}
+			if(state == GLFW_PRESS){
+			    keyState.setMovement(Movement.UP);
+			    state = GLFW_RELEASE;
+			}
+			
+			//check for down
+			if(getKey(Response.DOWN_MOVE).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.DOWN_MOVE).get());
+			}
+			if(state == GLFW_PRESS){
+			    keyState.setMovement(Movement.DOWN);
+			    state = GLFW_RELEASE;
+			}
+			
+			//check for left
+			if(getKey(Response.LEFT_MOVE).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.LEFT_MOVE).get());
+			}
+			if(state == GLFW_PRESS){
+			    keyState.setMovement(Movement.LEFT);
+			    state = GLFW_RELEASE;
+			}
+			
+			//check for right
+			if(getKey(Response.RIGHT_MOVE).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.RIGHT_MOVE).get());
+			}
+			if(state == GLFW_PRESS){
+			    keyState.setMovement(Movement.RIGHT);
+			    state = GLFW_RELEASE;
+			}
+			
+			return bombPressed;
+	}
+	
+	private Optional<Integer> getKey(Response r){
+		if(this.controlScheme.containsKey(r)){
+			return Optional.of(this.controlScheme.get(r));
+		}
+		return Optional.empty();
+	}
+	
 	public void setClearColour(float red, float green, float blue, float alpha) {
 		
 		glClearColor(red, green, blue, alpha);
 	} // END OF setClearColour
 
-	@Override
 	public boolean screenShouldClose() {
 		
 		return glfwWindowShouldClose(screenID);
 	} // END OF screenShouldClose METHOD
 
-	@Override
 	public String getTitle() {
 		
 		return title;
 	} // END OF getTitle METHOD
 
-	@Override
 	public int getWidth() {
 		
 		return width;
 	} // END OF getWidth METHOD
 
-	@Override
 	public int getHeight() {
 		
 		return height;
 	} // END OF getHeight METHOD
 
-	@Override
 	public boolean isResized() {
 		
 		return resized;
 	} // END OF isResized METHOD
 
-	@Override
 	public boolean isVsyncOn() {
 
 		return vSync;
 	} // END OF isVsyncOn METHOD
 
-	@Override
 	public void setResized(boolean resized) {
 		
 		this.resized = resized;
 	} // END OF setResized METHOD
 
-	@Override
 	public void setVsyncOn(boolean vSync) {
 		
 		this.vSync = vSync;
 	} // END OF setVsyncOn METHOD
 	
-	@Override
 	public void setViewport(int originX, int originY, int width, int height) {
 		
 		glViewport(originX, originY, width, height);
 	} // END OF setViewport METHOD
 	
-	@Override
+	public long getScreenID() {
+		
+		return screenID;
+	} // END OF getScreenID METHOD
+	
+	public void close() {
+		
+		glfwSetWindowShouldClose(screenID, true);
+	} // END OF close METHOD
+	
 	public void update() {
 		
         glfwSwapBuffers(screenID);

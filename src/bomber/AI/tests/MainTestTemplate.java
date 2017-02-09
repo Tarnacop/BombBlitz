@@ -67,9 +67,10 @@ public abstract class MainTestTemplate {
 
 		players = new ArrayList<>();
 
-		state = new GameState(map, players, bombs);
+		state = new GameState(map, players);
+		state.setBombs(bombs);
 
-		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state);
+		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state, null);
 		players.add(ai);
 		checker = new SafetyChecker(state, ai);
 		finder = new RouteFinder(state, ai,checker);

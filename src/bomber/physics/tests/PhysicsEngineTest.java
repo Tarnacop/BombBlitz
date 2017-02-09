@@ -27,7 +27,6 @@ public class PhysicsEngineTest
     private PhysicsEngine engine;
     private Player buddy;
 
-
     @Before
     public void setUp() throws Exception
     {
@@ -36,9 +35,6 @@ public class PhysicsEngineTest
                             {BLANK, BLANK, BLANK, BLANK, SOFT, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT},
                             {SOLID, SOFT, SOLID, SOFT, SOLID, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT}};
         map = new Map(blocks);
-
-        System.out.println();
-
 
         players = new ArrayList<>();
         buddy = new Player("Buddy", new Point(5,5), 3, 10);
@@ -153,7 +149,7 @@ public class PhysicsEngineTest
     }
 
     @Test
-    public void updateAll() throws Exception
+    public void update() throws Exception
     {
         KeyboardState kState = buddy.getKeyState();
 
@@ -175,6 +171,26 @@ public class PhysicsEngineTest
         buddy.setSpeed(20);
         engine.update();
         assertEquals("The position of the player after update does not match expected value", new Point(15, 10), buddy.getPos());
+    }
+
+    @Test
+    public void updateWithInterval() throws Exception
+    {
+        buddy.getKeyState().setMovement(Movement.DOWN);
+        buddy.setSpeed(100);
+
+        // pixels - speed*milliseconds / 1000
+
+        // TODO: look into parameterised tests
+        int[] intervals = {10, 20, 30, 50, 100, 50, 30, 20, 10, 130, 500};
+        int[] positionY = {6,  8,  11, 16, 26,  31, 34, 36, 37, 50,  100};
+
+        for(int i=0; i<intervals.length; i++)
+        {
+            engine.update(intervals[i]);
+            assertEquals("The position of the player after update does not match expected value", new Point(5, positionY[i]), buddy.getPos());
+        }
+
     }
 
 }

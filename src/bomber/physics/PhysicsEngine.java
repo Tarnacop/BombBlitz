@@ -13,11 +13,11 @@ import java.util.Optional;
 public class PhysicsEngine
 {
 
-    public static final int playerPixelWidth = 50;
-    public static final int playerPixelHeight = 50;
+    public static final int playerPixelWidth = 32;
+    public static final int playerPixelHeight = 32;
     public static final int bombPixelWidth = 50;
     public static final int bombPixelHeight = 50;
-    public static final int default_time = 200;
+    public static final int default_time = 2000;
     public static final int mapBlockToGridMultiplier = 64;
 
     private GameState gameState;
@@ -100,9 +100,9 @@ public class PhysicsEngine
         gameState.getBombs().add(new Bomb(playerName,  getBombLocation(playerPos), time, radius));
     }
 
-    private void updatePlayer(Player player)
+    private void updatePlayer(Player player, int milliseconds)
     {
-        int speed = (int)player.getSpeed();
+        int speed = (int) (milliseconds*player.getSpeed()/1000);
         Point pos = player.getPos();
         Movement movement = player.getKeyState().getMovement();
         Point fromDirection = null;
@@ -180,9 +180,9 @@ public class PhysicsEngine
         return new Point(corner.x-initialCorner.x, corner.y-initialCorner.y);
     }
 
-    public synchronized void update()
+    public synchronized void update(int miliseconds)
     {
-        // update map
+        // update map (blast)
         Map map = gameState.getMap();
         int width = gameState.getMap().getGridMap().length;
         int height = gameState.getMap().getGridMap()[0].length;
@@ -193,18 +193,21 @@ public class PhysicsEngine
 
         // update bombs
         ArrayList<Bomb> toBeDeleted = new ArrayList<>();
-        gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted));
+        gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted, miliseconds));
         toBeDeleted.forEach(b -> gameState.getBombs().remove(b));
 
         // update players
-        gameState.getPlayers().forEach(this::updatePlayer);
-
-
+        gameState.getPlayers().forEach(p -> updatePlayer(p, miliseconds));
     }
 
-    private void updateBomb(Bomb bomb, ArrayList<Bomb> toBeDeleted)
+    public synchronized void update()
     {
-        decreaseBombTimer(bomb);
+        update(1000);
+    }
+
+    private void updateBomb(Bomb bomb, ArrayList<Bomb> toBeDeleted, int milliseconds)
+    {
+        decreaseBombTimer(bomb, milliseconds);
         if(bomb.getTime()<=0)
         {
             toBeDeleted.add(bomb);
@@ -246,9 +249,9 @@ public class PhysicsEngine
         }
     }
 
-    private void decreaseBombTimer(Bomb bomb)
+    private void decreaseBombTimer(Bomb bomb, int miliseconds)
     {
-        bomb.setTime(bomb.getTime()-1);
+        bomb.setTime(bomb.getTime()-miliseconds);
     }
 
 }
