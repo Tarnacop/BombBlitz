@@ -4,6 +4,7 @@ import bomber.game.*;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 /**
@@ -14,9 +15,14 @@ public class PhysicsEngine
 
     public static final int playerPixelWidth = 50;
     public static final int playerPixelHeight = 50;
+    public static final int bombPixelWidth = 50;
+    public static final int bombPixelHeight = 50;
     public static final int default_time = 200;
+    public static final int mapBlockToGridMultiplier = 64;
 
     private GameState gameState;
+
+    private HashMap<String, Boolean> okToPlaceBomb;
 
     /**
      * Creates an engine using a GameState
@@ -25,14 +31,7 @@ public class PhysicsEngine
     public PhysicsEngine(GameState gameState)
     {
         this.gameState = gameState;
-    }
-
-    /**
-     * Puts a new player on the map
-     */
-    public void addPlayer(String name, Point pos, int lives, double speed)
-    {
-        gameState.getPlayers().add(new Player(name, pos, lives, speed));
+        okToPlaceBomb = new HashMap<>();
     }
 
     /*
@@ -58,6 +57,15 @@ public class PhysicsEngine
     */
 
     /**
+     * Puts a new player on the map
+     */
+    /*
+    public void addPlayer(String name, Point pos, int lives, double speed)
+    {
+        gameState.getPlayers().add(new Player(name, pos, lives, speed));
+    }
+
+    /**
      * Gets the player corresponding to a certain name
      * Assumes there is at most one player named that way
      * @param name The name
@@ -79,11 +87,17 @@ public class PhysicsEngine
 */    }
 
 
+    private Point getBombLocation(Point playerPosition)
+    {
+        int xOffset = (mapBlockToGridMultiplier - bombPixelWidth)/2;
+        int YOffset = (mapBlockToGridMultiplier - bombPixelHeight)/2;
+        return new Point((playerPosition.x+playerPixelWidth/2)/64 * 64+xOffset, (playerPosition.y+playerPixelHeight/2)/64*64+YOffset);
+    }
+
     public void plantBomb(String playerName, int time, int radius)
     {
         Point playerPos = getPlayerNamed(playerName).getPos();
-        Point newPos = new Point(playerPos.x+32, playerPos.y+32);
-        gameState.getBombs().add(new Bomb(playerName,  newPos, time, radius));
+        gameState.getBombs().add(new Bomb(playerName,  getBombLocation(playerPos), time, radius));
     }
 
     private void updatePlayer(Player player)
@@ -115,11 +129,15 @@ public class PhysicsEngine
 
         Map map = gameState.getMap();
 
+
         // check for bomb placement
-        if(player.getKeyState().isBomb())
+        if(player.getKeyState().isBomb() && okToPlaceBomb.get(player.getName()))
         {
             plantBomb(player.getName(), default_time, player.getBombRange());
+            okToPlaceBomb.put(player.getName(), false);
         }
+        if(!player.getKeyState().isBomb())
+            okToPlaceBomb.put(player.getName(), true);
 
         // collision detection
         
