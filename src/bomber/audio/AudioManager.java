@@ -1,5 +1,9 @@
 package bomber.audio;
 
+import bomber.game.AudioEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,7 +23,6 @@ public class AudioManager
         effects = new SoundEffectPlayer();
         effects.start();
     }
-
 
     public void playMusic()
     {
@@ -41,21 +44,17 @@ public class AudioManager
         music.interrupt();
     }
 
-    public void playExplosion()
+    public void playEventList(List<AudioEvent> eventList)
     {
-        effects.playExplosion();
+        eventList.forEach(event -> effects.play(event));
     }
-
-    /*
-    public boolean isMusicPlaying()
-    {
-        return music.isAlive() && music.isPlaying();
-    }
-    */
 
     public static void main(String[] args) {
         AudioManager audioManager = new AudioManager();
         audioManager.playMusic();
+
+        List<AudioEvent> eventList = new ArrayList<>();
+        eventList.add(AudioEvent.EXPLOSION);
 
         try
         {
@@ -65,7 +64,7 @@ public class AudioManager
             e.printStackTrace();
         }
 
-        audioManager.playExplosion();
+        audioManager.playEventList(eventList);
 
         try
         {

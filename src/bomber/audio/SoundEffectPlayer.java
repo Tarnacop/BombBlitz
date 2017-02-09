@@ -1,5 +1,6 @@
 package bomber.audio;
 
+import bomber.game.AudioEvent;
 import sun.applet.Main;
 
 import javax.sound.sampled.*;
@@ -12,13 +13,9 @@ public class SoundEffectPlayer extends Thread
 {
 
     public static final String explosionFilename = "sfx_exp_medium3.wav";
-
-
-
-    public void playExplosion()
-    {
-        playSound(explosionFilename);
-    }
+    public static final String bombPlaceFilename = "sfx_exp_medium3.wav";
+    public static final String movementFilename = "sfx_exp_medium3.wav";
+    public static final String playerDeathFilename = "sfx_exp_medium3.wav";
 
     private void playSound(String fileName)
     {
@@ -37,4 +34,19 @@ public class SoundEffectPlayer extends Thread
         }
     }
 
+    public void play(AudioEvent event)
+    {
+        switch (event)
+        {
+            case PLACE_BOMB:
+                playSound(bombPlaceFilename);
+                break;
+            case EXPLOSION:
+                playSound(explosionFilename);
+                break;
+            case PLAYER_DEATH:
+                playSound(playerDeathFilename);
+                break;
+        }
+    }
 }
