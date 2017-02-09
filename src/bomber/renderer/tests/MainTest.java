@@ -1,6 +1,6 @@
 package bomber.renderer.tests;
 
-import bomber.renderer.Game;
+import bomber.renderer.Graphics;
 import bomber.renderer.interfaces.GameLogicInterface;
 
 public class MainTest {
@@ -11,7 +11,7 @@ public class MainTest {
 			
             boolean vSync = true;
             GameLogicInterface gameLogic = new TestGame();
-            Game gameEng = new Game("GAME",
+            Graphics gameEng = new Graphics("GAME",
                 640, 640, vSync, gameLogic);
             gameEng.start();
         } catch (Exception excp) {

@@ -1,25 +1,36 @@
 package bomber.renderer;
 
 import bomber.renderer.constants.RendererConstants;
-import bomber.renderer.interfaces.GameInterface;
-import bomber.renderer.interfaces.GameLogicInterface;
 
-public class Game implements GameInterface {
+import java.util.HashMap;
+
+import bomber.game.Game;
+import bomber.game.GameState;
+import bomber.game.Player;
+import bomber.game.Response;
+
+public class Graphics implements Runnable {
 
 	private final Screen screen;
 	private final Thread gameLoopThread;
 	private final Timer timer;
-	private final GameLogicInterface gameLogic;
+	private final Game gameLogic;
+	private final GameState state;
+	private final Renderer renderer;
+	private Player player;
 	
-	public Game(String screenTitle, int screenWidth, int screenHeight, boolean vSync, GameLogicInterface gameLogic) throws Exception {
+	public Graphics(String screenTitle, int screenWidth, int screenHeight, Game gameLogic, GameState state, HashMap<Response, Integer> controls, Player player) throws Exception {
 		
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
-		screen = new Screen(screenWidth, screenHeight, screenTitle, true);
+		
+		this.screen = new Screen(screenTitle, screenWidth, screenHeight, true, controls, player);
+		this.renderer = new Renderer();
+		this.state = state;
 		this.gameLogic = gameLogic;
+		this.player = player;
 		timer = new Timer();
 	} // END OF CONSTRUCTOR
 	
-	@Override
 	public void start() {
 	
 		// Start the thread for the game engine loop
@@ -50,21 +61,24 @@ public class Game implements GameInterface {
 	private void init() throws Exception {
 		
 		screen.init();
+		renderer.init(screen);
+		float[] colours = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f };
+		player.makeMesh(0, 0, 32, 32, colours);
 		timer.init();
-		gameLogic.init(screen);
 	} // END OF init METHOD
 	
 	// Update method
 	private void update(float interval) {
 		
 		// Game logic gets updated
-		gameLogic.update(interval);
+		gameLogic.update(screen, interval);
 	} // END OF update METHOD
 
 	// Render method
 	private void render() {
 		
-		gameLogic.render(screen);
+		// Render the renderer
+		renderer.render(screen, state);
 		screen.update();
 	} // END OF render METHOD
 	
@@ -125,9 +139,8 @@ public class Game implements GameInterface {
 		
 	} // END OF sync METHOD
 	
-	@Override
 	public void dispose() {
 		
-		gameLogic.dispose();
+		renderer.dispose();
 	} // END OF dispose METHOD
 } // END OF Application

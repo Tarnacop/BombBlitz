@@ -61,9 +61,9 @@ public class PlanningTest {
 		
 		map = new Map(blocks);
 
-		state = new GameState(map, null, null);
+		state = new GameState(map, null);
 
-		ai = new GameAI("ai", new Point(12,0), 3, 10, state);
+		ai = new GameAI("ai", new Point(12,0), 3, 10, state, null);
 		ai.setBombRange(3);
 		checker = new SafetyChecker(state, ai);
 		finder = new RouteFinder(state, ai,checker);

@@ -13,8 +13,8 @@ import java.util.Optional;
 public class PhysicsEngine
 {
 
-    public static final int playerPixelWidth = 50;
-    public static final int playerPixelHeight = 50;
+    public static final int playerPixelWidth = 32;
+    public static final int playerPixelHeight = 32;
     public static final int bombPixelWidth = 50;
     public static final int bombPixelHeight = 50;
     public static final int default_time = 2000;
