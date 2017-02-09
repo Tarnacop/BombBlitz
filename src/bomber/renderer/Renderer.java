@@ -1,128 +1,105 @@
 package bomber.renderer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
-import java.nio.FloatBuffer;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 
-import org.lwjgl.system.MemoryUtil;
-
-import bomber.renderer.interfaces.RendererInterface;
-import bomber.renderer.interfaces.ScreenInterface;
+import bomber.game.Bomb;
+import bomber.game.GameState;
+import bomber.game.Player;
 import bomber.renderer.shaders.ShaderProgram;
 import bomber.renderer.utils.FileHandler;
+import bomber.renderer.utils.Transformation;
 
-public class Renderer implements RendererInterface {
+public class Renderer {
 
 	private ShaderProgram shaderConstructor;
+	private final Transformation transformation;
 
-	private int vaoID;
-	private int vboID;
+	public Renderer() {
 
-	@Override
-	public void init() throws Exception {
+		transformation = new Transformation();
+	} // END OF CONSTRUCTOR
+
+	public void init(Screen screen) throws Exception {
 
 		shaderConstructor = new ShaderProgram();
 		shaderConstructor.createVertexShader(FileHandler.loadResource("res/vertex.vs"));
 		shaderConstructor.createFragmentShader(FileHandler.loadResource("res/fragment.fs"));
 		shaderConstructor.link();
 
-		// Coords of a triangle
-		float[] vertices = new float[] { 0.0f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f };
+		shaderConstructor.createUniform("projection");
+		shaderConstructor.createUniform("model");
 
-		// Allocate memory for a float buffer
-		FloatBuffer verticesBuffer = null;
-		try {
-			verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
-
-			// Store the data and flip the buffer to 0
-			verticesBuffer.put(vertices).flip();
-
-			// Create a VAO and bind it
-			vaoID = glGenVertexArrays();
-			glBindVertexArray(vaoID);
-
-			// Create a VBO and bind it
-			vboID = glGenBuffers();
-			glBindBuffer(GL_ARRAY_BUFFER, vboID);
-			glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
-
-			glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-
-			// Unbind the VBO
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			// Unbind the VAO
-			glBindVertexArray(0);
-
-		} catch (Exception ex) {
-
-			System.err.println("ERROR: " + ex.getStackTrace());
-		} finally {
-
-			if (verticesBuffer != null) {
-				MemoryUtil.memFree(verticesBuffer);
-			}
-		}
-
+		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
 
-	public void render(ScreenInterface screen) {
-		
-		clear();
+	// Takes a state to render
+	public void render(Screen screen, GameState state) {
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Resize the screen if it needs to be resized
 		if (screen.isResized()) {
-			
+
 			screen.setViewport(0, 0, screen.getWidth(), screen.getHeight());
 			screen.setResized(false);
 		}
-		
+
 		// Bind the shader
 		shaderConstructor.bind();
-		
-		// Bind the VAO
-		glBindVertexArray(vaoID);
-		glEnableVertexAttribArray(0);
-		
-		// Draw the vertices
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		
-		// Disable the VAO and unbind it
-		glDisableVertexAttribArray(0);
-		glBindVertexArray(0);
-		
-		// Unbind the shader
-		shaderConstructor.unbind();
-		
-	} // END OF render METHOD
 
-	// Clear the screen - TODO REMOVE IT IF IT IS USED ONLY IN RENDER
-	@Override
-	public void clear() {
+		// Set the uniform
+		Matrix4f projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth(), screen.getHeight(), 0f, -1f, 1f);
+		shaderConstructor.setUniform("projection", projectionMatrix);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	} // END OF clear METHOD
-
-	@Override
-	public void dispose() {
+		// Render each entity of the state
 		
-		if(shaderConstructor != null) {
+		/*
+		for (GameEntity gameEntity : gameEntities) {
+
+			Matrix4f modelMatrix = transformation.getModelMatrix(gameEntity.getPosition(), gameEntity.getRotation(),
+					gameEntity.getScale());
 			
-			shaderConstructor.dispose();
+			shaderConstructor.setUniform("model", modelMatrix);
+
+			gameEntity.getMesh().render();
+		}*/
+		
+		
+		for (Player player : state.getPlayers()) {
+			
+			Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
+					,0f, 1f);
+			
+			shaderConstructor.setUniform("model", modelMatrix);
+			
+			player.getMesh().render();
 		}
 		
-		glDisableVertexAttribArray(0);
-		
-		// Delete the VBO
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDeleteBuffers(vboID);
-		
-		// Delete the VAO
-		glBindVertexArray(0);
-		glDeleteVertexArrays(vaoID);
-		
+		for (Bomb bomb : state.getBombs()) {
+			
+			Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) bomb.getPos().x, (float) bomb.getPos().y)
+			,0f, 1f);
+	
+			shaderConstructor.setUniform("model", modelMatrix);
+			
+			bomb.getMesh().render();
+		}
+
+		// Unbind the shader
+		shaderConstructor.unbind();
+
+	} // END OF render METHOD
+	
+	public void dispose() {
+
+		if (shaderConstructor != null) {
+
+			shaderConstructor.dispose();
+		}
 	} // END OF dispose METHOD
 } // END OF Renderer CLASS

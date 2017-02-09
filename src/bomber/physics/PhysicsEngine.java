@@ -4,6 +4,7 @@ import bomber.game.*;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 /**
@@ -14,9 +15,14 @@ public class PhysicsEngine
 
     public static final int playerPixelWidth = 50;
     public static final int playerPixelHeight = 50;
-    public static final int default_time = 200;
+    public static final int bombPixelWidth = 50;
+    public static final int bombPixelHeight = 50;
+    public static final int default_time = 2000;
+    public static final int mapBlockToGridMultiplier = 64;
 
     private GameState gameState;
+
+    private HashMap<String, Boolean> okToPlaceBomb;
 
     /**
      * Creates an engine using a GameState
@@ -25,14 +31,7 @@ public class PhysicsEngine
     public PhysicsEngine(GameState gameState)
     {
         this.gameState = gameState;
-    }
-
-    /**
-     * Puts a new player on the map
-     */
-    public void addPlayer(String name, Point pos, int lives, double speed)
-    {
-        gameState.getPlayers().add(new Player(name, pos, lives, speed));
+        okToPlaceBomb = new HashMap<>();
     }
 
     /*
@@ -58,6 +57,15 @@ public class PhysicsEngine
     */
 
     /**
+     * Puts a new player on the map
+     */
+    /*
+    public void addPlayer(String name, Point pos, int lives, double speed)
+    {
+        gameState.getPlayers().add(new Player(name, pos, lives, speed));
+    }
+
+    /**
      * Gets the player corresponding to a certain name
      * Assumes there is at most one player named that way
      * @param name The name
@@ -79,16 +87,22 @@ public class PhysicsEngine
 */    }
 
 
+    private Point getBombLocation(Point playerPosition)
+    {
+        int xOffset = (mapBlockToGridMultiplier - bombPixelWidth)/2;
+        int YOffset = (mapBlockToGridMultiplier - bombPixelHeight)/2;
+        return new Point((playerPosition.x+playerPixelWidth/2)/64 * 64+xOffset, (playerPosition.y+playerPixelHeight/2)/64*64+YOffset);
+    }
+
     public void plantBomb(String playerName, int time, int radius)
     {
         Point playerPos = getPlayerNamed(playerName).getPos();
-        Point newPos = new Point(playerPos.x+32, playerPos.y+32);
-        gameState.getBombs().add(new Bomb(playerName,  newPos, time, radius));
+        gameState.getBombs().add(new Bomb(playerName,  getBombLocation(playerPos), time, radius));
     }
 
-    private void updatePlayer(Player player)
+    private void updatePlayer(Player player, int milliseconds)
     {
-        int speed = (int)player.getSpeed();
+        int speed = (int) (milliseconds*player.getSpeed()/1000);
         Point pos = player.getPos();
         Movement movement = player.getKeyState().getMovement();
         Point fromDirection = null;
@@ -115,11 +129,15 @@ public class PhysicsEngine
 
         Map map = gameState.getMap();
 
+
         // check for bomb placement
-        if(player.getKeyState().isBomb())
+        if(player.getKeyState().isBomb() && okToPlaceBomb.get(player.getName()))
         {
             plantBomb(player.getName(), default_time, player.getBombRange());
+            okToPlaceBomb.put(player.getName(), false);
         }
+        if(!player.getKeyState().isBomb())
+            okToPlaceBomb.put(player.getName(), true);
 
         // collision detection
         
@@ -162,9 +180,9 @@ public class PhysicsEngine
         return new Point(corner.x-initialCorner.x, corner.y-initialCorner.y);
     }
 
-    public synchronized void update()
+    public synchronized void update(int miliseconds)
     {
-        // update map
+        // update map (blast)
         Map map = gameState.getMap();
         int width = gameState.getMap().getGridMap().length;
         int height = gameState.getMap().getGridMap()[0].length;
@@ -175,18 +193,21 @@ public class PhysicsEngine
 
         // update bombs
         ArrayList<Bomb> toBeDeleted = new ArrayList<>();
-        gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted));
+        gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted, miliseconds));
         toBeDeleted.forEach(b -> gameState.getBombs().remove(b));
 
         // update players
-        gameState.getPlayers().forEach(this::updatePlayer);
-
-
+        gameState.getPlayers().forEach(p -> updatePlayer(p, miliseconds));
     }
 
-    private void updateBomb(Bomb bomb, ArrayList<Bomb> toBeDeleted)
+    public synchronized void update()
     {
-        decreaseBombTimer(bomb);
+        update(1000);
+    }
+
+    private void updateBomb(Bomb bomb, ArrayList<Bomb> toBeDeleted, int milliseconds)
+    {
+        decreaseBombTimer(bomb, milliseconds);
         if(bomb.getTime()<=0)
         {
             toBeDeleted.add(bomb);
@@ -228,9 +249,9 @@ public class PhysicsEngine
         }
     }
 
-    private void decreaseBombTimer(Bomb bomb)
+    private void decreaseBombTimer(Bomb bomb, int miliseconds)
     {
-        bomb.setTime(bomb.getTime()-1);
+        bomb.setTime(bomb.getTime()-miliseconds);
     }
 
 }

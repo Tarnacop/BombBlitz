@@ -1,8 +1,8 @@
 package bomber.game;
 
-
-
 import java.awt.Point;
+import bomber.renderer.shaders.Mesh;
+
 
 public class Bomb {
 
@@ -12,6 +12,8 @@ public class Bomb {
 	private int radius;		
 	private int scalar = 64;
 	private Point gridPos;
+	private final Mesh mesh;
+	
 	public Bomb(String playerName, Point pos, int time, int radius){
 		
 		this.playerName = playerName;
@@ -19,6 +21,9 @@ public class Bomb {
 		this.time = time;
 		this.radius = radius;
 		this.gridPos = new Point();
+		float[] colours = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
+		
+		this.mesh = new Mesh(this.pos.x, this.pos.y, 64, 64, colours);
 		updatePos();
 	}
 
@@ -55,5 +60,10 @@ public class Bomb {
 	public int getRadius(){
 		
 		return this.radius;
+	}
+	
+	public Mesh getMesh() {
+		
+		return this.mesh;
 	}
 }
