@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 
 import bomber.game.Bomb;
 import bomber.game.GameState;
@@ -71,10 +72,20 @@ public class Renderer {
 		
 		for (Player player : state.getPlayers()) {
 			
+			Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
+					,0f, 1f);
+			
+			shaderConstructor.setUniform("model", modelMatrix);
+			
 			player.getMesh().render();
 		}
 		
 		for (Bomb bomb : state.getBombs()) {
+			
+			Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) bomb.getPos().x, (float) bomb.getPos().y)
+			,0f, 1f);
+	
+			shaderConstructor.setUniform("model", modelMatrix);
 			
 			bomb.getMesh().render();
 		}
@@ -90,6 +101,5 @@ public class Renderer {
 
 			shaderConstructor.dispose();
 		}
-
 	} // END OF dispose METHOD
 } // END OF Renderer CLASS

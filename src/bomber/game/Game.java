@@ -6,7 +6,9 @@ import java.util.HashMap;
 
 import bomber.AI.GameAI;
 import bomber.physics.PhysicsEngine;
+import bomber.renderer.Graphics;
 import bomber.renderer.Screen;
+import bomber.renderer.shaders.Mesh;
 
 
 public class Game{
@@ -18,65 +20,77 @@ public class Game{
 	private PhysicsEngine physics;
 	private GameState gameState;
 	private KeyboardState keyState;
-	private KeyboardUpdater updater;
+	private Graphics graphics;
+	private boolean bombPressed;
 
 	public Game(Map map, String playerName, HashMap<Response, Integer> controls){
 		
 		this.map = map;
 		this.playerName = playerName;
 		this.controlScheme = controls;
+		this.bombPressed = false;
 		
 		init();
 	}
 	
 	private void init(){
 		
-		Player p1 = new Player(this.playerName, new Point(64,64), 5, 3);
+		Player p1 = new Player(this.playerName, new Point(64,64), 5, 300, null);
+		this.keyState = p1.getKeyState();
 		
 		ArrayList<Player> list = new ArrayList<Player>();
 		list.add(p1);
 		
 		this.gameState = new GameState(map, list);
-
+		this.physics = new PhysicsEngine(gameState);
+		
+		try {
+			
+			this.graphics = new Graphics("Bomb Blitz", 600, 600, this, this.gameState);
+			this.graphics.start();
+			
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//Player ai = new GameAI("Player2", new Point(128, 128), 5, 3, gameState);
 		
 		//gameState.getPlayers().add(ai);
 		
-		this.screen  = new Screen(600, 600, "Bomb Blitz", false);
-		this.screen.init();
 		
-		this.keyState = p1.getKeyState();
-		
-		this.updater = new 
-				KeyboardUpdater(screen.getScreenID(), this.controlScheme, p1);
-		
-		this.physics = new PhysicsEngine(gameState);
-		
-		this.updater.start();
 		//ai.begin();
+		
+//		while(true){
+//			
+//			this.update(0);
+//			
+//			try {
+//				Thread.sleep(10);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+		
+	
+		
 	}
 	
-	public void update(float interval){
+	public void update(Screen screen, float interval){
 		
-		if(gameState.gameOver()){
-			
-			this.updater.die();
-			this.screen.close();
-		}
-		else{
-			this.screen.update();
-		this.physics.update();
+		this.bombPressed = screen.input(this.bombPressed);	
+		this.physics.update((int) (interval * 1000));
 		
 		System.out.println(this.gameState);
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 		
 		//UI.update();
-		//physics.update();
 		//audio.playEventList(gameState.getAudioEvents);
 //		this.screen.update();
 		
-		}
+		//}
 		
 	}
 }

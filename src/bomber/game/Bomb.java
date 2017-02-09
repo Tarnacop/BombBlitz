@@ -14,14 +14,16 @@ public class Bomb {
 	private Point gridPos;
 	private final Mesh mesh;
 	
-	public Bomb(String playerName, Point pos, int time, int radius, Mesh mesh){
+	public Bomb(String playerName, Point pos, int time, int radius){
 		
 		this.playerName = playerName;
 		this.pos = pos;
 		this.time = time;
 		this.radius = radius;
 		this.gridPos = new Point();
-		this.mesh = mesh;
+		float[] colours = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
+		
+		this.mesh = new Mesh(this.pos.x, this.pos.y, 64, 64, colours);
 		updatePos();
 	}
 

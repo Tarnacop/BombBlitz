@@ -1,6 +1,7 @@
 package bomber.renderer;
 
 import bomber.renderer.constants.RendererConstants;
+import bomber.game.Game;
 import bomber.game.GameState;
 
 public class Graphics implements Runnable {
@@ -16,6 +17,8 @@ public class Graphics implements Runnable {
 		
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
 		
+		this.screen = screen;
+		this.renderer = new Renderer();
 		this.state = state;
 		this.gameLogic = gameLogic;
 		timer = new Timer();
@@ -50,6 +53,7 @@ public class Graphics implements Runnable {
 	// Initialize the game engine
 	private void init() throws Exception {
 		
+		renderer.init(screen);
 		timer.init();
 	} // END OF init METHOD
 	
@@ -57,7 +61,6 @@ public class Graphics implements Runnable {
 	private void update(float interval) {
 		
 		// Game logic gets updated
-		renderer.render(screen, state);
 		gameLogic.update(interval);
 	} // END OF update METHOD
 
@@ -65,6 +68,7 @@ public class Graphics implements Runnable {
 	private void render() {
 		
 		// Render the renderer
+		renderer.render(screen, state);
 		screen.update();
 	} // END OF render METHOD
 	

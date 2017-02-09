@@ -12,7 +12,6 @@ import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.KeyboardState;
-import bomber.game.KeyboardUpdater;
 import bomber.game.Map;
 import bomber.game.Movement;
 import bomber.game.Player;

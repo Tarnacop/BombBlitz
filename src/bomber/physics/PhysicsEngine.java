@@ -17,7 +17,7 @@ public class PhysicsEngine
     public static final int playerPixelHeight = 50;
     public static final int bombPixelWidth = 50;
     public static final int bombPixelHeight = 50;
-    public static final int default_time = 200;
+    public static final int default_time = 2000;
     public static final int mapBlockToGridMultiplier = 64;
 
     private GameState gameState;
