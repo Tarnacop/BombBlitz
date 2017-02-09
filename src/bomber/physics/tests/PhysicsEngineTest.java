@@ -39,7 +39,7 @@ public class PhysicsEngineTest
         players = new ArrayList<>();
         buddy = new Player("Buddy", new Point(5,5), 3, 10);
         players.add(buddy);
-        gameState = new GameState(map, players, new ArrayList<>());
+        gameState = new GameState(map, players);
         engine = new PhysicsEngine(gameState);
     }
 

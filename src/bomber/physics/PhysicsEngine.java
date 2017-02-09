@@ -17,7 +17,7 @@ public class PhysicsEngine
     public static final int playerPixelHeight = 50;
     public static final int bombPixelWidth = 50;
     public static final int bombPixelHeight = 50;
-    public static final int default_time = 200;
+    public static final int default_time = 2000;
     public static final int mapBlockToGridMultiplier = 64;
 
     private GameState gameState;
@@ -98,6 +98,7 @@ public class PhysicsEngine
     {
         Point playerPos = getPlayerNamed(playerName).getPos();
         gameState.getBombs().add(new Bomb(playerName,  getBombLocation(playerPos), time, radius));
+        gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
     }
 
     private void updatePlayer(Player player, int milliseconds)
@@ -140,7 +141,6 @@ public class PhysicsEngine
             okToPlaceBomb.put(player.getName(), true);
 
         // collision detection
-        
         // TODO refactor (put this test up higher and test speed & direction)
         if (fromDirection != null)
         {
@@ -161,9 +161,9 @@ public class PhysicsEngine
         // check if player is killed
         if (map.getPixelBlockAt(pos.x, pos.y)==Block.BLAST)
         {
-            // TODO: tell gameLogic and/or audio
             player.setAlive(false);
             player.setLives(Math.max(player.getLives()-1,0));
+            gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
         }
     }
 
@@ -214,6 +214,7 @@ public class PhysicsEngine
             Point pos = bomb.getPos();
             int radius = bomb.getRadius();
             addBlast(pos.x/64, pos.y/64, radius, 0);
+            gameState.getAudioEvents().add(AudioEvent.EXPLOSION);
         }
     }
 
@@ -249,9 +250,9 @@ public class PhysicsEngine
         }
     }
 
-    private void decreaseBombTimer(Bomb bomb, int miliseconds)
+    private void decreaseBombTimer(Bomb bomb, int milliseconds)
     {
-        bomb.setTime(bomb.getTime()-miliseconds);
+        bomb.setTime(bomb.getTime()-milliseconds);
     }
 
 }
