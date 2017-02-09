@@ -7,9 +7,11 @@ import static org.lwjgl.opengl.GL30.*;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
+import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Player;
+import bomber.renderer.shaders.Mesh;
 import bomber.renderer.shaders.ShaderProgram;
 import bomber.renderer.utils.FileHandler;
 import bomber.renderer.utils.Transformation;
@@ -18,7 +20,10 @@ public class Renderer {
 
 	private ShaderProgram shaderConstructor;
 	private final Transformation transformation;
-
+	private Mesh blockMesh;
+	private Mesh softMesh;
+	private Mesh blastMesh;
+	
 	public Renderer() {
 
 		transformation = new Transformation();
@@ -33,7 +38,13 @@ public class Renderer {
 
 		shaderConstructor.createUniform("projection");
 		shaderConstructor.createUniform("model");
-
+		
+		float[] colours = new float[] { 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f };
+		blockMesh = new Mesh(0, 0, 64, 64, colours);
+		colours = new float[] { 1f, 1f, 1f, 0.0f, 1f, 1f, 1f, 0.0f, 1f, 1f, 1f, 0.0f };
+		softMesh = new Mesh(0, 0, 64, 64, colours);
+		colours = new float[] {0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f}; 
+		blastMesh = new Mesh(0, 0, 64, 64, colours);
 		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
 
@@ -69,6 +80,35 @@ public class Renderer {
 			gameEntity.getMesh().render();
 		}*/
 		
+		Block[][] blocks = state.getMap().getGridMap();
+		
+		for(int i = 0; i < blocks.length; i++) {
+			for (int j = 0; j < blocks[0].length; j++) {
+				
+				if(blocks[i][j] == Block.SOLID) {
+				
+					Vector2f blockCoords = new Vector2f(i*64f, j*64f);
+					Matrix4f modelMatrix = transformation.getModelMatrix(blockCoords
+							,0f, 1f);
+					shaderConstructor.setUniform("model", modelMatrix);
+					blockMesh.render();
+				} else if(blocks[i][j] == Block.SOFT) {
+					Vector2f blockCoords = new Vector2f(i*64f, j*64f);
+					Matrix4f modelMatrix = transformation.getModelMatrix(blockCoords
+							,0f, 1f);
+					shaderConstructor.setUniform("model", modelMatrix);
+					softMesh.render();
+					
+				} else if(blocks[i][j] == Block.BLAST) {
+					Vector2f blockCoords = new Vector2f(i*64f, j*64f);
+					Matrix4f modelMatrix = transformation.getModelMatrix(blockCoords
+							,0f, 1f);
+					shaderConstructor.setUniform("model", modelMatrix);
+					blastMesh.render();
+				}
+
+			}
+		}
 		
 		for (Player player : state.getPlayers()) {
 			

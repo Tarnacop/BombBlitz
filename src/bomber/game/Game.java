@@ -46,7 +46,7 @@ public class Game{
 		
 		try {
 			
-			this.graphics = new Graphics("Bomb Blitz", 600, 600, this, this.gameState);
+			this.graphics = new Graphics("Bomb Blitz", 600, 600, this, this.gameState, controlScheme, p1);
 			this.graphics.start();
 			
 			

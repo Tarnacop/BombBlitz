@@ -1,8 +1,13 @@
 package bomber.renderer;
 
 import bomber.renderer.constants.RendererConstants;
+
+import java.util.HashMap;
+
 import bomber.game.Game;
 import bomber.game.GameState;
+import bomber.game.Player;
+import bomber.game.Response;
 
 public class Graphics implements Runnable {
 
@@ -12,15 +17,17 @@ public class Graphics implements Runnable {
 	private final Game gameLogic;
 	private final GameState state;
 	private final Renderer renderer;
+	private Player player;
 	
-	public Graphics(Screen screen, Game gameLogic, GameState state) throws Exception {
+	public Graphics(String screenTitle, int screenWidth, int screenHeight, Game gameLogic, GameState state, HashMap<Response, Integer> controls, Player player) throws Exception {
 		
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
 		
-		this.screen = screen;
+		this.screen = new Screen(screenTitle, screenWidth, screenHeight, true, controls, player);
 		this.renderer = new Renderer();
 		this.state = state;
 		this.gameLogic = gameLogic;
+		this.player = player;
 		timer = new Timer();
 	} // END OF CONSTRUCTOR
 	
@@ -53,7 +60,10 @@ public class Graphics implements Runnable {
 	// Initialize the game engine
 	private void init() throws Exception {
 		
+		screen.init();
 		renderer.init(screen);
+		float[] colours = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f };
+		player.makeMesh(0, 0, 32, 32, colours);
 		timer.init();
 	} // END OF init METHOD
 	
@@ -61,7 +71,7 @@ public class Graphics implements Runnable {
 	private void update(float interval) {
 		
 		// Game logic gets updated
-		gameLogic.update(interval);
+		gameLogic.update(screen, interval);
 	} // END OF update METHOD
 
 	// Render method

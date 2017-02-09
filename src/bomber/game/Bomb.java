@@ -21,9 +21,9 @@ public class Bomb {
 		this.time = time;
 		this.radius = radius;
 		this.gridPos = new Point();
-		float[] colours = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
+		float[] colours = new float[] { 0.7f, 0.4f, 0.3f, 0.0f,  0.7f, 0.4f, 0.3f, 0.0f, 0.7f, 0.4f, 0.3f, 0.0f };
 		
-		this.mesh = new Mesh(this.pos.x, this.pos.y, 64, 64, colours);
+		this.mesh = new Mesh(0, 0, 50, 50, colours);
 		updatePos();
 	}
 
