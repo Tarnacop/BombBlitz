@@ -52,8 +52,7 @@ public class Renderer implements RendererInterface {
 		shaderConstructor.bind();
 
 		// Set the uniform
-		// float ratio = screen.getWidth() / screen.getHeight();
-		Matrix4f projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth(), 0f, screen.getHeight(), -1f, 1f);
+		Matrix4f projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth(), screen.getHeight(), 0f, -1f, 1f);
 		shaderConstructor.setUniform("projection", projectionMatrix);
 
 		// Render each gameItem

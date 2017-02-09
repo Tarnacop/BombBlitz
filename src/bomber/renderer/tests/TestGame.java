@@ -26,39 +26,26 @@ public class TestGame implements GameLogicInterface {
 		renderer.init(screen);
 
 		// Coords of a triangle
-		float[] positions = new float[] { 
-				// V0
-				0f, 100f, 
-				// V1
-				0f, 0f, 
-				// V2
-				100f, 0f, 
-				// V3
-				100f, 100f };
-		int[] indices = new int[] { 0, 1, 3, 3, 1, 2, };
 		float[] colours = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
-		meshConstructor = new Mesh(positions, colours, indices);
+		meshConstructor = new Mesh(0, 0, 64, 64, colours);
 		GameEntity entity = new GameEntity(meshConstructor);
 		gameEntities = new GameEntity[] { entity };
 	} // END OF init METHOD
 
 	// private boolean sign = true;
 
-	private float angle = 0f;
 	@Override
 	public void update(float interval) {
 
 
 		for (GameEntity gameEntity : gameEntities) {
 			
-			//float x = gameEntity.getPosition().x;
-			//float y = gameEntity.getPosition().y;
-			angle += 1f;
-			if(angle > 360f) angle = 0f;
-			//x += 1f;
+			float x = gameEntity.getPosition().x;
+			float y = gameEntity.getPosition().y;
+			x += 1f;
+			y += 1f;
 			
-			//gameEntity.setPosition(x, y);
-			gameEntity.setRotation(angle);
+			gameEntity.setPosition(x, y);
 		}
 
 	} // END OF update METHOD
