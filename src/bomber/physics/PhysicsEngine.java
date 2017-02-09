@@ -226,28 +226,30 @@ public class PhysicsEngine
             return;
         if(radius==0 || gameState.getMap().getGridBlockAt(x, y)==Block.SOLID)
             return;
+        if(gameState.getMap().getGridBlockAt(x, y) != Block.SOFT)
+            switch (direction)
+            {
+                case 0:
+                    addBlast(x, y - 1, radius - 1, 1);
+                    addBlast(x + 1, y, radius - 1, 2);
+                    addBlast(x, y + 1, radius - 1, 3);
+                    addBlast(x - 1, y, radius - 1, 4);
+                    break;
+                case 1:
+                    addBlast(x, y - 1, radius - 1, 1);
+                    break;
+                case 2:
+                    addBlast(x + 1, y, radius - 1, 2);
+                    break;
+                case 3:
+                    addBlast(x, y + 1, radius - 1, 3);
+                    break;
+                case 4:
+                    addBlast(x - 1, y, radius - 1, 4);
+                    break;
+            }
+
         gameState.getMap().setGridBlockAt(pos, Block.BLAST);
-        switch (direction)
-        {
-            case 0:
-                addBlast(x, y-1, radius-1, 1);
-                addBlast(x+1, y, radius-1, 2);
-                addBlast(x, y+1, radius-1, 3);
-                addBlast(x-1, y, radius-1, 4);
-                break;
-            case 1:
-                addBlast(x, y-1, radius-1, 1);
-                break;
-            case 2:
-                addBlast(x+1, y, radius-1, 2);
-                break;
-            case 3:
-                addBlast(x, y+1, radius-1, 3);
-                break;
-            case 4:
-                addBlast(x-1, y, radius-1, 4);
-                break;
-        }
     }
 
     private void decreaseBombTimer(Bomb bomb, int milliseconds)
