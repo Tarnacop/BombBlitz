@@ -70,11 +70,13 @@ public class ClientMain {
 
 					} else if (cmds[0].equals("printroomlist")) {
 
-						List<ClientServerRoom> roomList = client.getRoomList();
+						List<ClientServerLobbyRoom> roomList = client.getRoomList();
 						System.out.printf("Size: %d\n", roomList.size());
-						for (ClientServerRoom r : roomList) {
-							System.out.printf("ID: %d, Name: %s, Number of players: %d, inGame: %b, Map ID: %d\n",
-									r.getID(), r.getName(), r.getPlayerNumber(), r.isInGame(), r.getMapID());
+						for (ClientServerLobbyRoom r : roomList) {
+							System.out.printf(
+									"ID: %d, Name: %s, Number of players: %d, Max players: %d, inGame: %b, Map ID: %d\n",
+									r.getID(), r.getName(), r.getPlayerNumber(), r.getMaxPlayer(), r.isInGame(),
+									r.getMapID());
 						}
 
 					} else {
@@ -101,6 +103,30 @@ public class ClientMain {
 
 					}
 
+				} else if (cmds.length == 4) {
+					if (cmds[0].equals("createroom")) {
+
+						byte maxPlayer = 4;
+						try {
+							maxPlayer = Byte.parseByte(cmds[2]);
+						} catch (NumberFormatException e) {
+							maxPlayer = 4;
+						}
+
+						int mapID = 0;
+						try {
+							mapID = Integer.parseInt(cmds[3]);
+						} catch (NumberFormatException e) {
+							mapID = -1;
+						}
+
+						client.createRoom(cmds[1], maxPlayer, mapID);
+
+					} else {
+
+						pInvalid();
+
+					}
 				} else {
 
 					pInvalid();

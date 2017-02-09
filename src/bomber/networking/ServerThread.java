@@ -230,6 +230,7 @@ public class ServerThread implements Runnable {
 				return;
 			}
 			if (nameLength < 1 || nameLength > config.getMaxNameLength()) {
+				pServer("invalid name length in conection request from " + sockAddr);
 				return;
 			}
 
@@ -362,6 +363,44 @@ public class ServerThread implements Runnable {
 
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, len, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMLIST, true);
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_C_LOBBY_CREATEROOM: {
+			pServer("room creation request from " + sockAddr);
+
+			// get room name length
+			recvByteBuffer.position(3);
+			if (packet.getLength() < recvByteBuffer.position() + 1) {
+				pServer("failed to decode room creation request from " + sockAddr);
+				return;
+			}
+			byte nameLength = recvByteBuffer.get();
+
+			// get room name string
+			if (nameLength < 1 || nameLength > config.getMaxNameLength()) {
+				pServer("invalid name length in creation request from " + sockAddr);
+				return;
+			}
+			byte[] nameData = new byte[nameLength];
+			recvByteBuffer.get(nameData);
+			String roomName = new String(nameData, 0, nameLength, "UTF-8");
+
+			// get max player limit and map ID
+			if (packet.getLength() < recvByteBuffer.position() + 1 + 4) {
+				pServer("failed to decode room creation request from " + sockAddr);
+			}
+			// TODO check whether maxPlayer is in the range [2,4]
+			byte maxPlayer = recvByteBuffer.get();
+			int mapID = recvByteBuffer.getInt();
+
+			pServerf("decoded room creation request from %s: Room name: %s, Max player limit: %d, Map ID: %d\n",
+					sockAddr, roomName, maxPlayer, mapID);
+
+			// TODO unfinished, currently always reject room creation
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 
 			break;
 		}

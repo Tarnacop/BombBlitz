@@ -5,17 +5,19 @@ package bomber.networking;
  * Client side representation of rooms on the server lobby
  *
  */
-public class ClientServerRoom {
+public class ClientServerLobbyRoom {
 	private int id;
 	private String name;
 	private int playerNumber;
+	private int maxPlayer;
 	private boolean inGame;
 	private int mapID;
 
-	public ClientServerRoom(int id, String name, int playerNumber, boolean inGame, int mapID) {
+	public ClientServerLobbyRoom(int id, String name, int playerNumber, int maxPlayer, boolean inGame, int mapID) {
 		this.id = id;
 		this.name = name;
 		this.playerNumber = playerNumber;
+		this.setMaxPlayer(maxPlayer);
 		this.inGame = inGame;
 		this.mapID = mapID;
 	}
@@ -58,6 +60,14 @@ public class ClientServerRoom {
 
 	public void setMapID(int mapID) {
 		this.mapID = mapID;
+	}
+
+	public int getMaxPlayer() {
+		return maxPlayer;
+	}
+
+	public void setMaxPlayer(int maxPlayer) {
+		this.maxPlayer = maxPlayer;
 	}
 
 }

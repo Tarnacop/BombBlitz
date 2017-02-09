@@ -22,6 +22,7 @@ public class ServerClientInfo {
 	// a client is either in the lobby or in a room
 	private boolean inLobby = true;
 	private boolean inRoom = false;
+	private boolean readyToPlay = false;
 
 	private ServerRoom room;
 
@@ -259,5 +260,25 @@ public class ServerClientInfo {
 	 */
 	public void setRoom(ServerRoom room) {
 		this.room = room;
+	}
+
+	/**
+	 * Returns true if the player is ready to play the game (when it is in a
+	 * room)
+	 * 
+	 * @return true if the player is ready to play
+	 */
+	public boolean isReadyToPlay() {
+		return readyToPlay;
+	}
+
+	/**
+	 * Set whether the player is ready to play the game
+	 * 
+	 * @param readyToPlay
+	 *            true if the player is ready to play
+	 */
+	public void setReadyToPlay(boolean readyToPlay) {
+		this.readyToPlay = readyToPlay;
 	}
 }

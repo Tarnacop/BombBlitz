@@ -46,7 +46,7 @@ public class ClientThread implements Runnable {
 	private List<ClientServerPlayer> playerList = new ArrayList<ClientServerPlayer>();
 
 	// list of rooms in the server lobby
-	private List<ClientServerRoom> roomList = new ArrayList<ClientServerRoom>();
+	private List<ClientServerLobbyRoom> roomList = new ArrayList<ClientServerLobbyRoom>();
 
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
@@ -293,6 +293,14 @@ public class ClientThread implements Runnable {
 			break;
 		}
 
+		case ProtocolConstant.MSG_S_LOBBY_ROOMREJECT: {
+			pClient("room creation has been rejected by the server");
+
+			// TODO do something
+
+			break;
+		}
+
 		// TODO testing case
 		case 'm': {
 
@@ -399,8 +407,25 @@ public class ClientThread implements Runnable {
 		return playerList;
 	}
 
-	public List<ClientServerRoom> getRoomList() {
+	public List<ClientServerLobbyRoom> getRoomList() {
 		return roomList;
+	}
+
+	public synchronized void createRoom(String roomName, byte maxPlayer, int mapID) throws IOException {
+		if (roomName == null || roomName.length() < 1) {
+			throw new IOException("name cannot be null or zero length");
+		}
+		byte[] nameData = roomName.getBytes("UTF-8");
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.put((byte) nameData.length);
+		publicSendByteBuffer.put(nameData);
+		publicSendByteBuffer.put(maxPlayer);
+		publicSendByteBuffer.putInt(mapID);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 1 + nameData.length + 1 + 4, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_CREATEROOM, true);
 	}
 
 	public synchronized void exit() {

@@ -145,6 +145,12 @@ public class ServerPacketEncoder {
 			}
 			buffer.put((byte) e.getValue().getPlayerNumber());
 
+			// put max player limit
+			if (dest.length < buffer.position() + 1) {
+				throw new IOException("dest is too short");
+			}
+			buffer.put((byte) e.getValue().getMaxPlayer());
+
 			// put inGame boolean flag
 			if (dest.length < buffer.position() + 1) {
 				throw new IOException("dest is too short");
@@ -222,16 +228,16 @@ public class ServerPacketEncoder {
 		}
 		System.out.println("encodeRoomList returns " + ret);
 
-		List<ClientServerRoom> roomList = null;
+		List<ClientServerLobbyRoom> roomList = null;
 		try {
 			roomList = ClientPacketEncoder.decodeRoomList(arr, ret);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println("decodeRoomList:");
-		for (ClientServerRoom r : roomList) {
-			System.out.printf("ID: %d, Name: %s, Number of players: %d, inGame: %b, Map ID: %d\n", r.getID(),
-					r.getName(), r.getPlayerNumber(), r.isInGame(), r.getMapID());
+		for (ClientServerLobbyRoom r : roomList) {
+			System.out.printf("ID: %d, Name: %s, Number of players: %d, Max players: %d, inGame: %b, Map ID: %d\n",
+					r.getID(), r.getName(), r.getPlayerNumber(), r.getMaxPlayer(), r.isInGame(), r.getMapID());
 		}
 	}
 }

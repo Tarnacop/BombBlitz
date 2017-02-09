@@ -91,7 +91,7 @@ public class ClientPacketEncoder {
 	 * @return a list of ClientServerRoom
 	 * @throws IOException
 	 */
-	public static List<ClientServerRoom> decodeRoomList(byte[] src, int length) throws IOException {
+	public static List<ClientServerLobbyRoom> decodeRoomList(byte[] src, int length) throws IOException {
 		if (src == null) {
 			throw new IOException("src is null");
 		}
@@ -113,7 +113,7 @@ public class ClientPacketEncoder {
 		// maxIndex, numPlayers);
 
 		buffer.position(19);
-		List<ClientServerRoom> roomList = new ArrayList<ClientServerRoom>();
+		List<ClientServerLobbyRoom> roomList = new ArrayList<ClientServerLobbyRoom>();
 		for (int i = 0; i < numRooms; i++) {
 			// get room id
 			if (length < buffer.position() + 4) {
@@ -141,6 +141,12 @@ public class ClientPacketEncoder {
 			}
 			byte playerNumber = buffer.get();
 
+			// get max player limit
+			if (length < buffer.position() + 1) {
+				throw new IOException("packet format is invalid");
+			}
+			byte maxPlayer = buffer.get();
+
 			// get inGame boolean flag
 			if (length < buffer.position() + 1) {
 				throw new IOException("packet format is invalid");
@@ -156,7 +162,7 @@ public class ClientPacketEncoder {
 			}
 			int mapID = buffer.getInt();
 
-			roomList.add(new ClientServerRoom(id, name, playerNumber, inGame, mapID));
+			roomList.add(new ClientServerLobbyRoom(id, name, playerNumber, maxPlayer, inGame, mapID));
 		}
 
 		if (length != buffer.position()) {

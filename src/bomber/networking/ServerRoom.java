@@ -14,6 +14,8 @@ public class ServerRoom {
 	private String name;
 	// list of players in the room
 	private ArrayList<ServerClientInfo> playerList = new ArrayList<ServerClientInfo>(4);
+	// max number of players allowed in the room (in the range [2,4])
+	private byte maxPlayer = 4;
 	// flag indicating whether the game is in progress
 	private boolean inGame = false;
 	// the game session
@@ -34,6 +36,29 @@ public class ServerRoom {
 			this.name = name;
 		}
 		playerList.add(firstPlayer);
+	}
+
+	/**
+	 * Construct a room
+	 * 
+	 * @param name
+	 *            the name of the room
+	 * @param firstPlayer
+	 *            the player who created this room
+	 * @param maxPlayer
+	 *            the max number of players allowed in this room(in the range
+	 *            [2,4])
+	 */
+	public ServerRoom(String name, ServerClientInfo firstPlayer, byte maxPlayer) {
+		if (name == null) {
+			this.name = "Room " + id;
+		} else {
+			this.name = name;
+		}
+		playerList.add(firstPlayer);
+		if (maxPlayer >= 2 && maxPlayer <= 4) {
+			this.setMaxPlayer(maxPlayer);
+		}
 	}
 
 	/**
@@ -172,6 +197,27 @@ public class ServerRoom {
 	 */
 	public void removePlayer(ServerClientInfo player) {
 		playerList.remove(player);
+	}
+
+	/**
+	 * Get the max number of players allowed in this room
+	 * 
+	 * @return the max number of players
+	 */
+	public byte getMaxPlayer() {
+		return maxPlayer;
+	}
+
+	/**
+	 * Set the max number of players allowed in this room (in the range [2,4])
+	 * 
+	 * @param maxPlayer
+	 *            the max number of players
+	 */
+	public void setMaxPlayer(byte maxPlayer) {
+		if (maxPlayer >= 2 && maxPlayer <= 4) {
+			this.maxPlayer = maxPlayer;
+		}
 	}
 
 }

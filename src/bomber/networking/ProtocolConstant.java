@@ -58,8 +58,9 @@ public class ProtocolConstant {
 	// 1 byte message type + 2 byte sequence
 
 	// public static final byte MSG_C_LOBBY_GETLEADERBOARD = 0x06;
-	public static final byte MSG_C_LOBBY_CREATEROOM = 0x07;
-	// 1 byte message type + 2 byte sequence
+	public static final byte MSG_C_LOBBY_CREATEROOM = 0x07; // Bit set
+	// 1 byte message type + 2 byte sequence + 1 byte room name length + room
+	// name string + 1 byte max player limit + 4 byte map ID
 
 	public static final byte MSG_C_LOBBY_JOINROOM = 0x08;
 	// public static final byte MSG_C_LOBBY_SENDTEXT = 0x0a;
@@ -121,8 +122,8 @@ public class ProtocolConstant {
 	 * 1 byte message type + 2 byte sequence + 4 byte total number of rooms + 4
 	 * byte packet index + 4 byte max index + 4 byte number of rooms in this
 	 * packet + array of (4 byte room id + 1 byte name length + bytes of name
-	 * string + 1 byte player number + 1 byte inGame boolean flag + 4 byte game
-	 * map id)
+	 * string + 1 byte player number + 1 byte max player limit + 1 byte inGame
+	 * boolean flag + 4 byte game map id)
 	 */
 	/*
 	 * TODO max number of rooms is limited to 32 for the same reason above.
@@ -131,10 +132,24 @@ public class ProtocolConstant {
 	 */
 
 	public static final byte MSG_S_LOBBY_ROOMACCEPT = 0x49;
-	public static final byte MSG_S_LOBBY_ROOMREJECT = 0x4a;
+	// 1 byte message type + 2 byte sequence + 4 byte room id
+
+	public static final byte MSG_S_LOBBY_ROOMREJECT = 0x4a; // Bit set
+	// 1 byte message type + 2 byte sequence
 
 	public static final byte MSG_S_ROOM_ROOMINFO = 0x4b;
+	/*
+	 * 1 byte message type + 2 byte sequence + 4 byte room id + 1 byte name
+	 * length + bytes of name string + 1 byte player number + 1 byte max player
+	 * limit + 1 byte inGame flag + 4 byte game map id + array of up to 4 player
+	 * info(4 byte player id + 1 byte player name length + bytes of player
+	 * string + 1 byte isReadyToPlay flag)
+	 */
 
-	public static final byte MSG_S_GAME_GAMESTATE = 0x4c;
+	public static final byte MSG_S_GAME_GAMESTART = 0x4c;
+
+	public static final byte MSG_S_GAME_GAMESTATE = 0x4d;
+
+	public static final byte MSG_S_GAME_GAMEOVER = 0x4e;
 
 }

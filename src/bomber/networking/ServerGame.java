@@ -7,9 +7,17 @@ package bomber.networking;
  */
 public class ServerGame {
 	// private GameState gameState;
+	private int mapID = -1;
+
+	public ServerGame(int mapID) {
+		this.mapID = mapID;
+	}
+
+	public void setMapID(int mapID) {
+		this.mapID = mapID;
+	}
 
 	public int getMapID() {
-		// TODO Auto-generated method stub
-		return 0;
+		return mapID;
 	}
 }
