@@ -1,26 +1,27 @@
 package bomber.game;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.Optional;
 
-import org.lwjgl.input.Keyboard;
+import bomber.renderer.Screen;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class KeyboardUpdater extends Thread{
 
+	private long screenID;
 	private HashMap<Response, Integer> controls;
 	private Player player;
 	private boolean stop;
 	
-	public KeyboardUpdater(HashMap<Response, Integer> controls, Player player){
+	public KeyboardUpdater(long screenID, HashMap<Response, Integer> controls, Player player){
 		
 		super("Keyboard Updater");
+		this.screenID = screenID;
 		this.stop = false;
 		this.player = player;
 		this.controls = controls;
 		
-		
+		glfwSetInputMode(this.screenID, GLFW_STICKY_KEYS, GLFW_TRUE);
 	}
 	
 	private Optional<Integer> getKey(Response r){
@@ -37,39 +38,63 @@ public class KeyboardUpdater extends Thread{
 		
 		KeyboardState keyState = this.player.getKeyState();
 		
+		int state = GLFW_RELEASE;
+		
+		boolean bombPressed = false;
+		
 		while(!stop){
 			
 			//System.out.println("Checking again...");
 			
-			//Event for bomb
-			while(Keyboard.next()) {
-				if (getKey(Response.PLACE_BOMB).isPresent() && (Keyboard.isKeyDown(getKey(Response.PLACE_BOMB).get()))) {
-					keyState.setBomb(true);
-					//System.out.println("X");
-				}
+			//check for bomb
+			if(getKey(Response.PLACE_BOMB).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.PLACE_BOMB).get());
 			}
-			//Poll for up
-			if (getKey(Response.UP_MOVE).isPresent() && (Keyboard.isKeyDown(getKey(Response.UP_MOVE).get()))) {
-				keyState.setMovement(Movement.UP);
-				//System.out.println("^");
-				//System.out.println("|");
+			if(state == GLFW_PRESS && !bombPressed){
+			    keyState.setBomb(true);
+			    bombPressed = true;
+			    state = GLFW_RELEASE;
+			}else if(state == GLFW_RELEASE && bombPressed){
+				bombPressed = false;
 			}
-			//Poll for down
-			if (getKey(Response.DOWN_MOVE).isPresent() && (Keyboard.isKeyDown(getKey(Response.DOWN_MOVE).get()))) {
-				keyState.setMovement(Movement.DOWN);
-				//System.out.println("|");
-				//System.out.println("v");
+			
+			//Check for up
+			
+			if(getKey(Response.UP_MOVE).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.UP_MOVE).get());
 			}
-			//Poll for left
-			if (getKey(Response.LEFT_MOVE).isPresent() && (Keyboard.isKeyDown(getKey(Response.LEFT_MOVE).get()))) {
-				keyState.setMovement(Movement.LEFT);
-				//System.out.println("<-");
+			if(state == GLFW_PRESS){
+			    keyState.setMovement(Movement.UP);
+			    state = GLFW_RELEASE;
 			}
-			//Poll for right
-			if (getKey(Response.RIGHT_MOVE).isPresent() && (Keyboard.isKeyDown(getKey(Response.RIGHT_MOVE).get()))) {
-				keyState.setMovement(Movement.RIGHT);
-				//System.out.println("->");
+			
+			//check for down
+			if(getKey(Response.DOWN_MOVE).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.DOWN_MOVE).get());
 			}
+			if(state == GLFW_PRESS){
+			    keyState.setMovement(Movement.DOWN);
+			    state = GLFW_RELEASE;
+			}
+			
+			//check for left
+			if(getKey(Response.LEFT_MOVE).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.LEFT_MOVE).get());
+			}
+			if(state == GLFW_PRESS){
+			    keyState.setMovement(Movement.LEFT);
+			    state = GLFW_RELEASE;
+			}
+			
+			//check for right
+			if(getKey(Response.RIGHT_MOVE).isPresent()){
+				state = glfwGetKey(this.screenID, getKey(Response.RIGHT_MOVE).get());
+			}
+			if(state == GLFW_PRESS){
+			    keyState.setMovement(Movement.RIGHT);
+			    state = GLFW_RELEASE;
+			}
+		
 			
 			try {
 				Thread.sleep(10);
