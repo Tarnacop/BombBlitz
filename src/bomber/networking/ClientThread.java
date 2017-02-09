@@ -45,6 +45,9 @@ public class ClientThread implements Runnable {
 	// list of players connected to the server
 	private List<ClientServerPlayer> playerList = new ArrayList<ClientServerPlayer>();
 
+	// list of rooms in the server lobby
+	private List<ClientServerRoom> roomList = new ArrayList<ClientServerRoom>();
+
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
 	private final byte[] recvBuffer = new byte[recvBufferLen];
@@ -277,6 +280,19 @@ public class ClientThread implements Runnable {
 			break;
 		}
 
+		case ProtocolConstant.MSG_S_LOBBY_ROOMLIST: {
+			pClient("received room list from server");
+
+			try {
+				roomList = ClientPacketEncoder.decodeRoomList(recvBuffer, packet.getLength());
+			} catch (IOException e) {
+				pClient("failed to decode room list: " + e);
+				return;
+			}
+
+			break;
+		}
+
 		// TODO testing case
 		case 'm': {
 
@@ -365,6 +381,11 @@ public class ClientThread implements Runnable {
 		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_GETPLAYERLIST, true);
 	}
 
+	public synchronized void updateRoomList() throws IOException {
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_GETROOMLIST, true);
+	}
+
 	public synchronized void disconnect() throws IOException {
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_NET_DISCONNECT, true);
@@ -376,6 +397,10 @@ public class ClientThread implements Runnable {
 
 	public List<ClientServerPlayer> getPlayerList() {
 		return playerList;
+	}
+
+	public List<ClientServerRoom> getRoomList() {
+		return roomList;
 	}
 
 	public synchronized void exit() {

@@ -22,10 +22,11 @@ public class ProtocolConstant {
 	/*
 	 * The first bit (most significant bit) in the message type byte is reserved
 	 * for determining whether the message requires reliability and contains a
-	 * sequence number (which should be acknowledged immediately by the
+	 * sequence number. (which should be acknowledged immediately by the
 	 * recipient) When the bit is 1, the sequence number is a short (16-bit
-	 * integer) at offset 1 When the bit is 0, the sequence number is a short of
-	 * constant 0 at offset 1, which does not require acknowledgement
+	 * integer) at offset 1. When the bit is 0, the sequence number is a short
+	 * of constant 0 at offset 1 (which can be safely ignored), which does not
+	 * require acknowledgement
 	 */
 	// Mask for testing whether the bit is set
 	public static final byte MSG_B_HASSEQUENCE = (byte) 0x80;
@@ -53,23 +54,26 @@ public class ProtocolConstant {
 	public static final byte MSG_C_LOBBY_GETPLAYERLIST = 0x04; // Bit set
 	// 1 byte message type + 2 byte sequence
 
-	public static final byte MSG_C_LOBBY_GETROOMLIST = 0x05;
-	public static final byte MSG_C_LOBBY_GETLEADERBOARD = 0x06;
+	public static final byte MSG_C_LOBBY_GETROOMLIST = 0x05; // Bit set
+	// 1 byte message type + 2 byte sequence
+
+	// public static final byte MSG_C_LOBBY_GETLEADERBOARD = 0x06;
 	public static final byte MSG_C_LOBBY_CREATEROOM = 0x07;
+	// 1 byte message type + 2 byte sequence
+
 	public static final byte MSG_C_LOBBY_JOINROOM = 0x08;
-	public static final byte MSG_C_LOBBY_GETROOMINFO = 0x09;
-	public static final byte MSG_C_LOBBY_SENDTEXT = 0x0a;
+	// public static final byte MSG_C_LOBBY_SENDTEXT = 0x0a;
 
 	// In room
 	public static final byte MSG_C_ROOM_LEAVE = 0x0b;
 	public static final byte MSG_C_ROOM_SETINFO = 0x0c;
 	public static final byte MSG_C_ROOM_GETINFO = 0x0d;
-	public static final byte MSG_C_ROOM_SENDTEXT = 0x0e;
+	// public static final byte MSG_C_ROOM_SENDTEXT = 0x0e;
 
 	// In game
-	public static final byte MSG_C_GAME_LEAVE = 0x0f;
+	// public static final byte MSG_C_GAME_LEAVE = 0x0f;
 	public static final byte MSG_C_GAME_SENDMOVE = 0x10;
-	public static final byte MSG_C_GAME_SENDTEXT = 0x11;
+	// public static final byte MSG_C_GAME_SENDTEXT = 0x11;
 
 	// Server to Client message types
 	// Range from 0x40 to 0x7f (up to 64 types of message)
@@ -81,7 +85,7 @@ public class ProtocolConstant {
 	public static final byte MSG_S_NET_REJECT = 0x41; // Bit not set
 	// 1 byte message type + 2 byte sequence
 	// TODO rejection message should contain a reason: server full, duplicate
-	// name
+	// name, invalid name length
 
 	public static final byte MSG_S_NET_ALREADYCONNECTED = 0x42; // Bit set
 	// 1 byte message type + 2 byte sequence
@@ -102,14 +106,35 @@ public class ProtocolConstant {
 	/*
 	 * 1 byte message type + 2 byte sequence + 4 byte total number of players +
 	 * 4 byte packet index + 4 byte max index + 4 byte number of players in this
-	 * packet + array of player IDs and name pairs(4 byte id + 1 byte name
-	 * length + bytes of name string)
+	 * packet + array of (4 byte player id + 1 byte name length + bytes of name
+	 * string)
 	 */
 	/*
 	 * TODO currently packet index and max index are hard-coded to 0 and number
-	 * of players in this packet to total number of players since we don't
+	 * of players in this packet to total number of players, since we don't
 	 * expect to have the number of players one packet does not fit(32 players)
 	 */
 	/* TODO we encode player IDs and names only */
+
+	public static final byte MSG_S_LOBBY_ROOMLIST = 0x48; // Bit set
+	/*
+	 * 1 byte message type + 2 byte sequence + 4 byte total number of rooms + 4
+	 * byte packet index + 4 byte max index + 4 byte number of rooms in this
+	 * packet + array of (4 byte room id + 1 byte name length + bytes of name
+	 * string + 1 byte player number + 1 byte inGame boolean flag + 4 byte game
+	 * map id)
+	 */
+	/*
+	 * TODO max number of rooms is limited to 32 for the same reason above.
+	 * Additionally, we cannot have more rooms than players since each room must
+	 * have at least one player
+	 */
+
+	public static final byte MSG_S_LOBBY_ROOMACCEPT = 0x49;
+	public static final byte MSG_S_LOBBY_ROOMREJECT = 0x4a;
+
+	public static final byte MSG_S_ROOM_ROOMINFO = 0x4b;
+
+	public static final byte MSG_S_GAME_GAMESTATE = 0x4c;
 
 }

@@ -27,6 +27,9 @@ public class ServerThread implements Runnable {
 	// table for storing client info
 	private final ServerClientTable clientTable;
 
+	// table for storing room info
+	private final ServerRoomTable roomTable;
+
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
 	private final byte[] recvBuffer = new byte[recvBufferLen];
@@ -38,7 +41,7 @@ public class ServerThread implements Runnable {
 	private final byte[] sendBuffer = new byte[sendBufferLen];
 	private final ByteBuffer sendByteBuffer = ByteBuffer.wrap(sendBuffer);
 
-	// scheduled executor for client keep alive and packet retransmission
+	// scheduled executor for client keep alive and packet retransmission tasks
 	private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
 	/**
@@ -57,11 +60,10 @@ public class ServerThread implements Runnable {
 		this.printStream = printStream;
 		this.config = config;
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
+		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
 
 		// open socket
 		socket = new DatagramSocket(port);
-		// socket.setSoTimeout(0);
-
 	}
 
 	/**
@@ -78,11 +80,10 @@ public class ServerThread implements Runnable {
 		this.printStream = System.out;
 		this.config = config;
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
+		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
 
 		// open socket
 		socket = new DatagramSocket(port);
-		// socket.setSoTimeout(0);
-
 	}
 
 	/**
@@ -97,11 +98,10 @@ public class ServerThread implements Runnable {
 		this.printStream = System.out;
 		this.config = new ServerConfiguration();
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
+		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
 
 		// open socket
 		socket = new DatagramSocket(port);
-		// socket.setSoTimeout(0);
-
 	}
 
 	public void run() {
@@ -114,13 +114,16 @@ public class ServerThread implements Runnable {
 			for (Entry<SocketAddress, ServerClientInfo> e : clientTable.entrySet()) {
 				if (now.getEpochSecond() - e.getValue().getTimeStamp() > config.getClientTimeOut()) {
 					pServerf("keepAliveTask: removing %s due to timeout\n", e.getKey());
-					// TODO need to remove every reference of the client on the
-					// server(client table, room list, game sessions, etc)
+					/*
+					 * TODO need to remove every reference of the client on the
+					 * server(from client table, room list and game sessions)
+					 */
 					clientTable.remove(e.getKey());
 				} else {
-					// send a ping packet
+					// send a ping packet to each active client
 					try {
 						byte[] data = new byte[3];
+						// must be set to true in sendPacket for acknowledgement
 						sendPacket(new DatagramPacket(data, data.length, e.getKey()), ProtocolConstant.MSG_S_NET_PING,
 								true);
 					} catch (IOException e1) {
@@ -342,6 +345,23 @@ public class ServerThread implements Runnable {
 
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, len, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_PLAYERLIST, true);
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_C_LOBBY_GETROOMLIST: {
+			pServer("sending room list to " + sockAddr);
+
+			int len = 0;
+			try {
+				len = ServerPacketEncoder.encodeRoomList(roomTable, sendBuffer);
+			} catch (IOException e) {
+				pServer("failed to encode room list: " + e);
+				return;
+			}
+
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, len, sockAddr);
+			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMLIST, true);
 
 			break;
 		}

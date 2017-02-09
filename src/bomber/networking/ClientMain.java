@@ -64,6 +64,19 @@ public class ClientMain {
 							System.out.printf("ID: %d, Name: %s\n", p.getID(), p.getName());
 						}
 
+					} else if (cmds[0].equals("updateroomlist")) {
+
+						client.updateRoomList();
+
+					} else if (cmds[0].equals("printroomlist")) {
+
+						List<ClientServerRoom> roomList = client.getRoomList();
+						System.out.printf("Size: %d\n", roomList.size());
+						for (ClientServerRoom r : roomList) {
+							System.out.printf("ID: %d, Name: %s, Number of players: %d, inGame: %b, Map ID: %d\n",
+									r.getID(), r.getName(), r.getPlayerNumber(), r.isInGame(), r.getMapID());
+						}
+
 					} else {
 
 						pInvalid();
@@ -79,9 +92,7 @@ public class ClientMain {
 					} else if (cmds[0].equals("sendraw")) {
 
 						byte[] data = null;
-
 						data = cmds[1].getBytes("UTF-8");
-
 						client.sendRaw(data);
 
 					} else {

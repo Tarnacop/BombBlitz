@@ -6,8 +6,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * ServerClientTable wraps three maps which map SocketAddress, String and
- * Integer to ServerClientInfo respectively
+ * ServerClientTable wraps three maps which map SocketAddress(IP:Port of
+ * client), String(name of client) and Integer(ID of client) to ServerClientInfo
+ * respectively
  */
 public class ServerClientTable {
 	private ConcurrentHashMap<SocketAddress, ServerClientInfo> socketTable = new ConcurrentHashMap<SocketAddress, ServerClientInfo>();
@@ -176,6 +177,24 @@ public class ServerClientTable {
 	 */
 	public Set<Entry<SocketAddress, ServerClientInfo>> entrySet() {
 		return socketTable.entrySet();
+	}
+	
+	/**
+	 * Returns a Set view of the mappings contained in this map
+	 * 
+	 * @return the set
+	 */
+	public Set<Entry<String, ServerClientInfo>> entrySet2() {
+		return nameTable.entrySet();
+	}
+	
+	/**
+	 * Returns a Set view of the mappings contained in this map
+	 * 
+	 * @return the set
+	 */
+	public Set<Entry<Integer, ServerClientInfo>> entrySet3() {
+		return idTable.entrySet();
 	}
 
 	/**

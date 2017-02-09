@@ -156,7 +156,8 @@ public class ServerConfiguration {
 	}
 
 	/**
-	 * The max allowed length of the name of players
+	 * The max allowed length of the name of players and rooms (the minimum
+	 * required length is 1)
 	 * 
 	 * @return the max allowed name length
 	 */
