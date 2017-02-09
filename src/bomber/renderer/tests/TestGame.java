@@ -1,5 +1,6 @@
 package bomber.renderer.tests;
 
+import bomber.game.GameState;
 import bomber.renderer.Renderer;
 import bomber.renderer.interfaces.GameLogicInterface;
 import bomber.renderer.interfaces.ScreenInterface;
@@ -13,10 +14,13 @@ public class TestGame implements GameLogicInterface {
 	private final Renderer renderer;
 	private Mesh meshConstructor;
 
-	private GameEntity[] gameEntities;
+	// private GameEntity[] gameEntities;
+	private GameState state;
 
 	public TestGame() {
 
+		// For the moemnt
+		state = new GameState(null, null, null);
 		renderer = new Renderer();
 	} // END OF CONSTRUCTOR
 
@@ -28,8 +32,10 @@ public class TestGame implements GameLogicInterface {
 		// Coords of a triangle
 		float[] colours = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
 		meshConstructor = new Mesh(0, 0, 64, 64, colours);
-		GameEntity entity = new GameEntity(meshConstructor);
-		gameEntities = new GameEntity[] { entity };
+		
+		// Add the players / blocks / bombs etc.
+		// GameEntity entity = new GameEntity(meshConstructor);
+		// gameEntities = new GameEntity[] { entity };
 	} // END OF init METHOD
 
 	// private boolean sign = true;
@@ -37,7 +43,11 @@ public class TestGame implements GameLogicInterface {
 	@Override
 	public void update(float interval) {
 
-
+		
+		// Update everything you need to update
+		// For example physics.
+		
+		/*
 		for (GameEntity gameEntity : gameEntities) {
 			
 			float x = gameEntity.getPosition().x;
@@ -46,22 +56,26 @@ public class TestGame implements GameLogicInterface {
 			y += 1f;
 			
 			gameEntity.setPosition(x, y);
-		}
+		}*/
 
 	} // END OF update METHOD
 
 	@Override
 	public void render(ScreenInterface screen) {
 
-		renderer.render(screen, gameEntities);
+		// Render the state by passing it to the renderer
+		renderer.render(screen, state);
 	}
 
 	@Override
 	public void dispose() {
 
 		renderer.dispose();
-		for (GameEntity gameEntity : gameEntities) {
+		
+		// TODO - dispose the get Mesh
+		
+		/*for (GameEntity gameEntity : gameEntities) {
 			gameEntity.getMesh().dispose();
-		}
+		}*/
 	} // END OF dispose METHOD
 } // END OF TestGame CLASS

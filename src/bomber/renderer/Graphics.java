@@ -1,25 +1,26 @@
 package bomber.renderer;
 
 import bomber.renderer.constants.RendererConstants;
-import bomber.renderer.interfaces.GameInterface;
-import bomber.renderer.interfaces.GameLogicInterface;
+import bomber.game.GameState;
 
-public class Game implements GameInterface {
+public class Graphics implements Runnable {
 
 	private final Screen screen;
 	private final Thread gameLoopThread;
 	private final Timer timer;
-	private final GameLogicInterface gameLogic;
+	private final Game gameLogic;
+	private final GameState state;
+	private final Renderer renderer;
 	
-	public Game(String screenTitle, int screenWidth, int screenHeight, boolean vSync, GameLogicInterface gameLogic) throws Exception {
+	public Graphics(Screen screen, Game gameLogic, GameState state) throws Exception {
 		
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
-		screen = new Screen(screenWidth, screenHeight, screenTitle, true);
+		
+		this.state = state;
 		this.gameLogic = gameLogic;
 		timer = new Timer();
 	} // END OF CONSTRUCTOR
 	
-	@Override
 	public void start() {
 	
 		// Start the thread for the game engine loop
@@ -49,22 +50,21 @@ public class Game implements GameInterface {
 	// Initialize the game engine
 	private void init() throws Exception {
 		
-		screen.init();
 		timer.init();
-		gameLogic.init(screen);
 	} // END OF init METHOD
 	
 	// Update method
 	private void update(float interval) {
 		
 		// Game logic gets updated
+		renderer.render(screen, state);
 		gameLogic.update(interval);
 	} // END OF update METHOD
 
 	// Render method
 	private void render() {
 		
-		gameLogic.render(screen);
+		// Render the renderer
 		screen.update();
 	} // END OF render METHOD
 	
@@ -125,9 +125,8 @@ public class Game implements GameInterface {
 		
 	} // END OF sync METHOD
 	
-	@Override
 	public void dispose() {
 		
-		gameLogic.dispose();
+		renderer.dispose();
 	} // END OF dispose METHOD
 } // END OF Application

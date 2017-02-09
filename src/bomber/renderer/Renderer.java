@@ -6,14 +6,14 @@ import static org.lwjgl.opengl.GL30.*;
 
 import org.joml.Matrix4f;
 
-import bomber.renderer.interfaces.RendererInterface;
-import bomber.renderer.interfaces.ScreenInterface;
+import bomber.game.Bomb;
+import bomber.game.GameState;
+import bomber.game.Player;
 import bomber.renderer.shaders.ShaderProgram;
 import bomber.renderer.utils.FileHandler;
-import bomber.renderer.utils.GameEntity;
 import bomber.renderer.utils.Transformation;
 
-public class Renderer implements RendererInterface {
+public class Renderer {
 
 	private ShaderProgram shaderConstructor;
 	private final Transformation transformation;
@@ -23,8 +23,7 @@ public class Renderer implements RendererInterface {
 		transformation = new Transformation();
 	} // END OF CONSTRUCTOR
 
-	@Override
-	public void init(ScreenInterface screen) throws Exception {
+	public void init(Screen screen) throws Exception {
 
 		shaderConstructor = new ShaderProgram();
 		shaderConstructor.createVertexShader(FileHandler.loadResource("res/vertex.vs"));
@@ -37,7 +36,8 @@ public class Renderer implements RendererInterface {
 		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
 
-	public void render(ScreenInterface screen, GameEntity[] gameEntities) {
+	// Takes a state to render
+	public void render(Screen screen, GameState state) {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -55,7 +55,9 @@ public class Renderer implements RendererInterface {
 		Matrix4f projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth(), screen.getHeight(), 0f, -1f, 1f);
 		shaderConstructor.setUniform("projection", projectionMatrix);
 
-		// Render each gameItem
+		// Render each entity of the state
+		
+		/*
 		for (GameEntity gameEntity : gameEntities) {
 
 			Matrix4f modelMatrix = transformation.getModelMatrix(gameEntity.getPosition(), gameEntity.getRotation(),
@@ -64,6 +66,17 @@ public class Renderer implements RendererInterface {
 			shaderConstructor.setUniform("model", modelMatrix);
 
 			gameEntity.getMesh().render();
+		}*/
+		
+		
+		for (Player player : state.getPlayers()) {
+			
+			player.getMesh().render();
+		}
+		
+		for (Bomb bomb : state.getBombs()) {
+			
+			bomb.getMesh().render();
 		}
 
 		// Unbind the shader
@@ -71,7 +84,6 @@ public class Renderer implements RendererInterface {
 
 	} // END OF render METHOD
 	
-	@Override
 	public void dispose() {
 
 		if (shaderConstructor != null) {

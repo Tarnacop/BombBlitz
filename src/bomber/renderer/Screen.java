@@ -9,9 +9,7 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
-import bomber.renderer.interfaces.ScreenInterface;
-
-public class Screen implements ScreenInterface {
+public class Screen {
 
 	private final String title;
 	private int width;
@@ -29,7 +27,6 @@ public class Screen implements ScreenInterface {
 		this.vSync = vSync;
 	} // END OF CONSTRUCTOR
 
-	@Override
 	public void init() {
 
 		// Setup an error callback. The default implementation
@@ -91,61 +88,51 @@ public class Screen implements ScreenInterface {
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	} // END OF init METHOD
 
-	@Override
 	public void setClearColour(float red, float green, float blue, float alpha) {
 		
 		glClearColor(red, green, blue, alpha);
 	} // END OF setClearColour
 
-	@Override
 	public boolean screenShouldClose() {
 		
 		return glfwWindowShouldClose(screenID);
 	} // END OF screenShouldClose METHOD
 
-	@Override
 	public String getTitle() {
 		
 		return title;
 	} // END OF getTitle METHOD
 
-	@Override
 	public int getWidth() {
 		
 		return width;
 	} // END OF getWidth METHOD
 
-	@Override
 	public int getHeight() {
 		
 		return height;
 	} // END OF getHeight METHOD
 
-	@Override
 	public boolean isResized() {
 		
 		return resized;
 	} // END OF isResized METHOD
 
-	@Override
 	public boolean isVsyncOn() {
 
 		return vSync;
 	} // END OF isVsyncOn METHOD
 
-	@Override
 	public void setResized(boolean resized) {
 		
 		this.resized = resized;
 	} // END OF setResized METHOD
 
-	@Override
 	public void setVsyncOn(boolean vSync) {
 		
 		this.vSync = vSync;
 	} // END OF setVsyncOn METHOD
 	
-	@Override
 	public void setViewport(int originX, int originY, int width, int height) {
 		
 		glViewport(originX, originY, width, height);
@@ -161,7 +148,6 @@ public class Screen implements ScreenInterface {
 		glfwSetWindowShouldClose(screenID, true);
 	} // END OF close METHOD
 	
-	@Override
 	public void update() {
 		
         glfwSwapBuffers(screenID);

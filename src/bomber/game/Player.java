@@ -4,6 +4,8 @@ package bomber.game;
 
 import java.awt.Point;
 
+import bomber.renderer.shaders.Mesh;
+
 public class Player {
 
 	private String name;			
@@ -15,8 +17,9 @@ public class Player {
 	private final int scalar = 64;
 	private KeyboardState keyState;		
 	private boolean isAlive;
+	private Mesh mesh;
 	
-	public Player(String name, Point pos, int lives, double speed){
+	public Player(String name, Point pos, int lives, double speed, Mesh mesh){
 		
 		this.name = name;
 		this.pos = pos;
@@ -27,6 +30,7 @@ public class Player {
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
 		this.gridPos = new Point();
+		this.mesh = mesh;
 		updatePos();
 	}
 
@@ -105,5 +109,8 @@ public class Player {
 		updatePos();
 	}
 	
-	
+	public Mesh getMesh() {
+		
+		return this.mesh;
+	}
 }
