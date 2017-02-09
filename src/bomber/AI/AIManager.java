@@ -20,6 +20,7 @@ public class AIManager extends Thread {
 	/** The safety checker for AI. */
 	private SafetyChecker safetyCh;
 	private final int scalar = 64;
+
 	/**
 	 * Instantiates a new AI manager.
 	 *
@@ -41,9 +42,7 @@ public class AIManager extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
-		while (gameAI.isAlive()) {
-			move();
-		}
+		move();
 	}
 
 	/**
@@ -58,16 +57,16 @@ public class AIManager extends Thread {
 
 		switch (move) {
 		case UP:
-			aiPos.setLocation(aiPos.x*scalar, (aiPos.y - 1)*scalar);
+			aiPos.setLocation(aiPos.x, (aiPos.y - 1));
 			break;
 		case DOWN:
-			aiPos.setLocation(aiPos.x, (aiPos.y + 1)*scalar);
+			aiPos.setLocation(aiPos.x, (aiPos.y + 1));
 			break;
 		case LEFT:
-			aiPos.setLocation((aiPos.x - 1)*scalar, aiPos.y);
+			aiPos.setLocation((aiPos.x - 1), aiPos.y);
 			break;
 		case RIGHT:
-			aiPos.setLocation((aiPos.x + 1)*scalar, aiPos.y);
+			aiPos.setLocation((aiPos.x + 1), aiPos.y);
 			break;
 		default:
 			break;
@@ -113,7 +112,13 @@ public class AIManager extends Thread {
 	private void makeSingleMove(AIActions move) {
 		Point updatedPos = updatedPos(move);
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
-		while (gameAI.getGridPos().equals(updatedPos)) {
+		while (!gameAI.getGridPos().equals(updatedPos)) {
+			try {
+				sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		gameAI.getKeyState().setMovement(Movement.NONE);
 	}
@@ -127,16 +132,23 @@ public class AIManager extends Thread {
 	 *            the variable determining if the escape moves are passed
 	 */
 	private void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
+		
+		try{
 		if (inDanger)
-			while (!moves.isEmpty()) {
+			while (moves != null && !moves.isEmpty()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
-			while (!moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
+			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
 					&& !safetyCh.isEnemyInBombRange()) {
 				makeSingleMove(moves.removeFirst());
 			}
-		move();
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
 	}
 
 	/**
@@ -144,26 +156,39 @@ public class AIManager extends Thread {
 	 */
 	private void move() {
 		LinkedList<AIActions> moves;
-		System.out.println("AI moving");
-		// if AI is in danger then find the escape route
-		if (safetyCh.inDanger()) {
-			moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-			performMoves(moves, true);
+		try {
+			while (gameAI.isAlive()) {
+
+				// System.out.println("AI moving");
+				// if AI is in danger then find the escape route
+				if (safetyCh.inDanger()) {
+					moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+					performMoves(moves, true);
+				}
+
+				// if enemy is in bomb range then place the bomb and go to the
+				// safe
+				// location
+				 else if (safetyCh.isEnemyInBombRange()) {
+				 gameAI.getKeyState().setBomb(true);
+				 moves =
+				 finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+				 performMoves(moves, true);
+				 }
+
+				// if enemy is accessible(no boxes are blocking the path) then
+				// find
+				// a
+				// route to it and make moves
+				else if ((moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
+					performMoves(moves, false);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
-		
-		// if enemy is in bomb range then place the bomb and go to the safe
-		// location
-		else if (safetyCh.isEnemyInBombRange()) {
-			gameAI.getKeyState().setBomb(true);
-			moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-			performMoves(moves, true);
-		}
-		
-		// if enemy is accessible(no boxes are blocking the path) then find a
-		// route to it and make moves
-		else if ((moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
-			performMoves(moves, false);
-		}
+
 	}
 
 }

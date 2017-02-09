@@ -59,6 +59,12 @@ public class Player {
 	
 	public Point getGridPos()
 	{
+		
+		int x = pos.x/scalar;
+		int y = pos.y/scalar;
+		if(x%scalar > 32) x++;
+		if(y%scalar > 32) y++;
+		gridPos.setLocation(x, y);
 		return gridPos;
 	}
 	

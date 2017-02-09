@@ -99,12 +99,20 @@ public class SafetyChecker {
 	 * @return the tiles affected by bombs
 	 */
 	public ArrayList<Point> getTilesAffectedByBombs() {
-		ArrayList<Point> points = new ArrayList<>();
+		try{ArrayList<Point> points = new ArrayList<>();
 		List<Bomb> bombs = state.getBombs();
-		for (Bomb b : bombs) {
+		Bomb[] allBombs = new Bomb[bombs.size()];
+		allBombs = bombs.toArray(allBombs);
+		for (Bomb b : allBombs) {
 			points.addAll(getBombCoverage(b));
 		}
 		return points;
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return null;
 	}
 
 	/**
@@ -116,6 +124,7 @@ public class SafetyChecker {
 	public ArrayList<Point> getBombCoverage(Bomb bomb) {
 		//TODO need to solve the issue
 		ArrayList<Point> points = new ArrayList<>();
+		if(bomb == null) return points;
 		points.add(bomb.getGridPos());
 		Point temp = bomb.getGridPos();
 		int bombX = temp.x;
@@ -140,7 +149,7 @@ public class SafetyChecker {
 			}
 
 		}
-		System.out.println(points);
+//		System.out.println(points);
 		return points;
 	}
 
