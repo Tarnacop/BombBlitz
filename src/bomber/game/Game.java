@@ -1,5 +1,7 @@
 package bomber.game;
 
+import java.awt.Point;
+
 
 public class Game{
 	
@@ -10,10 +12,17 @@ public class Game{
 		
 		this.map = map;
 		this.playerName = playerName;
+		
+		Player p1 = new Player("Player1", new Point(64,64), 5, 3);
+		
+		
+		//AudioManager audio = new AudioManager();
 	}
 	
 	public void update(float interval){
 		
-		
+		//UI.update();
+		//physics.update();
+		//audio.playEventList(gameState.getAudioEvents());
 	}
 }

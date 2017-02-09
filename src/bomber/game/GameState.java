@@ -1,18 +1,21 @@
 package bomber.game;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameState {
 
 	private Map map;				
 	private List<Player> players;		
-	private List<Bomb> bombs;		
+	private List<Bomb> bombs;
+	private List<AudioEvent> audioEvents;
 
-	public GameState(Map map, List<Player> players, List<Bomb> bombs){	
+	public GameState(Map map, List<Player> players){	
 		
 		this.map = map;
 		this.players = players;
-		this.bombs = bombs;
+		this.bombs = new ArrayList<Bomb>();
+		this.audioEvents = new ArrayList<AudioEvent>();
 	}
 
 	public boolean gameOver(){
@@ -33,6 +36,14 @@ public class GameState {
 		return false;
 	}
 	
+	public List<AudioEvent> getAudioEvents() {
+		return audioEvents;
+	}
+
+	public void setAudioEvents(List<AudioEvent> audioEvents) {
+		this.audioEvents = audioEvents;
+	}
+
 	public Map getMap(){
 		
 		return this.map;

@@ -57,7 +57,6 @@ public class main {
 
 		Map map = new Map(gridMap);
 		
-		Player p1 = new Player("Player1", new Point(64,64), 5, 3);
 		
 		ArrayList<Player> list = new ArrayList<Player>();
 		list.add(p1);
