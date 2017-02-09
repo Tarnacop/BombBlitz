@@ -37,7 +37,7 @@ public class PhysicsEngineTest
         map = new Map(blocks);
 
         players = new ArrayList<>();
-        buddy = new Player("Buddy", new Point(5,5), 3, 10);
+        buddy = new Player("Buddy", new Point(5,5), 3, 10, null);
         players.add(buddy);
         gameState = new GameState(map, players);
         engine = new PhysicsEngine(gameState);
@@ -46,14 +46,14 @@ public class PhysicsEngineTest
     @Test
     public void addPlayer() throws Exception
     {
-        gameState.getPlayers().add(new Player("TestPlayer1", new Point(5,5), 1, 10));
+        gameState.getPlayers().add(new Player("TestPlayer1", new Point(5,5), 1, 10, null));
         Player testPlayer1 = engine.getPlayerNamed("TestPlayer1");
         assertNotNull("Player was not added or does not have the given name.", testPlayer1);
         assertEquals("Added player does not have the given position", new Point(5,5), testPlayer1.getPos());
         assertEquals("Added player does not have the given number of lives", 1, testPlayer1.getLives());
         assertEquals("Added player does not have the given speed", 10.0, testPlayer1.getSpeed());
 
-        gameState.getPlayers().add(new Player("TestPlayer2", new Point(3,4), 3, 14));
+        gameState.getPlayers().add(new Player("TestPlayer2", new Point(3,4), 3, 14, null));
         Player testPlayer2 = engine.getPlayerNamed("TestPlayer2");
         assertNotNull("Player was not added or does not have the given name.", testPlayer2);
         assertEquals("Added player does not have the given position", new Point(3, 4), testPlayer2.getPos());
