@@ -144,7 +144,7 @@ public class AIManager extends Thread {
 	 */
 	private void move() {
 		LinkedList<AIActions> moves;
-		
+		System.out.println("AI moving");
 		// if AI is in danger then find the escape route
 		if (safetyCh.inDanger()) {
 			moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));

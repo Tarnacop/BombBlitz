@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
+import bomber.AI.GameAI;
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
@@ -19,6 +20,7 @@ import bomber.game.Response;
 import bomber.physics.PhysicsEngine;
 
 import org.lwjgl.opengl.GL;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -54,7 +56,8 @@ public class main {
 
 		Map map = new Map(gridMap);
 		
-		Player p1 = new Player("Player1", new Point(64,64), 5, 5);
+		Player p1 = new Player("Player1", new Point(64,64), 1, 5);
+		
 		ArrayList<Player> list = new ArrayList<Player>();
 		list.add(p1);
 		
@@ -62,6 +65,10 @@ public class main {
 		
 		GameState gameState = new GameState(map, list, bombs);
 
+		Player ai = new GameAI("Player2", new Point(128, 128), 1, 5, gameState);
+		
+		gameState.getPlayers().add(ai);
+		
 		HashMap<Response, Integer> keymap = new HashMap<Response, Integer>();
 		keymap.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
 		keymap.put(Response.UP_MOVE, GLFW_KEY_UP);
@@ -93,6 +100,7 @@ public class main {
 		PhysicsEngine physics = new PhysicsEngine(gameState);
 		
 		updater.start();
+		ai.begin();
 		
 		while (!glfwWindowShouldClose(window)) {
 		   

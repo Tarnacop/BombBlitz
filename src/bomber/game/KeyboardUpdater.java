@@ -39,6 +39,7 @@ public class KeyboardUpdater extends Thread{
 		
 		int state = GLFW_RELEASE;
 		
+		boolean bombPressed = false;
 		
 		while(!stop){
 			
@@ -48,9 +49,12 @@ public class KeyboardUpdater extends Thread{
 			if(getKey(Response.PLACE_BOMB).isPresent()){
 				state = glfwGetKey(this.window, getKey(Response.PLACE_BOMB).get());
 			}
-			if(state == GLFW_PRESS){
+			if(state == GLFW_PRESS && !bombPressed){
 			    keyState.setBomb(true);
+			    bombPressed = true;
 			    state = GLFW_RELEASE;
+			}else if(state == GLFW_RELEASE && bombPressed){
+				bombPressed = false;
 			}
 			
 			//Check for up
