@@ -158,7 +158,7 @@ public class AIManager extends Thread {
 		LinkedList<AIActions> moves;
 		try {
 			while (gameAI.isAlive()) {
-
+				
 				// System.out.println("AI moving");
 				// if AI is in danger then find the escape route
 				if (safetyCh.inDanger()) {

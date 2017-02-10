@@ -128,6 +128,10 @@ public class Game implements GameInterface{
 	@Override
 	public void dispose() {
 		
+		for(Player player : this.gameState.getPlayers()){
+			
+			player.setAlive(false);
+		}
 		renderer.dispose();	
 	}
 }
