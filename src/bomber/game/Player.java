@@ -31,7 +31,6 @@ public class Player {
 		this.keyState = new KeyboardState();
 		this.gridPos = new Point();
 		this.mesh = mesh;
-		updatePos();
 	}
 
 	public void begin(){
@@ -63,6 +62,12 @@ public class Player {
 	
 	public Point getGridPos()
 	{
+		
+		int x = pos.x/scalar;
+		int y = pos.y/scalar;
+		if(x%scalar > 32) x++;
+		if(y%scalar > 32) y++;
+		gridPos.setLocation(x, y);
 		return gridPos;
 	}
 	

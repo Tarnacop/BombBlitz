@@ -23,6 +23,7 @@ public class Renderer {
 	private Mesh blockMesh;
 	private Mesh softMesh;
 	private Mesh blastMesh;
+	private Mesh AImesh;
 	
 	public Renderer() {
 
@@ -45,6 +46,8 @@ public class Renderer {
 		softMesh = new Mesh(0, 0, 64, 64, colours);
 		colours = new float[] {0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f}; 
 		blastMesh = new Mesh(0, 0, 64, 64, colours);
+		colours = new float[]{1f, 0f, 1f, 0f, 1f, 0f, 1f, 0f, 1f, 0f, 1f, 0f}; 
+		AImesh = new Mesh(0, 0, 32, 32, colours);
 		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
 
@@ -110,19 +113,39 @@ public class Renderer {
 			}
 		}
 		
-		for (Player player : state.getPlayers()) {
-			
-			Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
-					,0f, 1f);
-			
-			shaderConstructor.setUniform("model", modelMatrix);
-			
-			player.getMesh().render();
-		}
+//		for (Player player : state.getPlayers()) {
+//			
+//			Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
+//					,0f, 1f);
+//			
+//			shaderConstructor.setUniform("model", modelMatrix);
+//			
+//			player.getMesh().render();
+//		}
+//		
+		Player player = state.getPlayers().get(0);
+		
+		Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
+				,0f, 1f);
+		
+		shaderConstructor.setUniform("model", modelMatrix);
+		
+		player.getMesh().render();
+		
+
+		player = state.getPlayers().get(1);
+		
+		modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
+				,0f, 1f);
+		
+		shaderConstructor.setUniform("model", modelMatrix);
+		
+		AImesh.render();
+		
 		
 		for (Bomb bomb : state.getBombs()) {
 			
-			Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) bomb.getPos().x, (float) bomb.getPos().y)
+			modelMatrix = transformation.getModelMatrix(new Vector2f((float) bomb.getPos().x, (float) bomb.getPos().y)
 			,0f, 1f);
 	
 			shaderConstructor.setUniform("model", modelMatrix);

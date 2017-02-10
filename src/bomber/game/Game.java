@@ -43,12 +43,13 @@ public class Game{
 		
 		this.gameState = new GameState(map, list);
 		this.physics = new PhysicsEngine(gameState);
-		
+		Player ai = new GameAI("   dasda", new Point(128,128),5, 300, gameState,null);
+		list.add(ai);
 		try {
 			
 			this.graphics = new Graphics("Bomb Blitz", 600, 600, this, this.gameState, controlScheme, p1);
 			this.graphics.start();
-			
+			ai.begin();
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
