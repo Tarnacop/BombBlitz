@@ -59,8 +59,10 @@ public class ProtocolConstant {
 
 	// public static final byte MSG_C_LOBBY_GETLEADERBOARD = 0x06;
 	public static final byte MSG_C_LOBBY_CREATEROOM = 0x07; // Bit set
-	// 1 byte message type + 2 byte sequence + 1 byte room name length + room
-	// name string + 1 byte max player limit + 4 byte map ID
+	/*
+	 * 1 byte message type + 2 byte sequence + 1 byte room name length + room
+	 * name string + 1 byte max player limit + 4 byte map ID
+	 */
 
 	public static final byte MSG_C_LOBBY_JOINROOM = 0x08;
 	// public static final byte MSG_C_LOBBY_SENDTEXT = 0x0a;
