@@ -20,10 +20,12 @@ public class Renderer {
 
 	private ShaderProgram shaderConstructor;
 	private final Transformation transformation;
-	private Mesh blockMesh;
+	private Matrix4f projectionMatrix;
+	private Matrix4f modelMatrix;
+	private Mesh solidMesh;
 	private Mesh softMesh;
 	private Mesh blastMesh;
-	private Mesh AImesh;
+	private Mesh bombMesh;
 	
 	public Renderer() {
 
@@ -39,15 +41,16 @@ public class Renderer {
 
 		shaderConstructor.createUniform("projection");
 		shaderConstructor.createUniform("model");
+
+		float[] colours = new float[] { 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f };
+		solidMesh = new Mesh(64, 64, colours);
+		colours = new float[] { 1f, 1f, 1f, 0f, 1f, 1f, 1f, 0f, 1f, 1f, 1f, 0f };
+		softMesh = new Mesh(64, 64, colours);
+		colours = new float[] { 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f };
+		blastMesh = new Mesh(64, 64, colours);
+		colours = new float[] { 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f};
+		bombMesh = new Mesh(50, 50, colours);
 		
-		float[] colours = new float[] { 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f };
-		blockMesh = new Mesh(0, 0, 64, 64, colours);
-		colours = new float[] { 1f, 1f, 1f, 0.0f, 1f, 1f, 1f, 0.0f, 1f, 1f, 1f, 0.0f };
-		softMesh = new Mesh(0, 0, 64, 64, colours);
-		colours = new float[] {0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f}; 
-		blastMesh = new Mesh(0, 0, 64, 64, colours);
-		colours = new float[]{1f, 0f, 1f, 0f, 1f, 0f, 1f, 0f, 1f, 0f, 1f, 0f}; 
-		AImesh = new Mesh(0, 0, 32, 32, colours);
 		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
 
@@ -66,98 +69,66 @@ public class Renderer {
 		// Bind the shader
 		shaderConstructor.bind();
 
-		// Set the uniform
-		Matrix4f projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth(), screen.getHeight(), 0f, -1f, 1f);
+		// Set the uniform for the projection matrix
+		projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth(), screen.getHeight(),
+				0f, -1f, 1f);
 		shaderConstructor.setUniform("projection", projectionMatrix);
 
 		// Render each entity of the state
-		
-		/*
-		for (GameEntity gameEntity : gameEntities) {
-
-			Matrix4f modelMatrix = transformation.getModelMatrix(gameEntity.getPosition(), gameEntity.getRotation(),
-					gameEntity.getScale());
-			
-			shaderConstructor.setUniform("model", modelMatrix);
-
-			gameEntity.getMesh().render();
-		}*/
-		
 		Block[][] blocks = state.getMap().getGridMap();
-		
-		for(int i = 0; i < blocks.length; i++) {
+
+		for (int i = 0; i < blocks.length; i++) {
 			for (int j = 0; j < blocks[0].length; j++) {
-				
-				if(blocks[i][j] == Block.SOLID) {
-				
-					Vector2f blockCoords = new Vector2f(i*64f, j*64f);
-					Matrix4f modelMatrix = transformation.getModelMatrix(blockCoords
-							,0f, 1f);
+
+				if (blocks[i][j] == Block.SOLID) {
+
+					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
+					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
 					shaderConstructor.setUniform("model", modelMatrix);
-					blockMesh.render();
-				} else if(blocks[i][j] == Block.SOFT) {
-					Vector2f blockCoords = new Vector2f(i*64f, j*64f);
-					Matrix4f modelMatrix = transformation.getModelMatrix(blockCoords
-							,0f, 1f);
+					solidMesh.render();
+				} else if (blocks[i][j] == Block.SOFT) {
+					
+					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
+					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
 					shaderConstructor.setUniform("model", modelMatrix);
 					softMesh.render();
+
+				} else if (blocks[i][j] == Block.BLAST) {
 					
-				} else if(blocks[i][j] == Block.BLAST) {
-					Vector2f blockCoords = new Vector2f(i*64f, j*64f);
-					Matrix4f modelMatrix = transformation.getModelMatrix(blockCoords
-							,0f, 1f);
+					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
+					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
 					shaderConstructor.setUniform("model", modelMatrix);
 					blastMesh.render();
 				}
 
 			}
 		}
-		
-//		for (Player player : state.getPlayers()) {
-//			
-//			Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
-//					,0f, 1f);
-//			
-//			shaderConstructor.setUniform("model", modelMatrix);
-//			
-//			player.getMesh().render();
-//		}
-//		
-		Player player = state.getPlayers().get(0);
-		
-		Matrix4f modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
-				,0f, 1f);
-		
-		shaderConstructor.setUniform("model", modelMatrix);
-		
-		player.getMesh().render();
-		
 
-		player = state.getPlayers().get(1);
-		
-		modelMatrix = transformation.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y)
-				,0f, 1f);
-		
-		shaderConstructor.setUniform("model", modelMatrix);
-		
-		AImesh.render();
-		
-		
-		for (Bomb bomb : state.getBombs()) {
-			
-			modelMatrix = transformation.getModelMatrix(new Vector2f((float) bomb.getPos().x, (float) bomb.getPos().y)
-			,0f, 1f);
-	
+		for (Player player : state.getPlayers()) {
+
+			modelMatrix = transformation
+					.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y), 0f, 1f);
+
 			shaderConstructor.setUniform("model", modelMatrix);
-			
-			bomb.getMesh().render();
+
+			player.getMesh().render();
+		}
+
+		for (Bomb bomb : state.getBombs()) {
+
+			modelMatrix = transformation.getModelMatrix(new Vector2f((float) bomb.getPos().x, (float) bomb.getPos().y),
+					0f, 1f);
+
+			shaderConstructor.setUniform("model", modelMatrix);
+
+			bombMesh.render();
 		}
 
 		// Unbind the shader
 		shaderConstructor.unbind();
 
 	} // END OF render METHOD
-	
+
 	public void dispose() {
 
 		if (shaderConstructor != null) {
