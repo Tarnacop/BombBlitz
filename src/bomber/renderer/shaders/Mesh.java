@@ -19,18 +19,18 @@ public class Mesh {
 	private final VertexBufferObject vboindices;
 	private final int vertexCount;
 
-	public Mesh(int x, int y, int width, int height, float[] colours) {
+	public Mesh(int width, int height, float[] colours) {
 
 		int[] indices = new int[] { 0, 1, 3, 3, 1, 2, };
 		float[] positions = {
 				// V0
-				((float) x), ((float) (y + height)),
+				0f, (float) height,
 				// V1
-				((float) x), ((float) y),
+				0f, 0f,
 				// V2
-				((float) (x + width)), ((float) y),
+				(float) width, 0f,
 				// V3
-				((float) (x + width)), ((float) (y + height))
+				(float) width, (float) height
 		};
 		vao = new VertexArrayObject();
 		vbopos = new VertexBufferObject();

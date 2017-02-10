@@ -14,7 +14,6 @@ public class Bomb {
 	private int scalar = 64;
 
 	private Point gridPos;
-	private final Mesh mesh;
 	
 	public Bomb(String playerName, Point pos, int time, int radius){
 		
@@ -23,9 +22,6 @@ public class Bomb {
 		this.time = time;
 		this.radius = radius;
 		this.gridPos = new Point();
-		float[] colours = new float[] { 0.7f, 0.4f, 0.3f, 0.0f,  0.7f, 0.4f, 0.3f, 0.0f, 0.7f, 0.4f, 0.3f, 0.0f };
-		
-		this.mesh = new Mesh(0, 0, 50, 50, colours);
 		updatePos();
 	}
 
@@ -62,10 +58,5 @@ public class Bomb {
 	public int getRadius(){
 		
 		return this.radius;
-	}
-	
-	public Mesh getMesh() {
-		
-		return this.mesh;
 	}
 }
