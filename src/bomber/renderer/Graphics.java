@@ -20,6 +20,7 @@ public class Graphics implements Runnable {
 		
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
 		this.screen = new Screen(screenTitle, screenWidth, screenHeight, vSync);
+		System.out.println("Made new screen in Graphics");
 		this.gameLogic = gameLogic;
 		timer = new Timer();
 	} // END OF CONSTRUCTOR
@@ -53,9 +54,9 @@ public class Graphics implements Runnable {
 	// Initialize the game engine
 	private void init() throws Exception {
 		
-		screen.init();
-		timer.init();
-		gameLogic.init(screen);
+		this.screen.init();
+		this.timer.init();
+		this.gameLogic.init(screen);
 	} // END OF init METHOD
 	
 	// Update method

@@ -92,9 +92,9 @@ public class Player {
 		return gridPos;
 	}
 	
-	public void makeMesh(int x, int y, int width, int height, float[] colours){
+	public void makeMesh(int width, int height, float[] colours){
 		
-		this.mesh = new Mesh(x, y, width, height, colours);
+		this.mesh = new Mesh(width, height, colours);
 	}
 	
 	private void updatePos()
