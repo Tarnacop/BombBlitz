@@ -8,6 +8,7 @@ import bomber.renderer.shaders.Mesh;
 
 public class Player {
 
+	private int playerID;
 	private String name;			
 	private Point pos;	
 	private Point gridPos;
@@ -30,6 +31,26 @@ public class Player {
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
 		this.gridPos = new Point();
+		this.mesh = mesh;
+	}
+
+	public int getPlayerID() {
+		return playerID;
+	}
+
+	public void setPlayerID(int playerID) {
+		this.playerID = playerID;
+	}
+
+	public int getScalar() {
+		return scalar;
+	}
+
+	public void setGridPos(Point gridPos) {
+		this.gridPos = gridPos;
+	}
+
+	public void setMesh(Mesh mesh) {
 		this.mesh = mesh;
 	}
 
