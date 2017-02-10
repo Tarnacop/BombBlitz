@@ -131,6 +131,10 @@ public class Renderer {
 
 	public void dispose() {
 
+		solidMesh.dispose();
+		softMesh.dispose();
+		blastMesh.dispose();
+		bombMesh.dispose();
 		if (shaderConstructor != null) {
 
 			shaderConstructor.dispose();

@@ -85,7 +85,7 @@ public class Game implements GameInterface{
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 			this.player = new Player(this.playerName, new Point(64,64), 5, 300, new Mesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
-			
+			//System.out.println("Ours: " + this.keyState.toString() + " Theirs: " + this.player.getKeyState().toString());
 			ArrayList<Player> list = new ArrayList<Player>();
 			list.add(this.player);
 			
@@ -104,8 +104,13 @@ public class Game implements GameInterface{
 	@Override
 	public void update(float interval) {
 		
+		//System.out.println(this.gameState);
+		//System.out.println(this.player.getKeyState().toString() + ": " + this.player.getKeyState().getMovement());
+		//System.out.println(this.gameState.getPlayers().get(0).getKeyState().toString());
 		this.physics.update((int) (interval * 1000));
 		System.out.println(this.gameState);
+		this.keyState.setBomb(false);
+		this.keyState.setMovement(Movement.NONE);
 	}
 
 	@Override
@@ -117,9 +122,7 @@ public class Game implements GameInterface{
 	@Override
 	public void input(Screen screen) {
 		
-		this.bombPressed = this.input.update(screen, this.player, this.controlScheme, this.bombPressed);
-		this.keyState.setBomb(false);
-		this.keyState.setMovement(Movement.NONE);
+		this.bombPressed = this.input.update(screen, this.keyState, this.controlScheme, this.bombPressed);
 	}
 
 	@Override

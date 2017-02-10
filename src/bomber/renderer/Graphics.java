@@ -47,6 +47,7 @@ public class Graphics implements Runnable {
 		} finally {
 			
 			dispose();
+			System.out.println("DISPOSED");
 		}
 		
 	} // END OF run METHOD
@@ -83,16 +84,14 @@ public class Graphics implements Runnable {
 		boolean gameRunning = true;
 		
 		// The main loop of the game
-		while(gameRunning && !screen.screenShouldClose()) {
-			
+		while(gameRunning && (!screen.screenShouldClose())) {
 			deltaTime = timer.getDeltaTime();
 			accumulator = accumulator + deltaTime;
-			
 			input();
-			
 			// Update game and timer UPS if enough time passed
 			while(accumulator >= interval) {
 
+				
 				update(interval);
 				timer.updateUPS();
 				accumulator = accumulator - interval;
@@ -111,7 +110,7 @@ public class Graphics implements Runnable {
 				sync();
 			}
 		}
-		
+		System.out.println("FINISHED GAMELOOP");
 	} // END OF gameLoop METHOD
 	
 	private void sync() {
@@ -130,6 +129,7 @@ public class Graphics implements Runnable {
             	ie.printStackTrace();
             }
 		}
+		
 		
 	} // END OF sync METHOD
 	

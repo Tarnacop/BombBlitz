@@ -14,11 +14,10 @@ public class KeyboardInput {
 		
 	}
 	
-	public boolean update(Screen screen, Player player, HashMap<Response, Integer> controlScheme, boolean bombPressed){
+	public boolean update(Screen screen, KeyboardState keyState, HashMap<Response, Integer> controlScheme, boolean bombPressed){
 		
-		System.out.println("polling the keyboard");
+		//System.out.println("polling the keyboard with keyState" + keyState.toString());
 		
-		KeyboardState keyState = player.getKeyState();
 		
 		int state = GLFW_RELEASE;
 			
@@ -69,6 +68,7 @@ public class KeyboardInput {
 				state = screen.getKeyState(getKey(Response.RIGHT_MOVE, controlScheme).get());
 			}
 			if(state == GLFW_PRESS){
+				//System.out.println("SETTING MOVEMENT ON " + keyState.toString() + " TO RIGHT");
 			    keyState.setMovement(Movement.RIGHT);
 			    state = GLFW_RELEASE;
 			}
