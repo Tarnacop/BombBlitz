@@ -98,6 +98,7 @@ public class PhysicsEngine
     {
         Point playerPos = getPlayerNamed(playerName).getPos();
         gameState.getBombs().add(new Bomb(playerName,  getBombLocation(playerPos), time, radius));
+        gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
     }
 
     private void updatePlayer(Player player, int milliseconds)
@@ -140,7 +141,6 @@ public class PhysicsEngine
             okToPlaceBomb.put(player.getName(), true);
 
         // collision detection
-        
         // TODO refactor (put this test up higher and test speed & direction)
         if (fromDirection != null)
         {
@@ -161,9 +161,9 @@ public class PhysicsEngine
         // check if player is killed
         if (map.getPixelBlockAt(pos.x, pos.y)==Block.BLAST)
         {
-            // TODO: tell gameLogic and/or audio
             player.setAlive(false);
             player.setLives(Math.max(player.getLives()-1,0));
+            gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
         }
     }
 
@@ -214,6 +214,7 @@ public class PhysicsEngine
             Point pos = bomb.getPos();
             int radius = bomb.getRadius();
             addBlast(pos.x/64, pos.y/64, radius, 0);
+            gameState.getAudioEvents().add(AudioEvent.EXPLOSION);
         }
     }
 
@@ -225,33 +226,35 @@ public class PhysicsEngine
             return;
         if(radius==0 || gameState.getMap().getGridBlockAt(x, y)==Block.SOLID)
             return;
+        if(gameState.getMap().getGridBlockAt(x, y) != Block.SOFT)
+            switch (direction)
+            {
+                case 0:
+                    addBlast(x, y - 1, radius - 1, 1);
+                    addBlast(x + 1, y, radius - 1, 2);
+                    addBlast(x, y + 1, radius - 1, 3);
+                    addBlast(x - 1, y, radius - 1, 4);
+                    break;
+                case 1:
+                    addBlast(x, y - 1, radius - 1, 1);
+                    break;
+                case 2:
+                    addBlast(x + 1, y, radius - 1, 2);
+                    break;
+                case 3:
+                    addBlast(x, y + 1, radius - 1, 3);
+                    break;
+                case 4:
+                    addBlast(x - 1, y, radius - 1, 4);
+                    break;
+            }
+
         gameState.getMap().setGridBlockAt(pos, Block.BLAST);
-        switch (direction)
-        {
-            case 0:
-                addBlast(x, y-1, radius-1, 1);
-                addBlast(x+1, y, radius-1, 2);
-                addBlast(x, y+1, radius-1, 3);
-                addBlast(x-1, y, radius-1, 4);
-                break;
-            case 1:
-                addBlast(x, y-1, radius-1, 1);
-                break;
-            case 2:
-                addBlast(x+1, y, radius-1, 2);
-                break;
-            case 3:
-                addBlast(x, y+1, radius-1, 3);
-                break;
-            case 4:
-                addBlast(x-1, y, radius-1, 4);
-                break;
-        }
     }
 
-    private void decreaseBombTimer(Bomb bomb, int miliseconds)
+    private void decreaseBombTimer(Bomb bomb, int milliseconds)
     {
-        bomb.setTime(bomb.getTime()-miliseconds);
+        bomb.setTime(bomb.getTime()-milliseconds);
     }
 
 }
