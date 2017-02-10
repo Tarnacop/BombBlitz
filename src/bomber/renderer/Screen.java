@@ -3,19 +3,12 @@ package bomber.renderer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.glfw.GLFW.*;
 
-import java.util.HashMap;
-import java.util.Optional;
-
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
-
-import bomber.game.KeyboardState;
-import bomber.game.Movement;
-import bomber.game.Player;
-import bomber.game.Response;
 
 public class Screen {
 
@@ -26,7 +19,8 @@ public class Screen {
 	private boolean resized;
 	private boolean vSync;
 	private GLFWVidMode vidmode;
-
+	private GLFWKeyCallback keyCallback;
+	
 	public Screen(String title, int width, int height, boolean vSync) {
 
 		this.width = width;
@@ -79,7 +73,22 @@ public class Screen {
 				Screen.this.setResized(true);
 			}
 		});
+		
+		 // Setup a key callback. It will be called every time a key is pressed, repeated or released.
 
+        glfwSetKeyCallback(screenID, keyCallback = new GLFWKeyCallback() {
+
+            @Override
+            public void invoke(long window, int key, int scancode, int action, int mods) {
+
+                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+
+                    glfwSetWindowShouldClose(window, true);
+
+                }
+            }
+
+        });
 		// Get the resolution of the primary monitor
 		vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 

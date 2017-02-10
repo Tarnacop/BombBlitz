@@ -1,5 +1,7 @@
 package bomber.game;
 
+import static org.lwjgl.glfw.GLFW.*;
+
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,7 +124,7 @@ public class Game implements GameInterface{
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		
+		renderer.dispose();	
 	}
 }
