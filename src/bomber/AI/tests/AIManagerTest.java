@@ -67,8 +67,8 @@ public class AIManagerTest {
 		
 		players = new ArrayList<>();
 		
-		state = new GameState(map, players, bombs);
-		
+		state = new GameState(map, players);
+		state.setBombs(bombs);
 		
 		System.setOut(new PrintStream(outContent));
 		
@@ -80,8 +80,8 @@ public class AIManagerTest {
 
 	@Test
 	public void test() throws InterruptedException {
-		GameAI ai = new GameAI("ai",new Point(2*scalar,3*scalar),3,10,state);
-		Player ai2 = new GameAI("ai",new Point(6*scalar,5*scalar),3,10,state);
+		GameAI ai = new GameAI("ai",new Point(2*scalar,3*scalar),3,10,state, null);
+		Player ai2 = new GameAI("ai",new Point(6*scalar,5*scalar),3,10,state, null);
 		players.add(ai);
 		players.add(ai2);
 		state.setPlayers(players);

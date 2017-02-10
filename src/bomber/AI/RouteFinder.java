@@ -371,7 +371,7 @@ public class RouteFinder {
 		default:
 			break;
 		}
-		System.out.println(aiPos);
+//		System.out.println(aiPos);
 		return false;
 	}
 

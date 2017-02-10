@@ -27,7 +27,6 @@ public class PhysicsEngineTest
     private PhysicsEngine engine;
     private Player buddy;
 
-
     @Before
     public void setUp() throws Exception
     {
@@ -37,27 +36,24 @@ public class PhysicsEngineTest
                             {SOLID, SOFT, SOLID, SOFT, SOLID, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT}};
         map = new Map(blocks);
 
-        System.out.println();
-
-
         players = new ArrayList<>();
-        buddy = new Player("Buddy", new Point(5,5), 3, 10);
+        buddy = new Player("Buddy", new Point(5,5), 3, 10, null);
         players.add(buddy);
-        gameState = new GameState(map, players, new ArrayList<>());
+        gameState = new GameState(map, players);
         engine = new PhysicsEngine(gameState);
     }
 
     @Test
     public void addPlayer() throws Exception
     {
-        engine.addPlayer("TestPlayer1", new Point(5,5), 1, 10);
+        gameState.getPlayers().add(new Player("TestPlayer1", new Point(5,5), 1, 10, null));
         Player testPlayer1 = engine.getPlayerNamed("TestPlayer1");
         assertNotNull("Player was not added or does not have the given name.", testPlayer1);
         assertEquals("Added player does not have the given position", new Point(5,5), testPlayer1.getPos());
         assertEquals("Added player does not have the given number of lives", 1, testPlayer1.getLives());
         assertEquals("Added player does not have the given speed", 10.0, testPlayer1.getSpeed());
 
-        engine.addPlayer("TestPlayer2", new Point(3,4), 3, 14);
+        gameState.getPlayers().add(new Player("TestPlayer2", new Point(3,4), 3, 14, null));
         Player testPlayer2 = engine.getPlayerNamed("TestPlayer2");
         assertNotNull("Player was not added or does not have the given name.", testPlayer2);
         assertEquals("Added player does not have the given position", new Point(3, 4), testPlayer2.getPos());
@@ -107,11 +103,13 @@ public class PhysicsEngineTest
     @Test
     public void plantBomb() throws Exception
     {
-
         buddy.getKeyState().setMovement(Movement.RIGHT);
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
         engine.plantBomb("Buddy", 0, 3);
+
+        System.out.println("Player: " + buddy.getPos());
+        System.out.println("His bomb: " + gameState.getBombs().get(0).getPos());
 
         assertTrue("Bomb was not planted.", 1==gameState.getBombs().size());
 
@@ -151,7 +149,7 @@ public class PhysicsEngineTest
     }
 
     @Test
-    public void updateAll() throws Exception
+    public void update() throws Exception
     {
         KeyboardState kState = buddy.getKeyState();
 
@@ -173,6 +171,26 @@ public class PhysicsEngineTest
         buddy.setSpeed(20);
         engine.update();
         assertEquals("The position of the player after update does not match expected value", new Point(15, 10), buddy.getPos());
+    }
+
+    @Test
+    public void updateWithInterval() throws Exception
+    {
+        buddy.getKeyState().setMovement(Movement.DOWN);
+        buddy.setSpeed(100);
+
+        // pixels - speed*milliseconds / 1000
+
+        // TODO: look into parameterised tests
+        int[] intervals = {10, 20, 30, 50, 100, 50, 30, 20, 10, 130, 500};
+        int[] positionY = {6,  8,  11, 16, 26,  31, 34, 36, 37, 50,  100};
+
+        for(int i=0; i<intervals.length; i++)
+        {
+            engine.update(intervals[i]);
+            assertEquals("The position of the player after update does not match expected value", new Point(5, positionY[i]), buddy.getPos());
+        }
+
     }
 
 }

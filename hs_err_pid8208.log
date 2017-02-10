@@ -1,0 +1,257 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00007ff8fb90862d, pid=8208, tid=0x0000000000001d18
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_121-b13) (build 1.8.0_121-b13)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.121-b13 mixed mode windows-amd64 compressed oops)
+# Problematic frame:
+# C  [lwjgl_opengl.dll+0x862d]
+#
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000000002ab4800):  JavaThread "main" [_thread_in_native, id=7448, stack(0x0000000002920000,0x0000000002a20000)]
+
+siginfo: ExceptionCode=0xc0000005, reading address 0x0000000000000f18
+
+Registers:
+RAX=0x0000000068b4fd50, RBX=0x0000000015e4db00, RCX=0x0000000000000001, RDX=0x000000001847152c
+RSP=0x0000000002a1edf8, RBP=0x0000000002a1ee80, RSI=0x0000000000000188, RDI=0x0000000002bb7e70
+R8 =0x0000000000000001, R9 =0x000000001847152c, R10=0x0000000000000000, R11=0x00000000685db820
+R12=0x0000000000000000, R13=0x0000000015e4db00, R14=0x0000000002a1eeb0, R15=0x0000000002ab4800
+RIP=0x00007ff8fb90862d, EFLAGS=0x0000000000010206
+
+Top of Stack: (sp=0x0000000002a1edf8)
+0x0000000002a1edf8:   0000000002bc7f74 0000000002bb7e70
+0x0000000002a1ee08:   0000000002bc7cdd 0000000002ab4800
+0x0000000002a1ee18:   0000000015e4db00 0000000000000188
+0x0000000002a1ee28:   0000000002ab4800 0000000002a1ef28
+0x0000000002a1ee38:   0000000002bc7ca2 0000000002a1ee40
+0x0000000002a1ee48:   0000000015e4db00 0000000002a1eeb0
+0x0000000002a1ee58:   0000000015e50210 0000000000000000
+0x0000000002a1ee68:   0000000015e4db00 0000000000000000
+0x0000000002a1ee78:   0000000002a1eea0 0000000002a1eef8
+0x0000000002a1ee88:   0000000002bb835d 00000000e1ce3688
+0x0000000002a1ee98:   0000000002bc19d8 000000001847152c
+0x0000000002a1eea8:   00000000e1d65200 0000000000000001
+0x0000000002a1eeb8:   0000000002a1eeb8 0000000015e4dc54
+0x0000000002a1eec8:   0000000002a1ef28 0000000015e50210
+0x0000000002a1eed8:   0000000000000000 0000000015e4dcb8
+0x0000000002a1eee8:   0000000002a1eea0 0000000002a1ef30 
+
+Instructions: (pc=0x00007ff8fb90862d)
+0x00007ff8fb90860d:   49 ff a2 f0 09 00 00 cc cc cc cc cc cc cc cc cc
+0x00007ff8fb90861d:   cc cc cc 48 8b 01 49 8b d1 41 8b c8 4c 8b 50 18
+0x00007ff8fb90862d:   49 ff a2 18 0f 00 00 cc cc cc cc cc cc cc cc cc
+0x00007ff8fb90863d:   cc cc cc 48 8b 01 48 8b 48 18 48 8b 81 c0 1b 00 
+
+
+Register to memory mapping:
+
+RAX=0x0000000068b4fd50 is an unknown value
+RBX={method} {0x0000000015e4db08} 'nglGenVertexArrays' '(IJ)V' in 'org/lwjgl/opengl/GL30'
+RCX=0x0000000000000001 is an unknown value
+RDX=0x000000001847152c is an unknown value
+RSP=0x0000000002a1edf8 is pointing into the stack for thread: 0x0000000002ab4800
+RBP=0x0000000002a1ee80 is pointing into the stack for thread: 0x0000000002ab4800
+RSI=0x0000000000000188 is an unknown value
+RDI=0x0000000002bb7e70 is at code_begin+1040 in an Interpreter codelet
+invoke return entry points  [0x0000000002bb7a60, 0x0000000002bb8440]  2528 bytes
+R8 =0x0000000000000001 is an unknown value
+R9 =0x000000001847152c is an unknown value
+R10=0x0000000000000000 is an unknown value
+R11=0x00000000685db820 is an unknown value
+R12=0x0000000000000000 is an unknown value
+R13={method} {0x0000000015e4db08} 'nglGenVertexArrays' '(IJ)V' in 'org/lwjgl/opengl/GL30'
+R14=0x0000000002a1eeb0 is pointing into the stack for thread: 0x0000000002ab4800
+R15=0x0000000002ab4800 is a thread
+
+
+Stack: [0x0000000002920000,0x0000000002a20000],  sp=0x0000000002a1edf8,  free space=1019k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [lwjgl_opengl.dll+0x862d]
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+j  org.lwjgl.opengl.GL30.nglGenVertexArrays(IJ)V+0
+j  org.lwjgl.opengl.GL30.glGenVertexArrays()I+20
+j  bomber.renderer.shaders.VertexArrayObject.<init>()V+5
+j  bomber.renderer.shaders.Mesh.<init>(IIII[F)V+93
+j  bomber.game.Game.init()V+100
+j  bomber.game.Game.<init>(Lbomber/game/Map;Ljava/lang/String;Ljava/util/HashMap;)V+25
+j  bomber.game.main.main([Ljava/lang/String;)V+664
+v  ~StubRoutines::call_stub
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x0000000017ca0800 JavaThread "Service Thread" daemon [_thread_blocked, id=2716, stack(0x0000000018070000,0x0000000018170000)]
+  0x000000001632f000 JavaThread "C1 CompilerThread2" daemon [_thread_in_native, id=4720, stack(0x0000000017b70000,0x0000000017c70000)]
+  0x0000000016327800 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=7412, stack(0x0000000017a70000,0x0000000017b70000)]
+  0x0000000016322000 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=8788, stack(0x0000000017970000,0x0000000017a70000)]
+  0x0000000016320000 JavaThread "Attach Listener" daemon [_thread_blocked, id=7532, stack(0x0000000017870000,0x0000000017970000)]
+  0x000000001631f000 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=4044, stack(0x0000000017770000,0x0000000017870000)]
+  0x000000001630a000 JavaThread "Finalizer" daemon [_thread_blocked, id=4008, stack(0x0000000017580000,0x0000000017680000)]
+  0x00000000162e9000 JavaThread "Reference Handler" daemon [_thread_blocked, id=5092, stack(0x0000000017480000,0x0000000017580000)]
+=>0x0000000002ab4800 JavaThread "main" [_thread_in_native, id=7448, stack(0x0000000002920000,0x0000000002a20000)]
+
+Other Threads:
+  0x00000000162e6800 VMThread [stack: 0x0000000017380000,0x0000000017480000] [id=6784]
+  0x0000000017d07800 WatcherThread [stack: 0x0000000018170000,0x0000000018270000] [id=8992]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap:
+ PSYoungGen      total 28160K, used 10870K [0x00000000e1300000, 0x00000000e3200000, 0x0000000100000000)
+  eden space 24576K, 44% used [0x00000000e1300000,0x00000000e1d9da40,0x00000000e2b00000)
+  from space 3584K, 0% used [0x00000000e2e80000,0x00000000e2e80000,0x00000000e3200000)
+  to   space 3584K, 0% used [0x00000000e2b00000,0x00000000e2b00000,0x00000000e2e80000)
+ ParOldGen       total 64512K, used 0K [0x00000000a3800000, 0x00000000a7700000, 0x00000000e1300000)
+  object space 64512K, 0% used [0x00000000a3800000,0x00000000a3800000,0x00000000a7700000)
+ Metaspace       used 5556K, capacity 5724K, committed 5888K, reserved 1056768K
+  class space    used 634K, capacity 700K, committed 768K, reserved 1048576K
+
+Card table byte_map: [0x0000000011f70000,0x0000000012260000] byte_map_base: 0x0000000011a54000
+
+Marking Bits: (ParMarkBitMap*) 0x0000000068bcb6d0
+ Begin Bits: [0x0000000012850000, 0x0000000013f70000)
+ End Bits:   [0x0000000013f70000, 0x0000000015690000)
+
+Polling page: 0x0000000000cf0000
+
+CodeCache: size=245760Kb used=2174Kb max_used=2183Kb free=243585Kb
+ bounds [0x0000000002bb0000, 0x0000000002e20000, 0x0000000011bb0000]
+ total_blobs=809 nmethods=473 adapters=249
+ compilation: enabled
+
+Compilation events (10 events):
+Event: 0.392 Thread 0x000000001632f000 nmethod 471 0x0000000002dcb450 code [0x0000000002dcb5e0, 0x0000000002dcba68]
+Event: 0.392 Thread 0x0000000016327800 nmethod 460% 0x0000000002dd1a50 code [0x0000000002dd1ba0, 0x0000000002dd2018]
+Event: 0.392 Thread 0x0000000016327800  423   !   4       sun.misc.URLClassPath$JarLoader::ensureOpen (36 bytes)
+Event: 0.393 Thread 0x0000000016322000 nmethod 414 0x0000000002dd22d0 code [0x0000000002dd25a0, 0x0000000002dd3c78]
+Event: 0.394 Thread 0x0000000016327800 nmethod 423 0x0000000002dcaa50 code [0x0000000002dcabc0, 0x0000000002dcace8]
+Event: 0.396 Thread 0x000000001632f000  472       3       java.lang.ClassLoader::loadClass (7 bytes)
+Event: 0.396 Thread 0x000000001632f000 nmethod 472 0x0000000002dca610 code [0x0000000002dca780, 0x0000000002dca9a8]
+Event: 0.396 Thread 0x000000001632f000  473       3       sun.misc.Launcher$AppClassLoader::loadClass (85 bytes)
+Event: 0.396 Thread 0x000000001632f000 nmethod 473 0x0000000002dd0650 code [0x0000000002dd0880, 0x0000000002dd15a8]
+Event: 0.396 Thread 0x000000001632f000  474       3       java.net.URLStreamHandler::parseURL (1193 bytes)
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (2 events):
+Event: 0.111 Thread 0x0000000002ab4800 Uncommon trap: reason=unstable_if action=reinterpret pc=0x0000000002cbc9b8 method=java.lang.String.hashCode()I @ 14
+Event: 0.256 Thread 0x0000000002ab4800 Uncommon trap: reason=unstable_if action=reinterpret pc=0x0000000002d4a844 method=java.lang.String.indexOf([CII[CIII)I @ 134
+
+Internal exceptions (10 events):
+Event: 0.275 Thread 0x0000000002ab4800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000e18db4d8) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jvm.cpp, line 1390]
+Event: 0.275 Thread 0x0000000002ab4800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000e18db6e8) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jvm.cpp, line 1390]
+Event: 0.275 Thread 0x0000000002ab4800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000e18df358) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jvm.cpp, line 1390]
+Event: 0.275 Thread 0x0000000002ab4800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000e18df568) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jvm.cpp, line 1390]
+Event: 0.392 Thread 0x0000000002ab4800 Exception <a 'sun/nio/fs/WindowsException'> (0x00000000e1d3a268) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jni.cpp, line 709]
+Event: 0.393 Thread 0x0000000002ab4800 Exception <a 'sun/nio/fs/WindowsException'> (0x00000000e1d3aa98) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jni.cpp, line 709]
+Event: 0.394 Thread 0x0000000002ab4800 Exception <a 'sun/nio/fs/WindowsException'> (0x00000000e1d3d498) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jni.cpp, line 709]
+Event: 0.394 Thread 0x0000000002ab4800 Exception <a 'sun/nio/fs/WindowsException'> (0x00000000e1d3d9c0) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jni.cpp, line 709]
+Event: 0.394 Thread 0x0000000002ab4800 Exception <a 'sun/nio/fs/WindowsException'> (0x00000000e1d3e398) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jni.cpp, line 709]
+Event: 0.394 Thread 0x0000000002ab4800 Exception <a 'sun/nio/fs/WindowsException'> (0x00000000e1d3e828) thrown at [C:\re\workspace\8-2-build-windows-amd64-cygwin\jdk8u121\8372\hotspot\src\share\vm\prims\jni.cpp, line 709]
+
+Events (10 events):
+Event: 0.393 loading class java/util/ArrayList$SubList
+Event: 0.393 loading class java/util/ArrayList$SubList done
+Event: 0.393 loading class java/util/ArrayList$SubList$1
+Event: 0.394 loading class java/util/ArrayList$SubList$1 done
+Event: 0.396 loading class org/lwjgl/opengl/GL$1
+Event: 0.396 loading class org/lwjgl/opengl/GL$1 done
+Event: 0.396 loading class org/lwjgl/opengl/GL$SharedLibraryGL
+Event: 0.396 loading class org/lwjgl/opengl/GL$SharedLibraryGL done
+Event: 0.396 loading class org/lwjgl/system/SharedLibrary$Delegate
+Event: 0.396 loading class org/lwjgl/system/SharedLibrary$Delegate done
+
+
+Dynamic libraries:
+0x00007ff700c10000 - 0x00007ff700c47000 	C:\Program Files\Java\jre1.8.0_121\bin\javaw.exe
+0x00007ff938900000 - 0x00007ff938ad1000 	C:\Windows\SYSTEM32\ntdll.dll
+0x00007ff9368e0000 - 0x00007ff93698b000 	C:\Windows\System32\KERNEL32.DLL
+0x00007ff934f40000 - 0x00007ff93515d000 	C:\Windows\System32\KERNELBASE.dll
+0x00007ff936800000 - 0x00007ff9368a2000 	C:\Windows\System32\ADVAPI32.dll
+0x00007ff936670000 - 0x00007ff93670e000 	C:\Windows\System32\msvcrt.dll
+0x00007ff936060000 - 0x00007ff9360b9000 	C:\Windows\System32\sechost.dll
+0x00007ff935e90000 - 0x00007ff935fb1000 	C:\Windows\System32\RPCRT4.dll
+0x00007ff9363c0000 - 0x00007ff936525000 	C:\Windows\System32\USER32.dll
+0x00007ff935e70000 - 0x00007ff935e8e000 	C:\Windows\System32\win32u.dll
+0x00007ff938490000 - 0x00007ff9384c4000 	C:\Windows\System32\GDI32.dll
+0x00007ff9351d0000 - 0x00007ff935352000 	C:\Windows\System32\gdi32full.dll
+0x00007ff92a820000 - 0x00007ff92aa99000 	C:\Windows\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.14393.447_none_42191651c6827bb3\COMCTL32.dll
+0x00007ff9381c0000 - 0x00007ff938488000 	C:\Windows\System32\combase.dll
+0x00007ff935360000 - 0x00007ff935455000 	C:\Windows\System32\ucrtbase.dll
+0x00007ff935160000 - 0x00007ff9351ca000 	C:\Windows\System32\bcryptPrimitives.dll
+0x00007ff9368b0000 - 0x00007ff9368de000 	C:\Windows\System32\IMM32.DLL
+0x00000000680f0000 - 0x00000000681c2000 	C:\Program Files\Java\jre1.8.0_121\bin\msvcr100.dll
+0x00000000683b0000 - 0x0000000068c4b000 	C:\Program Files\Java\jre1.8.0_121\bin\server\jvm.dll
+0x00007ff9367e0000 - 0x00007ff9367e8000 	C:\Windows\System32\PSAPI.DLL
+0x00007ff923750000 - 0x00007ff923759000 	C:\Windows\SYSTEM32\WSOCK32.dll
+0x00007ff9328a0000 - 0x00007ff9328c3000 	C:\Windows\SYSTEM32\WINMM.dll
+0x00007ff936770000 - 0x00007ff9367da000 	C:\Windows\System32\WS2_32.dll
+0x00007ff9268a0000 - 0x00007ff9268aa000 	C:\Windows\SYSTEM32\VERSION.dll
+0x00007ff932840000 - 0x00007ff93286b000 	C:\Windows\SYSTEM32\WINMMBASE.dll
+0x00007ff935510000 - 0x00007ff935552000 	C:\Windows\System32\cfgmgr32.dll
+0x00000000682c0000 - 0x00000000682cf000 	C:\Program Files\Java\jre1.8.0_121\bin\verify.dll
+0x0000000068290000 - 0x00000000682b9000 	C:\Program Files\Java\jre1.8.0_121\bin\java.dll
+0x0000000068270000 - 0x0000000068286000 	C:\Program Files\Java\jre1.8.0_121\bin\zip.dll
+0x00007ff9369f0000 - 0x00007ff937ef9000 	C:\Windows\System32\SHELL32.dll
+0x00007ff935790000 - 0x00007ff935e6a000 	C:\Windows\System32\windows.storage.dll
+0x00007ff934d90000 - 0x00007ff934ddc000 	C:\Windows\System32\powrprof.dll
+0x00007ff936990000 - 0x00007ff9369e2000 	C:\Windows\System32\shlwapi.dll
+0x00007ff934d60000 - 0x00007ff934d6f000 	C:\Windows\System32\kernel.appcore.dll
+0x00007ff934df0000 - 0x00007ff934e99000 	C:\Windows\System32\shcore.dll
+0x00007ff934d70000 - 0x00007ff934d84000 	C:\Windows\System32\profapi.dll
+0x0000000068250000 - 0x000000006826a000 	C:\Program Files\Java\jre1.8.0_121\bin\net.dll
+0x00007ff934690000 - 0x00007ff9346ec000 	C:\Windows\system32\mswsock.dll
+0x0000000068230000 - 0x0000000068241000 	C:\Program Files\Java\jre1.8.0_121\bin\nio.dll
+0x00007ff8fbe50000 - 0x00007ff8fbea7000 	C:\Users\Alexandru\AppData\Local\Temp\lwjglAlexandru\3.1.1-build-16\lwjgl.dll
+0x00007ff934850000 - 0x00007ff93485b000 	C:\Windows\SYSTEM32\CRYPTBASE.DLL
+0x00007ff8fbd00000 - 0x00007ff8fbd3e000 	C:\Users\ALEXAN~1\AppData\Local\Temp\lwjglAlexandru\3.1.1-build-16\jemalloc.dll
+0x00007ff8fbcc0000 - 0x00007ff8fbcfc000 	C:\Users\ALEXAN~1\AppData\Local\Temp\lwjglAlexandru\3.1.1-build-16\glfw.dll
+0x00007ff8fb900000 - 0x00007ff8fb95f000 	C:\Users\Alexandru\AppData\Local\Temp\lwjglAlexandru\3.1.1-build-16\lwjgl_opengl.dll
+0x00007ff910e40000 - 0x00007ff910f63000 	C:\Windows\system32\opengl32.dll
+0x00007ff910d10000 - 0x00007ff910e07000 	C:\Windows\SYSTEM32\DDRAW.dll
+0x00007ff910e10000 - 0x00007ff910e3d000 	C:\Windows\SYSTEM32\GLU32.dll
+0x00007ff90f390000 - 0x00007ff90f398000 	C:\Windows\SYSTEM32\DCIMAN32.dll
+0x00007ff923b20000 - 0x00007ff923cb2000 	C:\Windows\SYSTEM32\dbghelp.dll
+
+VM Arguments:
+jvm_args: -Dfile.encoding=Cp1252 
+java_command: bomber.game.main
+java_class_path (initial): C:\Users\Alexandru\workspace\b1\bin;C:\Users\Alexandru\workspace\b1\lib\jars\joml-1.9.2-javadoc.jar;C:\Users\Alexandru\workspace\b1\lib\jars\joml-1.9.2-sources.jar;C:\Users\Alexandru\workspace\b1\lib\jars\joml-1.9.2.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl_util.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-assimp-javadoc.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-assimp-natives-linux.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-assimp-natives-macos.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-assimp-natives-windows.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-assimp-sources.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-assimp.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-bgfx-javadoc.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-bgfx-natives-linux.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-bgfx-natives-macos.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-bgfx-natives-windows.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-bgfx-sources.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-bgfx.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-egl-javadoc.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-egl-sources.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-egl.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-glfw-javadoc.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-glfw-natives-linux.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-glfw-natives-macos.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-glfw-natives-windows.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-glfw-sources.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-glfw.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-javadoc.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-jawt-javadoc.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-jawt-sources.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-jawt.jar;C:\Users\Alexandru\workspace\b1\lib\jars\lwjgl-jemalloc-javadoc.jar;C:\
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=C:/Program Files/Java/jre1.8.0_121/bin/server;C:/Program Files/Java/jre1.8.0_121/bin;C:/Program Files/Java/jre1.8.0_121/lib/amd64;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\ProgramData\Oracle\Java\javapath;C:\Program Files\Haskell\bin;C:\Program Files\Haskell Platform\8.0.1\lib\extralibs\bin;C:\Program Files\Haskell Platform\8.0.1\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;c:\Program Files\Intel\WiFi\bin\;c:\Program Files\Common Files\Intel\WirelessCommon\;C:\Program Files\Haskell Platform\8.0.1\mingw\bin;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\MiKTeX 2.9\miktex\bin\x64\;C:\Program Files (x86)\GNU\GnuPG\pub;C:\Users\Alexandru\AppData\Roaming\cabal\bin;C:\Users\Alexandru\AppData\Roaming\local\bin;C:\Users\Alexandru\AppData\Local\Microsoft\WindowsApps;c:\Program Files\Intel\WiFi\bin\;c:\Program Files\Common Files\Intel\WirelessCommon\;C:\Users\Alexandru\AppData\Local\atom\bin;C:\Users\Alexandru\Downloads\eclipse;
+USERNAME=Alexandru
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 69 Stepping 1, GenuineIntel
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS: Windows 10.0 , 64 bit Build 14393 (10.0.14393.0)
+
+CPU:total 4 (2 cores per cpu, 2 threads per core) family 6 model 69 stepping 1, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, erms, lzcnt, ht, tsc, tscinvbit, bmi1, bmi2
+
+Memory: 4k page, physical 6056088k(2619872k free), swap 7039128k(2629416k free)
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (25.121-b13) for windows-amd64 JRE (1.8.0_121-b13), built on Dec 12 2016 18:21:36 by "java_re" with MS VC++ 10.0 (VS2010)
+
+time: Thu Feb 09 20:20:48 2017
+elapsed time: 0 seconds (0d 0h 0m 0s)
+

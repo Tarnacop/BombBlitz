@@ -9,19 +9,19 @@ public class Bomb {
 	private String playerName;	
 	private Point pos;			
 	private int time;			
+
 	private int radius;		
 	private int scalar = 64;
+
 	private Point gridPos;
-	private final Mesh mesh;
 	
-	public Bomb(String playerName, Point pos, int time, int radius, Mesh mesh){
+	public Bomb(String playerName, Point pos, int time, int radius){
 		
 		this.playerName = playerName;
 		this.pos = pos;
 		this.time = time;
 		this.radius = radius;
 		this.gridPos = new Point();
-		this.mesh = mesh;
 		updatePos();
 	}
 
@@ -58,10 +58,5 @@ public class Bomb {
 	public int getRadius(){
 		
 		return this.radius;
-	}
-	
-	public Mesh getMesh() {
-		
-		return this.mesh;
 	}
 }
