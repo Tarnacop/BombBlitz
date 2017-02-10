@@ -229,8 +229,16 @@ public class ServerThread implements Runnable {
 			if (1 + 2 + 1 + nameLength != packet.getLength()) {
 				return;
 			}
-			if (nameLength < 1 || nameLength > config.getMaxNameLength()) {
-				pServer("invalid name length in conection request from " + sockAddr);
+			if (nameLength < 1) {
+				pServer("name length smaller than 1 in conection request from " + sockAddr);
+				return;
+			}
+			if (nameLength > config.getMaxNameLength()) {
+				// TODO should reject with a reason in the message
+				pServer("name length longer than " + config.getMaxNameLength() + " in conection request from "
+						+ sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
 			}
 
