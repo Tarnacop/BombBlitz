@@ -10,6 +10,7 @@ import bomber.game.GameState;
 import bomber.game.Player;
 
 /**
+ * @author Jokubas Liutkus
  * The Class SafetyChecker for checking safety of the moves and AI.
  */
 public class SafetyChecker {
@@ -102,10 +103,8 @@ public class SafetyChecker {
 		ArrayList<Point> points = new ArrayList<>();
 		List<Bomb> bombs = new ArrayList<>(state.getBombs());
 
-		for (Bomb b : bombs) {
-			points.addAll(getBombCoverage(b, getMap()));
-		}
-
+		bombs.forEach(b -> points.addAll(getBombCoverage(b, getMap())));
+		
 		return points;
 	}
 
@@ -113,6 +112,7 @@ public class SafetyChecker {
 	 * Gets the single bomb coverage.
 	 *
 	 * @param bomb the bomb
+	 * @param map the map
 	 * @return the tiles which are affected by a single bomb
 	 */
 	public ArrayList<Point> getBombCoverage(Bomb bomb, Block[][] map) {

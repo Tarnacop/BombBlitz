@@ -4,14 +4,15 @@ import java.awt.Point;
 import java.util.Comparator;
 
 /**
+ * @author Jokubas Liutkus
  * The Class Node for implementing A* algorithm.
  */
 public class Node implements Comparator<Node>, Comparable<Node>{
 	
-	/** The g value. */
+	/** The g value the price from starting node. */
 	private int gValue;
 	
-	/** The f value. */
+	/** The f value  total value. */
 	private int fValue;
 	
 	/** The parent. */
@@ -23,9 +24,9 @@ public class Node implements Comparator<Node>, Comparable<Node>{
 	/**
 	 * Instantiates a new node.
 	 *
-	 * @param gValue the g value
-	 * @param hValue the h value
-	 * @param parent the parent
+	 * @param gValue the g the price from starting node
+	 * @param hValue the heuristic value
+	 * @param parent the parent node
 	 * @param coordinates the coordinates
 	 */
 	public Node(int gValue, int hValue, Node parent, Point coordinates) {

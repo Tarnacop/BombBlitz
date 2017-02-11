@@ -1,14 +1,17 @@
+
 package bomber.AI;
 
 import java.awt.Point;
 import java.util.LinkedList;
-
 import bomber.game.GameState;
 import bomber.game.Movement;
 import bomber.game.Player;
 
+// TODO: Auto-generated Javadoc
 /**
- * The Class AIManager for making moves.
+ * The Class AIManager.
+ *
+ * @author Jokubas Liutkus The Class AIManager for making moves.
  */
 public class AIManager extends Thread {
 
@@ -18,11 +21,17 @@ public class AIManager extends Thread {
 	/** The finder for finding the route. */
 	private RouteFinder finder;
 
-	private GameState gameState;
 	/** The safety checker for AI. */
 	private SafetyChecker safetyCh;
-	private final int scalar = 64;
-	private final int playerSize = 32;
+
+	/** The game state. */
+	private GameState gameState;
+	
+	/** The Constant scalar. */
+	private static final int scalar = 64;
+
+	/** The Constant playerSize. */
+	private static final int playerSize = 32;
 
 	/**
 	 * Instantiates a new AI manager.
@@ -34,10 +43,9 @@ public class AIManager extends Thread {
 	 */
 	public AIManager(GameAI ai, GameState gameState) {
 		this.gameAI = ai;
+		this.gameState = gameState;
 		this.safetyCh = new SafetyChecker(gameState, ai);
 		this.finder = new RouteFinder(gameState, ai, safetyCh);
-		this.gameState = gameState;
-
 	}
 
 	/*
@@ -53,8 +61,8 @@ public class AIManager extends Thread {
 	 * Updated position.
 	 *
 	 * @param move
-	 *            the move
-	 * @return the position
+	 *            the AI move
+	 * @return the updated position after the move
 	 */
 	private Point updatedPos(AIActions move) {
 		Point aiPos = (Point) gameAI.getGridPos().clone();
@@ -79,10 +87,11 @@ public class AIManager extends Thread {
 	}
 
 	/**
-	 * From AI moves to game moves.
+	 * From AI moves to game moves. Changes the AI moves to the general game
+	 * moves
 	 *
 	 * @param action
-	 *            the move to be made
+	 *            the move to be changed
 	 * @return move in Movement representation
 	 */
 	private Movement FromAIMovesToGameMoves(AIActions action) {
@@ -107,7 +116,16 @@ public class AIManager extends Thread {
 		return m;
 	}
 
-	private boolean checkMoving(Point currentPixel, Point updatedFinalPixelPos) {
+	/**
+	 * Check ig the AI reached destination when making a single move
+	 *
+	 * @param currentPixel
+	 *            the pixel position of the AI
+	 * @param updatedFinalPixelPos
+	 *            the updated final pixel position which to be reached
+	 * @return true, if needs to stop moving
+	 */
+	private boolean checkIfReachedDestination(Point currentPixel, Point updatedFinalPixelPos) {
 		boolean check = (currentPixel.x - updatedFinalPixelPos.x) <= (scalar - playerSize);
 		check &= (updatedFinalPixelPos.x <= currentPixel.x);
 		check &= (currentPixel.y - updatedFinalPixelPos.y) <= (scalar - playerSize);
@@ -119,18 +137,18 @@ public class AIManager extends Thread {
 	 * Make single move.
 	 *
 	 * @param move
-	 *            the move
+	 *            the move to be made
 	 */
 	private void makeSingleMove(AIActions move) {
 		Point updatedPos = updatedPos(move);
 		updatedPos.setLocation(updatedPos.x * scalar, updatedPos.y * scalar);
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
-		while (checkMoving(gameAI.getPos(), updatedPos)) {
-			 try {
-			 sleep(10);
-			 } catch (InterruptedException e) {
-			
-			 }
+		while (checkIfReachedDestination(gameAI.getPos(), updatedPos)) {
+			try {
+				sleep(10);
+			} catch (InterruptedException e) {
+
+			}
 		}
 		gameAI.getKeyState().setMovement(Movement.NONE);
 
@@ -142,10 +160,10 @@ public class AIManager extends Thread {
 	 * @param moves
 	 *            the list of moves
 	 * @param inDanger
-	 *            the variable determining if the escape moves are passed
+	 *            the variable determining if the escape moves are passed in
+	 *            that case make moves without considering anything else
 	 */
 	private void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
-//		System.out.println("called");
 		if (inDanger)
 			while (moves != null && !moves.isEmpty()) {
 				makeSingleMove(moves.removeFirst());
@@ -154,16 +172,21 @@ public class AIManager extends Thread {
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
 					&& !safetyCh.isEnemyInBombRange()) {
 				makeSingleMove(moves.removeFirst());
-			}	
+			}
 	}
 
+	/**
+	 * Perform planned moves.
+	 * When none of the players are reachable
+	 *
+	 * @param moves
+	 *            the moves
+	 */
 	private void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
-		
-		while (moves != null && !moves.isEmpty() &&  getMovesToEnemy() == null) {
-//			System.out.println("not called");
+
+		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null) {
 			action = moves.removeFirst();
-			System.out.println(action);
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
 				gameAI.getKeyState().setBomb(true);
@@ -177,33 +200,38 @@ public class AIManager extends Thread {
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek())){
+					while (!safetyCh.checkMoveSafety(moves.peek())) {
 					}
 				}
-			} else
-			{
+			} 
+			// otherwise make a standard move
+			else {
 				makeSingleMove(action);
 			}
 		}
 	}
 
+	/**
+	 * Gets the moves to enemy.
+	 *
+	 * @return the moves to enemy
+	 */
 	private LinkedList<AIActions> getMovesToEnemy() {
 		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy());
 		if (moves != null)
 			return moves;
-//		for (Player p : gameState.getPlayers()) {
-//			if (!p.equals(gameAI)) {
-//				moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
-//				if (moves != null)
-//					return moves;
-//			}
-//		}
+		for (Player p : gameState.getPlayers()) {
+			if (!p.equals(gameAI)) {
+				moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
+				if (moves != null)
+					return moves;
+			}
+		}
 		return null;
-
 	}
 
 	/**
-	 * Main method for controlling what moves to make
+	 * Main method for controlling what moves to make.
 	 */
 	private void move() {
 		LinkedList<AIActions> moves;
@@ -211,32 +239,23 @@ public class AIManager extends Thread {
 
 			// if AI is in danger then find the escape route
 			if (safetyCh.inDanger()) {
-//				System.out.println("1");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
 			// if enemy is in bomb range then place the bomb and go to the
-			// safe
-			// location
+			// safe location
 			else if (safetyCh.isEnemyInBombRange()) {
-//				System.out.println("2");
 				gameAI.getKeyState().setBomb(true);
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
 			// if enemy is accessible(no boxes are blocking the path) then
-			// find
-			// a
-			// route to it and make moves
+			// find a route to it and make moves
 			else if ((moves = getMovesToEnemy()) != null) {
-//				System.out.println("3");
-//				System.out.println(moves);
 				performMoves(moves, false);
 			}
-			// if enemy is not in the range get the plan how to reach enemy
-			// and fullfill it
+			// if enemy is not in the range get the plan how to reach enemy and fullfill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
-//				System.out.println(moves);
 				performPlannedMoves(moves);
 			}
 

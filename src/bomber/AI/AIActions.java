@@ -3,6 +3,7 @@ package bomber.AI;
 
 /**
  * The Enum for AI Actions
+ * @author Jokubas Liutkus
  */
 public enum AIActions{
 	
