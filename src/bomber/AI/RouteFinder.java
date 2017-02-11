@@ -565,10 +565,11 @@ public class RouteFinder {
 				break;
 			}
 
-			for (Point p : getNeighbours(temp)) {
-				checkNeighbour(temp, p, open, closed, map);
-//				System.out.println(open);	System.out.println(closed);
-			}
+			getNeighbours(temp).stream().forEach(p -> checkNeighbour(temp, p, open, closed, map));
+//			for (Point p : getNeighbours(temp)) {
+//				checkNeighbour(temp, p, open, closed, map);
+////				System.out.println(open);	System.out.println(closed);
+//			}
 
 			// else we loop through all the neighbours
 			closed.add(temp);
