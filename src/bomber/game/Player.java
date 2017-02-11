@@ -15,6 +15,7 @@ public class Player {
 	private int lives;			
 	private double speed;			
 	private int bombRange;
+	private int maxNrOfBombs;
 	private final int scalar = 64;
 	private KeyboardState keyState;		
 	private boolean isAlive;
@@ -27,6 +28,7 @@ public class Player {
 		this.lives = lives;
 		this.speed = speed;
 		this.bombRange = 3; //setting the initial bomb range
+		this.maxNrOfBombs = 1;
 		
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
@@ -142,5 +144,15 @@ public class Player {
 	public Mesh getMesh() {
 		
 		return this.mesh;
+	}
+
+	public int getMaxNrOfBombs()
+	{
+		return maxNrOfBombs;
+	}
+
+	public void setMaxNrOfBombs(int maxNrOfBombs)
+	{
+		this.maxNrOfBombs = maxNrOfBombs;
 	}
 }

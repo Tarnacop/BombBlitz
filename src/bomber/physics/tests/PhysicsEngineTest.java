@@ -106,7 +106,7 @@ public class PhysicsEngineTest
         buddy.getKeyState().setMovement(Movement.RIGHT);
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
-        engine.plantBomb("Buddy", 0, 3);
+        engine.plantBomb(buddy, 0);
 
         System.out.println("Player: " + buddy.getPos());
         System.out.println("His bomb: " + gameState.getBombs().get(0).getPos());
@@ -135,17 +135,16 @@ public class PhysicsEngineTest
     {
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
-        engine.plantBomb("Buddy", 0, 3);
+        buddy.setLives(1);
+        engine.plantBomb(buddy, 0);
         engine.update();
-
         assertFalse("The player was not killed by standing on a bomb", buddy.isAlive());
-        assertEquals("The number of lives of the player did not decrease", 2, buddy.getLives());
 
-        buddy.setLives(0);
+        buddy.setLives(3);
         buddy.setAlive(true);
-        engine.plantBomb("Buddy", 0, 3);
+        engine.plantBomb(buddy, 0);
         engine.update();
-        assertEquals("The number of lives of the player changed even though it was 0", 0, buddy.getLives());
+        assertEquals("The number of lives of the player did not decrease", 2, buddy.getLives());
     }
 
     @Test
