@@ -70,7 +70,11 @@ public class Bomb {
 	
 	public Point getGridPos()
 	{
-		return this.gridPos;
+		int x = pos.x/scalar;
+		if(pos.x%scalar > 32) x++;
+		int y = pos.y/scalar;
+		if(pos.x%scalar > 32) x++;
+		return new Point(x,y);
 	}
 	
 	private void updatePos()

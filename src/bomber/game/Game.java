@@ -83,7 +83,7 @@ public class Game implements GameInterface{
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
-			this.player = new Player(this.playerName, new Point(64,64), 5, 300, new Mesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(704,64), 5, 300, new Mesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			//System.out.println("Ours: " + this.keyState.toString() + " Theirs: " + this.player.getKeyState().toString());
 			ArrayList<Player> list = new ArrayList<Player>();
@@ -108,7 +108,7 @@ public class Game implements GameInterface{
 		//System.out.println(this.player.getKeyState().toString() + ": " + this.player.getKeyState().getMovement());
 		//System.out.println(this.gameState.getPlayers().get(0).getKeyState().toString());
 		this.physics.update((int) (interval * 1000));
-		System.out.println(this.gameState);
+//		System.out.println(this.gameState);
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 	}

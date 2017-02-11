@@ -25,6 +25,7 @@ public class RouteFinder {
 	/** The safety checker. */
 	private SafetyChecker safetyCh;
 
+	private static final int scalar = 64;
 	/**
 	 * Instantiates a new route finder.
 	 *
@@ -471,8 +472,9 @@ public class RouteFinder {
 			//			System.out.println(move);
 			if (isSoftBlockAfterMove(move, pos, map)) {
 				realMoves.add(AIActions.BOMB);
+				
 				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(
-						safetyCh.getBombCoverage(new Bomb(null, pos, 0, gameAI.getBombRange())), pos));
+						safetyCh.getBombCoverage(new Bomb(null, new Point(pos.x*scalar,pos.y*scalar), 0, gameAI.getBombRange())), pos));
 				
 				
 				realMoves.addAll(escapeMoves);
@@ -484,7 +486,7 @@ public class RouteFinder {
 			realMoves.addLast(move);
 			updatePositionAndMap(move, pos, map);
 		}
-
+		
 		return realMoves;
 	}
 

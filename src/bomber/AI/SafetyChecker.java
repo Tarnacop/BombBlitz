@@ -99,20 +99,14 @@ public class SafetyChecker {
 	 * @return the tiles affected by bombs
 	 */
 	public ArrayList<Point> getTilesAffectedByBombs() {
-		try{ArrayList<Point> points = new ArrayList<>();
-		List<Bomb> bombs = state.getBombs();
-		Bomb[] allBombs = new Bomb[bombs.size()];
-		allBombs = bombs.toArray(allBombs);
-		for (Bomb b : allBombs) {
+		ArrayList<Point> points = new ArrayList<>();
+		List<Bomb> bombs = new ArrayList<>(state.getBombs());
+
+		for (Bomb b : bombs) {
 			points.addAll(getBombCoverage(b));
 		}
+
 		return points;
-		}catch(Exception e)
-		{
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return null;
 	}
 
 	/**

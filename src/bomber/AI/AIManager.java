@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import bomber.game.GameState;
 import bomber.game.Movement;
+import bomber.game.Player;
 
 /**
  * The Class AIManager for making moves.
@@ -17,9 +18,11 @@ public class AIManager extends Thread {
 	/** The finder for finding the route. */
 	private RouteFinder finder;
 
+	private GameState gameState;
 	/** The safety checker for AI. */
 	private SafetyChecker safetyCh;
 	private final int scalar = 64;
+	private final int playerSize = 32;
 
 	/**
 	 * Instantiates a new AI manager.
@@ -33,6 +36,7 @@ public class AIManager extends Thread {
 		this.gameAI = ai;
 		this.safetyCh = new SafetyChecker(gameState, ai);
 		this.finder = new RouteFinder(gameState, ai, safetyCh);
+		this.gameState = gameState;
 
 	}
 
@@ -103,6 +107,14 @@ public class AIManager extends Thread {
 		return m;
 	}
 
+	private boolean checkMoving(Point currentPixel, Point updatedFinalPixelPos) {
+		boolean check = (currentPixel.x - updatedFinalPixelPos.x) <= (scalar - playerSize);
+		check &= (updatedFinalPixelPos.x <= currentPixel.x);
+		check &= (currentPixel.y - updatedFinalPixelPos.y) <= (scalar - playerSize);
+		check &= (updatedFinalPixelPos.y <= currentPixel.y);
+		return !check;
+	}
+
 	/**
 	 * Make single move.
 	 *
@@ -111,16 +123,18 @@ public class AIManager extends Thread {
 	 */
 	private void makeSingleMove(AIActions move) {
 		Point updatedPos = updatedPos(move);
+		updatedPos.setLocation(updatedPos.x * scalar, updatedPos.y * scalar);
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
-		while (!gameAI.getGridPos().equals(updatedPos)) {
-			try {
-				sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		while (checkMoving(gameAI.getPos(), updatedPos)) {
+			 try {
+			 sleep(10);
+			 } catch (InterruptedException e) {
+			
+			 }
 		}
 		gameAI.getKeyState().setMovement(Movement.NONE);
+		System.out.println("done");
+
 	}
 
 	/**
@@ -132,8 +146,7 @@ public class AIManager extends Thread {
 	 *            the variable determining if the escape moves are passed
 	 */
 	private void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
-		
-		try{
+		System.out.println("called");
 		if (inDanger)
 			while (moves != null && !moves.isEmpty()) {
 				makeSingleMove(moves.removeFirst());
@@ -142,13 +155,54 @@ public class AIManager extends Thread {
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
 					&& !safetyCh.isEnemyInBombRange()) {
 				makeSingleMove(moves.removeFirst());
-			}
-		}catch(Exception e)
-		{
-			e.printStackTrace();
-			System.exit(1);
-		}
+			}	
+	}
+
+	private void performPlannedMoves(LinkedList<AIActions> moves) {
+		AIActions action;
+		System.out.println(moves);
 		
+		while (moves != null && !moves.isEmpty() && !safetyCh.inDanger()/* && getMovesToEnemy() == null*/) {
+			System.out.println("not called");
+			action = moves.removeFirst();
+			// if actions is bomb place it
+			if (action == AIActions.BOMB) {
+				gameAI.getKeyState().setBomb(true);
+				try {
+					sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+				}
+				gameAI.getKeyState().setBomb(false);
+			}
+			// if action is none wait until the next move is safe
+			else if (action == AIActions.NONE) {
+				if (moves != null) {
+					while (!safetyCh.checkMoveSafety(moves.peek())){
+						System.out.println("waiting");
+					}
+				}
+			} else
+			{
+				makeSingleMove(action);
+			}
+		}
+		System.out.println("finished");
+	}
+
+	private LinkedList<AIActions> getMovesToEnemy() {
+		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy());
+		if (moves != null)
+			return moves;
+//		for (Player p : gameState.getPlayers()) {
+//			if (!p.equals(gameAI)) {
+//				moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
+//				if (moves != null)
+//					return moves;
+//			}
+//		}
+		return null;
+
 	}
 
 	/**
@@ -156,39 +210,41 @@ public class AIManager extends Thread {
 	 */
 	private void move() {
 		LinkedList<AIActions> moves;
-		try {
-			while (gameAI.isAlive()) {
-				
-				// System.out.println("AI moving");
-				// if AI is in danger then find the escape route
-				if (safetyCh.inDanger()) {
-					moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-					performMoves(moves, true);
-				}
+		while (gameAI.isAlive()) {
 
-				// if enemy is in bomb range then place the bomb and go to the
-				// safe
-				// location
-				 else if (safetyCh.isEnemyInBombRange()) {
-				 gameAI.getKeyState().setBomb(true);
-				 moves =
-				 finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-				 performMoves(moves, true);
-				 }
-
-				// if enemy is accessible(no boxes are blocking the path) then
-				// find
-				// a
-				// route to it and make moves
-				else if ((moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
-					performMoves(moves, false);
-				}
+			// if AI is in danger then find the escape route
+			if (safetyCh.inDanger()) {
+				System.out.println("1");
+				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+				performMoves(moves, true);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+			// if enemy is in bomb range then place the bomb and go to the
+			// safe
+			// location
+			else if (safetyCh.isEnemyInBombRange()) {
+				System.out.println("2");
+				gameAI.getKeyState().setBomb(true);
+				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+				performMoves(moves, true);
+			}
+			// if enemy is accessible(no boxes are blocking the path) then
+			// find
+			// a
+			// route to it and make moves
+			else if ((moves = getMovesToEnemy()) != null) {
+				System.out.println("3");
+				System.out.println(moves);
+				performMoves(moves, false);
+			}
+			// if enemy is not in the range get the plan how to reach enemy
+			// and fullfill it
+			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
+				System.out.println("happens");
+				performPlannedMoves(moves);
+			}
 
+			gameAI.getKeyState().setBomb(false);
+		}
 	}
 
 }
