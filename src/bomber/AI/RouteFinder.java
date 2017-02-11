@@ -2,6 +2,7 @@ package bomber.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -250,10 +251,10 @@ public class RouteFinder {
 	 * @param closed
 	 *            the closed list of positions already visited
 	 */
-	private void checkNeighbour(Node parent, Point tile, LinkedList<Node> open, HashSet<Node> closed) {
+	private void checkNeighbour(Node parent, Point tile, LinkedList<Node> open, HashSet<Node> closed, Block[][] map) {
 		int x = tile.x;
 		int y = tile.y;
-		Block[][] map = getMap();
+//		Block[][] map = getMap();
 
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID)
@@ -302,7 +303,7 @@ public class RouteFinder {
 			}
 
 			for (Point p : getNeighbours(temp)) {
-				checkNeighbour(temp, p, open, closed);
+				checkNeighbour(temp, p, open, closed, getMap());
 			}
 
 			// else we loop through all the neighbours
@@ -462,10 +463,16 @@ public class RouteFinder {
 	 * @return the planned actions of the AI including bomb placement and moves.
 	 */
 	private LinkedList<AIActions> getPathWithBombs(LinkedList<AIActions> movesWithoutObstacles, Point position) {
-		Block[][] map = getMap().clone();
-		// TODO finish not implemented
+		Block[][] mainMap = getMap();
+		Block[][] map = Arrays.stream(mainMap).map(Block[]::clone).toArray(Block[][]::new);
+
+//		for(int i=0; i<map2.length; i++)
+//			for(int j=0;j<map2[0].length;j++)
+//				map[i][j] = map2[i][j];
+//		System.arraycopy(getMap, 0, map, 0, map2.length);
+				// TODO finish not implemented
 		LinkedList<AIActions> realMoves = new LinkedList<>();
-		Point pos = (Point) position.clone();
+		Point pos = new Point(position.x, position.y);
 		AIActions move = null;
 		while ((move = movesWithoutObstacles.peek()) != null) {
 			movesWithoutObstacles.removeFirst();
@@ -474,7 +481,7 @@ public class RouteFinder {
 				realMoves.add(AIActions.BOMB);
 				
 				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(
-						safetyCh.getBombCoverage(new Bomb(null, new Point(pos.x*scalar,pos.y*scalar), 0, gameAI.getBombRange())), pos));
+						safetyCh.getBombCoverage(new Bomb(null, new Point(pos.x*scalar,pos.y*scalar), 0, gameAI.getBombRange()), map), pos, map));
 				
 				
 				realMoves.addAll(escapeMoves);
@@ -538,17 +545,17 @@ public class RouteFinder {
 	
 	
 	//change this method
-	private LinkedList<AIActions> escapeFromExplotion(ArrayList<Point> dangerTiles, Point pos) {
+	private LinkedList<AIActions> escapeFromExplotion(ArrayList<Point> dangerTiles, Point pos, Block[][] map) {
 		LinkedList<Node> open = new LinkedList<>();
 		HashSet<Node> closed = new HashSet<>();
-
+//		System.out.println(dangerTiles);
 		Node startNode = new Node(null, pos);
 		open.add(startNode);
 
 		// loop until the queue is not empty
 		Node finish = null;
 		while (!open.isEmpty()) {
-
+			
 			// take the head of the queue
 			Node temp = open.poll();
 
@@ -559,13 +566,15 @@ public class RouteFinder {
 			}
 
 			for (Point p : getNeighbours(temp)) {
-				checkNeighbour(temp, p, open, closed);
+				checkNeighbour(temp, p, open, closed, map);
+//				System.out.println(open);	System.out.println(closed);
 			}
 
 			// else we loop through all the neighbours
 			closed.add(temp);
 		}
 
+//		System.out.println(finish.getCoord());
 		if (finish == null)
 			return null;
 		return getMovesFromPoints(finish);

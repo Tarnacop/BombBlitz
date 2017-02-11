@@ -103,7 +103,7 @@ public class SafetyChecker {
 		List<Bomb> bombs = new ArrayList<>(state.getBombs());
 
 		for (Bomb b : bombs) {
-			points.addAll(getBombCoverage(b));
+			points.addAll(getBombCoverage(b, getMap()));
 		}
 
 		return points;
@@ -115,7 +115,7 @@ public class SafetyChecker {
 	 * @param bomb the bomb
 	 * @return the tiles which are affected by a single bomb
 	 */
-	public ArrayList<Point> getBombCoverage(Bomb bomb) {
+	public ArrayList<Point> getBombCoverage(Bomb bomb, Block[][] map) {
 		//TODO need to solve the issue
 		ArrayList<Point> points = new ArrayList<>();
 		if(bomb == null) return points;
@@ -131,7 +131,7 @@ public class SafetyChecker {
 
 		}
 		
-		Block[][] map = getMap();
+//		Block[][] map = getMap();
 		int x, y;
 		for (int i = 0; i < points.size(); i++) {
 			x = points.get(i).x;

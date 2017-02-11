@@ -133,7 +133,6 @@ public class AIManager extends Thread {
 			 }
 		}
 		gameAI.getKeyState().setMovement(Movement.NONE);
-		System.out.println("done");
 
 	}
 
@@ -146,7 +145,7 @@ public class AIManager extends Thread {
 	 *            the variable determining if the escape moves are passed
 	 */
 	private void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
-		System.out.println("called");
+//		System.out.println("called");
 		if (inDanger)
 			while (moves != null && !moves.isEmpty()) {
 				makeSingleMove(moves.removeFirst());
@@ -160,11 +159,11 @@ public class AIManager extends Thread {
 
 	private void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
-		System.out.println(moves);
 		
-		while (moves != null && !moves.isEmpty() && !safetyCh.inDanger()/* && getMovesToEnemy() == null*/) {
-			System.out.println("not called");
+		while (moves != null && !moves.isEmpty() &&  getMovesToEnemy() == null) {
+//			System.out.println("not called");
 			action = moves.removeFirst();
+			System.out.println(action);
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
 				gameAI.getKeyState().setBomb(true);
@@ -179,7 +178,6 @@ public class AIManager extends Thread {
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
 					while (!safetyCh.checkMoveSafety(moves.peek())){
-						System.out.println("waiting");
 					}
 				}
 			} else
@@ -187,7 +185,6 @@ public class AIManager extends Thread {
 				makeSingleMove(action);
 			}
 		}
-		System.out.println("finished");
 	}
 
 	private LinkedList<AIActions> getMovesToEnemy() {
@@ -214,7 +211,7 @@ public class AIManager extends Thread {
 
 			// if AI is in danger then find the escape route
 			if (safetyCh.inDanger()) {
-				System.out.println("1");
+//				System.out.println("1");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
@@ -222,7 +219,7 @@ public class AIManager extends Thread {
 			// safe
 			// location
 			else if (safetyCh.isEnemyInBombRange()) {
-				System.out.println("2");
+//				System.out.println("2");
 				gameAI.getKeyState().setBomb(true);
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
@@ -232,14 +229,14 @@ public class AIManager extends Thread {
 			// a
 			// route to it and make moves
 			else if ((moves = getMovesToEnemy()) != null) {
-				System.out.println("3");
-				System.out.println(moves);
+//				System.out.println("3");
+//				System.out.println(moves);
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy
 			// and fullfill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
-				System.out.println("happens");
+//				System.out.println(moves);
 				performPlannedMoves(moves);
 			}
 
