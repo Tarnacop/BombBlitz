@@ -5,6 +5,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import bomber.AI.GameAI;
 import bomber.physics.PhysicsEngine;
@@ -83,7 +84,7 @@ public class Game implements GameInterface{
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
-			this.player = new Player(this.playerName, new Point(64,64), 5, 300, new Mesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(64,64), 100, 300, new Mesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			//System.out.println("Ours: " + this.keyState.toString() + " Theirs: " + this.player.getKeyState().toString());
 			ArrayList<Player> list = new ArrayList<Player>();
@@ -91,7 +92,7 @@ public class Game implements GameInterface{
 			
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
-			Player ai = new GameAI("   dasda", new Point(128,128),5, 300, gameState, new Mesh(32, 32, colours));
+			Player ai = new GameAI("   dasda", new Point(128,128), 1, 300, gameState, new Mesh(32, 32, colours));
 			list.add(ai);
 			ai.begin();
 
@@ -108,9 +109,15 @@ public class Game implements GameInterface{
 		//System.out.println(this.player.getKeyState().toString() + ": " + this.player.getKeyState().getMovement());
 		//System.out.println(this.gameState.getPlayers().get(0).getKeyState().toString());
 		this.physics.update((int) (interval * 1000));
-		System.out.println(this.gameState);
+		//System.out.println(this.gameState);
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
+		List<Player> players = this.gameState.getPlayers();
+		for(Player player : players){
+			
+			System.out.println("Player " + player.toString() + " is alive: " + player.isAlive() + " with " + player.getLives() + "lives.");
+			//if(!player.isAlive())players.remove(player);
+		}
 	}
 
 	@Override
