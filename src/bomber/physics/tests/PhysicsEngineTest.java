@@ -37,23 +37,23 @@ public class PhysicsEngineTest
         map = new Map(blocks);
 
         players = new ArrayList<>();
-        buddy = new Player("Buddy", new Point(5,5), 3, 10);
+        buddy = new Player("Buddy", new Point(5,5), 3, 10, null);
         players.add(buddy);
-        gameState = new GameState(map, players, new ArrayList<>());
+        gameState = new GameState(map, players);
         engine = new PhysicsEngine(gameState);
     }
 
     @Test
     public void addPlayer() throws Exception
     {
-        gameState.getPlayers().add(new Player("TestPlayer1", new Point(5,5), 1, 10));
+        gameState.getPlayers().add(new Player("TestPlayer1", new Point(5,5), 1, 10, null));
         Player testPlayer1 = engine.getPlayerNamed("TestPlayer1");
         assertNotNull("Player was not added or does not have the given name.", testPlayer1);
         assertEquals("Added player does not have the given position", new Point(5,5), testPlayer1.getPos());
         assertEquals("Added player does not have the given number of lives", 1, testPlayer1.getLives());
         assertEquals("Added player does not have the given speed", 10.0, testPlayer1.getSpeed());
 
-        gameState.getPlayers().add(new Player("TestPlayer2", new Point(3,4), 3, 14));
+        gameState.getPlayers().add(new Player("TestPlayer2", new Point(3,4), 3, 14, null));
         Player testPlayer2 = engine.getPlayerNamed("TestPlayer2");
         assertNotNull("Player was not added or does not have the given name.", testPlayer2);
         assertEquals("Added player does not have the given position", new Point(3, 4), testPlayer2.getPos());
@@ -106,7 +106,7 @@ public class PhysicsEngineTest
         buddy.getKeyState().setMovement(Movement.RIGHT);
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
-        engine.plantBomb("Buddy", 0, 3);
+        engine.plantBomb(buddy, 0);
 
         System.out.println("Player: " + buddy.getPos());
         System.out.println("His bomb: " + gameState.getBombs().get(0).getPos());
@@ -135,17 +135,16 @@ public class PhysicsEngineTest
     {
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
-        engine.plantBomb("Buddy", 0, 3);
+        buddy.setLives(1);
+        engine.plantBomb(buddy, 0);
         engine.update();
-
         assertFalse("The player was not killed by standing on a bomb", buddy.isAlive());
-        assertEquals("The number of lives of the player did not decrease", 2, buddy.getLives());
 
-        buddy.setLives(0);
+        buddy.setLives(3);
         buddy.setAlive(true);
-        engine.plantBomb("Buddy", 0, 3);
+        engine.plantBomb(buddy, 0);
         engine.update();
-        assertEquals("The number of lives of the player changed even though it was 0", 0, buddy.getLives());
+        assertEquals("The number of lives of the player did not decrease", 2, buddy.getLives());
     }
 
     @Test

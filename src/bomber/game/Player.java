@@ -8,12 +8,14 @@ import bomber.renderer.shaders.Mesh;
 
 public class Player {
 
+	private int playerID;
 	private String name;			
 	private Point pos;	
 	private Point gridPos;
 	private int lives;			
 	private double speed;			
 	private int bombRange;
+	private int maxNrOfBombs;
 	private final int scalar = 64;
 	private KeyboardState keyState;		
 	private boolean isAlive;
@@ -26,10 +28,31 @@ public class Player {
 		this.lives = lives;
 		this.speed = speed;
 		this.bombRange = 3; //setting the initial bomb range
+		this.maxNrOfBombs = 1;
 		
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
 		this.gridPos = new Point();
+		this.mesh = mesh;
+	}
+
+	public int getPlayerID() {
+		return playerID;
+	}
+
+	public void setPlayerID(int playerID) {
+		this.playerID = playerID;
+	}
+
+	public int getScalar() {
+		return scalar;
+	}
+
+	public void setGridPos(Point gridPos) {
+		this.gridPos = gridPos;
+	}
+
+	public void setMesh(Mesh mesh) {
 		this.mesh = mesh;
 	}
 
@@ -71,9 +94,9 @@ public class Player {
 		return gridPos;
 	}
 	
-	public void makeMesh(int x, int y, int width, int height, float[] colours){
+	public void makeMesh(int width, int height, float[] colours){
 		
-		this.mesh = new Mesh(x, y, width, height, colours);
+		this.mesh = new Mesh(width, height, colours);
 	}
 	
 	private void updatePos()
@@ -121,5 +144,15 @@ public class Player {
 	public Mesh getMesh() {
 		
 		return this.mesh;
+	}
+
+	public int getMaxNrOfBombs()
+	{
+		return maxNrOfBombs;
+	}
+
+	public void setMaxNrOfBombs(int maxNrOfBombs)
+	{
+		this.maxNrOfBombs = maxNrOfBombs;
 	}
 }

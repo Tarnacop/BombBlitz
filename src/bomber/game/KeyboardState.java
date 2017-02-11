@@ -26,7 +26,9 @@ public class KeyboardState {
 	}
 
 	public void setMovement(Movement movement) {
+		//System.out.println("SETTING MOVEMENT ON Object " + this.toString() + " TO " + movement);
 		this.movement = movement;
+		//System.out.println("SET to " + this.movement);
 	}
 
 	public Movement getMovement(){

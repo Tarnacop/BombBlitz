@@ -1,33 +1,27 @@
 package bomber.renderer;
 
 import bomber.renderer.constants.RendererConstants;
+import bomber.renderer.interfaces.GameInterface;
 
 import java.util.HashMap;
 
-import bomber.game.Game;
 import bomber.game.GameState;
 import bomber.game.Player;
 import bomber.game.Response;
 
 public class Graphics implements Runnable {
 
-	private final Screen screen;
 	private final Thread gameLoopThread;
+	private final Screen screen;
 	private final Timer timer;
-	private final Game gameLogic;
-	private final GameState state;
-	private final Renderer renderer;
-	private Player player;
+	private final GameInterface gameLogic;
 	
-	public Graphics(String screenTitle, int screenWidth, int screenHeight, Game gameLogic, GameState state, HashMap<Response, Integer> controls, Player player) throws Exception {
+	public Graphics(String screenTitle, int screenWidth, int screenHeight, boolean vSync, GameInterface gameLogic) throws Exception {
 		
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
-		
-		this.screen = new Screen(screenTitle, screenWidth, screenHeight, true, controls, player);
-		this.renderer = new Renderer();
-		this.state = state;
+		this.screen = new Screen(screenTitle, screenWidth, screenHeight, vSync);
+		System.out.println("Made new screen in Graphics");
 		this.gameLogic = gameLogic;
-		this.player = player;
 		timer = new Timer();
 	} // END OF CONSTRUCTOR
 	
@@ -53,6 +47,7 @@ public class Graphics implements Runnable {
 		} finally {
 			
 			dispose();
+			System.out.println("DISPOSED");
 		}
 		
 	} // END OF run METHOD
@@ -60,25 +55,23 @@ public class Graphics implements Runnable {
 	// Initialize the game engine
 	private void init() throws Exception {
 		
-		screen.init();
-		renderer.init(screen);
-		float[] colours = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f };
-		player.makeMesh(0, 0, 32, 32, colours);
-		timer.init();
+		this.screen.init();
+		this.timer.init();
+		this.gameLogic.init(screen);
 	} // END OF init METHOD
 	
 	// Update method
 	private void update(float interval) {
 		
 		// Game logic gets updated
-		gameLogic.update(screen, interval);
+		gameLogic.update(interval);
 	} // END OF update METHOD
 
 	// Render method
 	private void render() {
 		
 		// Render the renderer
-		renderer.render(screen, state);
+		gameLogic.render(screen);
 		screen.update();
 	} // END OF render METHOD
 	
@@ -91,14 +84,14 @@ public class Graphics implements Runnable {
 		boolean gameRunning = true;
 		
 		// The main loop of the game
-		while(gameRunning && !screen.screenShouldClose()) {
-			
+		while(gameRunning && (!screen.screenShouldClose())) {
 			deltaTime = timer.getDeltaTime();
 			accumulator = accumulator + deltaTime;
-			
+			input();
 			// Update game and timer UPS if enough time passed
 			while(accumulator >= interval) {
 
+				
 				update(interval);
 				timer.updateUPS();
 				accumulator = accumulator - interval;
@@ -117,7 +110,7 @@ public class Graphics implements Runnable {
 				sync();
 			}
 		}
-		
+		System.out.println("FINISHED GAMELOOP");
 	} // END OF gameLoop METHOD
 	
 	private void sync() {
@@ -137,10 +130,16 @@ public class Graphics implements Runnable {
             }
 		}
 		
+		
 	} // END OF sync METHOD
 	
+	
+	public void input() {
+		
+		gameLogic.input(screen);;
+	}
 	public void dispose() {
 		
-		renderer.dispose();
+		gameLogic.dispose();
 	} // END OF dispose METHOD
 } // END OF Application

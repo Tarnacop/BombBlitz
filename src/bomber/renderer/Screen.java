@@ -3,19 +3,12 @@ package bomber.renderer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.glfw.GLFW.*;
 
-import java.util.HashMap;
-import java.util.Optional;
-
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
-
-import bomber.game.KeyboardState;
-import bomber.game.Movement;
-import bomber.game.Player;
-import bomber.game.Response;
 
 public class Screen {
 
@@ -26,21 +19,26 @@ public class Screen {
 	private boolean resized;
 	private boolean vSync;
 	private GLFWVidMode vidmode;
-	private HashMap<Response, Integer> controlScheme;
-	private Player player;
+	private GLFWKeyCallback keyCallback;
+	
+	public Screen(String title, int width, int height, boolean vSync) {
 
-	public Screen(String title, int width, int height, boolean vSync, HashMap<Response, Integer> controls, Player player) {
-
-		this.player = player;
-		this.controlScheme = controls;
 		this.width = width;
 		this.height = height;
 		this.title = title;
 		this.vSync = vSync;
+		System.out.println("Made new screen in Screen.java");
 	} // END OF CONSTRUCTOR
 
+	
+	public int getKeyState(int keyCode){
+		
+		return glfwGetKey(this.screenID, keyCode);
+	}
+	
 	public void init() {
 
+		System.out.println("Initializing screen");
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
@@ -75,7 +73,22 @@ public class Screen {
 				Screen.this.setResized(true);
 			}
 		});
+		
+		 // Setup a key callback. It will be called every time a key is pressed, repeated or released.
 
+        glfwSetKeyCallback(screenID, keyCallback = new GLFWKeyCallback() {
+
+            @Override
+            public void invoke(long window, int key, int scancode, int action, int mods) {
+
+                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+
+                    glfwSetWindowShouldClose(window, true);
+
+                }
+            }
+
+        });
 		// Get the resolution of the primary monitor
 		vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
@@ -101,77 +114,10 @@ public class Screen {
 		
 		glfwSetInputMode(this.screenID, GLFW_STICKY_KEYS, GLFW_TRUE);
 
-		
+		System.out.println("Initialized screen");
 	} // END OF init METHOD
 
-	public boolean input(boolean bombPressed){
-		
-		System.out.println("polling the keyboard");
-		
-		KeyboardState keyState = this.player.getKeyState();
-		
-		int state = GLFW_RELEASE;
-			
-			//System.out.println("Checking again...");
-			
-			//check for bomb
-			if(getKey(Response.PLACE_BOMB).isPresent()){
-				state = glfwGetKey(this.screenID, getKey(Response.PLACE_BOMB).get());
-			}
-			if(state == GLFW_PRESS && !bombPressed){
-			    keyState.setBomb(true);
-			    bombPressed = true;
-			    state = GLFW_RELEASE;
-			}else if(state == GLFW_RELEASE && bombPressed){
-				bombPressed = false;
-			}
-			
-			//Check for up
-			
-			if(getKey(Response.UP_MOVE).isPresent()){
-				state = glfwGetKey(this.screenID, getKey(Response.UP_MOVE).get());
-			}
-			if(state == GLFW_PRESS){
-			    keyState.setMovement(Movement.UP);
-			    state = GLFW_RELEASE;
-			}
-			
-			//check for down
-			if(getKey(Response.DOWN_MOVE).isPresent()){
-				state = glfwGetKey(this.screenID, getKey(Response.DOWN_MOVE).get());
-			}
-			if(state == GLFW_PRESS){
-			    keyState.setMovement(Movement.DOWN);
-			    state = GLFW_RELEASE;
-			}
-			
-			//check for left
-			if(getKey(Response.LEFT_MOVE).isPresent()){
-				state = glfwGetKey(this.screenID, getKey(Response.LEFT_MOVE).get());
-			}
-			if(state == GLFW_PRESS){
-			    keyState.setMovement(Movement.LEFT);
-			    state = GLFW_RELEASE;
-			}
-			
-			//check for right
-			if(getKey(Response.RIGHT_MOVE).isPresent()){
-				state = glfwGetKey(this.screenID, getKey(Response.RIGHT_MOVE).get());
-			}
-			if(state == GLFW_PRESS){
-			    keyState.setMovement(Movement.RIGHT);
-			    state = GLFW_RELEASE;
-			}
-			
-			return bombPressed;
-	}
 	
-	private Optional<Integer> getKey(Response r){
-		if(this.controlScheme.containsKey(r)){
-			return Optional.of(this.controlScheme.get(r));
-		}
-		return Optional.empty();
-	}
 	
 	public void setClearColour(float red, float green, float blue, float alpha) {
 		
