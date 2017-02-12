@@ -1,7 +1,5 @@
 package bomber.game;
 
-
-
 import java.awt.Point;
 
 import bomber.renderer.shaders.Mesh;
@@ -9,20 +7,20 @@ import bomber.renderer.shaders.Mesh;
 public class Player {
 
 	private int playerID;
-	private String name;			
-	private Point pos;	
+	private String name;
+	private Point pos;
 	private Point gridPos;
-	private int lives;			
-	private double speed;			
+	private int lives;
+	private double speed;
 	private int bombRange;
 	private int maxNrOfBombs;
 	private final int scalar = 64;
-	private KeyboardState keyState;		
+	private KeyboardState keyState;
 	private boolean isAlive;
 	private Mesh mesh;
-	
-	public Player(String name, Point pos, int lives, double speed, Mesh mesh){
-		
+
+	public Player(String name, Point pos, int lives, double speed, Mesh mesh) {
+
 		this.name = name;
 		this.pos = pos;
 		this.lives = lives;
@@ -30,6 +28,7 @@ public class Player {
 		this.bombRange = 3; //setting the initial bomb range
 		this.maxNrOfBombs = 1;
 		
+
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
 		this.gridPos = new Point();
@@ -56,10 +55,10 @@ public class Player {
 		this.mesh = mesh;
 	}
 
-	public void begin(){
-		
+	public void begin() {
+
 	}
-	
+
 	public int getBombRange() {
 		return bombRange;
 	}
@@ -68,40 +67,40 @@ public class Player {
 		this.bombRange = bombRange;
 	}
 
-	public String getName(){
-		
+	public String getName() {
+
 		return this.name;
 	}
-	
-	public void setName(String name){
-		
+
+	public void setName(String name) {
+
 		this.name = name;
 	}
 
-	public Point getPos(){
-		
+	public Point getPos() {
+
 		return this.pos;
 	}
-	
-	public Point getGridPos()
-	{
-		
-		int x = pos.x/scalar;
-		int y = pos.y/scalar;
-		if(x%scalar > 32) x++;
-		if(y%scalar > 32) y++;
+
+	public Point getGridPos() {
+
+		int x = pos.x / scalar;
+		int y = pos.y / scalar;
+		if (x % scalar > 32)
+			x++;
+		if (y % scalar > 32)
+			y++;
 		gridPos.setLocation(x, y);
 		return gridPos;
 	}
-	
-	public void makeMesh(int width, int height, float[] colours){
-		
+
+	public void makeMesh(int width, int height, float[] colours) {
+
 		this.mesh = new Mesh(width, height, colours);
 	}
-	
-	private void updatePos()
-	{
-		this.gridPos.setLocation((pos.x/scalar),(pos.y/scalar) );
+
+	private void updatePos() {
+		this.gridPos.setLocation((pos.x / scalar), (pos.y / scalar));
 	}
 
 	public int getLives() {
@@ -140,9 +139,9 @@ public class Player {
 		this.pos = pos;
 		updatePos();
 	}
-	
+
 	public Mesh getMesh() {
-		
+
 		return this.mesh;
 	}
 
