@@ -87,6 +87,14 @@ public class ClientMain {
 
 						System.out.println("inRoom: " + client.isInRoom());
 
+					} else if (cmds[0].equals("getroomid")) {
+
+						System.out.println("roomID: " + client.getRoomID());
+
+					} else if (cmds[0].equals("leaveroom")) {
+
+						client.leaveRoom();
+
 					} else {
 
 						pInvalid();

@@ -167,10 +167,7 @@ public class ServerPacketEncoder {
 			if (dest.length < buffer.position() + 4) {
 				throw new IOException("dest is too short");
 			}
-			int mapID = -25;
-			if (e.getValue().getGame() != null) {
-				mapID = e.getValue().getGame().getMapID();
-			}
+			int mapID = e.getValue().getMapID();
 			buffer.putInt(mapID);
 
 		}
@@ -179,10 +176,10 @@ public class ServerPacketEncoder {
 		return len;
 	}
 
-	// Tests
+	// TODO Tests
 	public static void main(String[] args) {
 
-		// TODO player list test
+		// player list test
 		ServerClientTable clientTable = new ServerClientTable(32);
 
 		for (int i = 0; i < 32; i++) {
@@ -213,11 +210,11 @@ public class ServerPacketEncoder {
 			System.out.printf("ID: %d, Name: %s\n", p.getID(), p.getName());
 		}
 
-		// TODO room list test
+		// room list test
 		ServerRoomTable roomTable = new ServerRoomTable(32);
 
 		for (int i = 0; i < 32; i++) {
-			ServerRoom room = new ServerRoom("test_room " + i, clientTable.get(i));
+			ServerRoom room = new ServerRoom("test_room " + i, clientTable.get(i), i);
 			roomTable.put(room);
 		}
 

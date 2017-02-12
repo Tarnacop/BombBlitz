@@ -72,7 +72,7 @@ public class ProtocolConstant {
 
 	// In room
 	public static final byte MSG_C_ROOM_LEAVE = 0x0a;
-	// 1 byte message type + 2 byte sequence
+	// 1 byte message type + 2 byte sequence + 4 byte room ID
 
 	public static final byte MSG_C_ROOM_READYTOPLAY = 0x0b;
 	public static final byte MSG_C_ROOM_SETINFO = 0x0c;
@@ -151,13 +151,13 @@ public class ProtocolConstant {
 	 * name, invalid name length
 	 */
 
-	public static final byte MSG_S_LOBBY_NOTINROOM = 0x4b;
+	public static final byte MSG_S_LOBBY_NOTINROOM = 0x4b; // Bit set
 	// 1 byte message type + 2 byte sequence
 
 	public static final byte MSG_S_ROOM_ALREADYINROOM = 0x4c; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room id
 
-	public static final byte MSG_S_ROOM_HAVELEFT = 0x4d;
+	public static final byte MSG_S_ROOM_HAVELEFT = 0x4d; // Bit set
 	// 1 byte message type + 2 byte sequence
 
 	public static final byte MSG_S_ROOM_ROOMINFO = 0x4e;
