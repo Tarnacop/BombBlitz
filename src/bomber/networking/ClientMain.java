@@ -79,6 +79,14 @@ public class ClientMain {
 									r.getMapID());
 						}
 
+					} else if (cmds[0].equals("isinlobby")) {
+
+						System.out.println("inLobby: " + client.isInLobby());
+
+					} else if (cmds[0].equals("isinroom")) {
+
+						System.out.println("inRoom: " + client.isInRoom());
+
 					} else {
 
 						pInvalid();
@@ -90,6 +98,18 @@ public class ClientMain {
 					if (cmds[0].equals("connect")) {
 
 						client.connect(cmds[1]);
+
+					} else if (cmds[0].equals("joinroom")) {
+
+						int roomID = -1;
+						try {
+							roomID = Integer.parseInt(cmds[1]);
+						} catch (NumberFormatException e) {
+							System.out.println("Failed to parse room id");
+							continue;
+						}
+
+						client.joinRoom(roomID);
 
 					} else if (cmds[0].equals("sendraw")) {
 
@@ -117,7 +137,8 @@ public class ClientMain {
 						try {
 							mapID = Integer.parseInt(cmds[3]);
 						} catch (NumberFormatException e) {
-							mapID = -1;
+							System.out.println("Failed to parse map id");
+							continue;
 						}
 
 						client.createRoom(cmds[1], maxPlayer, mapID);

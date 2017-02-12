@@ -167,7 +167,7 @@ public class ServerPacketEncoder {
 			if (dest.length < buffer.position() + 4) {
 				throw new IOException("dest is too short");
 			}
-			int mapID = -1;
+			int mapID = -25;
 			if (e.getValue().getGame() != null) {
 				mapID = e.getValue().getGame().getMapID();
 			}

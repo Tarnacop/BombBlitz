@@ -20,6 +20,7 @@ public class ServerRoom {
 	private boolean inGame = false;
 	// the game session
 	private ServerGame game;
+	// TODO consistency between constructor, getter, setter and game's mapID
 
 	/**
 	 * Construct a room
@@ -36,6 +37,7 @@ public class ServerRoom {
 			this.name = name;
 		}
 		playerList.add(firstPlayer);
+		game = new ServerGame(0);
 	}
 
 	/**
@@ -59,6 +61,7 @@ public class ServerRoom {
 		if (maxPlayer >= 2 && maxPlayer <= 4) {
 			this.setMaxPlayer(maxPlayer);
 		}
+		game = new ServerGame(0);
 	}
 
 	/**
@@ -70,6 +73,7 @@ public class ServerRoom {
 	public ServerRoom(ServerClientInfo firstPlayer) {
 		this.name = "Room " + id;
 		playerList.add(firstPlayer);
+		game = new ServerGame(0);
 	}
 
 	/**
@@ -185,6 +189,11 @@ public class ServerRoom {
 			return;
 		}
 
+		if (playerList.contains(player)) {
+			System.err.println("Unexpected addPlayer(): Player is already in the list");
+			return;
+		}
+
 		playerList.add(player);
 
 	}
@@ -217,6 +226,20 @@ public class ServerRoom {
 	public void setMaxPlayer(byte maxPlayer) {
 		if (maxPlayer >= 2 && maxPlayer <= 4) {
 			this.maxPlayer = maxPlayer;
+		}
+	}
+
+	public int getMapID() {
+		if (this.game == null) {
+			return -1;
+		}
+
+		return this.game.getMapID();
+	}
+
+	public void setMapID(int mapID) {
+		if (this.game != null) {
+			this.game.setMapID(mapID);
 		}
 	}
 

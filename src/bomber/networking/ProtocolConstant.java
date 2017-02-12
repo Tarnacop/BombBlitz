@@ -58,25 +58,31 @@ public class ProtocolConstant {
 	// 1 byte message type + 2 byte sequence
 
 	// public static final byte MSG_C_LOBBY_GETLEADERBOARD = 0x06;
+
 	public static final byte MSG_C_LOBBY_CREATEROOM = 0x07; // Bit set
 	/*
 	 * 1 byte message type + 2 byte sequence + 1 byte room name length + room
 	 * name string + 1 byte max player limit + 4 byte map ID
 	 */
 
-	public static final byte MSG_C_LOBBY_JOINROOM = 0x08;
-	// public static final byte MSG_C_LOBBY_SENDTEXT = 0x0a;
+	public static final byte MSG_C_LOBBY_JOINROOM = 0x08; // Bit set
+	// 1 byte message type + 2 byte sequence + 4 byte room ID
+
+	// public static final byte MSG_C_LOBBY_SENDTEXT = 0x09;
 
 	// In room
-	public static final byte MSG_C_ROOM_LEAVE = 0x0b;
+	public static final byte MSG_C_ROOM_LEAVE = 0x0a;
+	// 1 byte message type + 2 byte sequence
+
+	public static final byte MSG_C_ROOM_READYTOPLAY = 0x0b;
 	public static final byte MSG_C_ROOM_SETINFO = 0x0c;
 	public static final byte MSG_C_ROOM_GETINFO = 0x0d;
+
 	// public static final byte MSG_C_ROOM_SENDTEXT = 0x0e;
 
 	// In game
-	// public static final byte MSG_C_GAME_LEAVE = 0x0f;
-	public static final byte MSG_C_GAME_SENDMOVE = 0x10;
-	// public static final byte MSG_C_GAME_SENDTEXT = 0x11;
+
+	public static final byte MSG_C_GAME_SENDMOVE = 0x0f;
 
 	// Server to Client message types
 	// Range from 0x40 to 0x7f (up to 64 types of message)
@@ -87,8 +93,10 @@ public class ProtocolConstant {
 
 	public static final byte MSG_S_NET_REJECT = 0x41; // Bit not set
 	// 1 byte message type + 2 byte sequence
-	// TODO rejection message should contain a reason: server full, duplicate
-	// name, invalid name length
+	/*
+	 * TODO rejection message should contain a reason: server full, duplicate
+	 * name, invalid name length
+	 */
 
 	public static final byte MSG_S_NET_ALREADYCONNECTED = 0x42; // Bit set
 	// 1 byte message type + 2 byte sequence
@@ -133,13 +141,26 @@ public class ProtocolConstant {
 	 * have at least one player
 	 */
 
-	public static final byte MSG_S_LOBBY_ROOMACCEPT = 0x49;
+	public static final byte MSG_S_LOBBY_ROOMACCEPT = 0x49; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room id
 
 	public static final byte MSG_S_LOBBY_ROOMREJECT = 0x4a; // Bit set
 	// 1 byte message type + 2 byte sequence
+	/*
+	 * TODO rejection message should contain a reason: server full, duplicate
+	 * name, invalid name length
+	 */
 
-	public static final byte MSG_S_ROOM_ROOMINFO = 0x4b;
+	public static final byte MSG_S_LOBBY_NOTINROOM = 0x4b;
+	// 1 byte message type + 2 byte sequence
+
+	public static final byte MSG_S_ROOM_ALREADYINROOM = 0x4c; // Bit set
+	// 1 byte message type + 2 byte sequence + 4 byte room id
+
+	public static final byte MSG_S_ROOM_HAVELEFT = 0x4d;
+	// 1 byte message type + 2 byte sequence
+
+	public static final byte MSG_S_ROOM_ROOMINFO = 0x4e;
 	/*
 	 * 1 byte message type + 2 byte sequence + 4 byte room id + 1 byte name
 	 * length + bytes of name string + 1 byte player number + 1 byte max player
@@ -148,10 +169,10 @@ public class ProtocolConstant {
 	 * string + 1 byte isReadyToPlay flag)
 	 */
 
-	public static final byte MSG_S_GAME_GAMESTART = 0x4c;
+	public static final byte MSG_S_ROOM_GAMESTART = 0x4f;
 
-	public static final byte MSG_S_GAME_GAMESTATE = 0x4d;
+	public static final byte MSG_S_ROOM_GAMESTATE = 0x50;
 
-	public static final byte MSG_S_GAME_GAMEOVER = 0x4e;
+	public static final byte MSG_S_ROOM_GAMEOVER = 0x51;
 
 }

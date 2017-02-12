@@ -27,6 +27,8 @@ public class ServerThread implements Runnable {
 	// table for storing client info
 	private final ServerClientTable clientTable;
 
+	// TODO need to broadcast player list and room list to clients periodically
+
 	// table for storing room info
 	private final ServerRoomTable roomTable;
 
@@ -219,6 +221,8 @@ public class ServerThread implements Runnable {
 
 		switch (messageType) {
 		case ProtocolConstant.MSG_C_NET_CONNECT: {
+			// TODO should reject with a reason in this type of message
+
 			// packet length check
 			if (packet.getLength() < 5) {
 				return;
@@ -234,7 +238,6 @@ public class ServerThread implements Runnable {
 				return;
 			}
 			if (nameLength > config.getMaxNameLength()) {
-				// TODO should reject with a reason in the message
 				pServer("name length longer than " + config.getMaxNameLength() + " in conection request from "
 						+ sockAddr);
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
@@ -265,7 +268,6 @@ public class ServerThread implements Runnable {
 
 			// server full check
 			if (clientTable.size() >= config.getMaxPlayer()) {
-				// TODO should reject with a reason in the message
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
@@ -276,7 +278,6 @@ public class ServerThread implements Runnable {
 
 			// duplicate name check
 			if (clientTable.contains(name)) {
-				// TODO should reject with a reason in the message
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
@@ -376,9 +377,10 @@ public class ServerThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_C_LOBBY_CREATEROOM: {
+			// TODO should reject with a reason in this type of message
+
 			pServer("room creation request from " + sockAddr);
 
-			// get room name length
 			recvByteBuffer.position(3);
 			if (packet.getLength() < recvByteBuffer.position() + 1) {
 				pServer("failed to decode room creation request from " + sockAddr);
@@ -387,8 +389,15 @@ public class ServerThread implements Runnable {
 			byte nameLength = recvByteBuffer.get();
 
 			// get room name string
-			if (nameLength < 1 || nameLength > config.getMaxNameLength()) {
-				pServer("invalid name length in creation request from " + sockAddr);
+			if (nameLength < 1) {
+				pServer("invalid name length in room creation request from " + sockAddr);
+				return;
+			}
+			if (nameLength > config.getMaxNameLength()) {
+				pServer("name length longer than " + config.getMaxNameLength() + " in room creation request from "
+						+ sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, false);
 				return;
 			}
 			byte[] nameData = new byte[nameLength];
@@ -399,21 +408,122 @@ public class ServerThread implements Runnable {
 			if (packet.getLength() < recvByteBuffer.position() + 1 + 4) {
 				pServer("failed to decode room creation request from " + sockAddr);
 			}
-			// TODO check whether maxPlayer is in the range [2,4]
 			byte maxPlayer = recvByteBuffer.get();
 			int mapID = recvByteBuffer.getInt();
-
 			pServerf("decoded room creation request from %s: Room name: %s, Max player limit: %d, Map ID: %d\n",
 					sockAddr, roomName, maxPlayer, mapID);
 
-			// TODO unfinished, currently always reject room creation
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
-			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
+			// check whether maxPlayer is in the range [2,4]
+			if (maxPlayer < 2 || maxPlayer > 4) {
+				maxPlayer = 4;
+			}
+
+			// check whether the player is already in a room
+			ServerClientInfo client = clientTable.get(sockAddr);
+			if (client == null) {
+				pServer("Bug: client should not be null in this situation");
+				return;
+			}
+			if (client.isInRoom()) {
+				ServerRoom room = client.getRoom();
+				if (room == null) {
+					pServer("Bug: room should not be null in this situation");
+					return;
+				}
+				sendByteBuffer.putInt(3, room.getID());
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
+			}
+
+			// check whether there is duplicate room name
+			if (roomTable.contains(roomName) || roomTable.size() >= clientTable.size()) {
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
+			}
+
+			// create the room and update the info of the client
+			ServerRoom room = new ServerRoom(roomName, client, maxPlayer);
+			room.setMapID(mapID);
+			roomTable.put(room);
+			// client.setInLobby(false);
+			client.setInRoom(true);
+			client.setReadyToPlay(false);
+			client.setRoom(room);
+
+			// tell the client it has been accepted into the new room
+			sendByteBuffer.putInt(3, room.getID());
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT, true);
+
+			// TODO send room info MSG_S_ROOM_ROOMINFO to client
 
 			break;
 		}
 
-		// TODO testing case
+		case ProtocolConstant.MSG_C_LOBBY_JOINROOM: {
+			pServer("room join request from " + sockAddr);
+
+			if (packet.getLength() < 7) {
+				pServer("failed to decode room join request from " + sockAddr);
+				return;
+			}
+			int roomID = recvByteBuffer.getInt(3);
+			if (roomID < 0) {
+				pServer("Client bug: roomID should not be negative");
+				return;
+			}
+
+			// check whether the player is already in a room
+			ServerClientInfo client = clientTable.get(sockAddr);
+			if (client == null) {
+				pServer("Bug: client should not be null in this situation");
+				return;
+			}
+			if (client.isInRoom()) {
+				ServerRoom room = client.getRoom();
+				if (room == null) {
+					pServer("Bug: room should not be null in this situation");
+					return;
+				}
+				sendByteBuffer.putInt(3, room.getID());
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
+				return;
+			}
+
+			// check whether the room exists
+			ServerRoom room = roomTable.get(roomID);
+			if (room == null) {
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
+				return;
+			}
+
+			// check whether the room is full
+			if (room.getPlayerList().size() >= room.getMaxPlayer()) {
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
+				return;
+			}
+
+			// update the info of the client and the room
+			client.setInRoom(true);
+			client.setReadyToPlay(false);
+			client.setRoom(room);
+			room.addPlayer(client);
+
+			// tell the client it has been accepted into the new room
+			sendByteBuffer.putInt(3, room.getID());
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT, true);
+
+			// TODO send room info MSG_S_ROOM_ROOMINFO to client
+
+			break;
+
+		}
+
+		// TODO testing cases
 		case 's': {
 			pServer("message type 's', table size: " + clientTable.size());
 
@@ -429,7 +539,6 @@ public class ServerThread implements Runnable {
 			break;
 		}
 
-		// TODO testing case
 		case 't': {
 			long time = System.currentTimeMillis();
 
@@ -485,7 +594,7 @@ public class ServerThread implements Runnable {
 				// packet.getSocketAddress());
 				socket.send(packet);
 			} else {
-				// TODO pServer("recipient does not exist in client table but
+				// pServer("recipient does not exist in client table but
 				// tryRetransmit is set to true");
 				sendPacket(packet, type);
 			}
