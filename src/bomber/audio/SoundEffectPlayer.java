@@ -14,8 +14,8 @@ public class SoundEffectPlayer extends Thread
 
     public static final String explosionFilename = "sfx_exp_medium3.wav";
     public static final String bombPlaceFilename = "sfx_sound_neutral6.wav";
-    public static final String movementFilename = "sfx_movement_footstepsloop4_slow.wav";
-    public static final String playerDeathFilename = "sfx_deathscream_robot1.wav";
+    public static final String movementFilename = "sfx_movement_footsteps1a.wav";
+    public static final String playerDeathFilename = "sfx_sounds_error1.wav";
 
     private void playSound(String fileName)
     {
@@ -46,6 +46,9 @@ public class SoundEffectPlayer extends Thread
                 break;
             case PLAYER_DEATH:
                 playSound(playerDeathFilename);
+                break;
+            case MOVEMENT:
+                playSound(movementFilename);
                 break;
         }
     }

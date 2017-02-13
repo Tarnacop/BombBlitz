@@ -41,17 +41,24 @@ public class AudioManager
 
     public void stopMusic()
     {
+        music.pause();
         music.interrupt();
     }
 
     public void playEventList(List<AudioEvent> eventList)
     {
-        eventList.forEach(event -> effects.play(event));
+        eventList.forEach(event -> {
+            //SoundEffectPlayer effects = new SoundEffectPlayer();
+            //effects.start();
+            effects.play(event);
+            //effects.interrupt();
+        });
+        eventList.clear();
     }
 
     public static void main(String[] args) {
         AudioManager audioManager = new AudioManager();
-        audioManager.playMusic();
+        //audioManager.playMusic();
 
         List<AudioEvent> eventList = new ArrayList<>();
         eventList.add(AudioEvent.EXPLOSION);
