@@ -10,6 +10,7 @@ import bomber.game.GameState;
 import bomber.game.Player;
 
 /**
+ * @author Jokubas Liutkus
  * The Class SafetyChecker for checking safety of the moves and AI.
  */
 public class SafetyChecker {
@@ -100,10 +101,10 @@ public class SafetyChecker {
 	 */
 	public ArrayList<Point> getTilesAffectedByBombs() {
 		ArrayList<Point> points = new ArrayList<>();
-		List<Bomb> bombs = state.getBombs();
-		for (Bomb b : bombs) {
-			points.addAll(getBombCoverage(b));
-		}
+		List<Bomb> bombs = new ArrayList<>(state.getBombs());
+
+		bombs.forEach(b -> points.addAll(getBombCoverage(b, getMap())));
+		
 		return points;
 	}
 
@@ -111,13 +112,15 @@ public class SafetyChecker {
 	 * Gets the single bomb coverage.
 	 *
 	 * @param bomb the bomb
+	 * @param map the map
 	 * @return the tiles which are affected by a single bomb
 	 */
-	public ArrayList<Point> getBombCoverage(Bomb bomb) {
+	public ArrayList<Point> getBombCoverage(Bomb bomb, Block[][] map) {
 		//TODO need to solve the issue
 		ArrayList<Point> points = new ArrayList<>();
-		points.add(bomb.getPos());
-		Point temp = bomb.getPos();
+		if(bomb == null) return points;
+		points.add(bomb.getGridPos());
+		Point temp = bomb.getGridPos();
 		int bombX = temp.x;
 		int bombY = temp.y;
 		for (int i = 1; i <= bomb.getRadius(); i++) {
@@ -128,7 +131,7 @@ public class SafetyChecker {
 
 		}
 		
-		Block[][] map = getMap();
+//		Block[][] map = getMap();
 		int x, y;
 		for (int i = 0; i < points.size(); i++) {
 			x = points.get(i).x;
@@ -140,7 +143,7 @@ public class SafetyChecker {
 			}
 
 		}
-		System.out.println(points);
+//		System.out.println(points);
 		return points;
 	}
 

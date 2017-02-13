@@ -2,17 +2,21 @@ package bomber.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Player;
 
 /**
- * The Class RouteFinder. For finding different routes and planning.
+ * The Class RouteFinder.
+ *
+ * @author Jokubas Liutkus
+ * The Class RouteFinder.
+ * For finding different routes and planning.
  */
 public class RouteFinder {
 
@@ -24,6 +28,9 @@ public class RouteFinder {
 
 	/** The safety checker. */
 	private SafetyChecker safetyCh;
+
+	/** The Constant scalar for pixel based representation. */
+	private static final int scalar = 64;
 
 	/**
 	 * Instantiates a new route finder.
@@ -54,14 +61,20 @@ public class RouteFinder {
 	public LinkedList<AIActions> findRoute(Point start, Point goal) {
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
-
+		
+		// heuristic value h
 		int hValue = Math.abs(goal.x - start.x) + Math.abs(goal.y - start.y);
 		Node startNode = new Node(0, hValue, null, start);
+		
+		// adding start node to the queue
 		open.add(startNode);
 
-		// loop until the queue is not empty
+		// finish node
 		Node finish = null;
+		
+		// loop until the queue is not empty
 		while (!open.isEmpty()) {
+			
 			// take the head of the queue
 			Node temp = open.poll();
 
@@ -71,9 +84,8 @@ public class RouteFinder {
 				break;
 			}
 			// else we loop through all the neighbours
-			for (Point p : getNeighbours(temp)) {
-				checkNeighbour(temp, goal, temp.getgValue() + 1, p, open, closed);
-			}
+			// adding them to the queue
+			getNeighbours(temp).stream().forEach(p -> checkNeighbour(temp, goal, temp.getgValue() + 1, p, open, closed));
 
 			// adding the head of the queue to visited list
 			closed.add(temp);
@@ -117,14 +129,19 @@ public class RouteFinder {
 		int y = neigh.y;
 		Block[][] map = getMap();
 
+		// we check if the coordiantes are valid
+		// if not we return
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID)
 			return;
 
+		// if the neighbour is in the visited list we return
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
 				return;
 
+		// else we iterate through the queue and add the new element to it if the path is better that the 
+		// previous already in the queue
 		for (Node nd : open) {
 			if (nd.getCoord().equals(neigh) && cost < nd.getgValue()) {
 				open.remove(nd);
@@ -134,7 +151,8 @@ public class RouteFinder {
 				return;
 			}
 		}
-
+		
+		// else we add it to the queue
 		int hValue = Math.abs(goal.x - neigh.x) + Math.abs(goal.y - neigh.y);
 		Node neighNode = new Node(cost, hValue, parent, neigh);
 		open.add(neighNode);
@@ -238,21 +256,18 @@ public class RouteFinder {
 	}
 
 	/**
-	 * Check neighbour if the neighbours tile is possible move
+	 * Check neighbour if the neighbours tile is possible move.
 	 *
-	 * @param parent
-	 *            the parent node
-	 * @param tile
-	 *            the position of the tile
-	 * @param open
-	 *            the open list of positions to be visited
-	 * @param closed
-	 *            the closed list of positions already visited
+	 * @param parent            the parent node
+	 * @param tile            the position of the tile
+	 * @param open            the open list of positions to be visited
+	 * @param closed            the closed list of positions already visited
+	 * @param map the map
 	 */
-	private void checkNeighbour(Node parent, Point tile, LinkedList<Node> open, HashSet<Node> closed) {
+	private void checkNeighbour(Node parent, Point tile, LinkedList<Node> open, HashSet<Node> closed, Block[][] map) {
 		int x = tile.x;
 		int y = tile.y;
-		Block[][] map = getMap();
+		// Block[][] map = getMap();
 
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID)
@@ -301,7 +316,7 @@ public class RouteFinder {
 			}
 
 			for (Point p : getNeighbours(temp)) {
-				checkNeighbour(temp, p, open, closed);
+				checkNeighbour(temp, p, open, closed, getMap());
 			}
 
 			// else we loop through all the neighbours
@@ -324,7 +339,8 @@ public class RouteFinder {
 		Point pos = null;
 		int distance = Integer.MAX_VALUE;
 		for (Player p : state.getPlayers()) {
-			if (!p.equals(gameAI) && (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
+			if (!p.equals(gameAI)
+					&& (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
 				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
 				pos = p.getGridPos();
 			}
@@ -350,42 +366,24 @@ public class RouteFinder {
 		case UP:
 			if (map[aiPos.x][aiPos.y - 1] == Block.SOFT)
 				return true;
-//			aiPos.setLocation(aiPos.x, aiPos.y - 1);
 			break;
 		case DOWN:
 			if (map[aiPos.x][aiPos.y + 1] == Block.SOFT)
 				return true;
-//			System.out.println("lol");
-//			aiPos.setLocation(aiPos.x, aiPos.y + 1);
 			break;
 		case LEFT:
 			if (map[aiPos.x - 1][aiPos.y] == Block.SOFT)
 				return true;
-//			aiPos.setLocation(aiPos.x - 1, aiPos.y);
 			break;
 		case RIGHT:
 			if (map[aiPos.x + 1][aiPos.y] == Block.SOFT)
 				return true;
-//			aiPos.setLocation(aiPos.x + 1, aiPos.y);
 			break;
 		default:
 			break;
 		}
-		System.out.println(aiPos);
 		return false;
 	}
-
-	/*
-	 * private LinkedList<AIActions>
-	 * fromMovememntToAIActions(LinkedList<AIActions> moves) {
-	 * LinkedList<AIActions> newMoves = new LinkedList<>(); for(AIActions m:
-	 * moves) { switch(m) { case UP: newMoves.add(AIActions.UP); break; case
-	 * DOWN: newMoves.add(AIActions.DOWN); break; case LEFT:
-	 * newMoves.add(AIActions.LEFT); break; case RIGHT:
-	 * newMoves.add(AIActions.RIGHT); break; default: break; } }
-	 * 
-	 * return newMoves; }
-	 */
 
 	/**
 	 * Reverse moves. Reverses the moves in the planning phase. For example when
@@ -454,33 +452,35 @@ public class RouteFinder {
 	/**
 	 * Returns the planned actions of the AI including bomb placement and moves.
 	 *
-	 * @param movesWithoutObstacles
-	 *            the moves without obstacles (moves which doesn't consider soft blocks)
-	 * @param pos
-	 *            the position of ai
+	 * @param movesWithoutObstacles            the moves without obstacles (moves which doesn't consider soft
+	 *            blocks)
+	 * @param position the position
 	 * @return the planned actions of the AI including bomb placement and moves.
 	 */
 	private LinkedList<AIActions> getPathWithBombs(LinkedList<AIActions> movesWithoutObstacles, Point position) {
-		Block[][] map = getMap().clone();
+
+		// copy the real map
+		Block[][] map = Arrays.stream(getMap()).map(Block[]::clone).toArray(Block[][]::new);
+
 		// TODO finish not implemented
 		LinkedList<AIActions> realMoves = new LinkedList<>();
-		Point pos = (Point) position.clone();
+		Point pos = new Point(position.x, position.y);
 		AIActions move = null;
 		while ((move = movesWithoutObstacles.peek()) != null) {
 			movesWithoutObstacles.removeFirst();
-			//			System.out.println(move);
 			if (isSoftBlockAfterMove(move, pos, map)) {
 				realMoves.add(AIActions.BOMB);
-				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(
-						safetyCh.getBombCoverage(new Bomb(null, pos, 0, gameAI.getBombRange())), pos));
-				
-				
+
+				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(safetyCh.getBombCoverage(
+						new Bomb(null, new Point(pos.x * scalar, pos.y * scalar), 0, gameAI.getBombRange()), map), pos,
+						map));
+
 				realMoves.addAll(escapeMoves);
 				realMoves.add(AIActions.NONE);
 				realMoves.addAll(reverseMoves(escapeMoves));
-				
+
 			}
-			
+
 			realMoves.addLast(move);
 			updatePositionAndMap(move, pos, map);
 		}
@@ -489,18 +489,15 @@ public class RouteFinder {
 	}
 
 	/**
-	 * Gets the planned sequence of actions to enemy
+	 * Gets the planned sequence of actions to enemy.
 	 *
-	 * @param start
-	 *            the starting position
-	 * @param goal
-	 *            the goal position
+	 * @param start            the starting position
+	 * @param goal            the goal position
 	 * @return the planned sequence of actions to enemy
 	 */
 	public LinkedList<AIActions> getPlanToEnemy(Point start, Point goal) {
 
 		// TODO finish not implemented
-
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
 
@@ -518,14 +515,13 @@ public class RouteFinder {
 				finish = temp;
 				break;
 			}
-			// else we loop through all the neighbours
 
-			for (Point p : getNeighbours(temp)) {
-				checkNeighbourWithSoftTiles(temp, goal, temp.getgValue() + 1, p, open, closed);
-			}
+			// else we loop through all the neighbours
+			getNeighbours(temp).stream()
+					.forEach(p -> checkNeighbourWithSoftTiles(temp, goal, temp.getgValue() + 1, p, open, closed));
 
 			closed.add(temp);
-			
+
 		}
 
 		if (finish == null)
@@ -533,13 +529,19 @@ public class RouteFinder {
 		return getPathWithBombs(getMovesFromPoints(finish), start);
 
 	}
-	
-	
-	//change this method
-	private LinkedList<AIActions> escapeFromExplotion(ArrayList<Point> dangerTiles, Point pos) {
+
+	/**
+	 * Escape from explotion.
+	 *
+	 * @param dangerTiles the danger tiles
+	 * @param pos the pos
+	 * @param map the map
+	 * @return the linked list
+	 */
+	// change this method
+	private LinkedList<AIActions> escapeFromExplotion(ArrayList<Point> dangerTiles, Point pos, Block[][] map) {
 		LinkedList<Node> open = new LinkedList<>();
 		HashSet<Node> closed = new HashSet<>();
-
 		Node startNode = new Node(null, pos);
 		open.add(startNode);
 
@@ -556,9 +558,7 @@ public class RouteFinder {
 				break;
 			}
 
-			for (Point p : getNeighbours(temp)) {
-				checkNeighbour(temp, p, open, closed);
-			}
+			getNeighbours(temp).stream().forEach(p -> checkNeighbour(temp, p, open, closed, map));
 
 			// else we loop through all the neighbours
 			closed.add(temp);

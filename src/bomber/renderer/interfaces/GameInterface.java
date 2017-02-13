@@ -1,10 +1,17 @@
 package bomber.renderer.interfaces;
 
-public interface GameInterface extends Runnable{
+import bomber.renderer.Screen;
 
-	// Start the application
-	public void start();
+public interface GameInterface {
+
 	
-	// Dispose the resources
+	public void init(Screen screen);
+	
+	public void update(float interval);
+	
+	public void render(Screen screen);
+	
+	public void input(Screen screen);
+	
 	public void dispose();
-} // END OF ApplicationInterface
+} // END OF GameInterface

@@ -4,16 +4,17 @@ import java.awt.Point;
 
 import bomber.game.GameState;
 import bomber.game.Player;
+import bomber.renderer.shaders.Mesh;
 
-// TODO: Auto-generated Javadoc
 /**
+ * @author Jokubas Liutkus 
  * The Class GameAI.
  */
 public class GameAI extends Player {
 
 	/** The game state. */
 	private GameState state;
-	
+
 	/** The AI manager thread. */
 	private Thread aiManager;
 
@@ -30,9 +31,11 @@ public class GameAI extends Player {
 	 *            the speed
 	 * @param gameState
 	 *            the game state
+	 * @param mesh
+	 *            the mesh
 	 */
-	public GameAI(String name, Point pos, int lives, double speed, GameState gameState) {
-		super(name, pos, lives, speed);
+	public GameAI(String name, Point pos, int lives, double speed, GameState gameState, Mesh mesh) {
+		super(name, pos, lives, speed, mesh);
 		this.state = gameState;
 		aiManager = new AIManager(this, state);
 	}
@@ -52,7 +55,7 @@ public class GameAI extends Player {
 		try {
 			aiManager.wait();
 		} catch (InterruptedException e) {
-			// TODO
+			
 		}
 	}
 

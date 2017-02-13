@@ -2,16 +2,15 @@ package bomber.renderer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.glfw.GLFW.*;
-import org.lwjgl.system.MemoryUtil;
 
+import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
-import bomber.renderer.interfaces.ScreenInterface;
-
-public class Screen implements ScreenInterface {
+public class Screen {
 
 	private final String title;
 	private int width;
@@ -20,18 +19,26 @@ public class Screen implements ScreenInterface {
 	private boolean resized;
 	private boolean vSync;
 	private GLFWVidMode vidmode;
-
-	public Screen(int width, int height, String title, boolean vSync) {
+	private GLFWKeyCallback keyCallback;
+	
+	public Screen(String title, int width, int height, boolean vSync) {
 
 		this.width = width;
 		this.height = height;
 		this.title = title;
 		this.vSync = vSync;
+		System.out.println("Made new screen in Screen.java");
 	} // END OF CONSTRUCTOR
 
-	@Override
+	
+	public int getKeyState(int keyCode){
+		
+		return glfwGetKey(this.screenID, keyCode);
+	}
+	
 	public void init() {
 
+		System.out.println("Initializing screen");
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
@@ -66,7 +73,22 @@ public class Screen implements ScreenInterface {
 				Screen.this.setResized(true);
 			}
 		});
+		
+		 // Setup a key callback. It will be called every time a key is pressed, repeated or released.
 
+        glfwSetKeyCallback(screenID, keyCallback = new GLFWKeyCallback() {
+
+            @Override
+            public void invoke(long window, int key, int scancode, int action, int mods) {
+
+                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+
+                    glfwSetWindowShouldClose(window, true);
+
+                }
+            }
+
+        });
 		// Get the resolution of the primary monitor
 		vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
@@ -89,63 +111,59 @@ public class Screen implements ScreenInterface {
 		GL.createCapabilities();
 		
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		
+		glfwSetInputMode(this.screenID, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+		System.out.println("Initialized screen");
 	} // END OF init METHOD
 
-	@Override
+	
+	
 	public void setClearColour(float red, float green, float blue, float alpha) {
 		
 		glClearColor(red, green, blue, alpha);
 	} // END OF setClearColour
 
-	@Override
 	public boolean screenShouldClose() {
 		
 		return glfwWindowShouldClose(screenID);
 	} // END OF screenShouldClose METHOD
 
-	@Override
 	public String getTitle() {
 		
 		return title;
 	} // END OF getTitle METHOD
 
-	@Override
 	public int getWidth() {
 		
 		return width;
 	} // END OF getWidth METHOD
 
-	@Override
 	public int getHeight() {
 		
 		return height;
 	} // END OF getHeight METHOD
 
-	@Override
 	public boolean isResized() {
 		
 		return resized;
 	} // END OF isResized METHOD
 
-	@Override
 	public boolean isVsyncOn() {
 
 		return vSync;
 	} // END OF isVsyncOn METHOD
 
-	@Override
 	public void setResized(boolean resized) {
 		
 		this.resized = resized;
 	} // END OF setResized METHOD
 
-	@Override
 	public void setVsyncOn(boolean vSync) {
 		
 		this.vSync = vSync;
 	} // END OF setVsyncOn METHOD
 	
-	@Override
 	public void setViewport(int originX, int originY, int width, int height) {
 		
 		glViewport(originX, originY, width, height);
@@ -161,7 +179,6 @@ public class Screen implements ScreenInterface {
 		glfwSetWindowShouldClose(screenID, true);
 	} // END OF close METHOD
 	
-	@Override
 	public void update() {
 		
         glfwSwapBuffers(screenID);

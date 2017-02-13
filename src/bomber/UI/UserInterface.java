@@ -1,63 +1,71 @@
 package bomber.UI;
 
-import java.awt.Container;
-import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.ParallelGroup;
-import javax.swing.GroupLayout.SequentialGroup;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
+import static org.lwjgl.glfw.GLFW.*;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import bomber.game.Block;
+import bomber.game.Game;
+import bomber.game.Map;
+import bomber.game.Maps;
+import bomber.game.Response;
 
-public class UserInterface extends JFrame{
+public class UserInterface extends Application{
 
-	public UserInterface(){
+	private static String appName;
+	
+	public UserInterface(String appName){
 		
-		initiateUI();
+		UserInterface.appName = appName;
+		launch();
 	}
 	
-	private void initiateUI(){
-		
-		setTitle("Bomb Blitz");
-        setSize(800, 800);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
-        //Create Prototype Button
-        JButton startButton = new JButton("Start");
-
-        startButton.addActionListener((ActionEvent event) -> {
-            System.exit(0);
-        });
-        
-        //Create Exit Button
-        JButton exitButton = new JButton("Exit");
-
-        exitButton.addActionListener((ActionEvent event) -> {
-            System.exit(0);
-        });
-
-        createLayout(startButton, exitButton);
+	public UserInterface(){
+		//for JavaFX
 	}
 
-	private void createLayout(JComponent... arg) {
+	@Override
+	public void start(Stage primaryStage){
 
-        Container pane = getContentPane();
-        GroupLayout gl = new GroupLayout(pane);
-        pane.setLayout(gl);
-
-        gl.setAutoCreateContainerGaps(true);
-        ParallelGroup hgroup = gl.createParallelGroup();
-        for(JComponent comp : arg){
-        	hgroup.addComponent(comp);
-        }
-        gl.setHorizontalGroup(hgroup);
+		primaryStage.setTitle(UserInterface.appName);
+        Button btn = new Button();
+        btn.setText("Say 'Hello World'");
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+ 
+            @Override
+            public void handle(ActionEvent event) {
+                
+            	List<Map> maps = Maps.getMaps();
+            	System.out.println("Got maps");
+            	Map map1 = maps.get(0);
+            	System.out.println("Got map");
+        		HashMap<Response, Integer> keymap = new HashMap<Response, Integer>();
+        		keymap.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
+        		keymap.put(Response.UP_MOVE, GLFW_KEY_UP);
+        		keymap.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
+        		keymap.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
+        		keymap.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);
+        		
+            	beginGame(map1, "player1", keymap);
+            }
+        });
         
-        SequentialGroup vgroup = gl.createSequentialGroup();
-        for(JComponent comp : arg){
-        	vgroup.addComponent(comp);
-        }
-        gl.setVerticalGroup(vgroup);
-    }
+        StackPane root = new StackPane();
+        root.getChildren().add(btn);
+        primaryStage.setScene(new Scene(root, 300, 250));
+        primaryStage.show();
+	}
+
+	public void beginGame(Map map, String playerName, HashMap<Response, Integer> keymap) {
+		
+		Game game = new Game(map, playerName, keymap);
+	}
 }
