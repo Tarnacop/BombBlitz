@@ -89,8 +89,7 @@ public class Game implements GameInterface {
 
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
-			Player ai = new GameAI("   dasda", new Point(128, 128), 1, 300, gameState, new Mesh(32, 32, colours));
-
+			Player ai = new GameAI("   dasda", new Point(768,128), 1, 300, gameState, new Mesh(32, 32, colours));
 			list.add(ai);
 			ai.begin();
 
@@ -112,12 +111,10 @@ public class Game implements GameInterface {
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 		List<Player> players = this.gameState.getPlayers();
-		for (Player player : players) {
-
-//			System.out.println("Player " + player.toString() + " is alive: " + player.isAlive() + " with "
-//					+ player.getLives() + "lives.");
-
-			// if(!player.isAlive())players.remove(player);
+		for(Player player : players){
+			
+//			System.out.println("Player " + player.toString() + " is alive: " + player.isAlive() + " with " + player.getLives() + "lives.");
+			//if(!player.isAlive())players.remove(player);
 		}
 	}
 
