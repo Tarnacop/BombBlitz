@@ -26,7 +26,7 @@ public class Player {
 		this.lives = lives;
 		this.speed = speed;
 		this.bombRange = 3; //setting the initial bomb range
-		this.maxNrOfBombs = 1;
+		this.maxNrOfBombs = 2;
 		
 
 		this.isAlive = true;

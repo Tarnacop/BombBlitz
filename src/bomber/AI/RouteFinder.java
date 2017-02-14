@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.PriorityQueue;
+
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Player;
+import bomber.physics.PhysicsEngine;
 
 /**
  * The Class RouteFinder.
@@ -529,6 +533,26 @@ public class RouteFinder {
 		return getPathWithBombs(getMovesFromPoints(finish), start);
 
 	}
+	
+	
+	public LinkedList<AIActions> canPutBombAndEscape()
+	{
+		LinkedList<AIActions> moves =  null;
+		if(safetyCh.isEnemyInBombRange()){
+			ArrayList<Point> bombs = safetyCh.getTilesAffectedByBombs();
+			ArrayList<Point> coverage = safetyCh.getBombCoverage(new Bomb(gameAI.getName(),gameAI.getPos(),PhysicsEngine.default_time, gameAI.getBombRange()), getMap());
+			bombs.addAll(coverage) ;
+			moves = escapeFromExplotion(bombs);
+			
+			
+		}
+		if ((moves!=null)  && (moves.size() < 3))
+			return moves;
+		return null;
+	}
+	
+	
+	
 
 	/**
 	 * Escape from explotion.
