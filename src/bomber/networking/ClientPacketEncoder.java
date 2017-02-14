@@ -190,7 +190,6 @@ public class ClientPacketEncoder {
 		return roomList;
 	}
 
-	// The Serious Part II
 	/**
 	 * Decode GameState from bytes in MSG_S_ROOM_GAMESTATE format. The first
 	 * three bytes in the destination byte array are reserved for message type

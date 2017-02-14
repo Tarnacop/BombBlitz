@@ -18,7 +18,7 @@ public class ServerRoom {
 	// max number of players allowed in the room (in the range [2,4])
 	private byte maxPlayer = 4;
 	// flag indicating whether the game is in progress
-	private boolean inGame = false;
+	// private boolean inGame = false;
 	// the map ID
 	private int mapID = 0;
 	// the game session
@@ -149,7 +149,7 @@ public class ServerRoom {
 	 *         (possibly due to invalid mapID)
 	 */
 	public boolean createGame() {
-		// TODO check whether the game is created successfully
+		// TODO check whether the game is created successfully with this mapID
 		this.game = new ServerGame(this.mapID);
 		return true;
 	}
@@ -160,17 +160,7 @@ public class ServerRoom {
 	 * @return true if there is a game in progress
 	 */
 	public boolean isInGame() {
-		return inGame;
-	}
-
-	/**
-	 * Set whether there is a game in progress
-	 * 
-	 * @param inGame
-	 *            true if a game is in progress
-	 */
-	public void setInGame(boolean inGame) {
-		this.inGame = inGame;
+		return game.isInGame();
 	}
 
 	/**

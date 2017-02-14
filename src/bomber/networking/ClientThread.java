@@ -21,7 +21,10 @@ public class ClientThread implements Runnable {
 
 	private final InetSocketAddress serverSockAddr;
 
-	// optional: wrap the variables below into a configuration object
+	/*
+	 * optional: wrap the variables below into a configuration object when there
+	 * are too many
+	 */
 	// time out value for server
 	// currently 25 seconds only, for testing
 	private long serverTimeOut = 25;
@@ -88,6 +91,15 @@ public class ClientThread implements Runnable {
 		serverInfo = new ClientServerInfo(serverSockAddr);
 	}
 
+	/**
+	 * Create a Runnable client object for use as a thread
+	 * 
+	 * @param hostname
+	 *            the host name of the server
+	 * @param port
+	 *            the UDP port of the server
+	 * @throws SocketException
+	 */
 	public ClientThread(String hostname, int port) throws SocketException {
 		// this.hostname = hostname;
 		// this.port = port;
@@ -117,6 +129,7 @@ public class ClientThread implements Runnable {
 			Instant now = Instant.now();
 			if (now.getEpochSecond() - serverInfo.getTimeStamp() > serverTimeOut) {
 				pClient("keepAliveTask: warning, connection to server possibly timeout, set connected to false");
+
 				// TODO do something when server timeout
 				setConnected(false);
 
@@ -658,6 +671,34 @@ public class ClientThread implements Runnable {
 
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_ROOM_LEAVE, true);
+	}
+
+	/**
+	 * Tell the server whether the client is ready to start the game(when it is
+	 * in a room). A game will be started by the server when all the clients in
+	 * the room are ready to play
+	 * 
+	 * @param readyToPlay
+	 *            true if the player is ready to play, false otherwise
+	 * @throws IOException
+	 */
+	public synchronized void readyToPlay(boolean readyToPlay) throws IOException {
+		if (!inRoom) {
+			pClient("warning: client is possibly not in a room yet");
+		}
+
+		byte ready = 0;
+		if (readyToPlay) {
+			ready = 1;
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ready);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_READYTOPLAY, true);
 	}
 
 	/**

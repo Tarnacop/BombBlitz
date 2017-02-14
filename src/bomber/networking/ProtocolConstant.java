@@ -71,10 +71,15 @@ public class ProtocolConstant {
 	// public static final byte MSG_C_LOBBY_SENDTEXT = 0x09;
 
 	// In room
-	public static final byte MSG_C_ROOM_LEAVE = 0x0a;
+	public static final byte MSG_C_ROOM_LEAVE = 0x0a; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room ID
 
-	public static final byte MSG_C_ROOM_READYTOPLAY = 0x0b;
+	public static final byte MSG_C_ROOM_READYTOPLAY = 0x0b; // Bit set
+	/*
+	 * 1 byte message type + 2 byte sequence + 4 byte room ID + 1 byte boolean
+	 * readtToPlay flag
+	 */
+
 	public static final byte MSG_C_ROOM_SETINFO = 0x0c;
 	public static final byte MSG_C_ROOM_GETINFO = 0x0d;
 
@@ -170,9 +175,12 @@ public class ProtocolConstant {
 	 */
 
 	public static final byte MSG_S_ROOM_GAMESTART = 0x4f;
+	// 1 byte message type + 2 byte sequence + 4 byte room id
 
 	public static final byte MSG_S_ROOM_GAMESTATE = 0x50;
+	// TODO need to document the format of this message
 
 	public static final byte MSG_S_ROOM_GAMEOVER = 0x51;
+	// 1 byte message type + 2 byte sequence + 4 byte room id
 
 }

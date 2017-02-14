@@ -186,7 +186,6 @@ public class ServerPacketEncoder {
 		return len;
 	}
 
-	// The Serious Part I
 	/**
 	 * Encode GameState into MSG_S_ROOM_GAMESTATE format. The first three bytes
 	 * in the destination byte array are reserved for message type and sequence
@@ -536,7 +535,7 @@ public class ServerPacketEncoder {
 		// game state test
 		Player testPlayer = new Player("testPlayer", new Point(64, 64), 100, 300, null);
 		testPlayer.getKeyState().setBomb(true);
-		testPlayer.getKeyState().setMovement(Movement.UP);
+		testPlayer.getKeyState().setMovement(Movement.RIGHT);
 		ArrayList<Player> testPlayerList = new ArrayList<Player>();
 		testPlayerList.add(testPlayer);
 

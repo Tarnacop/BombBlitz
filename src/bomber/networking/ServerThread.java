@@ -457,7 +457,7 @@ public class ServerThread implements Runnable {
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT, true);
 
-			// TODO send room info MSG_S_ROOM_ROOMINFO to client
+			// TODO send room info MSG_S_ROOM_ROOMINFO to this client
 
 			break;
 		}
@@ -503,15 +503,15 @@ public class ServerThread implements Runnable {
 				return;
 			}
 
-			// check whether the room has a game in progress
-			if (room.isInGame()) {
+			// check whether the room is full
+			if (room.getPlayerList().size() >= room.getMaxPlayer()) {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 				return;
 			}
 
-			// check whether the room is full
-			if (room.getPlayerList().size() >= room.getMaxPlayer()) {
+			// check whether the room has a game in progress
+			if (room.isInGame()) {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 				return;
@@ -528,7 +528,8 @@ public class ServerThread implements Runnable {
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT, true);
 
-			// TODO send room info MSG_S_ROOM_ROOMINFO to client
+			// TODO send room info MSG_S_ROOM_ROOMINFO to all clients in this
+			// room
 
 			break;
 
@@ -541,9 +542,10 @@ public class ServerThread implements Runnable {
 				pServer("failed to decode room leave request from " + sockAddr);
 				return;
 			}
+
 			int roomID = recvByteBuffer.getInt(3);
 			if (roomID < 0) {
-				pServer("Client bug: roomID should not be negative");
+				pServer("Bug: roomID should not be negative");
 			}
 
 			// check whether the client is already in a room
@@ -558,31 +560,127 @@ public class ServerThread implements Runnable {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
 				return;
-			} else {
-				// when the client is in room
-				ServerRoom room = client.getRoom();
-				if (room == null) {
-					pServer("Bug: room should not be null in this situation");
+			}
+
+			// when the client is in room
+			ServerRoom room = client.getRoom();
+			if (room == null) {
+				pServer("Bug: room should not be null in this situation");
+				return;
+			}
+
+			/*
+			 * check whether the room ID in request matches the room ID on
+			 * server side
+			 */
+			if (roomID != room.getID()) {
+				pServerf("roomID mismatch: %d(request) != %d(server)\n", roomID, room.getID());
+
+				sendByteBuffer.putInt(3, room.getID());
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
+				return;
+			}
+
+			// remove the client from room
+			removeClientFromRoom(client);
+			// TODO is the client also in game ?
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+			sendPacket(p, ProtocolConstant.MSG_S_ROOM_HAVELEFT, true);
+
+			// TODO send room info MSG_S_ROOM_ROOMINFO to other clients
+
+			break;
+
+		}
+
+		case ProtocolConstant.MSG_C_ROOM_READYTOPLAY: {
+			pServer("readyToPlay request from " + sockAddr);
+
+			if (packet.getLength() < 8) {
+				pServer("failed to decode readyToPlay request from " + sockAddr);
+				return;
+			}
+
+			int roomID = recvByteBuffer.getInt(3);
+			if (roomID < 0) {
+				pServer("Bug: roomID should not be negative");
+			}
+
+			boolean readyToPlay = recvByteBuffer.get(7) == 1;
+
+			// check whether the client is already in a room
+			ServerClientInfo client = clientTable.get(sockAddr);
+			if (client == null) {
+				pServer("Bug: client should not be null in this situation");
+				return;
+			}
+
+			// when the client is not in room already
+			if (!client.isInRoom()) {
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
+				return;
+			}
+
+			// when the client is in room
+			ServerRoom room = client.getRoom();
+			if (room == null) {
+				pServer("Bug: room should not be null in this situation");
+				return;
+			}
+
+			/*
+			 * check whether the room ID in request matches the room ID on
+			 * server side
+			 */
+			if (roomID != room.getID()) {
+				pServerf("roomID mismatch: %d(request) != %d(server)\n", roomID, room.getID());
+
+				sendByteBuffer.putInt(3, room.getID());
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
+				return;
+			}
+
+			// update the client info
+			client.setReadyToPlay(readyToPlay);
+
+			// TODO send room info MSG_S_ROOM_ROOMINFO to all clients in
+			// this room
+
+			// check whether the game can be started
+			if (!room.isInGame()) {
+				// create the game according to the map ID of the room
+				if (!room.createGame()) {
+					pServerf("failed to create game with map ID %d\n", room.getMapID());
+					// TODO tell clients this error
 					return;
 				}
 
-				/*
-				 * check whether the room ID in request matches the room ID on
-				 * server side
-				 */
-				if (roomID != room.getID()) {
-					pServerf("roomID mismatch: %d(request) != %d(server)\n", roomID, room.getID());
-
-					sendByteBuffer.putInt(3, room.getID());
-					DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
-					sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
+				// at least 2 players required to start the game
+				if (room.getPlayerNumber() < 2) {
+					// TODO tell this client this error
 					return;
-				} else {
-					// remove the client from room
-					removeClientFromRoom(client);
+				}
 
-					DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
-					sendPacket(p, ProtocolConstant.MSG_S_ROOM_HAVELEFT, true);
+				// if all clients in this room are ready, start the game
+				boolean shouldStartGame = true;
+				for (ServerClientInfo c : room.getPlayerList()) {
+					if (c == null) {
+						pServer("Bug: playerList should not contain null clients");
+					} else {
+						shouldStartGame = c.isReadyToPlay() && shouldStartGame;
+					}
+				}
+
+				if (shouldStartGame) {
+					/*
+					 * TODO ServerGame should be responsible for subsequent
+					 * communication between clients in this particular game
+					 * session(game start, game state and game over messages)
+					 */
+					// room.getGame().start();
 				}
 			}
 
