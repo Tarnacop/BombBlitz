@@ -22,7 +22,7 @@ import bomber.physics.PhysicsEngine;
  * The Class RouteFinder.
  * For finding different routes and planning.
  */
-public class RouteFinder2 {
+public class RouteFinder {
 
 	/** The game state. */
 	private GameState state;
@@ -46,7 +46,7 @@ public class RouteFinder2 {
 	 * @param safetyCh
 	 *            the safety checker
 	 */
-	public RouteFinder2(GameState state, GameAI gameAI, SafetyChecker safetyCh) {
+	public RouteFinder(GameState state, GameAI gameAI, SafetyChecker safetyCh) {
 		this.state = state;
 		this.gameAI = gameAI;
 		this.safetyCh = safetyCh;
@@ -464,15 +464,7 @@ public class RouteFinder2 {
 	private LinkedList<AIActions> getPathWithBombs(LinkedList<AIActions> movesWithoutObstacles, Point position) {
 
 		// copy the real map
-		//Block[][] map = Arrays.stream(getMap()).map(Block[]::clone).toArray(Block[][]::new);
-		Block[][] map2 = getMap();
-		// copy the real map
-		Block[][] map = new Block[map2.length][map2[0].length];//Arrays.stream(getMap()).map(Block[]::clone).toArray(Block[][]::new);
-
-
-		for (int x = 0; x < map2.length; x++)
-			for (int y = 0; y < map2[0].length; y++)
-				map[x][y] = map2[x][y];
+		Block[][] map = Arrays.stream(getMap()).map(Block[]::clone).toArray(Block[][]::new);
 
 		// TODO finish not implemented
 		LinkedList<AIActions> realMoves = new LinkedList<>();
