@@ -11,6 +11,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import bomber.game.Block;
 import bomber.game.Game;
@@ -20,11 +21,17 @@ import bomber.game.Response;
 
 public class UserInterface extends Application{
 
-	private static String appName;
+	private String appName, playerName;
+	private Stage currentStage;
+	private VBox pane1, pane2;
+	private Scene scene1, scene2;
+	private Button startBtn;
+	private Button backBtn;
+	private Scene previousScene;
 	
 	public UserInterface(String appName){
 		
-		UserInterface.appName = appName;
+		this.appName = appName;
 		launch();
 	}
 	
@@ -35,35 +42,70 @@ public class UserInterface extends Application{
 	@Override
 	public void start(Stage primaryStage){
 
-		primaryStage.setTitle(UserInterface.appName);
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
- 
-            @Override
-            public void handle(ActionEvent event) {
-                
-            	List<Map> maps = Maps.getMaps();
-            	System.out.println("Got maps");
-            	Map map1 = maps.get(0);
-            	System.out.println("Got map");
-        		HashMap<Response, Integer> keymap = new HashMap<Response, Integer>();
-        		keymap.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
-        		keymap.put(Response.UP_MOVE, GLFW_KEY_UP);
-        		keymap.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
-        		keymap.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
-        		keymap.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);
-        		
-            	beginGame(map1, "player1", keymap);
-            }
-        });
-        
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        primaryStage.setScene(new Scene(root, 300, 250));
+		this.currentStage = primaryStage;
+		primaryStage.setTitle(this.appName);
+        startBtn = new Button();
+        startBtn.setText("Next scene");
+        startBtn.setOnAction(e -> advance(e, scene1));
+        backBtn = new Button();
+        backBtn.setText("Back");
+        backBtn.setOnAction(e -> previous(e));
+        pane1 = new VBox(); 
+        pane2 = new VBox();
+        //StackPane root = new StackPane();
+        pane1.getChildren().add(startBtn);
+        pane2.getChildren().add(backBtn);
+        scene1 = new Scene(pane1, 300, 250);
+        scene2 = new Scene(pane2, 300, 250);
+        primaryStage.setScene(scene1);
         primaryStage.show();
 	}
 
+	private void previous(ActionEvent e) {
+		
+		double x = this.currentStage.getWidth();
+		double y = this.currentStage.getHeight();
+		
+		this.currentStage.setScene(this.previousScene);
+		this.previousScene = null;
+		
+		this.currentStage.setWidth(x);
+		this.currentStage.setHeight(y);
+	}
+	
+	private void advance(ActionEvent e, Scene previousScene) {
+		
+		double x = this.currentStage.getWidth();
+		double y = this.currentStage.getHeight();
+		
+		this.currentStage.setScene(scene2);
+		this.previousScene = previousScene;
+		
+		this.currentStage.setWidth(x);
+		this.currentStage.setHeight(y);
+	}
+
+	public void setName(){
+		
+	}
+	
+	public void setControls(){
+		
+		HashMap<Response, Integer> keymap = new HashMap<Response, Integer>();
+		keymap.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
+		keymap.put(Response.UP_MOVE, GLFW_KEY_UP);
+		keymap.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
+		keymap.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
+		keymap.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);
+		
+	}
+	
+	public void setMap(){
+		
+		List<Map> maps = Maps.getMaps();
+    	Map map1 = maps.get(0);
+	}
+	
 	public void beginGame(Map map, String playerName, HashMap<Response, Integer> keymap) {
 		
 		Game game = new Game(map, playerName, keymap);
