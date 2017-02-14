@@ -26,7 +26,9 @@ public class Player {
 		this.lives = lives;
 		this.speed = speed;
 		this.bombRange = 3; //setting the initial bomb range
+
 		this.maxNrOfBombs = 1;
+
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
 		this.gridPos = new Point();
