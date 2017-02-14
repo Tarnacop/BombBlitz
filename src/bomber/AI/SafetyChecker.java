@@ -79,7 +79,7 @@ public class SafetyChecker {
 			newPosition = playerPos;
 			break;
 		}
-		return !positionSafety(newPosition);
+		return !positionSafety(newPosition) && getMap()[newPosition.x][newPosition.y] != Block.BLAST;
 	}
 
 	/**
@@ -123,14 +123,14 @@ public class SafetyChecker {
 		Point temp = bomb.getGridPos();
 		int bombX = temp.x;
 		int bombY = temp.y;
-		for (int i = 1; i <= bomb.getRadius(); i++) {
+		for (int i = 1; i < bomb.getRadius(); i++) {
 			points.add(new Point((bombX - i), bombY));
 			points.add(new Point((bombX + i), bombY));
 			points.add(new Point(bombX, (bombY - i)));
 			points.add(new Point(bombX, (bombY + i)));
 
 		}
-		
+//		System.out.println(points);
 //		Block[][] map = getMap();
 		int x, y;
 		for (int i = 0; i < points.size(); i++) {
@@ -156,9 +156,10 @@ public class SafetyChecker {
 		Point playerPos = gameAI.getGridPos();
 		int bombRange = gameAI.getBombRange();
 		for (Player p : state.getPlayers()) {
-			if (p == gameAI)
+			if (p.equals(gameAI))
 				continue;
-			if (isStraightDistance(playerPos, p.getGridPos(), bombRange))
+			
+			if (isStraightDistance(playerPos, p.getGridPos(), bombRange) || p.getGridPos().equals(gameAI.getGridPos()))
 				return true;
 
 		}
@@ -179,7 +180,7 @@ public class SafetyChecker {
 			int sign = 1;
 			if (p1.y < p2.y)
 				sign = -1;
-			for (int i = 1; i <= range; i++) {
+			for (int i = 1; i < range; i++) {
 				if (map[p2.x][p2.y + sign * i] == Block.SOFT || map[p2.x][p2.y + sign * i] == Block.SOLID)
 					return false;
 				else if ((p1.y == p2.y + sign * i))
@@ -191,7 +192,7 @@ public class SafetyChecker {
 			int sign = 1;
 			if (p1.x < p2.x)
 				sign = -1;
-			for (int i = 1; i <= range; i++) {
+			for (int i = 1; i < range; i++) {
 				if (map[p2.x + sign * i][p2.y] == Block.SOFT || map[p2.x + sign * i][p2.y] == Block.SOLID)
 					return false;
 				else if ((p1.x == p2.x + sign * i))
