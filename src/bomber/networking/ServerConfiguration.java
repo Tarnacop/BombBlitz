@@ -7,6 +7,8 @@ public class ServerConfiguration {
 
 	private final long retransmitInterval;
 
+	private int tickRate;
+
 	private int maxRetransmitCount;
 
 	private final int maxPlayer;
@@ -33,9 +35,17 @@ public class ServerConfiguration {
 	 */
 	public ServerConfiguration(long clientTimeOut, long keepAliveInterval, long retransmitInterval,
 			int maxRetransmitCount, int maxPlayer) {
-		this.clientTimeOut = clientTimeOut;
-		this.keepAliveInterval = keepAliveInterval;
-		this.retransmitInterval = retransmitInterval;
+		setClientTimeOut(clientTimeOut);
+		if (keepAliveInterval < 1) {
+			this.keepAliveInterval = 10;
+		} else {
+			this.keepAliveInterval = keepAliveInterval;
+		}
+		if (retransmitInterval < 1) {
+			this.retransmitInterval = 500;
+		} else {
+			this.retransmitInterval = retransmitInterval;
+		}
 		this.maxRetransmitCount = maxRetransmitCount;
 		if (maxPlayer < 1 || maxPlayer > 32) {
 			this.maxPlayer = 32;
@@ -58,7 +68,7 @@ public class ServerConfiguration {
 	 *            [1,32]
 	 */
 	public ServerConfiguration(long clientTimeOut, int maxRetransmitCount, int maxPlayer) {
-		this.clientTimeOut = clientTimeOut;
+		setClientTimeOut(clientTimeOut);
 		this.keepAliveInterval = 10;
 		this.retransmitInterval = 500;
 		this.maxRetransmitCount = maxRetransmitCount;
@@ -72,13 +82,14 @@ public class ServerConfiguration {
 	/**
 	 * Construct a configuration for the server before running, with default
 	 * clientTimeOut 25 seconds, keepAliveInterval 10 seconds,
-	 * retransmitInterval 500 milliseconds, maxRetransmitCount 10 and maxPlayer
-	 * 32
+	 * retransmitInterval 500 milliseconds, tickRate 30, maxRetransmitCount 10
+	 * and maxPlayer 32
 	 */
 	public ServerConfiguration() {
 		this.clientTimeOut = 25;
 		this.keepAliveInterval = 10;
 		this.retransmitInterval = 500;
+		this.tickRate = 30;
 		this.maxRetransmitCount = 10;
 		this.maxPlayer = 32;
 	}
@@ -103,7 +114,11 @@ public class ServerConfiguration {
 	 *            the max time allowed in *seconds*
 	 */
 	public void setClientTimeOut(long clientTimeOut) {
-		this.clientTimeOut = clientTimeOut;
+		if (clientTimeOut < 1) {
+			this.clientTimeOut = 25;
+		} else {
+			this.clientTimeOut = clientTimeOut;
+		}
 	}
 
 	/**
@@ -126,6 +141,29 @@ public class ServerConfiguration {
 	}
 
 	/**
+	 * Get the tick rate at which the game will run
+	 * 
+	 * @return the tick rate
+	 */
+	public int getTickRate() {
+		return tickRate;
+	}
+
+	/**
+	 * Set the tick rate at which the game will run
+	 * 
+	 * @param tickRate
+	 *            the tick rate in the range [1,1000]
+	 */
+	public void setTickRate(int tickRate) {
+		if (tickRate < 1 || tickRate > 1000) {
+			this.tickRate = 30;
+		} else {
+			this.tickRate = tickRate;
+		}
+	}
+
+	/**
 	 * The max number of times the server will attempt to retransmit an
 	 * unacknowledged packet
 	 * 
@@ -143,7 +181,11 @@ public class ServerConfiguration {
 	 *            the max number of attempts
 	 */
 	public void setMaxRetransmitCount(int maxRetransmitCount) {
-		this.maxRetransmitCount = maxRetransmitCount;
+		if (maxRetransmitCount < 0) {
+			this.maxRetransmitCount = 10;
+		} else {
+			this.maxRetransmitCount = maxRetransmitCount;
+		}
 	}
 
 	/**

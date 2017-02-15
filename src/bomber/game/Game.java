@@ -89,9 +89,13 @@ public class Game implements GameInterface {
 
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
-			Player ai = new GameAI("   dasda", new Point(768,128), 1, 300, gameState, new Mesh(32, 32, colours));
+
+			Player ai = new GameAI("player", new Point(64,64), 3, 300, gameState, new Mesh(32, 32, colours));
+//			Player ai2 = new GameAI("   dasda", new Point(832,832), 3, 300, gameState, new Mesh(32, 32, colours));
 			list.add(ai);
+//			list.add(ai2);
 			ai.begin();
+//			ai2.begin();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -107,7 +111,7 @@ public class Game implements GameInterface {
 		// this.player.getKeyState().getMovement());
 		// System.out.println(this.gameState.getPlayers().get(0).getKeyState().toString());
 		this.physics.update((int) (interval * 1000));
-		// System.out.println(this.gameState);
+		 System.out.println(this.gameState);
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 		List<Player> players = this.gameState.getPlayers();
