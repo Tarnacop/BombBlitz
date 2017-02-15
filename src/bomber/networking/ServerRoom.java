@@ -1,3 +1,4 @@
+
 package bomber.networking;
 
 import java.util.ArrayList;
@@ -11,15 +12,18 @@ public class ServerRoom {
 	// id of the room, uniqueness required
 	private int id;
 	// name of the room, uniqueness required
-	private String name;
+	private String name = null;
 	// list of players in the room
 	private ArrayList<ServerClientInfo> playerList = new ArrayList<ServerClientInfo>(4);
 	// max number of players allowed in the room (in the range [2,4])
 	private byte maxPlayer = 4;
 	// flag indicating whether the game is in progress
-	private boolean inGame = false;
+	// private boolean inGame = false;
+	// the map ID
+	private int mapID = 0;
 	// the game session
-	private ServerGame game;
+	private ServerGame game = null;
+	// TODO consistency between constructor, getter, setter and game's mapID
 
 	/**
 	 * Construct a room
@@ -28,14 +32,17 @@ public class ServerRoom {
 	 *            the name of the room
 	 * @param firstPlayer
 	 *            the player who created this room
+	 * @param mapID
+	 *            the initial map ID of the room
 	 */
-	public ServerRoom(String name, ServerClientInfo firstPlayer) {
+	public ServerRoom(String name, ServerClientInfo firstPlayer, int mapID) {
 		if (name == null) {
 			this.name = "Room " + id;
 		} else {
 			this.name = name;
 		}
 		playerList.add(firstPlayer);
+		this.mapID = mapID;
 	}
 
 	/**
@@ -48,8 +55,10 @@ public class ServerRoom {
 	 * @param maxPlayer
 	 *            the max number of players allowed in this room(in the range
 	 *            [2,4])
+	 * @param mapID
+	 *            the initial map ID of the room
 	 */
-	public ServerRoom(String name, ServerClientInfo firstPlayer, byte maxPlayer) {
+	public ServerRoom(String name, ServerClientInfo firstPlayer, byte maxPlayer, int mapID) {
 		if (name == null) {
 			this.name = "Room " + id;
 		} else {
@@ -59,6 +68,7 @@ public class ServerRoom {
 		if (maxPlayer >= 2 && maxPlayer <= 4) {
 			this.setMaxPlayer(maxPlayer);
 		}
+		this.mapID = mapID;
 	}
 
 	/**
@@ -70,6 +80,7 @@ public class ServerRoom {
 	public ServerRoom(ServerClientInfo firstPlayer) {
 		this.name = "Room " + id;
 		playerList.add(firstPlayer);
+		this.mapID = 0;
 	}
 
 	/**
@@ -132,13 +143,15 @@ public class ServerRoom {
 	}
 
 	/**
-	 * Set the current game of the room
+	 * Create a new game for the room with the current mapID
 	 * 
-	 * @param game
-	 *            the current game
+	 * @return true if a new game is created successfully, false otherwise
+	 *         (possibly due to invalid mapID)
 	 */
-	public void setGame(ServerGame game) {
-		this.game = game;
+	public boolean createGame() {
+		// TODO check whether the game is created successfully with this mapID
+		this.game = new ServerGame(this.mapID);
+		return true;
 	}
 
 	/**
@@ -147,17 +160,7 @@ public class ServerRoom {
 	 * @return true if there is a game in progress
 	 */
 	public boolean isInGame() {
-		return inGame;
-	}
-
-	/**
-	 * Set whether there is a game in progress
-	 * 
-	 * @param inGame
-	 *            true if a game is in progress
-	 */
-	public void setInGame(boolean inGame) {
-		this.inGame = inGame;
+		return game.isInGame();
 	}
 
 	/**
@@ -182,6 +185,11 @@ public class ServerRoom {
 		}
 
 		if (player == null) {
+			return;
+		}
+
+		if (playerList.contains(player)) {
+			System.err.println("Unexpected addPlayer(): Player is already in the list");
 			return;
 		}
 
@@ -218,6 +226,25 @@ public class ServerRoom {
 		if (maxPlayer >= 2 && maxPlayer <= 4) {
 			this.maxPlayer = maxPlayer;
 		}
+	}
+
+	/**
+	 * Get the map ID of the room
+	 * 
+	 * @return the map ID
+	 */
+	public int getMapID() {
+		return this.mapID;
+	}
+
+	/**
+	 * Set the map ID of the room
+	 * 
+	 * @param mapID
+	 *            the map ID
+	 */
+	public void setMapID(int mapID) {
+		this.mapID = mapID;
 	}
 
 }

@@ -19,19 +19,25 @@ import java.util.concurrent.TimeUnit;
 public class ClientThread implements Runnable {
 	private final PrintStream printStream;
 
-	// private String hostname;
-	// private int port;
 	private final InetSocketAddress serverSockAddr;
 
-	// TODO wrap the variables below into a configuration object
+	/*
+	 * optional: wrap the variables below into a configuration object when there
+	 * are too many
+	 */
 	// time out value for server
 	// currently 25 seconds only, for testing
 	private long serverTimeOut = 25;
+	// the interval at which the client will test whether the connection is
+	// timeout
 	private long keepAliveInterval = 10;
+	// the interval at which the client will request the latest list of players
+	// and rooms from the server
+	private long listRequestInterval = 10;
 	// unacknowledged packets will be detected and retransmitted every 500ms
 	private long retransmitInterval = 500;
 	// maximum number of retransmissions per packet
-	private int maxRetransmitCount = 10;
+	private int maxRetransmitCount = 20;
 
 	// the socket for client
 	private final DatagramSocket socket;
@@ -41,6 +47,10 @@ public class ClientThread implements Runnable {
 
 	// whether the connection has been established
 	private boolean connected = false;
+
+	// whether the client is in room(a client can either in lobby or in room)
+	private boolean inRoom = false;
+	private int roomID = -1;
 
 	// list of players connected to the server
 	private List<ClientServerPlayer> playerList = new ArrayList<ClientServerPlayer>();
@@ -81,6 +91,15 @@ public class ClientThread implements Runnable {
 		serverInfo = new ClientServerInfo(serverSockAddr);
 	}
 
+	/**
+	 * Create a Runnable client object for use as a thread
+	 * 
+	 * @param hostname
+	 *            the host name of the server
+	 * @param port
+	 *            the UDP port of the server
+	 * @throws SocketException
+	 */
 	public ClientThread(String hostname, int port) throws SocketException {
 		// this.hostname = hostname;
 		// this.port = port;
@@ -102,15 +121,17 @@ public class ClientThread implements Runnable {
 		// set up tasks
 		// server keep alive task
 		Runnable keepAliveTask = () -> {
-			if (!connected) {
+			if (!isConnected()) {
+				setInRoom(false, -1);
 				return;
 			}
 
 			Instant now = Instant.now();
 			if (now.getEpochSecond() - serverInfo.getTimeStamp() > serverTimeOut) {
-				pClient("keepAliveTask: warning, server possibly timeout, set connected to false");
+				pClient("keepAliveTask: warning, connection to server possibly timeout, set connected to false");
+
 				// TODO do something when server timeout
-				connected = false;
+				setConnected(false);
 
 			} else {
 				// send a ping packet
@@ -121,13 +142,37 @@ public class ClientThread implements Runnable {
 				} catch (IOException e) {
 					pClient("keepAliveTask: " + e);
 				}
-
 			}
 		};
 		scheduledExecutor.scheduleWithFixedDelay(keepAliveTask, keepAliveInterval, keepAliveInterval, TimeUnit.SECONDS);
+
+		// player list and room request task
+		Runnable listRequestTask = () -> {
+			if (!isConnected()) {
+				setInRoom(false, -1);
+				return;
+			}
+
+			// request room list only when the client is in lobby
+			if (isInLobby()) {
+				try {
+					this.updateRoomList();
+				} catch (IOException e) {
+					pClient("listRequestTask: " + e);
+				}
+			}
+
+			// request player list
+			try {
+				this.updatePlayerList();
+			} catch (IOException e) {
+				pClient("listRequestTask: " + e);
+			}
+		};
+		scheduledExecutor.scheduleWithFixedDelay(listRequestTask, 0, listRequestInterval, TimeUnit.SECONDS);
+
 		// server packet acknowledgement checking and retransmission task
 		Runnable retransmitTask = () -> {
-
 			ArrayList<PacketHistoryEntry> packetList = serverInfo.getPacketHistoryList();
 			for (PacketHistoryEntry f : packetList) {
 				if (f != null && !f.isAcked() && f.getRetransmissionCount() < maxRetransmitCount) {
@@ -142,7 +187,6 @@ public class ClientThread implements Runnable {
 					}
 				}
 			}
-
 		};
 		scheduledExecutor.scheduleWithFixedDelay(retransmitTask, retransmitInterval, retransmitInterval,
 				TimeUnit.MILLISECONDS);
@@ -197,7 +241,8 @@ public class ClientThread implements Runnable {
 			pClient("connection has been accepted by the server");
 
 			// TODO do something
-			connected = true;
+			setConnected(true);
+			setInRoom(false, -1);
 
 			break;
 		}
@@ -206,7 +251,7 @@ public class ClientThread implements Runnable {
 			pClient("connection has been rejected by the server");
 
 			// TODO do something
-			connected = false;
+			setConnected(false);
 
 			break;
 		}
@@ -215,7 +260,7 @@ public class ClientThread implements Runnable {
 			pClient("you have already connected to the server");
 
 			// TODO do something
-			connected = true;
+			setConnected(true);
 
 			break;
 		}
@@ -224,7 +269,7 @@ public class ClientThread implements Runnable {
 			pClient("you have not connected to the server, setting connected to false");
 
 			// TODO do something
-			connected = false;
+			setConnected(false);
 
 			break;
 		}
@@ -233,7 +278,7 @@ public class ClientThread implements Runnable {
 			pClient("you have disconnected from the server, setting connected to false");
 
 			// TODO do something
-			connected = false;
+			setConnected(false);
 
 			break;
 		}
@@ -268,7 +313,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_LOBBY_PLAYERLIST: {
-			pClient("received player list from server");
+			// pClient("received player list from server");
 
 			try {
 				playerList = ClientPacketEncoder.decodePlayerList(recvBuffer, packet.getLength());
@@ -281,7 +326,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_LOBBY_ROOMLIST: {
-			pClient("received room list from server");
+			// pClient("received room list from server");
 
 			try {
 				roomList = ClientPacketEncoder.decodeRoomList(recvBuffer, packet.getLength());
@@ -293,8 +338,69 @@ public class ClientThread implements Runnable {
 			break;
 		}
 
+		case ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT: {
+			// this message must contain a room ID
+			if (packet.getLength() < 7) {
+				return;
+			}
+
+			int roomID = recvByteBuffer.getInt(3);
+			if (roomID < 0) {
+				pClient("Server bug, roomID should not be negative");
+				return;
+			}
+
+			pClient("room creation/join has been accepted, room ID: " + roomID);
+
+			setInRoom(true, roomID);
+
+			// TODO do something
+
+			break;
+		}
+
 		case ProtocolConstant.MSG_S_LOBBY_ROOMREJECT: {
-			pClient("room creation has been rejected by the server");
+			pClient("room creation/join has been rejected by the server");
+
+			// TODO do something
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_S_LOBBY_NOTINROOM: {
+			pClient("you are not in a room");
+
+			setInRoom(false, -1);
+
+			// TODO do something
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_S_ROOM_ALREADYINROOM: {
+			if (packet.getLength() < 7) {
+				return;
+			}
+
+			int roomID = recvByteBuffer.getInt(3);
+			if (roomID < 0) {
+				pClient("Server bug, roomID should not be negative");
+				return;
+			}
+
+			pClient("you are already in room with ID " + roomID);
+
+			setInRoom(true, roomID);
+
+			// TODO do something
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_S_ROOM_HAVELEFT: {
+			pClient("you have left the room");
+
+			setInRoom(false, -1);
 
 			// TODO do something
 
@@ -362,11 +468,37 @@ public class ClientThread implements Runnable {
 		printStream.printf("Client: " + string, args);
 	}
 
+	private synchronized void setConnected(boolean isConnected) {
+		if (isConnected) {
+			this.connected = true;
+		} else {
+			this.connected = false;
+			setInRoom(false, -1);
+		}
+	}
+
+	private synchronized void setInRoom(boolean inRoom, int roomID) {
+		if (inRoom) {
+			this.inRoom = true;
+			this.roomID = roomID;
+		} else {
+			this.inRoom = false;
+			this.roomID = -1;
+		}
+	}
+
 	public synchronized void sendRaw(byte[] data) throws IOException {
 		DatagramPacket packet = new DatagramPacket(data, data.length, serverSockAddr);
 		socket.send(packet);
 	}
 
+	/**
+	 * Send a connection request to the server with a nickname
+	 * 
+	 * @param name
+	 *            the nickname to use
+	 * @throws IOException
+	 */
 	public synchronized void connect(String name) throws IOException {
 		// ignore null or empty name
 		if (name == null || name.length() < 1) {
@@ -384,36 +516,111 @@ public class ClientThread implements Runnable {
 		sendPacket(p, ProtocolConstant.MSG_C_NET_CONNECT, true);
 	}
 
+	/**
+	 * Send a request to the server for the latest list of players
+	 * 
+	 * @throws IOException
+	 */
 	public synchronized void updatePlayerList() throws IOException {
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_GETPLAYERLIST, true);
 	}
 
+	/**
+	 * Send a request to the server for the latest list of rooms
+	 * 
+	 * @throws IOException
+	 */
 	public synchronized void updateRoomList() throws IOException {
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_GETROOMLIST, true);
 	}
 
+	/**
+	 * Send a disconnection request to the server
+	 * 
+	 * @throws IOException
+	 */
 	public synchronized void disconnect() throws IOException {
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_NET_DISCONNECT, true);
 	}
 
+	/**
+	 * Tell whether the client has connected to the server
+	 * 
+	 * @return true if the client has connected to the server
+	 */
 	public boolean isConnected() {
 		return connected;
 	}
 
+	/**
+	 * Tell whether the client is in a room
+	 * 
+	 * @return true if the client is in a room, false if the client is in lobby
+	 */
+	public boolean isInRoom() {
+		return inRoom;
+	}
+
+	/**
+	 * Tell whether the client is in lobby
+	 * 
+	 * @return true if the client is in lobby, false if the client is in a room
+	 */
+	public boolean isInLobby() {
+		return !inRoom;
+	}
+
+	/**
+	 * Get the latest list of players received from the server. Client will also
+	 * automatically request the list periodically
+	 * 
+	 * @return a list of ClientServerPlayer objects
+	 */
 	public List<ClientServerPlayer> getPlayerList() {
 		return playerList;
 	}
 
+	/**
+	 * Get the latest list of rooms received from the server. Client will also
+	 * automatically request the list periodically when it is NOT in a room(when
+	 * it is in lobby)
+	 * 
+	 * @return a list of ClientServerLobbyRoom objects
+	 */
 	public List<ClientServerLobbyRoom> getRoomList() {
 		return roomList;
 	}
 
+	/**
+	 * Get the ID of the room the client is currently in
+	 * 
+	 * @return a non-negative room ID, or -1 when the client is not in a room
+	 */
+	public int getRoomID() {
+		if (!inRoom) {
+			roomID = -1;
+		}
+
+		return roomID;
+	}
+
+	/**
+	 * Send a room creation request to the server
+	 * 
+	 * @param roomName
+	 *            the name of the room
+	 * @param maxPlayer
+	 *            the max number of players in the room
+	 * @param mapID
+	 *            the ID of the map
+	 * @throws IOException
+	 */
 	public synchronized void createRoom(String roomName, byte maxPlayer, int mapID) throws IOException {
 		if (roomName == null || roomName.length() < 1) {
-			throw new IOException("name cannot be null or zero length");
+			throw new IOException("name cannot be null or have zero length");
 		}
 		byte[] nameData = roomName.getBytes("UTF-8");
 
@@ -428,6 +635,76 @@ public class ClientThread implements Runnable {
 		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_CREATEROOM, true);
 	}
 
+	/**
+	 * Send a room join request to the server
+	 * 
+	 * @param roomID
+	 *            the ID of the room
+	 * @throws IOException
+	 */
+	public synchronized void joinRoom(int roomID) throws IOException {
+		if (inRoom) {
+			pClient("warning: client is possibly already in a room");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(roomID);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_JOINROOM, true);
+	}
+
+	/**
+	 * Send a room leave request to the server
+	 * 
+	 * @throws IOException
+	 */
+	public synchronized void leaveRoom() throws IOException {
+		if (!inRoom) {
+			pClient("warning: client is possibly already not in a room");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_LEAVE, true);
+	}
+
+	/**
+	 * Tell the server whether the client is ready to start the game(when it is
+	 * in a room). A game will be started by the server when all the clients in
+	 * the room are ready to play
+	 * 
+	 * @param readyToPlay
+	 *            true if the player is ready to play, false otherwise
+	 * @throws IOException
+	 */
+	public synchronized void readyToPlay(boolean readyToPlay) throws IOException {
+		if (!inRoom) {
+			pClient("warning: client is possibly not in a room yet");
+		}
+
+		byte ready = 0;
+		if (readyToPlay) {
+			ready = 1;
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ready);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_READYTOPLAY, true);
+	}
+
+	/**
+	 * Terminate the thread. It is advisable to leave the room and disconnect
+	 * from server first
+	 */
 	public synchronized void exit() {
 		socket.close();
 	}
