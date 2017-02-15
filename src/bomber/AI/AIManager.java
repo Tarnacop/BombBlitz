@@ -55,6 +55,7 @@ public class AIManager extends Thread {
 	 */
 	public void run() {
 		move();
+		System.out.println("AI Stopped.");
 	}
 
 	/**
