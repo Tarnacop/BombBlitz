@@ -10,6 +10,6 @@ public class main {
 		
 		Maps maps = new Maps();
 		UserInterface ui = new UserInterface("Bomb Blitz v1");
-		Game game = new Game(maps.getMaps().get(1), "Player 1", new HashMap<Response, Integer>());
+//		Game game = new Game(maps.getMaps().get(1), "Player 1", new HashMap<Response, Integer>());
 	}
 }
