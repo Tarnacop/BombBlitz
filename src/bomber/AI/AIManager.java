@@ -126,9 +126,9 @@ public class AIManager extends Thread {
 	 * @return true, if needs to stop moving
 	 */
 	private boolean checkIfReachedDestination(Point currentPixel, Point updatedFinalPixelPos) {
-		boolean check = (currentPixel.x - updatedFinalPixelPos.x) <= (scalar - playerSize);
+		boolean check = (currentPixel.x - updatedFinalPixelPos.x) < (scalar - playerSize);
 		check &= (updatedFinalPixelPos.x <= currentPixel.x);
-		check &= (currentPixel.y - updatedFinalPixelPos.y) <= (scalar - playerSize);
+		check &= (currentPixel.y - updatedFinalPixelPos.y) < (scalar - playerSize);
 		check &= (updatedFinalPixelPos.y <= currentPixel.y);
 		return !check;
 	}
@@ -239,32 +239,37 @@ public class AIManager extends Thread {
 
 			// if AI is in danger then find the escape route
 			if (safetyCh.inDanger()) {
+				System.out.println("Danger");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
+				
 			}
 			
 //			//if enemy is in range and it is possible to place bomb and escape then do it
-			else if((moves = finder.canPutBombAndEscape()) != null){
-				gameAI.getKeyState().setBomb(true);
-				performMoves(moves, true);
-			}
+//			else if((moves = finder.canPutBombAndEscape()) != null){
+//				System.out.println("Bomb");
+//				gameAI.getKeyState().setBomb(true);
+//				performMoves(moves, true);
+//			}
 //			
 			
 			
 			// if enemy is in bomb range then place the bomb and go to the
 ////			// safe location
-//			else if (safetyCh.isEnemyInBombRange()) {
-//				gameAI.getKeyState().setBomb(true);
-//				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-//				performMoves(moves, true);
-//			}
+			else if (safetyCh.isEnemyInBombRange()) {
+				gameAI.getKeyState().setBomb(true);
+				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+				performMoves(moves, true);
+			}
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemy()) != null) {
+				System.out.println("Track");
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy and fullfill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
+				System.out.println("Plan");
 				performPlannedMoves(moves);
 			}
 
