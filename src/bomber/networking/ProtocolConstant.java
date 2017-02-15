@@ -181,7 +181,7 @@ public class ProtocolConstant {
 	public static final byte MSG_S_ROOM_GAMESTART = 0x4f; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room id
 
-	public static final byte MSG_S_ROOM_GAMESTATE = 0x50; // Bit not
+	public static final byte MSG_S_ROOM_GAMESTATE = 0x50; // Bit not set
 	// TODO need to document the format of this message
 
 	public static final byte MSG_S_ROOM_GAMEOVER = 0x51; // Bit set

@@ -65,6 +65,12 @@ public class ClientThread implements Runnable {
 	// list of rooms in the server lobby
 	private List<ClientServerLobbyRoom> roomList = new ArrayList<ClientServerLobbyRoom>();
 
+	// last received game state will be here
+	private GameState gameState = null;
+
+	// list of client network event listeners
+	private List<ClientNetInterface> netList = new ArrayList<ClientNetInterface>();
+
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
 	private final byte[] recvBuffer = new byte[recvBufferLen];
@@ -139,6 +145,10 @@ public class ClientThread implements Runnable {
 
 				// TODO do something when server timeout
 				setConnected(false);
+
+				for (ClientNetInterface e : netList) {
+					e.disconnected();
+				}
 
 			} else {
 				// send a ping packet
@@ -227,8 +237,6 @@ public class ClientThread implements Runnable {
 		SocketAddress sockAddr = packet.getSocketAddress();
 
 		if (sockAddr.equals(serverSockAddr)) {
-			// pClient("received message from " + sockAddr + " with length " +
-			// packet.getLength());
 			serverInfo.updateTimeStamp();
 		} else {
 			pClient("Unexpected packet from " + sockAddr);
@@ -248,47 +256,69 @@ public class ClientThread implements Runnable {
 
 		switch (messageType) {
 		case ProtocolConstant.MSG_S_NET_ACCEPT: {
-			pClient("Connection has been accepted by the server");
+			// pClient("Connection has been accepted by the server");
 
 			// TODO do something
 			setConnected(true);
 			setInRoom(false, -1);
 
+			for (ClientNetInterface e : netList) {
+				e.connectionAccepted();
+			}
+
 			break;
 		}
 
 		case ProtocolConstant.MSG_S_NET_REJECT: {
-			pClient("Connection has been rejected by the server");
+			// pClient("Connection has been rejected by the server");
 
 			// TODO do something
 			setConnected(false);
+
+			for (ClientNetInterface e : netList) {
+				e.connectionRejected();
+			}
 
 			break;
 		}
 
 		case ProtocolConstant.MSG_S_NET_ALREADYCONNECTED: {
-			pClient("You have already connected to the server");
+			// pClient("You have already connected to the server");
 
 			// TODO do something
 			setConnected(true);
+
+			for (ClientNetInterface e : netList) {
+				e.alreadyConnected();
+			}
 
 			break;
 		}
 
 		case ProtocolConstant.MSG_S_NET_NOTCONNECTED: {
-			pClient("You have not connected to the server, setting connected to false");
+			// pClient("You have not connected to the server, setting connected
+			// to false");
 
 			// TODO do something
 			setConnected(false);
+
+			for (ClientNetInterface e : netList) {
+				e.notConnected();
+			}
 
 			break;
 		}
 
 		case ProtocolConstant.MSG_S_NET_DISCONNECTED: {
-			pClient("You have disconnected from the server, setting connected to false");
+			// pClient("You have disconnected from the server, setting connected
+			// to false");
 
 			// TODO do something
 			setConnected(false);
+
+			for (ClientNetInterface e : netList) {
+				e.disconnected();
+			}
 
 			break;
 		}
@@ -330,6 +360,11 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
+			// TODO
+			for (ClientNetInterface e : netList) {
+				e.playerListReceived();
+			}
+
 			break;
 		}
 
@@ -339,6 +374,11 @@ public class ClientThread implements Runnable {
 			} catch (IOException e) {
 				pClient("Failed to decode room list: " + e);
 				return;
+			}
+
+			// TODO
+			for (ClientNetInterface e : netList) {
+				e.roomListReceived();
 			}
 
 			break;
@@ -356,29 +396,39 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			pClient("Room creation/join has been accepted, room ID: " + roomID);
+			// pClient("Room creation/join has been accepted, room ID: " +
+			// roomID);
 
 			setInRoom(true, roomID);
 
 			// TODO do something
+			for (ClientNetInterface e : netList) {
+				e.roomAccepted();
+			}
 
 			break;
 		}
 
 		case ProtocolConstant.MSG_S_LOBBY_ROOMREJECT: {
-			pClient("Room creation/join has been rejected by the server");
+			// pClient("Room creation/join has been rejected by the server");
 
 			// TODO do something
+			for (ClientNetInterface e : netList) {
+				e.roomRejected();
+			}
 
 			break;
 		}
 
 		case ProtocolConstant.MSG_S_LOBBY_NOTINROOM: {
-			pClient("You are not in a room");
+			// pClient("You are not in a room");
 
 			setInRoom(false, -1);
 
 			// TODO do something
+			for (ClientNetInterface e : netList) {
+				e.notInRoom();
+			}
 
 			break;
 		}
@@ -394,21 +444,27 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			pClient("You are already in room with ID " + roomID);
+			// pClient("You are already in room with ID " + roomID);
 
 			setInRoom(true, roomID);
 
 			// TODO do something
+			for (ClientNetInterface e : netList) {
+				e.alreadyInRoom();
+			}
 
 			break;
 		}
 
 		case ProtocolConstant.MSG_S_ROOM_HAVELEFT: {
-			pClient("You have left the room");
+			// pClient("You have left the room");
 
 			setInRoom(false, -1);
 
 			// TODO do something
+			for (ClientNetInterface e : netList) {
+				e.haveLeftRoom();
+			}
 
 			break;
 		}
@@ -424,12 +480,15 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			pClient("Game has started in room with ID " + roomID);
+			// pClient("Game has started in room with ID " + roomID);
 
 			setInRoom(true, roomID);
 			setInGame(true);
 
 			// TODO do something
+			for (ClientNetInterface e : netList) {
+				e.gameStarted();
+			}
 
 			break;
 		}
@@ -445,7 +504,6 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			GameState gameState = null;
 			try {
 				gameState = ClientPacketEncoder.decodeGameState(recvBuffer, packet.getLength());
 			} catch (IOException e) {
@@ -453,10 +511,13 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			pClient("Received game state for room with ID " + roomID);
-			pClient(gameState.toString());
+			// pClient("Received game state for room with ID " + roomID);
+			// pClient(gameState.toString());
 
 			// TODO do something
+			for (ClientNetInterface e : netList) {
+				e.gameStateReceived();
+			}
 
 			break;
 		}
@@ -472,12 +533,15 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			pClient("Game has ended in room with ID " + roomID);
+			// pClient("Game has ended in room with ID " + roomID);
 
 			setInRoom(true, roomID);
 			setInGame(false);
 
 			// TODO do something
+			for (ClientNetInterface e : netList) {
+				e.gameEnded();
+			}
 
 			break;
 		}
@@ -573,6 +637,41 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
+	 * Add a client network event listener
+	 * 
+	 * @param i
+	 *            the client network event listener to be added
+	 */
+	public synchronized void addNetListener(ClientNetInterface i) {
+		if (i == null) {
+			return;
+		}
+
+		netList.add(i);
+	}
+
+	/**
+	 * Remove a client network event listener
+	 * 
+	 * @param i
+	 *            the client network event listener to be removed
+	 */
+	public synchronized void removeNetListener(ClientNetInterface i) {
+		if (i == null) {
+			return;
+		}
+
+		netList.remove(i);
+	}
+
+	/**
+	 * Remove all client network event listeners
+	 */
+	public synchronized void removeAllNetListener() {
+		netList.removeIf(e -> true);
+	}
+
+	/**
 	 * Send a connection request to the server with a nickname
 	 * 
 	 * @param name
@@ -663,7 +762,7 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
-	 * Get the latest list of players received from the server. Client will also
+	 * Get the last list of players received from the server. Client will also
 	 * automatically request the list periodically
 	 * 
 	 * @return a list of ClientServerPlayer objects
@@ -673,7 +772,7 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
-	 * Get the latest list of rooms received from the server. Client will also
+	 * Get the last list of rooms received from the server. Client will also
 	 * automatically request the list periodically when it is NOT in a room(when
 	 * it is in lobby)
 	 * 
@@ -681,6 +780,16 @@ public class ClientThread implements Runnable {
 	 */
 	public List<ClientServerLobbyRoom> getRoomList() {
 		return roomList;
+	}
+
+	/**
+	 * Get the last received game state from the server. Note that a "null" will
+	 * be returned if the client has not received any game state from the server
+	 * 
+	 * @return a GameState
+	 */
+	public GameState getGameState() {
+		return gameState;
 	}
 
 	/**

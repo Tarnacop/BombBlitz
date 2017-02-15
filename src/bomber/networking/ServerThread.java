@@ -393,7 +393,7 @@ public class ServerThread implements Runnable {
 			}
 			byte maxPlayer = recvByteBuffer.get();
 			int mapID = recvByteBuffer.getInt();
-			pServerf("Decoded room creation request from %s: Room name: %s, Max player limit: %d, Map ID: %d\n",
+			pServerf("Room creation request from %s: Room name: %s, Max player limit: %d, Map ID: %d\n",
 					sockAddr, roomName, maxPlayer, mapID);
 
 			// check whether maxPlayer is in the range [2,4]
@@ -454,14 +454,14 @@ public class ServerThread implements Runnable {
 				return;
 			}
 			int roomID = recvByteBuffer.getInt(3);
-			if (roomID < 0) {
-				pServer("Client bug: roomID should not be negative");
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
-				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
-				return;
-			}
+			/*
+			 * if (roomID < 0) { pServer(
+			 * "Client bug: roomID should not be negative"); DatagramPacket p =
+			 * new DatagramPacket(sendBuffer, 0, 3, sockAddr); sendPacket(p,
+			 * ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true); return; }
+			 */
 
-			pServerf("Decoded room join request from %s, room ID: %d\n", sockAddr, roomID);
+			pServerf("Room join request from %s, room ID: %d\n", sockAddr, roomID);
 
 			// check whether the client is already in a room
 			ServerClientInfo client = clientTable.get(sockAddr);
@@ -528,9 +528,10 @@ public class ServerThread implements Runnable {
 			}
 
 			int roomID = recvByteBuffer.getInt(3);
-			if (roomID < 0) {
-				pServer("Bug: roomID should not be negative");
-			}
+			/*
+			 * if (roomID < 0) { pServer("Bug: roomID should not be negative");
+			 * }
+			 */
 
 			pServerf("Room leave request from %s, room ID: %d\n", sockAddr, roomID);
 
@@ -541,7 +542,7 @@ public class ServerThread implements Runnable {
 				return;
 			}
 
-			// when the client is not in room already
+			// when the client is not in room yet
 			if (!client.isInRoom()) {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
@@ -587,9 +588,10 @@ public class ServerThread implements Runnable {
 			}
 
 			int roomID = recvByteBuffer.getInt(3);
-			if (roomID < 0) {
-				pServer("Bug: roomID should not be negative");
-			}
+			/*
+			 * if (roomID < 0) { pServer("Bug: roomID should not be negative");
+			 * }
+			 */
 
 			boolean readyToPlay = recvByteBuffer.get(7) == 1;
 
@@ -602,7 +604,7 @@ public class ServerThread implements Runnable {
 				return;
 			}
 
-			// when the client is not in room already
+			// when the client is not in room yet
 			if (!client.isInRoom()) {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
@@ -688,9 +690,10 @@ public class ServerThread implements Runnable {
 			}
 
 			int roomID = recvByteBuffer.getInt(3);
-			if (roomID < 0) {
-				pServer("Bug: roomID should not be negative");
-			}
+			/*
+			 * if (roomID < 0) { pServer("Bug: roomID should not be negative");
+			 * }
+			 */
 
 			short keyState = recvByteBuffer.getShort(7);
 			KeyboardState keyboardState = ServerPacketEncoder.shortToKeyboardState(keyState);
@@ -705,7 +708,7 @@ public class ServerThread implements Runnable {
 				return;
 			}
 
-			// when the client is not in room already
+			// when the client is not in room yet
 			if (!client.isInRoom()) {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
