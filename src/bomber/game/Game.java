@@ -85,17 +85,17 @@ public class Game implements GameInterface {
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
 			ArrayList<Player> list = new ArrayList<Player>();
-//			list.add(this.player);
+			list.add(this.player);
 
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
 
 			Player ai = new GameAI("player", new Point(64,64), 3, 300, gameState, new Mesh(32, 32, colours));
-			Player ai2 = new GameAI("   dasda", new Point(832,832), 3, 300, gameState, new Mesh(32, 32, colours));
+//			Player ai2 = new GameAI("   dasda", new Point(832,832), 3, 300, gameState, new Mesh(32, 32, colours));
 			list.add(ai);
-			list.add(ai2);
+//			list.add(ai2);
 			ai.begin();
-			ai2.begin();
+//			ai2.begin();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
