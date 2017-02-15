@@ -8,13 +8,10 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -22,7 +19,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import bomber.game.Block;
 import bomber.game.Game;
@@ -35,25 +31,29 @@ public class UserInterface extends Application{
 	private String appName;
 	private SimpleStringProperty playerName;
 	private Stage currentStage;
-	private VBox mainMenu, settingsMenu, keyMenu, multiMenu, singleMenu;
-	private Scene mainScene, settingsScene, keyScene, multiScene, singleScene;
-	private TextField nameText;
+	private VBox mainMenu, settingsMenu, keyMenu, multiMenu, serverMenu, singleMenu;
+	private Scene mainScene, settingsScene, keyScene, multiScene, serverScene, singleScene;
+	private TextField nameText, ipText;
 	private Button nameBtn, singleBtn, multiBtn, settingsBtn, controlsBtn, audioBtn, graphicsBtn, startBtn;
 	private Button backBtn1, backBtn2, backBtn3, backBtn4;
 	private Button rightMapToggle, leftMapToggle, upAiToggle, downAiToggle;
+	private Button connectBtn;
 	private Stack<Scene> previousScenes;
 	private HashMap<Response, Integer> controls;
 	private Map map;
 	private Label displayName;
 	private Label displayMap;
 	private SimpleStringProperty mapName;
+	private Label currentNameLabel;
+	private Label currentMapLabel;
+	private TextField portNum;
 	
 	public UserInterface(){
 		//for JavaFX
-		this.playerName = new SimpleStringProperty("Current Name:\nPlayer 1");
+		this.playerName = new SimpleStringProperty("Player 1");
 		Maps maps = new Maps();
 		this.map = maps.getMaps().get(0);
-		this.mapName = new SimpleStringProperty("Current Map:\n" + this.map.getName());
+		this.mapName = new SimpleStringProperty(this.map.getName());
 		this.controls = new HashMap<Response, Integer>();
 		this.controls.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
 		this.controls.put(Response.UP_MOVE, GLFW_KEY_UP);
@@ -64,7 +64,8 @@ public class UserInterface extends Application{
 	}
 	
 	public static void begin(){
-		launch();
+
+        launch();
 	}
 
 	@Override
@@ -77,18 +78,26 @@ public class UserInterface extends Application{
         settingsMenu = new VBox();
         keyMenu = new VBox();
         multiMenu = new VBox();
+        serverMenu = new VBox();
         singleMenu = new VBox();
         
         mainScene = new Scene(mainMenu, 300, 250);
         settingsScene = new Scene(settingsMenu, 300, 250);
         keyScene = new Scene(keyMenu, 300, 250);
         multiScene = new Scene(multiMenu, 300, 250);
+        serverScene = new Scene(serverMenu, 300, 250);
         singleScene = new Scene(singleMenu, 300, 250);
         
         previousScenes = new Stack<Scene>();
         
         nameText = new TextField("Enter Name");
+        ipText = new TextField("Enter IP Address");
+        portNum = new TextField("Enter Port Number");
         
+        connectBtn = new Button("Connect");
+        connectBtn.setOnAction(e -> connect(ipText.getText(), Integer.parseInt(portNum.getText())));
+        
+        currentNameLabel = new Label("Current Name:");
         displayName = new Label();
         displayName.textProperty().bind(this.playerName);
         
@@ -128,6 +137,7 @@ public class UserInterface extends Application{
         
         graphicsBtn = new Button("Graphics Options");
         
+        currentMapLabel = new Label("Current Map:");
         displayMap = new Label();
         displayMap.textProperty().bind(this.mapName);
         
@@ -139,16 +149,30 @@ public class UserInterface extends Application{
         
         downAiToggle = new Button("v");
         
-        addElements(mainMenu, displayName, nameText, nameBtn, singleBtn, multiBtn, settingsBtn);
+        addElements(mainMenu, currentNameLabel, displayName, nameText, nameBtn, singleBtn, multiBtn, settingsBtn);
         addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
         addElements(keyMenu, backBtn2);
-        addElements(singleMenu, leftMapToggle, displayMap, rightMapToggle, upAiToggle, downAiToggle, startBtn, backBtn3);
-        addElements(multiMenu, backBtn4);
+        addElements(singleMenu, leftMapToggle, currentMapLabel, displayMap, rightMapToggle, upAiToggle, downAiToggle, startBtn, backBtn3);
+        addElements(multiMenu, ipText, portNum, connectBtn, backBtn4);
         
         primaryStage.setScene(mainScene);
         primaryStage.show();
 	}
 	
+	private void resetFields(){
+		
+		nameText.setText("Enter Name");
+		ipText.setText("Enter IP Address");
+		portNum.setText("Enter Port Number");
+	}
+	
+	private void connect(String text, int port) {
+		
+		System.out.println("Attempting connection to: " + text + ", port = " + port);
+		
+		
+	}
+
 	private void addElements(Pane pane, Node... elems){
 		
 		for(Node node : elems){
@@ -177,17 +201,13 @@ public class UserInterface extends Application{
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
+		
+		resetFields();
 	}
 
 	public void setName(String string){
 		
-		System.out.println("Set name to " + string);
-		this.playerName.set("Current Name:\n" + string);
-	}
-	
-	public void setControls(){
-		
-		this.controls = null;
+		this.playerName.set(string);
 	}
 	
 	public void beginGame(Map map, String playerName, HashMap<Response, Integer> controls) {
