@@ -201,6 +201,13 @@ public class ServerPacketEncoder {
 	 * @return the number of bytes of the encoded data in the byte array
 	 * @throws IOException
 	 */
+	/**
+	 * @param gameState
+	 * @param roomID
+	 * @param dest
+	 * @return
+	 * @throws IOException
+	 */
 	public static int encodeGameState(GameState gameState, int roomID, byte[] dest) throws IOException {
 		if (gameState == null || dest == null) {
 			throw new IOException("table or dest is null");
@@ -292,10 +299,15 @@ public class ServerPacketEncoder {
 			throw new IOException("bombList is null");
 		}
 
-		if (bombList.size() < 0 || bombList.size() > Byte.MAX_VALUE) {
-			throw new IOException("bombList size is not in the range [0,127]");
+		/*
+		 * if (bombList.size() < 0 || bombList.size() > Byte.MAX_VALUE) { throw
+		 * new IOException("bombList size is not in the range [0,127]"); }
+		 */
+		if (bombList.size() > Byte.MAX_VALUE) {
+			numBomb = Byte.MAX_VALUE;
+		} else {
+			numBomb = (byte) bombList.size();
 		}
-		numBomb = (byte) bombList.size();
 
 		for (Bomb b : bombList) {
 			if (b == null) {
@@ -303,7 +315,7 @@ public class ServerPacketEncoder {
 			}
 
 			if (b.getGridPos() == null || b.getPos() == null) {
-				throw new IOException("bomb has null fields");
+				throw new IOException("bomb has null position");
 			}
 		}
 
@@ -312,10 +324,15 @@ public class ServerPacketEncoder {
 			throw new IOException("audioEventList is null");
 		}
 
-		if (audioEventList.size() < 0 || audioEventList.size() > 16) {
-			throw new IOException("audioEventList size is not in the range [0,16]");
+		/*
+		 * if (audioEventList.size() < 0 || audioEventList.size() > 16) { throw
+		 * new IOException("audioEventList size is not in the range [0,16]"); }
+		 */
+		if (audioEventList.size() > 16) {
+			numAudioEvent = 16;
+		} else {
+			numAudioEvent = (byte) audioEventList.size();
 		}
-		numAudioEvent = (byte) audioEventList.size();
 
 		for (AudioEvent e : audioEventList) {
 			if (e == null) {
@@ -465,6 +482,34 @@ public class ServerPacketEncoder {
 		}
 
 		return dataLength;
+	}
+
+	/**
+	 * Convert short into KeyboardState
+	 * 
+	 * @param k
+	 *            the short
+	 * @return the KeyboardState
+	 */
+	public static KeyboardState shortToKeyboardState(short k) {
+		KeyboardState keyboardState = new KeyboardState();
+		keyboardState.setMovement(Movement.NONE);
+		keyboardState.setBomb(false);
+
+		if (BitArray.getBit(k, 0)) {
+			keyboardState.setMovement(Movement.NONE);
+		} else if (BitArray.getBit(k, 1)) {
+			keyboardState.setMovement(Movement.UP);
+		} else if (BitArray.getBit(k, 2)) {
+			keyboardState.setMovement(Movement.DOWN);
+		} else if (BitArray.getBit(k, 3)) {
+			keyboardState.setMovement(Movement.LEFT);
+		} else if (BitArray.getBit(k, 4)) {
+			keyboardState.setMovement(Movement.RIGHT);
+		}
+		keyboardState.setBomb(BitArray.getBit(k, 5));
+
+		return keyboardState;
 	}
 
 	// TODO Tests

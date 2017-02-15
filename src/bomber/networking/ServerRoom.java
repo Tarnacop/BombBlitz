@@ -2,6 +2,7 @@
 package bomber.networking;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -22,7 +23,7 @@ public class ServerRoom {
 	// the map ID
 	private int mapID = 0;
 	// the game session
-	private ServerGame game = null;
+	private ServerGame game;
 	// TODO consistency between constructor, getter, setter and game's mapID
 
 	/**
@@ -129,7 +130,7 @@ public class ServerRoom {
 	 * 
 	 * @return the list of players in the room
 	 */
-	public ArrayList<ServerClientInfo> getPlayerList() {
+	public List<ServerClientInfo> getPlayerList() {
 		return playerList;
 	}
 
@@ -145,13 +146,15 @@ public class ServerRoom {
 	/**
 	 * Create a new game for the room with the current mapID
 	 * 
-	 * @return true if a new game is created successfully, false otherwise
-	 *         (possibly due to invalid mapID)
+	 * @param tickRate
+	 *            the tick rate at which the game will run
+	 * @param serverThread
+	 *            the server thread used for sending packets
+	 * @return
 	 */
-	public boolean createGame() {
-		// TODO check whether the game is created successfully with this mapID
-		this.game = new ServerGame(this.mapID);
-		return true;
+	public boolean createGame(int tickRate, ServerThread serverThread) {
+		game = new ServerGame(id, mapID, playerList, tickRate, serverThread);
+		return game.isMapIDValid();
 	}
 
 	/**
@@ -160,6 +163,9 @@ public class ServerRoom {
 	 * @return true if there is a game in progress
 	 */
 	public boolean isInGame() {
+		if (game == null) {
+			return false;
+		}
 		return game.isInGame();
 	}
 
@@ -234,7 +240,7 @@ public class ServerRoom {
 	 * @return the map ID
 	 */
 	public int getMapID() {
-		return this.mapID;
+		return mapID;
 	}
 
 	/**

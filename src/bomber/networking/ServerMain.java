@@ -14,11 +14,13 @@ public class ServerMain {
 			System.exit(1);
 		}
 
+		ServerConfiguration config = new ServerConfiguration();
+
 		ServerThread server = null;
 		try {
-			server = new ServerThread(port);
+			server = new ServerThread(port, config);
 		} catch (SocketException e) {
-			System.err.println(e);
+			System.out.println(e);
 			System.exit(1);
 		}
 
@@ -29,15 +31,59 @@ public class ServerMain {
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			String[] cmds = line.split("\\s+");
-			if (cmds[0].equals("exit")) {
-				break;
+			if (cmds.length < 1) {
+
+				pInvalid();
+
+			} else if (cmds.length == 1) {
+
+				if (cmds[0].equals("exit")) {
+
+					break;
+
+				} else if (cmds[0].equals("tickrate")) {
+
+					System.out.println(config.getTickRate());
+
+				} else {
+
+					pInvalid();
+
+				}
+
+			} else if (cmds.length == 2) {
+
+				if (cmds[0].equals("tickrate")) {
+
+					int tickRate = config.getTickRate();
+					try {
+						tickRate = Integer.parseInt(cmds[1]);
+					} catch (NumberFormatException e) {
+						System.out.println("Failed to parse tick rate");
+						continue;
+					}
+
+					config.setTickRate(tickRate);
+
+				} else {
+
+					pInvalid();
+
+				}
+
 			} else {
-				System.out.println("Invalid command");
+
+				pInvalid();
+
 			}
 		}
+
 		scanner.close();
 
 		server.exit();
 	}
 
+	private static void pInvalid() {
+		System.out.println("Invalid command");
+	}
 }

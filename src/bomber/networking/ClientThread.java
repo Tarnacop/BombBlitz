@@ -16,6 +16,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import bomber.game.GameState;
+import bomber.game.KeyboardState;
+
 public class ClientThread implements Runnable {
 	private final PrintStream printStream;
 
@@ -51,6 +54,10 @@ public class ClientThread implements Runnable {
 	// whether the client is in room(a client can either in lobby or in room)
 	private boolean inRoom = false;
 	private int roomID = -1;
+
+	// whether the client is in game(a client must be in room when it is in
+	// game)
+	private boolean inGame = false;
 
 	// list of players connected to the server
 	private List<ClientServerPlayer> playerList = new ArrayList<ClientServerPlayer>();
@@ -128,7 +135,7 @@ public class ClientThread implements Runnable {
 
 			Instant now = Instant.now();
 			if (now.getEpochSecond() - serverInfo.getTimeStamp() > serverTimeOut) {
-				pClient("keepAliveTask: warning, connection to server possibly timeout, set connected to false");
+				pClient("keepAliveTask: Warning, connection to server is possibly timeout, setting connected to false");
 
 				// TODO do something when server timeout
 				setConnected(false);
@@ -168,6 +175,9 @@ public class ClientThread implements Runnable {
 			} catch (IOException e) {
 				pClient("listRequestTask: " + e);
 			}
+
+			// TODO request detailed room info when the client is in room
+
 		};
 		scheduledExecutor.scheduleWithFixedDelay(listRequestTask, 0, listRequestInterval, TimeUnit.SECONDS);
 
@@ -177,7 +187,7 @@ public class ClientThread implements Runnable {
 			for (PacketHistoryEntry f : packetList) {
 				if (f != null && !f.isAcked() && f.getRetransmissionCount() < maxRetransmitCount) {
 					pClientf(
-							"retransmitTask: retransmit packet %d created at %d with length %d and retransmission count %d to server %s\n",
+							"retransmitTask: Retransmitting packet %d created at %d with length %d and retransmission count %d to server %s\n",
 							f.getSequence(), f.getCreationTimeStamp(), f.getPacketLength(),
 							f.getRetransmissionCountAndIncrement(), serverSockAddr);
 					try {
@@ -204,7 +214,7 @@ public class ClientThread implements Runnable {
 				break;
 			}
 		}
-		pClient("exiting");
+		pClient("Exiting");
 		System.exit(0);
 	}
 
@@ -221,7 +231,7 @@ public class ClientThread implements Runnable {
 			// packet.getLength());
 			serverInfo.updateTimeStamp();
 		} else {
-			pClient("unexpected packet from " + sockAddr);
+			pClient("Unexpected packet from " + sockAddr);
 			return;
 		}
 
@@ -238,7 +248,7 @@ public class ClientThread implements Runnable {
 
 		switch (messageType) {
 		case ProtocolConstant.MSG_S_NET_ACCEPT: {
-			pClient("connection has been accepted by the server");
+			pClient("Connection has been accepted by the server");
 
 			// TODO do something
 			setConnected(true);
@@ -248,7 +258,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_NET_REJECT: {
-			pClient("connection has been rejected by the server");
+			pClient("Connection has been rejected by the server");
 
 			// TODO do something
 			setConnected(false);
@@ -257,7 +267,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_NET_ALREADYCONNECTED: {
-			pClient("you have already connected to the server");
+			pClient("You have already connected to the server");
 
 			// TODO do something
 			setConnected(true);
@@ -266,7 +276,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_NET_NOTCONNECTED: {
-			pClient("you have not connected to the server, setting connected to false");
+			pClient("You have not connected to the server, setting connected to false");
 
 			// TODO do something
 			setConnected(false);
@@ -275,7 +285,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_NET_DISCONNECTED: {
-			pClient("you have disconnected from the server, setting connected to false");
+			pClient("You have disconnected from the server, setting connected to false");
 
 			// TODO do something
 			setConnected(false);
@@ -313,12 +323,10 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_LOBBY_PLAYERLIST: {
-			// pClient("received player list from server");
-
 			try {
 				playerList = ClientPacketEncoder.decodePlayerList(recvBuffer, packet.getLength());
 			} catch (IOException e) {
-				pClient("failed to decode player list: " + e);
+				pClient("Failed to decode player list: " + e);
 				return;
 			}
 
@@ -326,12 +334,10 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_LOBBY_ROOMLIST: {
-			// pClient("received room list from server");
-
 			try {
 				roomList = ClientPacketEncoder.decodeRoomList(recvBuffer, packet.getLength());
 			} catch (IOException e) {
-				pClient("failed to decode room list: " + e);
+				pClient("Failed to decode room list: " + e);
 				return;
 			}
 
@@ -350,7 +356,7 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			pClient("room creation/join has been accepted, room ID: " + roomID);
+			pClient("Room creation/join has been accepted, room ID: " + roomID);
 
 			setInRoom(true, roomID);
 
@@ -360,7 +366,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_LOBBY_ROOMREJECT: {
-			pClient("room creation/join has been rejected by the server");
+			pClient("Room creation/join has been rejected by the server");
 
 			// TODO do something
 
@@ -368,7 +374,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_LOBBY_NOTINROOM: {
-			pClient("you are not in a room");
+			pClient("You are not in a room");
 
 			setInRoom(false, -1);
 
@@ -388,7 +394,7 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			pClient("you are already in room with ID " + roomID);
+			pClient("You are already in room with ID " + roomID);
 
 			setInRoom(true, roomID);
 
@@ -398,9 +404,78 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_ROOM_HAVELEFT: {
-			pClient("you have left the room");
+			pClient("You have left the room");
 
 			setInRoom(false, -1);
+
+			// TODO do something
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_S_ROOM_GAMESTART: {
+			if (packet.getLength() < 7) {
+				return;
+			}
+
+			int roomID = recvByteBuffer.getInt(3);
+			if (roomID < 0) {
+				pClient("Server bug, roomID should not be negative");
+				return;
+			}
+
+			pClient("Game has started in room with ID " + roomID);
+
+			setInRoom(true, roomID);
+			setInGame(true);
+
+			// TODO do something
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_S_ROOM_GAMESTATE: {
+			if (packet.getLength() < 7) {
+				return;
+			}
+
+			int roomID = recvByteBuffer.getInt(3);
+			if (roomID < 0) {
+				pClient("Server bug, roomID should not be negative");
+				return;
+			}
+
+			GameState gameState = null;
+			try {
+				gameState = ClientPacketEncoder.decodeGameState(recvBuffer, packet.getLength());
+			} catch (IOException e) {
+				pClient("Failed to decode game state");
+				return;
+			}
+
+			pClient("Received game state for room with ID " + roomID);
+			pClient(gameState.toString());
+
+			// TODO do something
+
+			break;
+		}
+
+		case ProtocolConstant.MSG_S_ROOM_GAMEOVER: {
+			if (packet.getLength() < 7) {
+				return;
+			}
+
+			int roomID = recvByteBuffer.getInt(3);
+			if (roomID < 0) {
+				pClient("Server bug, roomID should not be negative");
+				return;
+			}
+
+			pClient("Game has ended in room with ID " + roomID);
+
+			setInRoom(true, roomID);
+			setInGame(false);
 
 			// TODO do something
 
@@ -417,7 +492,7 @@ public class ClientThread implements Runnable {
 		}
 
 		default: {
-			pClient("default case: message type " + messageType);
+			pClient("Default case: message type " + String.format("0x%02x", messageType));
 		}
 
 		}
@@ -485,6 +560,11 @@ public class ClientThread implements Runnable {
 			this.inRoom = false;
 			this.roomID = -1;
 		}
+		setInGame(false);
+	}
+
+	private void setInGame(boolean inGame) {
+		this.inGame = inGame;
 	}
 
 	public synchronized void sendRaw(byte[] data) throws IOException {
@@ -574,6 +654,15 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
+	 * Tell whether the client is in a game
+	 * 
+	 * @return true if the client is in a game
+	 */
+	public boolean isInGame() {
+		return inGame;
+	}
+
+	/**
 	 * Get the latest list of players received from the server. Client will also
 	 * automatically request the list periodically
 	 * 
@@ -602,6 +691,7 @@ public class ClientThread implements Runnable {
 	public int getRoomID() {
 		if (!inRoom) {
 			roomID = -1;
+			inGame = false;
 		}
 
 		return roomID;
@@ -644,7 +734,7 @@ public class ClientThread implements Runnable {
 	 */
 	public synchronized void joinRoom(int roomID) throws IOException {
 		if (inRoom) {
-			pClient("warning: client is possibly already in a room");
+			pClient("Warning: client is possibly already in a room");
 		}
 
 		// prepare the buffer
@@ -662,7 +752,7 @@ public class ClientThread implements Runnable {
 	 */
 	public synchronized void leaveRoom() throws IOException {
 		if (!inRoom) {
-			pClient("warning: client is possibly already not in a room");
+			pClient("Warning: client is possibly already not in a room");
 		}
 
 		// prepare the buffer
@@ -684,7 +774,7 @@ public class ClientThread implements Runnable {
 	 */
 	public synchronized void readyToPlay(boolean readyToPlay) throws IOException {
 		if (!inRoom) {
-			pClient("warning: client is possibly not in a room yet");
+			pClient("Warning: client is possibly not in a room yet");
 		}
 
 		byte ready = 0;
@@ -701,9 +791,23 @@ public class ClientThread implements Runnable {
 		sendPacket(p, ProtocolConstant.MSG_C_ROOM_READYTOPLAY, true);
 	}
 
+	public synchronized void sendMove(KeyboardState keyboardState) throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly not in a room yet");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.putShort(ClientPacketEncoder.keyboardStateToShort(keyboardState));
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 2, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_GAME_SENDMOVE, false);
+	}
+
 	/**
 	 * Terminate the thread. It is advisable to leave the room and disconnect
-	 * from server first
+	 * from the server first
 	 */
 	public synchronized void exit() {
 		socket.close();
