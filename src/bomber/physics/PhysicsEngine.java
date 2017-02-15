@@ -91,7 +91,9 @@ public class PhysicsEngine
 
 
         // check for bomb placement
-        if(player.getKeyState().isBomb() && okToPlaceBomb.get(player.getName()))
+        System.out.println(player.getName());
+        if(player.getKeyState().isBomb() 
+        		&& okToPlaceBomb.get(player.getName()))
         {
             int bombCount = 0;
             for (Bomb bomb : gameState.getBombs())
