@@ -367,4 +367,39 @@ public class ClientPacketEncoder {
 		return gameState;
 	}
 
+	/**
+	 * Convert KeyboardState into short
+	 * 
+	 * @param k
+	 *            the KeyboardState object
+	 * @return the short
+	 */
+	public static short keyboardStateToShort(KeyboardState k) {
+		if (k == null) {
+			return 0;
+		}
+
+		Movement movement = k.getMovement();
+		boolean bomb = k.isBomb();
+		short keyState = 0;
+
+		if (movement == null || movement == Movement.NONE) {
+			keyState = BitArray.setBit(keyState, 0, true);
+		} else if (movement == Movement.UP) {
+			keyState = BitArray.setBit(keyState, 1, true);
+		} else if (movement == Movement.DOWN) {
+			keyState = BitArray.setBit(keyState, 2, true);
+		} else if (movement == Movement.LEFT) {
+			keyState = BitArray.setBit(keyState, 3, true);
+		} else if (movement == Movement.RIGHT) {
+			keyState = BitArray.setBit(keyState, 4, true);
+		}
+
+		if (bomb) {
+			keyState = BitArray.setBit(keyState, 5, true);
+		}
+
+		return keyState;
+	}
+
 }

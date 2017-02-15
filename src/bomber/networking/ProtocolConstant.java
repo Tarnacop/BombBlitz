@@ -87,7 +87,11 @@ public class ProtocolConstant {
 
 	// In game
 
-	public static final byte MSG_C_GAME_SENDMOVE = 0x0f;
+	public static final byte MSG_C_GAME_SENDMOVE = 0x0f; // Bit not set
+	/*
+	 * 1 byte message type + 2 byte sequence + 4 byte room ID + 2 byte keyboard
+	 * state
+	 */
 
 	// Server to Client message types
 	// Range from 0x40 to 0x7f (up to 64 types of message)
@@ -174,13 +178,13 @@ public class ProtocolConstant {
 	 * string + 1 byte isReadyToPlay flag)
 	 */
 
-	public static final byte MSG_S_ROOM_GAMESTART = 0x4f;
+	public static final byte MSG_S_ROOM_GAMESTART = 0x4f; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room id
 
-	public static final byte MSG_S_ROOM_GAMESTATE = 0x50;
+	public static final byte MSG_S_ROOM_GAMESTATE = 0x50; // Bit not
 	// TODO need to document the format of this message
 
-	public static final byte MSG_S_ROOM_GAMEOVER = 0x51;
+	public static final byte MSG_S_ROOM_GAMEOVER = 0x51; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room id
 
 }

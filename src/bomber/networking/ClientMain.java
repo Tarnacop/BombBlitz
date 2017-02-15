@@ -3,7 +3,10 @@ package bomber.networking;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
+
+import bomber.game.KeyboardState;
 
 public class ClientMain {
 
@@ -22,7 +25,7 @@ public class ClientMain {
 		try {
 			client = new ClientThread(hostname, port);
 		} catch (SocketException e) {
-			System.err.println(e);
+			System.out.println(e);
 			System.exit(1);
 		}
 
@@ -52,11 +55,11 @@ public class ClientMain {
 
 						client.disconnect();
 
-					} else if (cmds[0].equals("updateplayerlist")) {
+					} else if (cmds[0].equals("upl") || cmds[0].equals("updateplayerlist")) {
 
 						client.updatePlayerList();
 
-					} else if (cmds[0].equals("printplayerlist")) {
+					} else if (cmds[0].equals("players")) {
 
 						List<ClientServerPlayer> playerList = client.getPlayerList();
 						System.out.printf("Size: %d\n", playerList.size());
@@ -64,11 +67,11 @@ public class ClientMain {
 							System.out.printf("ID: %d, Name: %s\n", p.getID(), p.getName());
 						}
 
-					} else if (cmds[0].equals("updateroomlist")) {
+					} else if (cmds[0].equals("url") || cmds[0].equals("updateroomlist")) {
 
 						client.updateRoomList();
 
-					} else if (cmds[0].equals("printroomlist")) {
+					} else if (cmds[0].equals("rooms")) {
 
 						List<ClientServerLobbyRoom> roomList = client.getRoomList();
 						System.out.printf("Size: %d\n", roomList.size());
@@ -87,13 +90,24 @@ public class ClientMain {
 
 						System.out.println("inRoom: " + client.isInRoom());
 
-					} else if (cmds[0].equals("getroomid")) {
+					} else if (cmds[0].equals("roomid")) {
 
 						System.out.println("roomID: " + client.getRoomID());
 
 					} else if (cmds[0].equals("leaveroom")) {
 
 						client.leaveRoom();
+
+					} else if (cmds[0].equals("isingame")) {
+
+						System.out.println("inGame: " + client.isInGame());
+
+					} else if (cmds[0].equals("sendmove")) {
+
+						// TODO currently just send a random move
+						short random = (short) new Random().nextInt();
+						KeyboardState k = ServerPacketEncoder.shortToKeyboardState(random);
+						client.sendMove(k);
 
 					} else {
 
@@ -118,6 +132,14 @@ public class ClientMain {
 						}
 
 						client.joinRoom(roomID);
+
+					} else if (cmds[0].equals("ready")) {
+
+						if (cmds[1].equals("true")) {
+							client.readyToPlay(true);
+						} else {
+							client.readyToPlay(false);
+						}
 
 					} else if (cmds[0].equals("sendraw")) {
 
@@ -162,7 +184,7 @@ public class ClientMain {
 
 				}
 			} catch (IOException e) {
-				System.err.println(e);
+				System.out.println(e);
 				break;
 			}
 
@@ -174,7 +196,7 @@ public class ClientMain {
 	}
 
 	private static void pInvalid() {
-		System.err.println("Invalid command");
+		System.out.println("Invalid command");
 	}
 
 }
