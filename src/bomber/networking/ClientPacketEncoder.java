@@ -360,7 +360,7 @@ public class ClientPacketEncoder {
 			audioEventList.add(AudioEvent.PLAYER_DEATH);
 		}
 
-		GameState gameState = new GameState(new Map(gridMap), playerList);
+		GameState gameState = new GameState(new Map("map", gridMap), playerList);
 		gameState.setBombs(bombList);
 		gameState.setAudioEvents(audioEventList);
 

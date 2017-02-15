@@ -601,7 +601,7 @@ public class ServerPacketEncoder {
 				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
 				{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
 				{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
-		Map testMap = new Map(testGridMap);
+		Map testMap = new Map("test map", testGridMap);
 
 		GameState testGameState = new GameState(testMap, testPlayerList);
 
