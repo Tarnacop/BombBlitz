@@ -176,12 +176,15 @@ public class SafetyChecker {
 	 */
 	private boolean isStraightDistance(Point p1, Point p2, int range) {
 		Block[][] map = getMap();
-		if (p1.x == p2.x) {
+		
+		if( (p1.x == p2.x) && (p1.y == p2.y)) return true;
+		
+		else if (p1.x == p2.x) {
 			int sign = 1;
 			if (p1.y < p2.y)
 				sign = -1;
 			for (int i = 1; i < range; i++) {
-				if (map[p2.x][p2.y + sign * i] == Block.SOFT || map[p2.x][p2.y + sign * i] == Block.SOLID)
+				if ( map[p2.x][p2.y + sign * i] == Block.SOFT || map[p2.x][p2.y + sign * i] == Block.SOLID)
 					return false;
 				else if ((p1.y == p2.y + sign * i))
 					return true;
