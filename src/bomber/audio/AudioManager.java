@@ -38,11 +38,12 @@ public class AudioManager
     {
         music.unpause();
     }
-
-    public void stopMusic()
+    
+    public void stopAudio()
     {
-        music.pause();
+    	music.pause();
         music.interrupt();
+        effects.interrupt();
     }
 
     public void playEventList(List<AudioEvent> eventList)

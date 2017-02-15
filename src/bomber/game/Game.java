@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import bomber.AI.GameAI;
+import bomber.audio.AudioManager;
 import bomber.physics.PhysicsEngine;
 import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
@@ -27,6 +28,7 @@ public class Game implements GameInterface {
 	private boolean bombPressed;
 	private KeyboardInput input;
 	private Player player;
+	private AudioManager audio;
 
 	public Game(Map map, String playerName, HashMap<Response, Integer> controls) {
 
@@ -36,34 +38,8 @@ public class Game implements GameInterface {
 		this.bombPressed = false;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
-
-		// ClientThread client = null;
-		// try {
-		// client = new ClientThread("localhost", 1234);
-		// } catch (SocketException e1) {
-		// //Can't resolve hostname or port, or can't create socket
-		// e1.printStackTrace();
-		// }
-		//
-		// Thread networkThread = new Thread(client);
-		// networkThread.start();
-		//
-		// try {
-		// //connect to a lobby
-		// client.connect("nickname");
-		// //update my player list
-		// client.updatePlayerList();
-		// //get my player list
-		// List<ClientServerPlayer> playerList = client.getPlayerList();
-		// client.updateRoomList();
-		// //simple room to display in lobby
-		// List<ClientServerLobbyRoom> roomList = client.getRoomList();
-		// //TODO complex room desc
-		// client.createRoom("room name", (byte) 4, 0);
-		// } catch (IOException e1) {
-		// // TODO Auto-generated catch block
-		// e1.printStackTrace();
-		// }
+		audio = new AudioManager();
+		audio.playMusic();
 
 		try {
 			this.graphics = new Graphics("Bomb Blitz", 1200, 600, true, this);
@@ -80,7 +56,7 @@ public class Game implements GameInterface {
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
-			this.player = new Player(this.playerName, new Point(64, 64), 100, 300, new Mesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(64, 64), 10, 300, new Mesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
@@ -90,7 +66,7 @@ public class Game implements GameInterface {
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
 
-			Player ai = new GameAI("player", new Point(64,64), 3, 300, gameState, new Mesh(32, 32, colours));
+			Player ai = new GameAI("player", new Point(64,64), 1, 50, gameState, new Mesh(32, 32, colours));
 //			Player ai2 = new GameAI("   dasda", new Point(832,832), 3, 300, gameState, new Mesh(32, 32, colours));
 			list.add(ai);
 //			list.add(ai2);
@@ -106,6 +82,7 @@ public class Game implements GameInterface {
 	@Override
 	public void update(float interval) {
 
+		if(!this.player.isAlive()){dispose();return;}
 		// System.out.println(this.gameState);
 		// System.out.println(this.player.getKeyState().toString() + ": " +
 		// this.player.getKeyState().getMovement());
@@ -115,11 +92,10 @@ public class Game implements GameInterface {
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 		List<Player> players = this.gameState.getPlayers();
-		for(Player player : players){
-			
-//			System.out.println("Player " + player.toString() + " is alive: " + player.isAlive() + " with " + player.getLives() + "lives.");
-			//if(!player.isAlive())players.remove(player);
-		}
+		//for(Player player : players){
+		//	if(!player.isAlive())players.remove(player);
+		//}
+		audio.playEventList(gameState.getAudioEvents());
 	}
 
 	@Override
@@ -142,5 +118,8 @@ public class Game implements GameInterface {
 			player.setAlive(false);
 		}
 		renderer.dispose();
+		this.graphics.getScreen().close();
+		audio.stopAudio();
+		
 	}
 }

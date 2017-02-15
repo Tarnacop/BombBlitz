@@ -142,4 +142,9 @@ public class Graphics implements Runnable {
 		
 		gameLogic.dispose();
 	} // END OF dispose METHOD
+
+	public Screen getScreen() {
+		// TODO Auto-generated method stub
+		return this.screen;
+	}
 } // END OF Application

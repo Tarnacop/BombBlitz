@@ -6,8 +6,11 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 import javafx.application.Application;
@@ -25,8 +28,12 @@ import bomber.game.Game;
 import bomber.game.Map;
 import bomber.game.Maps;
 import bomber.game.Response;
+import bomber.networking.ClientNetInterface;
+import bomber.networking.ClientServerLobbyRoom;
+import bomber.networking.ClientServerPlayer;
+import bomber.networking.ClientThread;
 
-public class UserInterface extends Application{
+public class UserInterface extends Application implements ClientNetInterface{
 
 	private String appName;
 	private SimpleStringProperty playerName;
@@ -166,11 +173,39 @@ public class UserInterface extends Application{
 		portNum.setText("Enter Port Number");
 	}
 	
-	private void connect(String text, int port) {
+	private void connect(String hostName, int port) {
 		
-		System.out.println("Attempting connection to: " + text + ", port = " + port);
+		System.out.println("Attempting connection to: " + hostName + ", port = " + port);
 		
+		ClientThread client = null;
+		try {
+			client = new ClientThread(hostName, port);
+		} catch (SocketException e1) {
+			// Can't resolve hostname or port, or can't create socket
+			e1.printStackTrace();
+		}
+
+		client.addNetListener(this);
 		
+		Thread networkThread = new Thread(client);
+		networkThread.start();
+
+		try {
+			// connect to a lobby
+			client.connect("nickname");
+			// update my player list
+			client.updatePlayerList();
+			// get my player list
+			List<ClientServerPlayer> playerList = client.getPlayerList();
+			client.updateRoomList();
+			// simple room to display in lobby
+			List<ClientServerLobbyRoom> roomList = client.getRoomList();
+			// TODO complex room desc
+			client.createRoom("room name", (byte) 4, 0);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 	private void addElements(Pane pane, Node... elems){
@@ -224,5 +259,95 @@ public class UserInterface extends Application{
 		Map mapCopy = new Map(map.getName(), arrayCopy);
 		
 		Game game = new Game(mapCopy, playerName, controls);
+	}
+
+	@Override
+	public void disconnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void connectionAccepted() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void connectionRejected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void alreadyConnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void notConnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void playerListReceived() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void roomListReceived() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void roomAccepted() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void roomRejected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void notInRoom() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void alreadyInRoom() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void haveLeftRoom() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameStarted() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameStateReceived() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameEnded() {
+		// TODO Auto-generated method stub
+		
 	}
 }

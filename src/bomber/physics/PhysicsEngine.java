@@ -63,6 +63,8 @@ public class PhysicsEngine
 
     private void updatePlayer(Player player, int milliseconds)
     {
+    	if (!player.isAlive())
+    		return;
         int speed = (int) (milliseconds*player.getSpeed()/1000);
         Point pos = player.getPos();
         Movement movement = player.getKeyState().getMovement();
