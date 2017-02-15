@@ -265,12 +265,10 @@ public class AIManager extends Thread {
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemy()) != null) {
-				System.out.println("Track");
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy and fullfill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
-				System.out.println("Plan");
 				performPlannedMoves(moves);
 			}
 

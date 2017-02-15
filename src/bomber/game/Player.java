@@ -27,7 +27,7 @@ public class Player {
 		this.speed = speed;
 		this.bombRange = 3; //setting the initial bomb range
 
-		this.maxNrOfBombs = 1;
+		this.maxNrOfBombs = 2;
 
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
