@@ -9,9 +9,12 @@ public class Map {
 	private Block[][] gridMap;		//the grid representation of the map
 	private Block[][] pixelMap;		//the pixel representation of the map
 	private final int scalar = 64;
+	private int id;
+	private String name;
 	
-	public Map(Block[][] gridMap){
+	public Map(String name, Block[][] gridMap){
 		
+		this.name = name;
 		this.gridMap = gridMap;
 		
 		this.pixelMap = this.convertToPixel(gridMap);
@@ -127,4 +130,8 @@ public String toStringWithPlayersBombs(List<Player> players, List<Bomb> bombs){
 		
 		return s;
 	}
+
+public String getName() {
+	return this.name;
+}
 }

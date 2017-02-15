@@ -50,14 +50,14 @@ public class Maps {
 					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
 			{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID}};
 			
-		Map map1 = new Map(gridMap1);
-		Map map2 = new Map(gridMap2);
+		Map map1 = new Map("Level 1", gridMap1);
+		Map map2 = new Map("", gridMap2);
 		maps = new ArrayList<Map>();
 		maps.add(map1);
 		maps.add(map2);
 	}
 
-	public static List<Map> getMaps() {
+	public List<Map> getMaps() {
 
 		return maps;
 	}

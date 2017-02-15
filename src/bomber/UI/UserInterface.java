@@ -1,18 +1,28 @@
 package bomber.UI;
 
-import java.util.ArrayList;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
-import static org.lwjgl.glfw.GLFW.*;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import bomber.game.Block;
 import bomber.game.Game;
@@ -22,25 +32,39 @@ import bomber.game.Response;
 
 public class UserInterface extends Application{
 
-	private String appName, playerName;
+	private String appName;
+	private SimpleStringProperty playerName;
 	private Stage currentStage;
-	private VBox pane1, pane2;
-	private Scene scene1, scene2;
-	private Button startBtn;
-	private Button backBtn;
-	private Scene previousScene;
-	private Button playBtn;
+	private VBox mainMenu, settingsMenu, keyMenu, multiMenu, singleMenu;
+	private Scene mainScene, settingsScene, keyScene, multiScene, singleScene;
+	private TextField nameText;
+	private Button nameBtn, singleBtn, multiBtn, settingsBtn, controlsBtn, audioBtn, graphicsBtn, startBtn;
+	private Button backBtn1, backBtn2, backBtn3, backBtn4;
+	private Button rightMapToggle, leftMapToggle, upAiToggle, downAiToggle;
+	private Stack<Scene> previousScenes;
 	private HashMap<Response, Integer> controls;
 	private Map map;
-	
-	public UserInterface(String appName){
-		
-		this.appName = appName;
-		launch();
-	}
+	private Label displayName;
+	private Label displayMap;
+	private SimpleStringProperty mapName;
 	
 	public UserInterface(){
 		//for JavaFX
+		this.playerName = new SimpleStringProperty("Current Name:\nPlayer 1");
+		Maps maps = new Maps();
+		this.map = maps.getMaps().get(0);
+		this.mapName = new SimpleStringProperty("Current Map:\n" + this.map.getName());
+		this.controls = new HashMap<Response, Integer>();
+		this.controls.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
+		this.controls.put(Response.UP_MOVE, GLFW_KEY_UP);
+		this.controls.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
+		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
+		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);
+		
+	}
+	
+	public static void begin(){
+		launch();
 	}
 
 	@Override
@@ -49,87 +73,124 @@ public class UserInterface extends Application{
 		this.currentStage = primaryStage;
 		primaryStage.setTitle(this.appName);
 		
-        startBtn = new Button();
-        startBtn.setText("Next scene");
-        startBtn.setOnAction(e -> advance(e, scene1, scene2));
+        mainMenu = new VBox(); 
+        settingsMenu = new VBox();
+        keyMenu = new VBox();
+        multiMenu = new VBox();
+        singleMenu = new VBox();
         
-        backBtn = new Button();
-        backBtn.setText("Back");
-        backBtn.setOnAction(e -> previous(e));
+        mainScene = new Scene(mainMenu, 300, 250);
+        settingsScene = new Scene(settingsMenu, 300, 250);
+        keyScene = new Scene(keyMenu, 300, 250);
+        multiScene = new Scene(multiMenu, 300, 250);
+        singleScene = new Scene(singleMenu, 300, 250);
         
-        playBtn = new Button();
-        playBtn.setText("Play Game");
-        playBtn.setOnAction(e -> beginGame(this.map, this.playerName, this.controls));
+        previousScenes = new Stack<Scene>();
         
-        setMap();
-        setName();
-        setControls();
+        nameText = new TextField("Enter Name");
         
-        pane1 = new VBox(); 
-        pane2 = new VBox();
+        displayName = new Label();
+        displayName.textProperty().bind(this.playerName);
         
-        //StackPane root = new StackPane();
-        pane1.getChildren().add(startBtn);
-        pane2.getChildren().add(backBtn);
-        pane2.getChildren().add(playBtn);
+        nameBtn = new Button("Set Name");
+        nameBtn.setOnAction(e -> setName(nameText.getText()));
         
-        scene1 = new Scene(pane1, 300, 250);
-        scene2 = new Scene(pane2, 300, 250);
+        //button to start the game
+        startBtn = new Button("Start Game");
+        startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls));
         
-        primaryStage.setScene(scene1);
+        //back button
+        backBtn1 = new Button("Back");
+        backBtn1.setOnAction(e -> previous());
+        
+        backBtn2 = new Button("Back");
+        backBtn2.setOnAction(e -> previous());
+        
+        backBtn3 = new Button("Back");
+        backBtn3.setOnAction(e -> previous());
+        
+        backBtn4 = new Button("Back");
+        backBtn4.setOnAction(e -> previous());
+        
+        singleBtn = new Button("Single Player");
+        singleBtn.setOnAction(e -> advance(mainScene, singleScene));
+        
+        multiBtn = new Button("Multi Player");
+        multiBtn.setOnAction(e -> advance(mainScene, multiScene));
+        
+        settingsBtn = new Button("Settings");
+        settingsBtn.setOnAction(e -> advance(mainScene, settingsScene));
+        
+        controlsBtn = new Button("Control Options");
+        controlsBtn.setOnAction(e -> advance(settingsScene, keyScene));
+        
+        audioBtn = new Button("Audio Options");
+        
+        graphicsBtn = new Button("Graphics Options");
+        
+        displayMap = new Label();
+        displayMap.textProperty().bind(this.mapName);
+        
+        rightMapToggle = new Button("->");
+        
+        leftMapToggle = new Button("<-");
+        
+        upAiToggle = new Button("^");
+        
+        downAiToggle = new Button("v");
+        
+        addElements(mainMenu, displayName, nameText, nameBtn, singleBtn, multiBtn, settingsBtn);
+        addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
+        addElements(keyMenu, backBtn2);
+        addElements(singleMenu, leftMapToggle, displayMap, rightMapToggle, upAiToggle, downAiToggle, startBtn, backBtn3);
+        addElements(multiMenu, backBtn4);
+        
+        primaryStage.setScene(mainScene);
         primaryStage.show();
 	}
+	
+	private void addElements(Pane pane, Node... elems){
+		
+		for(Node node : elems){
+			pane.getChildren().add(node);
+		}
+	}
 
-	private void previous(ActionEvent e) {
+	private void previous() {
 		
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
-		this.currentStage.setScene(this.previousScene);
-		this.previousScene = null;
+		this.currentStage.setScene(this.previousScenes.pop());
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
 	}
 	
-	private void advance(ActionEvent e, Scene thisScene, Scene nextScene) {
+	private void advance(Scene thisScene, Scene nextScene) {
 		
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
 		this.currentStage.setScene(nextScene);
-		this.previousScene = thisScene;
+		this.previousScenes.push(thisScene);
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
 	}
 
-	public void setName(){
+	public void setName(String string){
 		
-		this.playerName = "player1";
+		System.out.println("Set name to " + string);
+		this.playerName.set("Current Name:\n" + string);
 	}
 	
 	public void setControls(){
 		
-		HashMap<Response, Integer> keymap = new HashMap<Response, Integer>();
-		keymap.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
-		keymap.put(Response.UP_MOVE, GLFW_KEY_UP);
-		keymap.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
-		keymap.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
-		keymap.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);
-		
-		this.controls = keymap;
+		this.controls = null;
 	}
 	
-	public void setMap(){
-		
-		List<Map> maps = Maps.getMaps();
-    	Map map1 = maps.get(0);
-    	
-    	this.map = map1;
-	}
-	
-	public void beginGame(Map map, String playerName, HashMap<Response, Integer> keymap) {
+	public void beginGame(Map map, String playerName, HashMap<Response, Integer> controls) {
 		
 		Block[][] masterMap = this.map.getGridMap();
 		int columnLength = masterMap[0].length;
@@ -140,8 +201,8 @@ public class UserInterface extends Application{
 			arrayCopy[x] = Arrays.copyOf(masterMap[x], columnLength);
 		}
 		
-		Map mapCopy = new Map(arrayCopy);
+		Map mapCopy = new Map(map.getName(), arrayCopy);
 		
-		Game game = new Game(mapCopy, playerName, keymap);
+		Game game = new Game(mapCopy, playerName, controls);
 	}
 }
