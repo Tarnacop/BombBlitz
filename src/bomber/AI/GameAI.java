@@ -45,6 +45,7 @@ public class GameAI extends Player {
 	 * 
 	 */
 	public void begin() {
+		System.out.println("Pos: " + this.getPos().x + ", " + this.getPos().y);
 		aiManager.start();
 	}
 

@@ -50,7 +50,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private SimpleStringProperty playerName;
 	private Stage currentStage;
 	private BorderPane mainMenu;
-	private VBox settingsMenu, keyMenu, multiMenu, serverMenu, singleMenu;
+	private VBox settingsMenu, keyMenu, multiMenu, serverMenu;
+	private BorderPane singleMenu;
 	private Scene mainScene, settingsScene, keyScene, multiScene, serverScene, singleScene;
 	private TextField nameText, ipText;
 	private Button nameBtn, singleBtn, multiBtn, settingsBtn, controlsBtn, audioBtn, graphicsBtn, startBtn;
@@ -73,6 +74,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private final String font = "Arial";
 	private VBox singleButtonPane;
 	private Pane imagePane;
+	private VBox mapBox;
+	private HBox backBox;
+	private VBox startBox;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -110,14 +114,15 @@ public class UserInterface extends Application implements ClientNetInterface{
         keyMenu = new VBox();
         multiMenu = new VBox();
         serverMenu = new VBox();
-        singleMenu = new VBox();
         
-        mainScene = new Scene(mainMenu, 750, 500);
-        settingsScene = new Scene(settingsMenu, 300, 250);
-        keyScene = new Scene(keyMenu, 300, 250);
-        multiScene = new Scene(multiMenu, 300, 250);
-        serverScene = new Scene(serverMenu, 300, 250);
-        singleScene = new Scene(singleMenu, 300, 250);
+        singleMenu = new BorderPane();
+        
+        mainScene = new Scene(mainMenu, 800, 600);
+        settingsScene = new Scene(settingsMenu, 800, 600);
+        keyScene = new Scene(keyMenu, 800, 600);
+        multiScene = new Scene(multiMenu, 800, 600);
+        serverScene = new Scene(serverMenu, 800, 600);
+        singleScene = new Scene(singleMenu, 800, 600);
         
         previousScenes = new Stack<Scene>();
         
@@ -140,6 +145,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         //button to start the game
         startBtn = new Button("Start Game");
+        startBtn.setPrefWidth(Integer.MAX_VALUE);
         startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls));
         
         //back button
@@ -155,11 +161,11 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBtn4 = new Button("Back");
         backBtn4.setOnAction(e -> previous());
         
-        singleBtn = new Button("Single Player");
+        singleBtn = new Button("Single\nPlayer");
         singleBtn.setPrefHeight(Integer.MAX_VALUE);
         singleBtn.setOnAction(e -> advance(mainScene, singleScene));
         
-        multiBtn = new Button("Multi Player");
+        multiBtn = new Button("Multi\nPlayer");
         multiBtn.setPrefHeight(Integer.MAX_VALUE);
         multiBtn.setOnAction(e -> advance(mainScene, multiScene));
         
@@ -179,8 +185,10 @@ public class UserInterface extends Application implements ClientNetInterface{
         displayMap.textProperty().bind(this.mapName);
         
         rightMapToggle = new Button("->");
+        rightMapToggle.setPrefHeight(Integer.MAX_VALUE);
         
         leftMapToggle = new Button("<-");
+        leftMapToggle.setPrefHeight(Integer.MAX_VALUE);
         
         upAiToggle = new Button("^");
         
@@ -202,7 +210,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         singleButtonPane.setAlignment(Pos.CENTER);
         singleButtonPane.getChildren().add(singleBtn);
         
-        
         Image mainImage = new Image("resources/images/titlescreen.png");
         ImageView mainImageView = new ImageView(mainImage);
         imagePane = new Pane();
@@ -220,7 +227,25 @@ public class UserInterface extends Application implements ClientNetInterface{
         //addElements(mainMenu, currentNameLabel, displayName, nameText, nameBtn, singleBtn, multiBtn, settingsBtn);
         addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
         addElements(keyMenu, backBtn2);
-        addElements(singleMenu, leftMapToggle, currentMapLabel, displayMap, rightMapToggle, upAiToggle, downAiToggle, startBtn, backBtn3);
+        
+        mapBox = new VBox();
+        mapBox.setAlignment(Pos.CENTER);
+        mapBox.getChildren().addAll(currentMapLabel, displayMap);
+        
+        backBox = new HBox();
+        backBox.setAlignment(Pos.CENTER_LEFT);
+        backBox.getChildren().addAll(backBtn3);
+        
+        startBox = new VBox();
+        
+        
+        singleMenu.setCenter(mapBox);
+        singleMenu.setTop(backBox);
+        singleMenu.setLeft(leftMapToggle);
+        singleMenu.setRight(rightMapToggle);
+        singleMenu.setBottom(startBtn);
+        
+        //addElements(singleMenu, leftMapToggle, currentMapLabel, displayMap, rightMapToggle, upAiToggle, downAiToggle, startBtn, backBtn3);
         addElements(multiMenu, ipText, portNum, connectBtn, backBtn4);
         
         primaryStage.setScene(mainScene);
@@ -318,8 +343,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 			arrayCopy[x] = Arrays.copyOf(masterMap[x], columnLength);
 		}
 		
-		Map mapCopy = new Map(map.getName(), arrayCopy);
-		
+		Map mapCopy = new Map(map.getName(), arrayCopy, map.getSpawnPoints());
+
+		Platform.setImplicitExit(false);
 		Game game = new Game(this, mapCopy, playerName, controls);
 	}
 
@@ -418,6 +444,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
+				System.out.println("CLOSING MENU");
 				currentStage.hide();
 			}
 			   
@@ -429,7 +456,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
+				System.out.println("OPENING MENU");
 				currentStage.show();
+				Platform.setImplicitExit(true);
 			}
 			   
 		});
