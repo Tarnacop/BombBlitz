@@ -15,13 +15,22 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import bomber.game.Block;
 import bomber.game.Game;
@@ -35,10 +44,11 @@ import bomber.networking.ClientThread;
 
 public class UserInterface extends Application implements ClientNetInterface{
 
-	private String appName;
+	private final String appName = "Bomb Blitz v1";
 	private SimpleStringProperty playerName;
 	private Stage currentStage;
-	private VBox mainMenu, settingsMenu, keyMenu, multiMenu, serverMenu, singleMenu;
+	private BorderPane mainMenu;
+	private VBox settingsMenu, keyMenu, multiMenu, serverMenu, singleMenu;
 	private Scene mainScene, settingsScene, keyScene, multiScene, serverScene, singleScene;
 	private TextField nameText, ipText;
 	private Button nameBtn, singleBtn, multiBtn, settingsBtn, controlsBtn, audioBtn, graphicsBtn, startBtn;
@@ -54,6 +64,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label currentNameLabel;
 	private Label currentMapLabel;
 	private TextField portNum;
+	private HBox namePane;
+	private VBox currentName;
+	private VBox nameSetter;
+	
+	private final String font = "Arial";
+	private VBox singleButtonPane;
+	private StackPane imagePane;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -81,14 +98,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.currentStage = primaryStage;
 		primaryStage.setTitle(this.appName);
 		
-        mainMenu = new VBox(); 
+        mainMenu = new BorderPane(); 
+        
+        namePane = new HBox();
+        
         settingsMenu = new VBox();
         keyMenu = new VBox();
         multiMenu = new VBox();
         serverMenu = new VBox();
         singleMenu = new VBox();
         
-        mainScene = new Scene(mainMenu, 300, 250);
+        mainScene = new Scene(mainMenu, 750, 500);
         settingsScene = new Scene(settingsMenu, 300, 250);
         keyScene = new Scene(keyMenu, 300, 250);
         multiScene = new Scene(multiMenu, 300, 250);
@@ -105,10 +125,13 @@ public class UserInterface extends Application implements ClientNetInterface{
         connectBtn.setOnAction(e -> connect(ipText.getText(), Integer.parseInt(portNum.getText())));
         
         currentNameLabel = new Label("Current Name:");
+        currentNameLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
         displayName = new Label();
+        displayName.setFont(Font.font(font, FontWeight.BOLD, FontPosture.ITALIC, 20));
         displayName.textProperty().bind(this.playerName);
         
         nameBtn = new Button("Set Name");
+        nameBtn.setPrefWidth(200);
         nameBtn.setOnAction(e -> setName(nameText.getText()));
         
         //button to start the game
@@ -129,12 +152,15 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBtn4.setOnAction(e -> previous());
         
         singleBtn = new Button("Single Player");
+        singleBtn.setPrefHeight(Integer.MAX_VALUE);
         singleBtn.setOnAction(e -> advance(mainScene, singleScene));
         
         multiBtn = new Button("Multi Player");
+        multiBtn.setPrefHeight(Integer.MAX_VALUE);
         multiBtn.setOnAction(e -> advance(mainScene, multiScene));
         
         settingsBtn = new Button("Settings");
+        settingsBtn.setPrefWidth(Integer.MAX_VALUE);
         settingsBtn.setOnAction(e -> advance(mainScene, settingsScene));
         
         controlsBtn = new Button("Control Options");
@@ -156,7 +182,38 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         downAiToggle = new Button("v");
         
-        addElements(mainMenu, currentNameLabel, displayName, nameText, nameBtn, singleBtn, multiBtn, settingsBtn);
+        currentName = new VBox();
+        currentName.setSpacing(10);
+        currentName.getChildren().addAll(currentNameLabel, displayName);
+        
+        nameSetter = new VBox();
+        nameSetter.setSpacing(0);
+        nameSetter.getChildren().addAll(nameText, nameBtn);
+        
+        namePane.setSpacing(100);
+        namePane.getChildren().addAll(currentName, nameSetter);
+        namePane.setAlignment(Pos.CENTER);
+        
+        singleButtonPane = new VBox();
+        singleButtonPane.setAlignment(Pos.CENTER);
+        singleButtonPane.getChildren().add(singleBtn);
+        
+        
+        Image mainImage = new Image("resources/images/titlescreen.png");
+        ImageView mainImageView = new ImageView(mainImage);
+        imagePane = new StackPane();
+        imagePane.getChildren().add(mainImageView); 
+        imagePane.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        mainImageView.fitWidthProperty().bind(imagePane.widthProperty()); 
+        mainImageView.fitHeightProperty().bind(imagePane.heightProperty());
+        
+        mainMenu.setCenter(imagePane);
+        mainMenu.setTop(namePane);
+        mainMenu.setLeft(singleButtonPane);
+        mainMenu.setRight(multiBtn);
+        mainMenu.setBottom(settingsBtn);
+        
+        //addElements(mainMenu, currentNameLabel, displayName, nameText, nameBtn, singleBtn, multiBtn, settingsBtn);
         addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
         addElements(keyMenu, backBtn2);
         addElements(singleMenu, leftMapToggle, currentMapLabel, displayMap, rightMapToggle, upAiToggle, downAiToggle, startBtn, backBtn3);
@@ -164,6 +221,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         primaryStage.setScene(mainScene);
         primaryStage.show();
+        
 	}
 	
 	private void resetFields(){
