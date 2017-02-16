@@ -225,7 +225,6 @@ public class ClientThread implements Runnable {
 			}
 		}
 		pClient("Exiting");
-		System.exit(0);
 	}
 
 	private void processPacket(DatagramPacket packet) throws IOException {
