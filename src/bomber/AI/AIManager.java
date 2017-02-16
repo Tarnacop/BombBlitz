@@ -150,7 +150,7 @@ public class AIManager extends Thread {
 		Point updatedPos = updatedPos(move);
 		updatedPos.setLocation(updatedPos.x * scalar, updatedPos.y * scalar);
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
-		while (checkIfReachedDestination(gameAI.getPos(), updatedPos)) {
+		while (checkIfReachedDestination(gameAI.getPos(), updatedPos) && gameAI.isAlive()) {
 			try {
 				sleep(10);
 			} catch (InterruptedException e) {
