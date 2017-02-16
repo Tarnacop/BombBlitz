@@ -15,16 +15,33 @@ public class EscapeRouteFinderTest extends MainTestTemplate {
 	@Test
 	public void test() {
 
+		
+//		Map
+		/*
+			[b][-][-][-][-][ ][ ][ ][ ][ ][ ][x][ ]
+			[-][x][-][x][-][x][ ][x][ ][x][ ][x][x]
+			[-][-][b][-][-][-][-][ ][ ][ ][ ][ ][ ]
+			[-][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
+			[-][-][-][-][b][-][-][-][-][ ][ ][ ][ ]
+			[ ][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][-][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+			[ ][x][ ][x][-][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][ ][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+			[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+			[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]*/
+		
 		List<AIActions> escapeMoves = finder.escapeFromExplotion(checker.getTilesAffectedByBombs());
 		assertEquals(escapeMoves.size(), 3);
 
 		ai.setPos(new Point(0, 0));
 		escapeMoves = finder.escapeFromExplotion(checker.getTilesAffectedByBombs());
-		assertEquals(escapeMoves.size(), 6);
+		assertEquals(escapeMoves.size(), 5);
 
 		ai.setPos(new Point(2*scalar, 7*scalar));
 		escapeMoves = finder.escapeFromExplotion(checker.getTilesAffectedByBombs());
-		assertEquals(escapeMoves.size(), 1);
+		assertEquals(escapeMoves.size(), 0);
 
 		ai.setPos(new Point(6*scalar, 6*scalar));
 		escapeMoves = finder.escapeFromExplotion(checker.getTilesAffectedByBombs());
