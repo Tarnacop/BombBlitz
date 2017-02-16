@@ -10,7 +10,6 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -496,7 +495,7 @@ public class ServerThread implements Runnable {
 			}
 
 			// check whether the room is full
-			if (room.getPlayerList().size() >= room.getMaxPlayer()) {
+			if (room.numPlayers() >= room.getMaxPlayer()) {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 				return;
@@ -667,20 +666,12 @@ public class ServerThread implements Runnable {
 			}
 
 			// if all clients in this room are ready, start the game
-			boolean shouldStartGame = true;
-			for (ServerClientInfo c : room.getPlayerList()) {
-				if (c == null) {
-					pServer("Bug: playerList should not contain null clients");
-				} else {
-					shouldStartGame = c.isReadyToPlay() && shouldStartGame;
-				}
-			}
-			if (shouldStartGame) {
+			if (room.allPlayersReady()) {
 				/*
 				 * ServerGame should be responsible for sending updated game
 				 * states to clients in this particular game session(game start,
 				 * game state and game over messages) while ServerThread will
-				 * update the KeyboardState of the players
+				 * update the KeyboardState of the players itself
 				 */
 				room.getGame().start();
 			}
@@ -868,24 +859,19 @@ public class ServerThread implements Runnable {
 			return;
 		}
 
-		List<ServerClientInfo> roomPlayerList = room.getPlayerList();
-		if (roomPlayerList == null) {
-			return;
-		}
-
 		pServerf("Removing client %s from room\n", client.getSocketAddress());
 
-		if (room.getPlayerNumber() < 2 && roomPlayerList.contains(client)) {
+		if (room.getPlayerNumber() < 2 && room.containsPlayer(client)) {
 			pServerf("Removing room %s with ID %d due to %s being the only client in this room\n", room.getName(),
 					room.getID(), client.getSocketAddress());
 
-			roomPlayerList.remove(client);
+			room.removePlayer(client);
 			roomTable.remove(room.getID());
-		} else if (room.getPlayerNumber() > 1 && roomPlayerList.contains(client)) {
+		} else if (room.getPlayerNumber() > 1 && room.containsPlayer(client)) {
 			pServerf("Removing client %s from room %s with ID %d\n", client.getSocketAddress(), room.getName(),
 					room.getID());
 
-			roomPlayerList.remove(client);
+			room.removePlayer(client);
 		}
 
 		client.setInRoom(false);
