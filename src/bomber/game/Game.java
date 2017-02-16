@@ -47,7 +47,10 @@ public class Game implements GameInterface {
 		audio.playMusic();
 
 		try {
-			this.graphics = new Graphics("Bomb Blitz", 1200, 600, true, this);
+			
+			int width = this.map.getPixelMap().length;
+			int height = this.map.getPixelMap()[0].length;
+			this.graphics = new Graphics("Bomb Blitz", width, height, true, this);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

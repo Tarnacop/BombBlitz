@@ -7,7 +7,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -17,10 +16,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -41,8 +38,6 @@ import bomber.game.Map;
 import bomber.game.Maps;
 import bomber.game.Response;
 import bomber.networking.ClientNetInterface;
-import bomber.networking.ClientServerLobbyRoom;
-import bomber.networking.ClientServerPlayer;
 import bomber.networking.ClientThread;
 
 public class UserInterface extends Application implements ClientNetInterface{
@@ -51,7 +46,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private SimpleStringProperty playerName;
 	private Stage currentStage;
 	private BorderPane mainMenu;
-	private VBox settingsMenu, keyMenu, serverMenu;
+	private VBox settingsMenu, keyMenu;
+	private BorderPane serverMenu;
 	private BorderPane multiMenu;
 	private BorderPane singleMenu;
 	private Scene mainScene, settingsScene, keyScene, multiScene, serverScene, singleScene;
@@ -71,8 +67,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label currentMapLabel;
 	private TextField portNum;
 	private HBox namePane;
-	private VBox currentName;
-	private VBox nameSetter;
+	private HBox currentName;
+	private HBox nameSetter;
 	
 	private final String font = "Arial";
 	private VBox singleButtonPane;
@@ -90,13 +86,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private HBox backBox1;
 	private HBox backBox2;
 	private VBox connectPane;
-	private Label loadLabel;
 	private VBox loadMenu;
-	private Scene loadScene;
-	private boolean connected;
-	private boolean disconnected;
-	private Button cancelBtn;
 	private ClientThread client;
+	private Button disconnectBtn;
+	private Label roomsTitle;
+	private Label roomTitle;
+	private Label playersTitle;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -138,7 +133,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         multiMenu = new BorderPane();
         
         loadMenu = new VBox();
-        serverMenu = new VBox();
+        serverMenu = new BorderPane();
         
         singleMenu = new BorderPane();
         
@@ -147,7 +142,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         keyScene = new Scene(keyMenu, 800, 600);
         multiScene = new Scene(multiMenu, 800, 600);
         
-        loadScene = new Scene(loadMenu, 800, 600);
+        new Scene(loadMenu, 800, 600);
         serverScene = new Scene(serverMenu, 800, 600);
         
         singleScene = new Scene(singleMenu, 800, 600);
@@ -194,8 +189,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBtn1 = new Button("Back");
         backBtn1.setOnAction(e -> previous());
         
-        cancelBtn = new Button("Cancel");
-        cancelBtn.setOnAction(e -> disconnect());
+        disconnectBtn = new Button("Disconnect");
+        disconnectBtn.setOnAction(e -> disconnect());
         
         backBtn2 = new Button("Back");
         backBtn2.setOnAction(e -> previous());
@@ -252,15 +247,15 @@ public class UserInterface extends Application implements ClientNetInterface{
         downAiToggle.setPrefWidth(50);
         downAiToggle.setOnAction(e -> decrementAi());
         
-        currentName = new VBox();
+        currentName = new HBox();
         currentName.setSpacing(10);
         currentName.getChildren().addAll(currentNameLabel, displayName);
         
-        nameSetter = new VBox();
-        nameSetter.setSpacing(0);
+        nameSetter = new HBox();
+        nameSetter.setSpacing(10);
         nameSetter.getChildren().addAll(nameText, nameBtn);
         
-        namePane.setSpacing(100);
+        namePane.setSpacing(50);
         namePane.getChildren().addAll(currentName, nameSetter);
         namePane.setAlignment(Pos.CENTER);
         
@@ -284,13 +279,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
         addElements(keyMenu, backBtn2);
-        
-        loadLabel = new Label("Connecting...");
-        loadLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
-        
-        loadMenu.getChildren().addAll(loadLabel, cancelBtn);
-        loadMenu.setAlignment(Pos.CENTER);
-        loadMenu.setSpacing(20);
         
         mapBox = new VBox();
         mapBox.setAlignment(Pos.CENTER);
@@ -328,6 +316,12 @@ public class UserInterface extends Application implements ClientNetInterface{
         singleMenu.setRight(rightMapToggle);
         singleMenu.setBottom(startBtn);
         
+        roomsTitle = new Label("Rooms:");
+        roomsTitle.setFont(Font.font(font, FontWeight.BOLD, 20));
+        
+        playersTitle = new Label("Online Players:");
+        playersTitle.setFont(Font.font(font, FontWeight.BOLD, 20));
+        
         connectPane = new VBox();
         connectPane.setAlignment(Pos.CENTER);
         connectPane.setSpacing(20);
@@ -335,6 +329,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         multiMenu.setTop(backBox2);
         multiMenu.setCenter(connectPane);
+        
+        serverMenu.setTop(disconnectBtn);
         
         primaryStage.setScene(mainScene);
         primaryStage.show();
@@ -349,7 +345,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			e.printStackTrace();
 		}finally{
 			previous();
-	
 		}
 	}
 	
@@ -400,7 +395,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			e1.printStackTrace();
 		}finally{
 
-			advance(thisScene, this.loadScene);
+			advance(thisScene, this.serverScene);
 		}
 		
 //		Thread networkThread = new Thread(client);
@@ -475,7 +470,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Map mapCopy = new Map(map.getName(), arrayCopy, map.getSpawnPoints());
 
 		Platform.setImplicitExit(false);
-		Game game = new Game(this, mapCopy, playerName, controls, aiNum);
+		new Game(this, mapCopy, playerName, controls, aiNum);
 	}
 
 	@Override
