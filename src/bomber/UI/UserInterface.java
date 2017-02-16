@@ -15,6 +15,7 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -25,7 +26,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -64,6 +64,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label displayName;
 	private Label displayMap;
 	private SimpleStringProperty mapName;
+	private SimpleIntegerProperty aiNumber;
 	private Label currentNameLabel;
 	private Label currentMapLabel;
 	private TextField portNum;
@@ -77,12 +78,18 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private VBox mapBox;
 	private HBox backBox;
 	private VBox startBox;
+	private VBox aiBox;
+	private Label displayAi;
+	private HBox aiPane;
+	private Label aiLabel;
+	private VBox centerBox;
 	
 	public UserInterface(){
 		//for JavaFX
 		this.playerName = new SimpleStringProperty("Player 1");
+		this.aiNumber = new SimpleIntegerProperty(1);
 		Maps maps = new Maps();
-		this.map = maps.getMaps().get(1);
+		this.map = maps.getMaps().get(0);
 		this.mapName = new SimpleStringProperty(this.map.getName());
 		this.controls = new HashMap<Response, Integer>();
 		this.controls.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
@@ -144,9 +151,9 @@ public class UserInterface extends Application implements ClientNetInterface{
         nameBtn.setOnAction(e -> setName(nameText.getText()));
         
         //button to start the game
-        startBtn = new Button("Start Game");
+        startBtn = new Button("Start\nGame");
         startBtn.setPrefWidth(Integer.MAX_VALUE);
-        startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls));
+        startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls, this.aiNumber.get()));
         
         //back button
         backBtn1 = new Button("Back");
@@ -191,8 +198,13 @@ public class UserInterface extends Application implements ClientNetInterface{
         leftMapToggle.setPrefHeight(Integer.MAX_VALUE);
         
         upAiToggle = new Button("^");
+        upAiToggle.setOnAction(e -> incrementAi());
+        
+        displayAi = new Label();
+        displayAi.textProperty().bind(this.aiNumber.asString());
         
         downAiToggle = new Button("v");
+        downAiToggle.setOnAction(e -> decrementAi());
         
         currentName = new VBox();
         currentName.setSpacing(10);
@@ -236,10 +248,23 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBox.setAlignment(Pos.CENTER_LEFT);
         backBox.getChildren().addAll(backBtn3);
         
-        startBox = new VBox();
+        aiBox = new VBox();
+        aiBox.setAlignment(Pos.CENTER);
+        aiBox.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
         
+        aiLabel = new Label("Number of\nAI Players");
+        aiLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
         
-        singleMenu.setCenter(mapBox);
+        aiPane = new HBox();
+        aiPane.setAlignment(Pos.CENTER);
+        aiPane.setSpacing(30);
+        aiPane.getChildren().addAll(aiBox, aiLabel);
+        
+        centerBox = new VBox();
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.getChildren().addAll(mapBox, aiPane);
+        
+        singleMenu.setCenter(centerBox);
         singleMenu.setTop(backBox);
         singleMenu.setLeft(leftMapToggle);
         singleMenu.setRight(rightMapToggle);
@@ -253,6 +278,18 @@ public class UserInterface extends Application implements ClientNetInterface{
         
 	}
 	
+	private void decrementAi() {
+		//System.out.println(this.aiNumber.get());
+		if(this.aiNumber.get() > 1)aiNumber.set(this.aiNumber.get()-1);
+		//System.out.println(" dec-> " + this.aiNumber.get());
+	}
+
+	private void incrementAi() {
+		//System.out.println(this.aiNumber.get());
+		if(this.aiNumber.get() < 3)aiNumber.set(this.aiNumber.get()+1);
+		//System.out.println(" inc-> " + this.aiNumber.get());
+	}
+
 	private void resetFields(){
 		
 		nameText.setText("Enter Name");
@@ -332,7 +369,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.playerName.set(string);
 	}
 	
-	public void beginGame(Map map, String playerName, HashMap<Response, Integer> controls) {
+	public void beginGame(Map map, String playerName, HashMap<Response, Integer> controls, int aiNum) {
 		
 		Block[][] masterMap = this.map.getGridMap();
 		int columnLength = masterMap[0].length;
@@ -346,7 +383,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Map mapCopy = new Map(map.getName(), arrayCopy, map.getSpawnPoints());
 
 		Platform.setImplicitExit(false);
-		Game game = new Game(this, mapCopy, playerName, controls);
+		Game game = new Game(this, mapCopy, playerName, controls, aiNum);
 	}
 
 	@Override
