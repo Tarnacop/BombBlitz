@@ -66,7 +66,7 @@ public class Game implements GameInterface {
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
 
-			Player ai = new GameAI("player", new Point(64,64), 1, 300, gameState, new Mesh(32, 32, colours));
+			Player ai = new GameAI("player", new Point(832,832), 1, 300, gameState, new Mesh(32, 32, colours));
 //			Player ai2 = new GameAI("   dasda", new Point(832,832), 3, 300, gameState, new Mesh(32, 32, colours));
 			list.add(ai);
 //			list.add(ai2);
