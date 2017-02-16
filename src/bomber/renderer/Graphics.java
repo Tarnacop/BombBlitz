@@ -42,7 +42,7 @@ public class Graphics implements Runnable {
 		}catch(Exception ex) {
 			
 			// Catch an exception
-			System.err.println("ERROR!");
+			System.err.println("ERROR1!" + ex.getMessage());
 			ex.printStackTrace();
 		} finally {
 			
@@ -125,7 +125,7 @@ public class Graphics implements Runnable {
                 Thread.sleep(1);
             } catch (InterruptedException ie) {
             	
-            	System.err.println("ERROR!");
+            	System.err.println("ERROR2!");
             	ie.printStackTrace();
             }
 		}
@@ -142,4 +142,9 @@ public class Graphics implements Runnable {
 		
 		gameLogic.dispose();
 	} // END OF dispose METHOD
+
+	public Screen getScreen() {
+		// TODO Auto-generated method stub
+		return this.screen;
+	}
 } // END OF Application

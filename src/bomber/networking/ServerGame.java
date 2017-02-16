@@ -25,7 +25,6 @@ public class ServerGame implements Runnable {
 
 	private int roomID;
 
-	// TODO currently we ignore map id and always use the test map
 	private int mapID;
 
 	private List<ServerClientInfo> playerList;
@@ -44,6 +43,10 @@ public class ServerGame implements Runnable {
 
 	public ServerGame(int roomID, int mapID, List<ServerClientInfo> playerList, int tickRate,
 			ServerThread serverThread) {
+		/*
+		 * TODO currently if the map with this id cannot be found, we use test
+		 * map with id 0
+		 */
 		this.roomID = roomID;
 		this.mapID = mapID;
 		this.playerList = playerList;
@@ -74,6 +77,19 @@ public class ServerGame implements Runnable {
 	 * @return true if the map ID is valid
 	 */
 	public boolean isMapIDValid() {
+		if (isMapIDValidreal()) {
+			return true;
+		} else {
+			this.mapID = 0;
+			return isMapIDValidreal();
+		}
+	}
+
+	/*
+	 * TODO currently if the map with this id cannot be found, we use test map
+	 * with id 0
+	 */
+	private boolean isMapIDValidreal() {
 		if (mapList == null || mapList.size() - 1 < mapID) {
 			return false;
 		}
@@ -137,7 +153,8 @@ public class ServerGame implements Runnable {
 	public void run() {
 		inGame = true;
 
-		System.out.printf("ServerGame: game thread for room %d started\n", roomID);
+		System.out.printf("ServerGame: game thread for room %d started, tick rate: %d, interval: %d\n", roomID,
+				tickRate, interval);
 
 		if (!isMapIDValid()) {
 			System.out.println("ServerGame: attemping to start game thread with invalid map ID");
@@ -149,8 +166,8 @@ public class ServerGame implements Runnable {
 		List<Player> players = new ArrayList<Player>();
 		for (int i = 0; i < playerList.size(); i++) {
 			/*
-			 * we can choose the initial position of the player based on the
-			 * index
+			 * TODO we can choose the initial position of the player based on
+			 * the index
 			 */
 			// currently just use hard-coded initial position
 			ServerClientInfo c = playerList.get(i);
@@ -255,8 +272,11 @@ public class ServerGame implements Runnable {
 				}
 			}
 
-			System.out.printf("ServerGame: tickrate: %d, interval: %d busy time: %d sleep time: %d\n", tickRate,
-					interval, busyTime, sleepTime);
+			/*
+			 * System.out.printf(
+			 * "ServerGame: tickrate: %d, interval: %d busy time: %d sleep time: %d\n"
+			 * , tickRate, interval, busyTime, sleepTime);
+			 */
 		}
 
 		// tell clients the game is over

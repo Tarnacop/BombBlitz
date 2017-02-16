@@ -29,6 +29,9 @@ public class ClientMain {
 			System.exit(1);
 		}
 
+		TestClientNetListener netListener = new TestClientNetListener(client);
+		client.addNetListener(netListener);
+
 		Thread clientThread = new Thread(client);
 		clientThread.start();
 

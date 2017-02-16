@@ -39,7 +39,7 @@ public class TestMaps {
 				//		HH      OOHHHHHHHHHHOOOOOO  HH
 				//		HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 
-		Map map1 = new Map(gridMap1);
+		Map map1 = new Map("testmap", gridMap1);
 
 		List<Map> maps = new ArrayList<Map>();
 		maps.add(map1);

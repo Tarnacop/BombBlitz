@@ -32,6 +32,7 @@ public class PhysicsEngine
     {
         this.gameState = gameState;
         okToPlaceBomb = new HashMap<>();
+        System.out.println("Instantiated okToPlaceBomb");
     }
 
     /**
@@ -62,6 +63,8 @@ public class PhysicsEngine
 
     private void updatePlayer(Player player, int milliseconds)
     {
+    	if (!player.isAlive())
+    		return;
         int speed = (int) (milliseconds*player.getSpeed()/1000);
         Point pos = player.getPos();
         Movement movement = player.getKeyState().getMovement();
@@ -89,11 +92,11 @@ public class PhysicsEngine
 
         Map map = gameState.getMap();
 
-
         // check for bomb placement
-        System.out.println(player.getName());
+        if(okToPlaceBomb == null)
+        	System.err.println("Why is this happeningggggggggg?");
         if(player.getKeyState().isBomb() 
-        		&& okToPlaceBomb.get(player.getName()))
+        		&& okToPlaceBomb.get(player.getName())!=null && okToPlaceBomb.get(player.getName()))
         {
             int bombCount = 0;
             for (Bomb bomb : gameState.getBombs())

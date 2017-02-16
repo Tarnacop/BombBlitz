@@ -105,7 +105,8 @@ public class Renderer {
 		}
 
 		for (Player player : state.getPlayers()) {
-
+			if (!player.isAlive())
+				continue;
 			modelMatrix = transformation
 					.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y), 0f, 1f);
 
