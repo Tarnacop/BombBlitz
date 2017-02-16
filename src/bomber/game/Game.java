@@ -59,7 +59,7 @@ public class Game implements GameInterface {
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
-			this.player = new Player(this.playerName, new Point(64, 64), 3, 300, new Mesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(64, 64), 10, 300, new Mesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
@@ -69,7 +69,7 @@ public class Game implements GameInterface {
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
 
-			Player ai = new GameAI("player", new Point(832,832), 1, 300, gameState, new Mesh(32, 32, colours));
+			Player ai = new GameAI("player", new Point(832,704), 1, 300, gameState, new Mesh(32, 32, colours));
 //			Player ai2 = new GameAI("   dasda", new Point(832,832), 3, 300, gameState, new Mesh(32, 32, colours));
 			list.add(ai);
 //			list.add(ai2);
