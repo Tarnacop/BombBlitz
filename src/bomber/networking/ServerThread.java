@@ -167,12 +167,12 @@ public class ServerThread implements Runnable {
 				pServer("" + e);
 			} catch (IOException e) {
 				pServer("" + e);
+				scheduledExecutor.shutdown();
 				socket.close();
 				break;
 			}
 		}
 		pServer("Exiting");
-		System.exit(0);
 	}
 
 	private void processPacket(DatagramPacket packet) throws IOException {

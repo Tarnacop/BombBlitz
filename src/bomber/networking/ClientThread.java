@@ -220,6 +220,7 @@ public class ClientThread implements Runnable {
 				pClient("" + e);
 			} catch (IOException e) {
 				pClient("" + e);
+				scheduledExecutor.shutdown();
 				socket.close();
 				break;
 			}
