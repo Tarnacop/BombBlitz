@@ -36,7 +36,7 @@ public class ClientThread implements Runnable {
 	private long keepAliveInterval = 10;
 	// the interval at which the client will request the latest list of players
 	// and rooms from the server
-	private long listRequestInterval = 10;
+	private long listRequestInterval = 5;
 	// unacknowledged packets will be detected and retransmitted every 500ms
 	private long retransmitInterval = 500;
 	// maximum number of retransmissions per packet
