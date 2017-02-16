@@ -30,16 +30,16 @@ public abstract class MainTestTemplate {
 		
 //		Map
 		/*
-			[b][-][-][-][-][-][ ][ ][ ][ ][ ][x][ ]
+			[b][-][-][-][-][ ][ ][ ][ ][ ][ ][x][ ]
 			[-][x][-][x][-][x][ ][x][ ][x][ ][x][x]
-			[-][-][b][-][-][-][-][-][ ][ ][ ][ ][ ]
+			[-][-][b][-][-][-][-][ ][ ][ ][ ][ ][ ]
 			[-][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
-			[-][-][-][-][b][-][-][-][-][-][ ][ ][ ]
-			[-][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
-			[ ][ ][-][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+			[-][-][-][-][b][-][-][-][-][ ][ ][ ][ ]
 			[ ][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
-			[ ][ ][ ][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+			[ ][ ][-][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
 			[ ][x][ ][x][-][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][ ][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+			[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
 			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
 			[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
 			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]*/
@@ -58,7 +58,7 @@ public abstract class MainTestTemplate {
 				  {Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK}};	
 		
-		map = new Map(blocks);
+		map = new Map("",blocks);
 
 		bombs = new ArrayList<>();
 		bombs.add(new Bomb("", new Point(0, 0), 5, 5));

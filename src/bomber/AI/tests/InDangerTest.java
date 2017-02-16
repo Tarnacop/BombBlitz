@@ -12,6 +12,21 @@ import org.junit.Test;
 import bomber.game.Bomb;
 
 public class InDangerTest extends MainTestTemplate {
+//	Map
+	/*
+		[b][-][-][-][-][ ][ ][ ][ ][ ][ ][x][ ]
+		[-][x][-][x][-][x][ ][x][ ][x][ ][x][x]
+		[-][-][b][-][-][-][-][ ][ ][ ][ ][ ][ ]
+		[-][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
+		[-][-][-][-][b][-][-][-][-][ ][ ][ ][ ]
+		[ ][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
+		[ ][ ][-][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+		[ ][x][ ][x][-][x][ ][x][ ][x][ ][x][ ]
+		[ ][ ][ ][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+		[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
+		[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+		[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
+		[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]*/
 	
 	@Test
 	public void test() {
@@ -21,7 +36,7 @@ public class InDangerTest extends MainTestTemplate {
 		ai.setPos(new Point(6*scalar, 0));
 		assertFalse(checker.inDanger());
 
-		ai.setPos(new Point(9*scalar, 4*scalar));
+		ai.setPos(new Point(8*scalar, 4*scalar));
 		assertTrue(checker.inDanger());
 
 		ai.setPos(new Point(12*scalar, 12*scalar));

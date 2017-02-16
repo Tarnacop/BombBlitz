@@ -15,9 +15,13 @@ public class MoveSafetyTest extends MainTestTemplate {
 	public void test() {
 		
 		ai.setPos(new Point(0,6*scalar));
-		assertFalse(checker.checkMoveSafety(AIActions.UP));
+		assertTrue(checker.checkMoveSafety(AIActions.UP));
 		assertTrue(checker.checkMoveSafety(AIActions.RIGHT));
 		assertTrue(checker.checkMoveSafety(AIActions.NONE));
+		
+		
+		ai.setPos(new Point(0,5*scalar));
+		assertFalse(checker.checkMoveSafety(AIActions.UP));
 		
 		ai.setPos(new Point(6*scalar,3*scalar));
 		assertFalse(checker.checkMoveSafety(AIActions.UP));

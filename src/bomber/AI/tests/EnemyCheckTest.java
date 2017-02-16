@@ -12,6 +12,22 @@ public class EnemyCheckTest extends MainTestTemplate {
 
 	@Test
 	public void test() {
+//		Map
+		/*
+			[b][-][-][-][-][ ][ ][ ][ ][ ][ ][x][ ]
+			[-][x][-][x][-][x][ ][x][ ][x][ ][x][x]
+			[-][-][b][-][-][-][-][ ][ ][ ][ ][ ][ ]
+			[-][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
+			[-][-][-][-][b][-][-][-][-][ ][ ][ ][ ]
+			[ ][x][-][x][-][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][-][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+			[ ][x][ ][x][-][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][ ][ ][-][ ][ ][ ][ ][ ][ ][ ][ ]
+			[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
+			[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
+			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]*/
+		
 		Player player = new Player("name", new Point(2*scalar, 2*scalar), 5, 10, null);
 		players.add(player);
 		assertFalse(checker.isEnemyInBombRange());
@@ -23,7 +39,7 @@ public class EnemyCheckTest extends MainTestTemplate {
 		ai.setPos(new Point(8*scalar, 2*scalar));
 		assertFalse(checker.isEnemyInBombRange());
 
-		ai.setPos(new Point(7*scalar, 2*scalar));
+		ai.setPos(new Point(6*scalar, 2*scalar));
 		assertTrue(checker.isEnemyInBombRange());
 	}
 
