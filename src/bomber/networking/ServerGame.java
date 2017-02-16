@@ -10,6 +10,7 @@ import java.util.List;
 import bomber.game.GameState;
 import bomber.game.KeyboardState;
 import bomber.game.Map;
+import bomber.game.Maps;
 import bomber.game.Player;
 import bomber.physics.PhysicsEngine;
 
@@ -35,7 +36,7 @@ public class ServerGame implements Runnable {
 
 	private ServerThread serverThread;
 
-	private List<Map> mapList = TestMaps.getMaps();
+	private List<Map> mapList = new Maps().getMaps();
 
 	private Thread thread = new Thread(this);
 
@@ -90,7 +91,7 @@ public class ServerGame implements Runnable {
 	 * with id 0
 	 */
 	private boolean isMapIDValidreal() {
-		if (mapList == null || mapList.size() - 1 < mapID) {
+		if (mapID < 0 || mapList == null || mapList.size() - 1 < mapID) {
 			return false;
 		}
 		return mapList.get(mapID) != null;
