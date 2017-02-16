@@ -393,8 +393,8 @@ public class ServerThread implements Runnable {
 			}
 			byte maxPlayer = recvByteBuffer.get();
 			int mapID = recvByteBuffer.getInt();
-			pServerf("Room creation request from %s: Room name: %s, Max player limit: %d, Map ID: %d\n",
-					sockAddr, roomName, maxPlayer, mapID);
+			pServerf("Room creation request from %s: Room name: %s, Max player limit: %d, Map ID: %d\n", sockAddr,
+					roomName, maxPlayer, mapID);
 
 			// check whether maxPlayer is in the range [2,4]
 			if (maxPlayer < 2) {
@@ -403,6 +403,12 @@ public class ServerThread implements Runnable {
 			} else if (maxPlayer > 4) {
 				pServerf("Warning: maxPlayer value %d out of range, capping to 4\n", maxPlayer);
 				maxPlayer = 4;
+			}
+
+			// check whether mapID is non-negative
+			if (mapID < 0) {
+				pServerf("Warning: mapID value %d out of range, capping to 0\n", mapID);
+				mapID = 0;
 			}
 
 			// check whether the player is already in a room

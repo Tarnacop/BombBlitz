@@ -91,7 +91,7 @@ public class ServerGame implements Runnable {
 	 * with id 0
 	 */
 	private boolean isMapIDValidreal() {
-		if (mapList == null || mapList.size() - 1 < mapID) {
+		if (mapID < 0 || mapList == null || mapList.size() - 1 < mapID) {
 			return false;
 		}
 		return mapList.get(mapID) != null;
