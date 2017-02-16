@@ -36,19 +36,19 @@ public class Maps {
 //				  0 1 2 3 4 5 6 7 8 9 1011121314
 			
 			Block[][] gridMap2 = {{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID},
-					{Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK,  Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
-					{Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					{Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK,  Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
-					{Block.SOLID,Block.SOFT, Block.SOLID, Block.BLANK,  Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK,  Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,  Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK,  Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,  Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK,  Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.SOFT, Block.SOLID, Block.BLANK,  Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
+					{Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK,  Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
+					{Block.SOLID,Block.BLANK, Block.SOLID, Block.SOFT,Block.SOLID,Block.BLANK, Block.SOLID,Block.SOFT, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
+					{Block.SOLID,Block.BLANK, Block.SOFT, Block.SOFT,  Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
+					{Block.SOLID,Block.SOFT, Block.SOLID, Block.BLANK,  Block.SOLID,Block.BLANK, Block.SOLID,Block.SOFT, Block.SOLID,Block.SOFT, Block.SOLID, Block.SOFT,Block.SOLID},
+					  {Block.SOLID,Block.SOFT, Block.BLANK, Block.SOFT,  Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.SOFT,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,  Block.SOLID,Block.SOFT, Block.SOLID,Block.BLANK, Block.SOLID,Block.SOFT, Block.SOLID, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.SOFT, Block.BLANK, Block.SOFT,  Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.SOFT,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.SOFT,  Block.SOLID,Block.SOFT, Block.SOLID,Block.BLANK, Block.SOLID,Block.SOFT, Block.SOLID, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.SOFT, Block.SOFT, Block.SOFT,  Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.SOFT,Block.SOLID},
+					  {Block.SOLID,Block.SOFT, Block.SOLID, Block.SOFT,  Block.SOLID,Block.SOFT, Block.SOLID,Block.SOFT, Block.SOLID,Block.BLANK, Block.SOLID, Block.SOFT,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.SOFT, Block.SOLID,Block.BLANK, Block.SOLID,Block.SOFT, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
 					  {Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID}};
 			
 			
@@ -60,9 +60,9 @@ public class Maps {
 		Map map1 = new Map("Level 1", gridMap1, spawns);
 		List<Point> spawns1 = new ArrayList<Point>();
 		spawns1.add(new Point(64, 64));
-		spawns1.add(new Point(128, 64));
-		spawns1.add(new Point(64, 128));
-		spawns1.add(new Point(192, 192));
+		spawns1.add(new Point(832,704));
+		spawns1.add(new Point(64, 704));
+		spawns1.add(new Point(832, 64));
 		Map map2 = new Map("Level 2", gridMap2, spawns1);
 		maps = new ArrayList<Map>();
 		maps.add(map1);
