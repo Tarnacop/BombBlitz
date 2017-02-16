@@ -9,15 +9,24 @@ public class Map {
 	private Block[][] gridMap;		//the grid representation of the map
 	private Block[][] pixelMap;		//the pixel representation of the map
 	private final int scalar = 64;
+	private List<Point> spawnPoints;
 	private int id;
 	private String name;
 	
-	public Map(String name, Block[][] gridMap){
+	public Map(String name, Block[][] gridMap, List<Point> spawnPoints){
 		
 		this.name = name;
 		this.gridMap = gridMap;
-		
+		this.spawnPoints = spawnPoints;
 		this.pixelMap = this.convertToPixel(gridMap);
+	}
+
+	public List<Point> getSpawnPoints() {
+		return spawnPoints;
+	}
+
+	public void setSpawnPoints(List<Point> spawnPoints) {
+		this.spawnPoints = spawnPoints;
 	}
 
 	public void update(){

@@ -58,8 +58,10 @@ public class Game implements GameInterface {
 		try {
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
+			
+			List<Point> spawns = this.map.getSpawnPoints();
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
-			this.player = new Player(this.playerName, new Point(64, 64), 3, 300, new Mesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 3, 300, new Mesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
@@ -69,7 +71,7 @@ public class Game implements GameInterface {
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
 
-			Player ai = new GameAI("player", new Point(64,64), 1, 300, gameState, new Mesh(32, 32, colours));
+			Player ai = new GameAI("ai1", new Point(spawns.get(1).x, spawns.get(1).y), 1, 300, gameState, new Mesh(32, 32, colours));
 //			Player ai2 = new GameAI("   dasda", new Point(832,832), 3, 300, gameState, new Mesh(32, 32, colours));
 			list.add(ai);
 //			list.add(ai2);
@@ -93,7 +95,7 @@ public class Game implements GameInterface {
 		// this.player.getKeyState().getMovement());
 		// System.out.println(this.gameState.getPlayers().get(0).getKeyState().toString());
 		this.physics.update((int) (interval * 1000));
-		 System.out.println(this.gameState);
+		//System.out.println(this.gameState);
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 		List<Player> players = this.gameState.getPlayers();
@@ -123,6 +125,7 @@ public class Game implements GameInterface {
 		for (Player player : this.gameState.getPlayers()) {
 
 			player.setAlive(false);
+			System.out.println("Player " + player.getName() + " is alive: " + player.isAlive());
 		}
 		renderer.dispose();
 		this.graphics.getScreen().close();
