@@ -54,6 +54,12 @@ public class AIManager extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
+		try {
+			sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		move();
 		System.out.println("AI Stopped.");
 	}

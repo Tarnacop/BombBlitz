@@ -58,7 +58,7 @@ public abstract class MainTestTemplate {
 				  {Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK}};	
 		
-		map = new Map("",blocks);
+		map = new Map("",blocks,null);
 
 		bombs = new ArrayList<>();
 		bombs.add(new Bomb("", new Point(0, 0), 5, 5));
