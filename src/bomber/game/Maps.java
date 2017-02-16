@@ -60,9 +60,9 @@ public class Maps {
 		Map map1 = new Map("Level 1", gridMap1, spawns);
 		List<Point> spawns1 = new ArrayList<Point>();
 		spawns1.add(new Point(64, 64));
-		spawns1.add(new Point(64, 64));
-		spawns1.add(new Point(64, 64));
-		spawns1.add(new Point(64, 64));
+		spawns1.add(new Point(128, 64));
+		spawns1.add(new Point(64, 128));
+		spawns1.add(new Point(192, 192));
 		Map map2 = new Map("Level 2", gridMap2, spawns1);
 		maps = new ArrayList<Map>();
 		maps.add(map1);
