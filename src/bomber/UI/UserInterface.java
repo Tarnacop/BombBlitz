@@ -82,7 +82,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		//for JavaFX
 		this.playerName = new SimpleStringProperty("Player 1");
 		Maps maps = new Maps();
-		this.map = maps.getMaps().get(0);
+		this.map = maps.getMaps().get(1);
 		this.mapName = new SimpleStringProperty(this.map.getName());
 		this.controls = new HashMap<Response, Integer>();
 		this.controls.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);

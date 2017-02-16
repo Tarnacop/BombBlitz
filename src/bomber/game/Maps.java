@@ -36,20 +36,20 @@ public class Maps {
 //				  0 1 2 3 4 5 6 7 8 9 1011121314
 			
 			Block[][] gridMap2 = {{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID},
-					{Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
+					{Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
+					{Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
+					{Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
+					{Block.SOLID,Block.SOFT, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
 					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
 					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.SOFT, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
 					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK,Block.SOLID},
-					  {Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK,Block.SOLID},
-			{Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID}};
+					  {Block.SOLID,Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.BLANK, Block.BLANK,Block.SOLID},
+					  {Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID,Block.SOLID}};
 			
 			
 		List<Point> spawns = new ArrayList<Point>();
