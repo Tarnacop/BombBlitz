@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import bomber.AI.GameAI;
+import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
 import bomber.physics.PhysicsEngine;
 import bomber.renderer.Graphics;
@@ -29,9 +30,11 @@ public class Game implements GameInterface {
 	private KeyboardInput input;
 	private Player player;
 	private AudioManager audio;
+	private UserInterface ui;
 
-	public Game(Map map, String playerName, HashMap<Response, Integer> controls) {
+	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls) {
 
+		this.ui = ui;
 		this.map = map;
 		this.playerName = playerName;
 		this.controlScheme = controls;
@@ -56,7 +59,7 @@ public class Game implements GameInterface {
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
-			this.player = new Player(this.playerName, new Point(64, 64), 10, 300, new Mesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(64, 64), 3, 300, new Mesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
@@ -77,6 +80,8 @@ public class Game implements GameInterface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		this.ui.hide();
 	}
 
 	@Override
@@ -113,6 +118,8 @@ public class Game implements GameInterface {
 	@Override
 	public void dispose() {
 
+		this.ui.show();
+		System.out.println("RETURNED TO MENU");
 		for (Player player : this.gameState.getPlayers()) {
 
 			player.setAlive(false);

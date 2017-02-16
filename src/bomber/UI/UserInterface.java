@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Stack;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -23,10 +25,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -70,7 +72,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private final String font = "Arial";
 	private VBox singleButtonPane;
-	private StackPane imagePane;
+	private Pane imagePane;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -96,6 +98,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	public void start(Stage primaryStage){
 
 		this.currentStage = primaryStage;
+		this.currentStage.setMinHeight(600);
+		this.currentStage.setMinWidth(800);
 		primaryStage.setTitle(this.appName);
 		
         mainMenu = new BorderPane(); 
@@ -201,7 +205,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         Image mainImage = new Image("resources/images/titlescreen.png");
         ImageView mainImageView = new ImageView(mainImage);
-        imagePane = new StackPane();
+        imagePane = new Pane();
         imagePane.getChildren().add(mainImageView); 
         imagePane.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
         mainImageView.fitWidthProperty().bind(imagePane.widthProperty()); 
@@ -316,7 +320,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		Map mapCopy = new Map(map.getName(), arrayCopy);
 		
-		Game game = new Game(mapCopy, playerName, controls);
+		Game game = new Game(this, mapCopy, playerName, controls);
 	}
 
 	@Override
@@ -407,5 +411,27 @@ public class UserInterface extends Application implements ClientNetInterface{
 	public void gameEnded() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void hide() {
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				currentStage.hide();
+			}
+			   
+		});
+	}
+	
+	public void show() {
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				currentStage.show();
+			}
+			   
+		});
 	}
 }
