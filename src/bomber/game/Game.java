@@ -31,9 +31,11 @@ public class Game implements GameInterface {
 	private Player player;
 	private AudioManager audio;
 	private UserInterface ui;
+	private int aiNum;
 
-	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls) {
+	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum) {
 
+		this.aiNum = aiNum;
 		this.ui = ui;
 		this.map = map;
 		this.playerName = playerName;
@@ -45,7 +47,10 @@ public class Game implements GameInterface {
 		audio.playMusic();
 
 		try {
-			this.graphics = new Graphics("Bomb Blitz", 1200, 600, true, this);
+			
+			int width = this.map.getPixelMap().length;
+			int height = this.map.getPixelMap()[0].length;
+			this.graphics = new Graphics("Bomb Blitz", width, height, true, this);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -72,12 +77,11 @@ public class Game implements GameInterface {
 			this.gameState = new GameState(map, list);
 			this.physics = new PhysicsEngine(gameState);
 
-			Player ai = new GameAI("ai1", new Point(spawns.get(1).x, spawns.get(1).y), 1, 300, gameState, new Mesh(32, 32, colours));
-//			Player ai2 = new GameAI("   dasda", new Point(832,832), 3, 300, gameState, new Mesh(32, 32, colours));
-			list.add(ai);
-//			list.add(ai2);
-			ai.begin();
-//			ai2.begin();
+			for(int x = 1; x <= this.aiNum; x++){
+				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 1, 300, gameState, new Mesh(32, 32, colours));
+				list.add(ai);
+				ai.begin();
+			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

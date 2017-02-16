@@ -608,5 +608,26 @@ public class RouteFinder {
 		return getMovesFromPoints(finish);
 
 	}
+	
+	private class Pair
+	{
+		private Point position;
+		private LinkedList<AIActions> actions;
+		private Pair(Point position, LinkedList<AIActions> actions)
+		{
+			this.position = position;
+			this.actions = actions;
+		}
+		
+		private Point getPos()
+		{
+			return position;
+		}
+		
+		private LinkedList<AIActions> getActions()
+		{
+			return actions;
+		}
+	}
 
 }
