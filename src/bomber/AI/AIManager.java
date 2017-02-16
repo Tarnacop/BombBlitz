@@ -240,6 +240,7 @@ public class AIManager extends Thread {
 
 			// if AI is in danger then find the escape route
 			if (safetyCh.inDanger()) {
+				System.out.println("Danger");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 				
