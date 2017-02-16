@@ -165,22 +165,31 @@ public class ServerGame implements Runnable {
 
 		// initialise gameState
 		List<Player> players = new ArrayList<Player>();
-		for (int i = 0; i < playerList.size(); i++) {
-			/*
-			 * TODO we can choose the initial position of the player based on
-			 * the index
-			 */
-			// currently just use hard-coded initial position
-			ServerClientInfo c = playerList.get(i);
-			if (c == null) {
-				System.out.println("ServerGame: playerList contains null");
-			} else {
-				Player p = new Player(c.getName(), new Point(64, 64), 100, 300, null);
-				p.setPlayerID(c.getID());
-				players.add(p);
+
+		Map map = mapList.get(mapID);
+		List<Point> spawnPoints = map.getSpawnPoints();
+		synchronized (playerList) {
+			for (int i = 0; i < playerList.size(); i++) {
+				ServerClientInfo c = playerList.get(i);
+				if (c == null) {
+					System.out.println("ServerGame: playerList contains null");
+				} else {
+					Point initPos = null;
+					if (spawnPoints == null || spawnPoints.size() < i + 1) {
+						initPos = new Point(64, 64);
+					} else {
+						initPos = spawnPoints.get(i);
+						if (initPos == null) {
+							initPos = new Point(64, 64);
+						}
+					}
+					Player p = new Player(c.getName(), initPos, 3, 300, null);
+					p.setPlayerID(c.getID());
+					players.add(p);
+				}
 			}
 		}
-		gameState = new GameState(mapList.get(mapID), players);
+		gameState = new GameState(map, players);
 
 		// initialise send buffer
 		byte[] sendBuffer = new byte[2000];
@@ -196,15 +205,16 @@ public class ServerGame implements Runnable {
 		sendByteBuffer.putInt(roomID);
 		packet.setLength(1 + 2 + 4);
 
-		for (ServerClientInfo c : playerList) {
-			packet.setSocketAddress(c.getSocketAddress());
-			try {
-				serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTART, true);
-			} catch (IOException e) {
-				System.out.println("ServerGame: failed to send packet: " + e);
+		synchronized (playerList) {
+			for (ServerClientInfo c : playerList) {
+				packet.setSocketAddress(c.getSocketAddress());
+				try {
+					serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTART, true);
+				} catch (IOException e) {
+					System.out.println("ServerGame: failed to send packet: " + e);
+				}
 			}
 		}
-
 		long loopStartTime = System.currentTimeMillis();
 		int busyTime = 0;
 		int sleepTime = interval;
@@ -226,12 +236,14 @@ public class ServerGame implements Runnable {
 				 * ServerClientInfo in playerList ?
 				 */
 				boolean shouldRemove = true;
-				for (ServerClientInfo c : playerList) {
-					if (p != null && c != null && p.getPlayerID() == c.getID()) {
-						shouldRemove = false;
+				synchronized (playerList) {
+					for (ServerClientInfo c : playerList) {
+						if (p != null && c != null && p.getPlayerID() == c.getID()) {
+							shouldRemove = false;
+						}
 					}
 				}
-				if (shouldRemove && p != null) {
+				if (shouldRemove && p != null && p.getLives() != 0 && p.isAlive()) {
 					// If no, kill this player
 					System.out.printf("ServerGame: killing player %d due to not in room\n", p.getPlayerID());
 					p.setLives(0);
@@ -251,14 +263,16 @@ public class ServerGame implements Runnable {
 			}
 			packet.setLength(packetLen);
 
-			// send new gameState to clients
-			for (ServerClientInfo c : playerList) {
+			synchronized (playerList) {
+				// send new gameState to clients
+				for (ServerClientInfo c : playerList) {
 
-				packet.setSocketAddress(c.getSocketAddress());
-				try {
-					serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTATE, false);
-				} catch (IOException e) {
-					System.out.println("ServerGame: failed to send packet: " + e);
+					packet.setSocketAddress(c.getSocketAddress());
+					try {
+						serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTATE, false);
+					} catch (IOException e) {
+						System.out.println("ServerGame: failed to send packet: " + e);
+					}
 				}
 			}
 
@@ -273,11 +287,6 @@ public class ServerGame implements Runnable {
 				}
 			}
 
-			/*
-			 * System.out.printf(
-			 * "ServerGame: tickrate: %d, interval: %d busy time: %d sleep time: %d\n"
-			 * , tickRate, interval, busyTime, sleepTime);
-			 */
 		}
 
 		// tell clients the game is over
@@ -285,18 +294,15 @@ public class ServerGame implements Runnable {
 		sendByteBuffer.putInt(roomID);
 		packet.setLength(1 + 2 + 4);
 
-		for (ServerClientInfo c : playerList) {
-			packet.setSocketAddress(c.getSocketAddress());
-			try {
-				serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMEOVER, true);
-			} catch (IOException e) {
-				System.out.println("ServerGame: failed to send packet: " + e);
-			}
-		}
-
-		// set all the players to not ready after the game
-		for (ServerClientInfo c : playerList) {
-			if (c != null) {
+		synchronized (playerList) {
+			for (ServerClientInfo c : playerList) {
+				packet.setSocketAddress(c.getSocketAddress());
+				try {
+					serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMEOVER, true);
+				} catch (IOException e) {
+					System.out.println("ServerGame: failed to send packet: " + e);
+				}
+				// set all the players to not ready after the game
 				c.setReadyToPlay(false);
 			}
 		}

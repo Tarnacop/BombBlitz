@@ -15,7 +15,7 @@ public class ServerRoom {
 	// name of the room, uniqueness required
 	private String name = null;
 	// list of players in the room
-	private ArrayList<ServerClientInfo> playerList = new ArrayList<ServerClientInfo>(4);
+	private List<ServerClientInfo> playerList = new ArrayList<ServerClientInfo>();
 	// max number of players allowed in the room (in the range [2,4])
 	private byte maxPlayer = 4;
 	// flag indicating whether the game is in progress
@@ -125,13 +125,32 @@ public class ServerRoom {
 	}
 
 	/**
-	 * Get the list of players in the room. It is not advisable to modify the
-	 * list directly
+	 * Get the number of players in the room
 	 * 
-	 * @return the list of players in the room
+	 * @return the number of players in the room
 	 */
-	public List<ServerClientInfo> getPlayerList() {
-		return playerList;
+	public int numPlayers() {
+		return playerList.size();
+	}
+
+	/**
+	 * Returns true if all players in the room are ready to play the game
+	 * 
+	 * @return true if all players in the room are ready to play the game
+	 */
+	public boolean allPlayersReady() {
+		synchronized (playerList) {
+			boolean allPlayersReady = true;
+			for (ServerClientInfo c : playerList) {
+				if (c == null) {
+					System.err.println("Bug: playerList should not contain null");
+				} else {
+					allPlayersReady = c.isReadyToPlay() && allPlayersReady;
+				}
+			}
+			return allPlayersReady;
+		}
+
 	}
 
 	/**
@@ -191,6 +210,7 @@ public class ServerRoom {
 		}
 
 		if (player == null) {
+			System.err.println("Unexpected addPlayer(): Player is null");
 			return;
 		}
 
@@ -211,6 +231,17 @@ public class ServerRoom {
 	 */
 	public void removePlayer(ServerClientInfo player) {
 		playerList.remove(player);
+	}
+
+	/**
+	 * Returns true if the room contains the specified player
+	 * 
+	 * @param player
+	 *            the player whose presence in the room is to be tested
+	 * @return true if the room contains the specified player
+	 */
+	public boolean containsPlayer(ServerClientInfo player) {
+		return playerList.contains(player);
 	}
 
 	/**
