@@ -54,6 +54,12 @@ public class AIManager extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
+		try {
+			sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		move();
 		System.out.println("AI Stopped.");
 	}
@@ -240,6 +246,7 @@ public class AIManager extends Thread {
 
 			// if AI is in danger then find the escape route
 			if (safetyCh.inDanger()) {
+				System.out.println("Danger");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 				
