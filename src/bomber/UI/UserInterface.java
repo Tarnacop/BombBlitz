@@ -25,6 +25,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -103,6 +105,24 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private VBox playersListPane;
 	private FlowPane roomsBox;
 	private VBox playersBox;
+	private Button backBtn5;
+	private Button upBtn;
+	private Button downBtn;
+	private Button leftBtn;
+	private Button rightBtn;
+	private Button spaceBtn;
+	private Label upLabel;
+	private Label downLabel;
+	private Label rightLabel;
+	private Label leftLabel;
+	private Label keyLabel;
+	private HBox upPane;
+	private Label bombLabel;
+	private Button bombBtn;
+	private HBox downPane;
+	private HBox rightPane;
+	private HBox leftPane;
+	private HBox bombPane;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -165,6 +185,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         nameText = new TextField("Enter Name");
         
         enterLabel = new Label("Enter Server Details:");
+        enterLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
         
         ipBox = new HBox();
         
@@ -216,6 +237,10 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBtn4 = new Button("Back");
         backBtn4.setOnAction(e -> previous());
         
+        backBtn5 = new Button("Back");
+        backBtn5.setAlignment(Pos.CENTER);
+        backBtn5.setOnAction(e -> previous());
+        
         singleBtn = new Button("Single\nPlayer");
         singleBtn.setPrefHeight(Integer.MAX_VALUE);
         singleBtn.setOnAction(e -> advance(mainScene, singleScene));
@@ -226,7 +251,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         settingsBtn = new Button("Settings");
         settingsBtn.setPrefWidth(Integer.MAX_VALUE);
-        settingsBtn.setOnAction(e -> advance(mainScene, settingsScene));
+        settingsBtn.setOnAction(e -> advance(mainScene, keyScene));//TODO
         
         controlsBtn = new Button("Control Options");
         controlsBtn.setOnAction(e -> advance(settingsScene, keyScene));
@@ -290,10 +315,71 @@ public class UserInterface extends Application implements ClientNetInterface{
         mainMenu.setTop(namePane);
         mainMenu.setLeft(singleButtonPane);
         mainMenu.setRight(multiBtn);
-        mainMenu.setBottom(settingsBtn);
+        //TODO mainMenu.setBottom(settingsBtn);
         
-        addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
-        addElements(keyMenu, backBtn2);
+        //addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
+        
+        upBtn = new Button("" + this.controls.get(Response.UP_MOVE));
+        upBtn.setPrefWidth(200);
+        upBtn.setOnAction(e -> setUp());
+        
+        downBtn = new Button("" + this.controls.get(Response.DOWN_MOVE));
+        downBtn.setPrefWidth(200);
+        downBtn.setOnAction(e -> setDown());
+        
+        leftBtn = new Button("" + this.controls.get(Response.LEFT_MOVE));
+        leftBtn.setPrefWidth(200);
+        leftBtn.setOnAction(e -> setLeft());
+        
+        rightBtn = new Button("" + this.controls.get(Response.RIGHT_MOVE));
+        rightBtn.setPrefWidth(200);
+        rightBtn.setOnAction(e -> setRight());
+        
+        bombBtn = new Button("" + this.controls.get(Response.PLACE_BOMB));
+        bombBtn.setPrefWidth(200);
+        bombBtn.setOnAction(e -> setNextKey(this.bombBtn, Response.PLACE_BOMB));
+        
+        keyLabel = new Label("Key Bindings");
+        keyLabel.setFont(Font.font(font, FontWeight.BOLD, 40));
+        
+        upLabel = new Label("UP");
+        upLabel.setPrefWidth(200);
+        upPane = new HBox();
+        upPane.setAlignment(Pos.CENTER);
+        upPane.getChildren().addAll(upLabel, upBtn);
+        upPane.setSpacing(20);
+        
+        downLabel = new Label("DOWN");
+        downLabel.setPrefWidth(200);
+        downPane = new HBox();
+        downPane.setAlignment(Pos.CENTER);
+        downPane.getChildren().addAll(downLabel, downBtn);
+        downPane.setSpacing(20);
+        
+        rightLabel = new Label("RIGHT");
+        rightLabel.setPrefWidth(200);
+        rightPane = new HBox();
+        rightPane.setAlignment(Pos.CENTER);
+        rightPane.getChildren().addAll(rightLabel, rightBtn);
+        rightPane.setSpacing(20);
+        
+        leftLabel = new Label("LEFT");
+        leftLabel.setPrefWidth(200);
+        leftPane = new HBox();
+        leftPane.setAlignment(Pos.CENTER);
+        leftPane.getChildren().addAll(leftLabel, leftBtn);
+        leftPane.setSpacing(20);
+        
+        bombLabel = new Label("BOMB");
+        bombLabel.setPrefWidth(200);
+        bombPane = new HBox();
+        bombPane.setAlignment(Pos.CENTER);
+        bombPane.getChildren().addAll(bombLabel, bombBtn);
+        bombPane.setSpacing(20);
+        
+        keyMenu.setSpacing(20);
+        keyMenu.setAlignment(Pos.CENTER);
+        keyMenu.getChildren().addAll(upPane, downPane, rightPane, leftPane, bombPane, backBtn5);
         
         mapBox = new VBox();
         mapBox.setAlignment(Pos.CENTER);
@@ -388,6 +474,38 @@ public class UserInterface extends Application implements ClientNetInterface{
         
 	}
 	
+	private Object setRight() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Object setLeft() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Object setDown() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Object setUp() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private void setNextKey(Button btn, Response response) {
+
+		btn.setText("PRESS KEY");
+		this.keyScene.setOnKeyPressed(e -> addControl(btn, e, response));
+	}
+
+	private void addControl(Button btn, KeyEvent e, Response response) {
+		
+		btn.setText(e.getText());
+		System.out.println(e.getCode());
+	}
+
 	private void disconnect() {
 		if (this.client != null) {
 			try {
