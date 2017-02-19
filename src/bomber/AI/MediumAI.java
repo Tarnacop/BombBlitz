@@ -1,47 +1,22 @@
-
 package bomber.AI;
 
 import java.awt.Point;
 import java.util.LinkedList;
+import java.util.Random;
+
 import bomber.game.GameState;
-import bomber.game.Movement;
-import bomber.game.Player;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class AIManager.
- *
- * @author Jokubas Liutkus The Class AIManager for making moves.
- */
-public class AIManager extends AITemplate{
+public class MediumAI extends AITemplate {
 
-
-	/**
-	 * Instantiates a new AI manager.
-	 *
-	 * @param ai
-	 *            the AI
-	 * @param gameState
-	 *            the game state
-	 */
-	public AIManager(GameAI ai, GameState gameState) {
+	public MediumAI(GameAI ai, GameState gameState) {
 		super(ai, gameState);
+		// TODO Auto-generated constructor stub
 	}
 
-	
-
-	/**
-	 * Perform sequence of moves.
-	 *
-	 * @param moves
-	 *            the list of moves
-	 * @param inDanger
-	 *            the variable determining if the escape moves are passed in
-	 *            that case make moves without considering anything else
-	 */
+	@Override
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
-			while (moves != null && !moves.isEmpty() ) {
+			while (moves != null && !moves.isEmpty()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
@@ -49,19 +24,14 @@ public class AIManager extends AITemplate{
 					&& !safetyCh.isEnemyInBombRange()) {
 				makeSingleMove(moves.removeFirst());
 			}
+
 	}
 
-	/**
-	 * Perform planned moves.
-	 * When none of the players are reachable
-	 *
-	 * @param moves
-	 *            the moves
-	 */
+	@Override
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null) {
+		while (moves != null && !moves.isEmpty() && !safetyCh.inDanger()) {
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -79,53 +49,52 @@ public class AIManager extends AITemplate{
 					while (!safetyCh.checkMoveSafety(moves.peek())) {
 					}
 				}
-			} 
+			}
 			// otherwise make a standard move
 			else {
 				makeSingleMove(action);
 			}
 		}
+
 	}
 
-	
-
-	/**
-	 * Main method for controlling what moves to make.
-	 */
+	@Override
 	protected void move() {
 		LinkedList<AIActions> moves;
+		Random random = new Random();
+
 		while (gameAI.isAlive()) {
 
-			// if AI is in danger then find the escape route
-			if (safetyCh.inDanger()) {
+			// if AI is in dangger then escape only with 75% possibility
+			if (safetyCh.inDanger() && random.nextInt(100) > 25) {
+				System.out.println("1");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
-				
+
 			}
-			
-//			//if enemy is in range and it is possible to place bomb and escape then do it
-//			else if((moves = finder.canPutBombAndEscape()) != null){
-//				System.out.println("Bomb");
-//				gameAI.getKeyState().setBomb(true);
-//				performMoves(moves, true);
-//			}
-//			
-			
-			
+
 			// if enemy is in bomb range then place the bomb and go to the
-////			// safe location
-			else if (safetyCh.isEnemyInBombRange()) {
+			//// // safe location only with 30% possibility
+			else if (safetyCh.isEnemyInBombRange() && random.nextInt(10) > 4) {
+				System.out.println("2");
 				gameAI.getKeyState().setBomb(true);
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
+
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
-			else if ((moves = getMovesToEnemy()) != null) {
+			else if ((moves = getMovesToEnemy()) != null && random.nextBoolean()) {
 				performMoves(moves, false);
 			}
-			// if enemy is not in the range get the plan how to reach enemy and fullfill it
-			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
+
+			// otherwise just generate a random goal and star fullfilling it
+			else {
+				System.out.println("3");
+				int x = random.nextInt(gameState.getMap().getGridMap()[0].length);
+				int y = random.nextInt(gameState.getMap().getGridMap().length);
+				System.out.println(x + "  " + y);
+				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
 				performPlannedMoves(moves);
 			}
 

@@ -18,6 +18,13 @@ public class GameAI extends Player {
 	/** The AI manager thread. */
 	private Thread aiManager;
 
+	
+	
+	
+	private Thread easyAI;
+	
+	
+	private Thread mediumAI;
 	/**
 	 * Instantiates a new game AI.
 	 *
@@ -38,6 +45,8 @@ public class GameAI extends Player {
 		super(name, pos, lives, speed, mesh);
 		this.state = gameState;
 		aiManager = new AIManager(this, state);
+		easyAI = new EasyAI(this, state);
+		mediumAI = new MediumAI(this, state);
 	}
 
 	/**
@@ -46,7 +55,10 @@ public class GameAI extends Player {
 	 */
 	public void begin() {
 		System.out.println("Pos: " + this.getPos().x + ", " + this.getPos().y);
-		aiManager.start();
+//		aiManager.start();
+//		easyAI.start();
+		mediumAI.start();
+		
 	}
 
 	/**
