@@ -31,7 +31,7 @@ public class MediumAI extends AITemplate {
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() && !safetyCh.inDanger()) {
+		while (moves != null && !moves.isEmpty()  ) {
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -46,7 +46,8 @@ public class MediumAI extends AITemplate {
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek())) {
+					while (!safetyCh.checkMoveSafety(moves.peek()) ) {
+						if(safetyCh.inDanger()) break;
 					}
 				}
 			}
@@ -86,6 +87,7 @@ public class MediumAI extends AITemplate {
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemy()) != null && random.nextBoolean()) {
 				performMoves(moves, false);
+				gameAI.getKeyState().setBomb(true);
 			}
 
 			// otherwise just generate a random goal and star fullfilling it
