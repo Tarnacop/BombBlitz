@@ -1,5 +1,6 @@
 package bomber.audio;
 
+import bomber.game.Constants;
 import sun.applet.Main;
 
 import javax.sound.sampled.*;
@@ -11,8 +12,6 @@ import java.io.IOException;
 public class MusicPlayer extends Thread
 {
 
-    public static final String musicFilename = "01_A_Night_Of_Dizzy_Spells.wav";
-
     private Clip clip;
 
     public MusicPlayer()
@@ -20,7 +19,7 @@ public class MusicPlayer extends Thread
         try {
             clip = AudioSystem.getClip();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    Main.class.getResourceAsStream(AudioManager.audioFilesPath + musicFilename));
+                    Main.class.getResourceAsStream(Constants.audioFilesPath + Constants.musicFilename));
             clip.open(inputStream);
         } catch (UnsupportedAudioFileException e) {
             e.printStackTrace();

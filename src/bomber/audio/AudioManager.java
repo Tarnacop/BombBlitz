@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 public class AudioManager
 {
 
-    public static final String audioFilesPath = "/bomber/audio/";
-
     private MusicPlayer music;
     private SoundEffectPlayer effects;
 

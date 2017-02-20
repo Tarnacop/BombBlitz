@@ -1,6 +1,7 @@
 package bomber.audio;
 
 import bomber.game.AudioEvent;
+import bomber.game.Constants;
 import sun.applet.Main;
 
 import javax.sound.sampled.*;
@@ -12,17 +13,12 @@ import java.io.IOException;
 public class SoundEffectPlayer extends Thread
 {
 
-    public static final String explosionFilename = "sfx_exp_medium3.wav";
-    public static final String bombPlaceFilename = "sfx_sound_neutral6.wav";
-    public static final String movementFilename = "sfx_movement_footsteps1a.wav";
-    public static final String playerDeathFilename = "sfx_sounds_error1.wav";
-
     private void playSound(String fileName)
     {
         try {
             Clip clip = AudioSystem.getClip();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    Main.class.getResourceAsStream(AudioManager.audioFilesPath + fileName));
+                    Main.class.getResourceAsStream(Constants.audioFilesPath + fileName));
             clip.open(inputStream);
             clip.start();
         } catch (UnsupportedAudioFileException e) {
@@ -39,16 +35,19 @@ public class SoundEffectPlayer extends Thread
         switch (event)
         {
             case PLACE_BOMB:
-                playSound(bombPlaceFilename);
+                playSound(Constants.bombPlaceFilename);
                 break;
             case EXPLOSION:
-                playSound(explosionFilename);
+                playSound(Constants.explosionFilename);
                 break;
             case PLAYER_DEATH:
-                playSound(playerDeathFilename);
+                playSound(Constants.playerDeathFilename);
                 break;
             case MOVEMENT:
-                playSound(movementFilename);
+                playSound(Constants.movementFilename);
+                break;
+            case POWERUP:
+                playSound(Constants.powerupFilename);
                 break;
         }
     }
