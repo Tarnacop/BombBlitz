@@ -10,7 +10,6 @@ public class Map {
 	private Block[][] pixelMap;		//the pixel representation of the map
 	private final int scalar = 64;
 	private List<Point> spawnPoints;
-	private int id;
 	private String name;
 	
 	public Map(String name, Block[][] gridMap, List<Point> spawnPoints){

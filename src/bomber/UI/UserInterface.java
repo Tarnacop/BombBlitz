@@ -14,29 +14,25 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import bomber.game.Block;
 import bomber.game.Game;
@@ -78,7 +74,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private HBox currentName;
 	private HBox nameSetter;
 	
-	private final String font = "Arial";
 	private VBox singleButtonPane;
 	private Pane imagePane;
 	private VBox mapBox;
@@ -123,9 +118,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private HBox rightPane;
 	private HBox leftPane;
 	private HBox bombPane;
+	private boolean connected;
+	private boolean connectionBroke;
+	private boolean expectingConnection;
+	private Scene currentScene;
+	private Font font;
 	
 	public UserInterface(){
 		//for JavaFX
+		this.font = Font.loadFont(UserInterface.class.getResource("minecraft.ttf").toExternalForm(), 20);
+
 		this.playerName = new SimpleStringProperty("Player 1");
 		this.aiNumber = new SimpleIntegerProperty(1);
 		Maps maps = new Maps();
@@ -150,7 +152,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 		this.currentStage = primaryStage;
 		this.currentStage.setMinHeight(600);
-		this.currentStage.setMinWidth(800);
+		this.currentStage.setMinWidth(1000);
 		primaryStage.setTitle(this.appName);
 		
         mainMenu = new BorderPane(); 
@@ -165,34 +167,31 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         loadMenu = new VBox();
         serverMenu = new VBox();
-        //serverMenu.setStyle("-fx-background-color: black");
         
         singleMenu = new BorderPane();
         
-        mainScene = new Scene(mainMenu, 800, 600);
-        mainScene.setFill(Color.BLACK);
-        settingsScene = new Scene(settingsMenu, 800, 600);
+        mainScene = new Scene(mainMenu, 1000, 600);
+        settingsScene = new Scene(settingsMenu, 1000, 600);
         
-        keyScene = new Scene(keyMenu, 800, 600);
-        multiScene = new Scene(multiMenu, 800, 600);
-        multiScene.setFill(Color.BLACK);
-        serverScene = new Scene(serverMenu, 800, 600);
-        serverScene.setFill(Color.BLACK);
-        singleScene = new Scene(singleMenu, 800, 600);
+        keyScene = new Scene(keyMenu, 1000, 600);
+        multiScene = new Scene(multiMenu, 1000, 600);
+
+        serverScene = new Scene(serverMenu, 1000, 600);
+        singleScene = new Scene(singleMenu, 1000, 600);
         
         previousScenes = new Stack<Scene>();
         
         nameText = new TextField("Enter Name");
         
         enterLabel = new Label("Enter Server Details:");
-        enterLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
+        enterLabel.setFont(font);
         
         ipBox = new HBox();
         
         //ipText = new TextField("IP Address");
         ipText = new TextField("10.20.170.99");
         slashLabel = new Label("/");
-        slashLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
+        slashLabel.setFont(font);
         //portNum = new TextField("Port Number");
         portNum = new TextField("1234");
         
@@ -206,10 +205,10 @@ public class UserInterface extends Application implements ClientNetInterface{
         connectBtn.setOnAction(e -> connect(multiScene, ipText.getText(), Integer.parseInt(portNum.getText())));
         
         currentNameLabel = new Label("Current Name:");
-        currentNameLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
+        currentNameLabel.setFont(font);
         
         displayName = new Label();
-        displayName.setFont(Font.font(font, FontWeight.BOLD, FontPosture.ITALIC, 20));
+        displayName.setFont(font);
         displayName.textProperty().bind(this.playerName);
         
         nameBtn = new Button("Set Name");
@@ -235,36 +234,48 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBtn3.setOnAction(e -> previous());
         
         backBtn4 = new Button("Back");
-        backBtn4.setOnAction(e -> previous());
+        backBtn4.setOnAction(e -> disconnect());
         
         backBtn5 = new Button("Back");
         backBtn5.setAlignment(Pos.CENTER);
         backBtn5.setOnAction(e -> previous());
         
-        singleBtn = new Button("Single\nPlayer");
-        singleBtn.setPrefHeight(Integer.MAX_VALUE);
+        singleBtn = new Button("Single Player");
+        singleBtn.setPrefWidth(200);
+        singleBtn.setFont(font);
+        singleBtn.setStyle(""
+        		+ "-fx-background-color: transparent;"
+        		+ "-fx-background-image: url(\"resources/images/button.png\");"
+        		+ "-fx-background-size:100% 100%;"
+        		+ "-fx-background-repeat:no-repeat;");
         singleBtn.setOnAction(e -> advance(mainScene, singleScene));
         
-        multiBtn = new Button("Multi\nPlayer");
-        multiBtn.setPrefHeight(Integer.MAX_VALUE);
+        multiBtn = new Button("Multiplayer");
+        multiBtn.setPrefWidth(200);
+        multiBtn.setFont(font);
+        multiBtn.setStyle(""
+        		+ "-fx-background-color: transparent;"
+        		+ "-fx-background-image: url(\"resources/images/button.png\");"
+        		+ "-fx-background-size:100% 100%;"
+        		+ "-fx-background-repeat:no-repeat;");
         multiBtn.setOnAction(e -> advance(mainScene, multiScene));
         
         settingsBtn = new Button("Settings");
-        settingsBtn.setPrefWidth(Integer.MAX_VALUE);
+        settingsBtn.setPrefWidth(200);
         settingsBtn.setOnAction(e -> advance(mainScene, keyScene));//TODO
         
         controlsBtn = new Button("Control Options");
-        controlsBtn.setOnAction(e -> advance(settingsScene, keyScene));
+        controlsBtn.setOnAction(e -> advance(mainScene, keyScene));
         
         audioBtn = new Button("Audio Options");
         
         graphicsBtn = new Button("Graphics Options");
         
         currentMapLabel = new Label("Current Map:");
-        currentMapLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
+        currentMapLabel.setFont(font);
         
         displayMap = new Label();
-        displayMap.setFont(Font.font(font, FontWeight.BOLD, FontPosture.ITALIC, 20));
+        displayMap.setFont(font);
         displayMap.textProperty().bind(this.mapName);
         
         rightMapToggle = new Button("->");
@@ -280,7 +291,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         upAiToggle.setOnAction(e -> incrementAi());
         
         displayAi = new Label();
-        displayAi.setFont(Font.font(font, FontWeight.BOLD, FontPosture.ITALIC, 20));
+        displayAi.setFont(font);
         displayAi.textProperty().bind(this.aiNumber.asString());
         
         downAiToggle = new Button("v");
@@ -303,7 +314,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         singleButtonPane.setAlignment(Pos.CENTER);
         singleButtonPane.getChildren().add(singleBtn);
         
-        Image mainImage = new Image("resources/images/titlescreen.png");
+        Image mainImage = new Image("resources/images/background.png");
         ImageView mainImageView = new ImageView(mainImage);
         imagePane = new Pane();
         imagePane.getChildren().add(mainImageView); 
@@ -311,10 +322,31 @@ public class UserInterface extends Application implements ClientNetInterface{
         mainImageView.fitWidthProperty().bind(imagePane.widthProperty()); 
         mainImageView.fitHeightProperty().bind(imagePane.heightProperty());
         
-        mainMenu.setCenter(imagePane);
-        mainMenu.setTop(namePane);
-        mainMenu.setLeft(singleButtonPane);
-        mainMenu.setRight(multiBtn);
+        Image logoImage = new Image("resources/images/logo.png");
+        ImageView logoImageView = new ImageView(logoImage);
+        HBox logoPane = new HBox();
+        logoPane.setSpacing(20);
+        logoPane.setAlignment(Pos.CENTER);
+        VBox menuBox = new VBox();
+        menuBox.setSpacing(20);
+        menuBox.setAlignment(Pos.CENTER);
+        menuBox.getChildren().addAll(singleBtn, multiBtn);
+        logoPane.getChildren().addAll(logoImageView, menuBox);
+        //logoImageView.fitWidthProperty().bind(imagePane.widthProperty().divide(3)); 
+        //logoImageView.fitHeightProperty().bind(imagePane.heightProperty().divide(3));
+//        mainMenu.setStyle("-fx-background-image: url(\"resources/images/menu_background.png\");"
+//        		+ "-fx-background-repeat:no-repeat;"
+//        		+ "-fx-background-size:cover;"
+//        		+ "-fx-background-position:center;"
+//        		+ "-fx-overflow:hidden;");
+        StackPane background = new StackPane();
+        background.setAlignment(Pos.CENTER);
+        background.getChildren().add(imagePane);
+        background.getChildren().add(logoPane);
+        mainMenu.setCenter(background);
+        //mainMenu.setTop(namePane);
+        //mainMenu.setLeft(singleButtonPane);
+        //mainMenu.setRight(multiBtn);
         //TODO mainMenu.setBottom(settingsBtn);
         
         //addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
@@ -340,7 +372,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         bombBtn.setOnAction(e -> setNextKey(this.bombBtn, Response.PLACE_BOMB));
         
         keyLabel = new Label("Key Bindings");
-        keyLabel.setFont(Font.font(font, FontWeight.BOLD, 40));
+        keyLabel.setFont(font);
         
         upLabel = new Label("UP");
         upLabel.setPrefWidth(200);
@@ -391,7 +423,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         backBox2 = new HBox();
         backBox2.setAlignment(Pos.CENTER_LEFT);
-        backBox2.getChildren().addAll(backBtn4);
+        backBox2.getChildren().add(backBtn4);
         
         aiBox = new VBox();
         aiBox.setAlignment(Pos.CENTER);
@@ -399,7 +431,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiBox.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
         
         aiLabel = new Label("Number of\nAI Players");
-        aiLabel.setFont(Font.font(font, FontWeight.BOLD, 20));
+        aiLabel.setFont(font);
         
         aiPane = new HBox();
         aiPane.setAlignment(Pos.CENTER);
@@ -418,7 +450,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         singleMenu.setBottom(startBtn);
         
         roomsTitle = new Label("Rooms:");
-        roomsTitle.setFont(Font.font(font, FontWeight.BOLD, 20));
+        roomsTitle.setFont(font);
         
         roomsBox = new FlowPane();
         roomsBox.setVgap(10);
@@ -434,7 +466,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
         
         playersTitle = new Label("Online Players:");
-        playersTitle.setFont(Font.font(font, FontWeight.BOLD, 20));
+        playersTitle.setFont(font);
         
         playersBox = new VBox();
         playersBox.setSpacing(20);
@@ -515,8 +547,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 			} finally {
 				this.client.exit();
 				this.client = null;
-				previous();
 			}
+		}
+		this.expectingConnection = false;
+
+		if(this.previousScenes.size() != 0){
+			previous();
 		}
 	}
 	
@@ -556,7 +592,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private void connect(Scene thisScene, String hostName, int port) {
 		
 		System.out.println("Attempting connection to: " + hostName + ", port = " + port);
-		
+		this.connectionBroke = false;
 		this.client = null;
 		try {
 			client = new ClientThread(hostName, port);
@@ -570,13 +606,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 			client.updateRoomList();
 			client.updatePlayerList();
 		} catch (Exception e1) {
-			// Can't resolve hostname or port, or can't create socket
-			e1.printStackTrace();
 		}finally{
-
-			advance(thisScene, this.serverScene);
-			displayPlayers();
-			displayRooms();
+			
+			this.expectingConnection = true;
+				
 		}
 		
 //			// update my player list
@@ -615,9 +648,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 			//roomName.setPadding(new Insets(20));
 			roomName.setStyle("-fx-background-color: blue;"
 					+ "-fx-text-fill: white;");
-			roomName.setFont(Font.font(font, FontWeight.BOLD, 40));
+			//roomName.setFont(Font.font(font, FontWeight.BOLD, 40));
 			Button joinButton = new Button("JOIN");
 			joinButton.setPrefHeight(50);
+			joinButton.setOnAction(e -> joinRoom(room.getID()));
 			HBox roomPane = new HBox();
 			roomPane.setSpacing(15);
 			roomPane.setPrefHeight(50);
@@ -626,15 +660,25 @@ public class UserInterface extends Application implements ClientNetInterface{
 			Label slash = new Label("/");
 			Label maxPlayers = new Label("" + room.getMaxPlayer());
 			slash.setAlignment(Pos.CENTER);
-			slash.setFont(Font.font(font, FontWeight.BOLD, 50));
+			//slash.setFont(Font.font(font, FontWeight.BOLD, 50));
 			numPlayers.setAlignment(Pos.CENTER);
-			numPlayers.setFont(Font.font(font, FontWeight.BOLD, 50));
+			//numPlayers.setFont(Font.font(font, FontWeight.BOLD, 50));
 			maxPlayers.setAlignment(Pos.CENTER);
-			maxPlayers.setFont(Font.font(font, FontWeight.BOLD, 50));
+			//maxPlayers.setFont(Font.font(font, FontWeight.BOLD, 50));
 			roomPane.getChildren().addAll(joinButton, numPlayers, slash, maxPlayers);
 			roomContainer.getChildren().addAll(roomName, roomPane);
 			
 			this.roomsBox.getChildren().add(roomContainer);
+		}
+	}
+
+	private void joinRoom(int id) {
+		
+		try {
+			this.client.joinRoom(id);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -646,15 +690,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		for(ClientServerPlayer player : connectedPlayers){
 			Label playerLabel = new Label("Connected (" + player.getID() + "): " + player.getName());
-			playerLabel.setFont(Font.font(font, FontPosture.ITALIC, 15));
+			//playerLabel.setFont(Font.font(font, FontPosture.ITALIC, 15));
 			this.playersBox.getChildren().add(playerLabel);
-		}
-	}
-
-	private void addElements(Pane pane, Node... elems){
-		
-		for(Node node : elems){
-			pane.getChildren().add(node);
 		}
 	}
 
@@ -663,8 +700,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
+		System.out.println("Moving from " + this.currentScene);
 		this.currentStage.setScene(this.previousScenes.pop());
-		
+		System.out.println("Moved back to " + this.currentScene);
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
@@ -675,8 +713,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
-		this.currentStage.setScene(nextScene);
+		
 		this.previousScenes.push(thisScene);
+		this.currentStage.setScene(nextScene);
+		this.currentScene = nextScene;
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
@@ -708,32 +748,67 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void disconnected() {
-		// TODO Auto-generated method stub
-		
+
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				disconnect();
+			}
+			   
+		});
 	}
 
 	@Override
 	public void connectionAccepted() {
-		// TODO Auto-generated method stub
 		
+		System.out.println("ADDED CONNECTION EVENT");
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				if(expectingConnection){
+					advance(multiScene, serverScene);
+					displayPlayers();
+					displayRooms();
+				}
+				System.out.println("CONNECTION ACCEPTED");
+			}
+			   
+		});
 	}
 
 	@Override
 	public void connectionRejected() {
-		// TODO Auto-generated method stub
 		
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				
+				disconnect();
+			}
+			   
+		});
 	}
 
 	@Override
 	public void alreadyConnected() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void notConnected() {
-		// TODO Auto-generated method stub
 		
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				connectionBroke = true;
+				disconnect();
+			}
+			   
+		});
 	}
 
 	@Override
