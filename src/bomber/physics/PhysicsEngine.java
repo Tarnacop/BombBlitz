@@ -94,7 +94,7 @@ public class PhysicsEngine
             gameState.getAudioEvents().add(AudioEvent.MOVEMENT);
 
             // Initialise data
-            int speed = (int) (milliseconds*player.getSpeed()/1000);
+            int speed = (int) (milliseconds * player.getSpeed() / 1000);
             Rectangle initialPlayerRect = new Rectangle(pos.x, pos.y, Constants.playerPixelWidth, Constants.playerPixelHeight);
             Point fromDirection = null;
             switch (movement)
@@ -117,16 +117,16 @@ public class PhysicsEngine
                     break;
             }
 
-            assert(fromDirection != null);
+            assert (fromDirection != null);
 
             // Collision with bombs
             // If the dimensions ever change, this should be checked
             Rectangle translatedPlayerRect = new Rectangle(pos.x, pos.y, Constants.playerPixelWidth, Constants.playerPixelHeight);
-            for(Bomb bomb: gameState.getBombs())
+            for (Bomb bomb : gameState.getBombs())
             {
                 Rectangle bombRect = new Rectangle(bomb.getPos().x, bomb.getPos().y, Constants.bombPixelWidth, Constants.bombPixelHeight);
-                if(!bombRect.intersects(initialPlayerRect))
-                    while(bombRect.intersects(translatedPlayerRect))
+                if (!bombRect.intersects(initialPlayerRect))
+                    while (bombRect.intersects(translatedPlayerRect))
                     {
                         translatedPlayerRect.translate(fromDirection.x, fromDirection.y);
                         translatePoint(pos, fromDirection);
@@ -148,11 +148,11 @@ public class PhysicsEngine
         }
 
         // -------- Planting bombs --------
-        if(player.getKeyState().isBomb() && okToPlaceBomb.get(player.getName())!=null && okToPlaceBomb.get(player.getName()))
+        if (player.getKeyState().isBomb() && okToPlaceBomb.get(player.getName()) != null && okToPlaceBomb.get(player.getName()))
         {
             int bombCount = 0;
             for (Bomb bomb : gameState.getBombs())
-                if(bomb.getPlayerName().equals(player.getName()))
+                if (bomb.getPlayerName().equals(player.getName()))
                     bombCount++;
             if (bombCount < player.getMaxNrOfBombs())
             {
@@ -160,40 +160,73 @@ public class PhysicsEngine
                 okToPlaceBomb.put(player.getName(), false);
             }
         }
-        if(!player.getKeyState().isBomb())
+        if (!player.getKeyState().isBomb())
             okToPlaceBomb.put(player.getName(), true);
 
 
         // -------- Damage --------
-        if (playerTouchesBlock(pos, Block.BLAST))
+        if (playerTouchesBlock(pos, Block.BLAST) != null)
         {
-            player.setLives(player.getLives()-1);
+            player.setLives(player.getLives() - 1);
             if (player.getLives() == 0)
                 player.setAlive(false);
             gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
         }
 
         // -------- Getting power-ups --------
-        if (playerTouchesBlock(pos, Block.MINUS_BOMB))
-            player.setMaxNrOfBombs(Math.max(1, player.getMaxNrOfBombs()-1));
-        else if (playerTouchesBlock(pos, Block.PLUS_BOMB))
-            player.setMaxNrOfBombs(player.getMaxNrOfBombs()+1);
-        else if (playerTouchesBlock(pos, Block.MINUS_RANGE))
-            player.setBombRange(Math.max(Constants.minimumBombRange, player.getBombRange()- Constants.bombRangeChange));
-        else if (playerTouchesBlock(pos, Block.PLUS_RANGE))
-            player.setBombRange(Math.min(Constants.maximumBombRange, player.getBombRange()+ Constants.bombRangeChange));
-        else if (playerTouchesBlock(pos, Block.MINUS_SPEED))
+        Point powerup;
+        while ((powerup = playerTouchesBlock(pos, Block.MINUS_BOMB)) != null)
+        {
+            player.setMaxNrOfBombs(Math.max(1, player.getMaxNrOfBombs() - 1));
+            gameState.getAudioEvents().add(AudioEvent.POWERUP);
+            gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
+        }
+        while ((powerup = playerTouchesBlock(pos, Block.PLUS_BOMB)) != null)
+        {
+            player.setMaxNrOfBombs(player.getMaxNrOfBombs() + 1);
+            gameState.getAudioEvents().add(AudioEvent.POWERUP);
+            gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
+        }
+        while ((powerup = playerTouchesBlock(pos, Block.MINUS_RANGE)) != null)
+        {
+            player.setBombRange(Math.max(Constants.minimumBombRange, player.getBombRange() - Constants.bombRangeChange));
+            gameState.getAudioEvents().add(AudioEvent.POWERUP);
+            gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
+        }
+        while ((powerup = playerTouchesBlock(pos, Block.PLUS_RANGE)) != null)
+        {
+            player.setBombRange(Math.min(Constants.maximumBombRange, player.getBombRange() + Constants.bombRangeChange));
+            gameState.getAudioEvents().add(AudioEvent.POWERUP);
+            gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
+        }
+        while ((powerup = playerTouchesBlock(pos, Block.MINUS_SPEED)) != null)
+        {
             player.setSpeed(Constants.lowPlayerSpeed);
-        else if (playerTouchesBlock(pos, Block.PLUS_SPEED))
+            gameState.getAudioEvents().add(AudioEvent.POWERUP);
+            gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
+        }
+        while ((powerup = playerTouchesBlock(pos, Block.PLUS_SPEED)) != null)
+        {
             player.setSpeed(Constants.highPlayerSpeed);
+            gameState.getAudioEvents().add(AudioEvent.POWERUP);
+            gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
+        }
 
     }
 
-    private boolean playerTouchesBlock(Point pos, Block block)
+    private Point playerTouchesBlock(Point pos, Block block)
     {
+        // Return: 0 no, 1 up-left, 2 up-right, 3 down-left, 4 down-right
         Map map = gameState.getMap();
-        return map.getPixelBlockAt(pos.x, pos.y)== block || map.getPixelBlockAt(pos.x+ Constants.playerPixelWidth,pos.y+ Constants.playerPixelHeight)== block
-                || map.getPixelBlockAt(pos.x,pos.y+ Constants.playerPixelHeight)== block || map.getPixelBlockAt(pos.x+ Constants.playerPixelWidth,pos.y)== block;
+        if (map.getPixelBlockAt(pos.x, pos.y)== block)
+            return new Point(pos.x/64,pos.y/64);
+        if (map.getPixelBlockAt(pos.x+ Constants.playerPixelWidth,pos.y+ Constants.playerPixelHeight)== block)
+            return new Point((pos.x+ Constants.playerPixelWidth)/64,(pos.y+ Constants.playerPixelHeight)/64);
+        if (map.getPixelBlockAt(pos.x,pos.y+ Constants.playerPixelHeight)== block)
+            return new Point(pos.x/64,(pos.y+ Constants.playerPixelHeight)/64);
+        if (map.getPixelBlockAt(pos.x+ Constants.playerPixelWidth,pos.y)== block)
+            return new Point((pos.x+ Constants.playerPixelWidth)/64,pos.y/64);
+        return null;
     }
 
     private void translatePoint(Point point, Point delta)
