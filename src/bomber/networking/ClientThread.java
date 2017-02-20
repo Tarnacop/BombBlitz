@@ -1030,7 +1030,7 @@ public class ClientThread implements Runnable {
 	 * Terminate the thread. It is advisable to leave the room and disconnect
 	 * from the server first
 	 */
-	public synchronized void exit() {
+	public void exit() {
 		socket.close();
 	}
 

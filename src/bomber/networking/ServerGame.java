@@ -291,30 +291,12 @@ public class ServerGame implements Runnable {
 			// game is over when no human player is left in the room
 			if (playerList.size() < 1) {
 				System.out.printf("ServerGame: ending game in room %d due to no human players in room\n", roomID);
-				// terminate AI threads if there is any
-				for (ServerAI a : aiList) {
-					GameAI ai = a.getGameAI();
-					if (ai == null) {
-						continue;
-					}
-					ai.setLives(0);
-					ai.setAlive(false);
-				}
 				terminate();
 			}
 
 			// game is over when only one player is left in the room
 			if (playerList.size() + aiList.size() < 2) {
 				System.out.printf("ServerGame: ending game in room %d due to fewer than 2 players in room\n", roomID);
-				// terminate AI threads if there is any
-				for (ServerAI a : aiList) {
-					GameAI ai = a.getGameAI();
-					if (ai == null) {
-						continue;
-					}
-					ai.setLives(0);
-					ai.setAlive(false);
-				}
 				terminate();
 			}
 
@@ -342,11 +324,6 @@ public class ServerGame implements Runnable {
 
 			// update gameState
 			physics.update(interval);
-			/*
-			 * TODO physics should also set the player ID(not just player name)
-			 * of each bomb when it is planted, otherwise the client will see
-			 * all bombs belong to player with id 0
-			 */
 			/*
 			 * TODO physics is very likely to have
 			 * ArrayIndexOutOfBoundsException when tick rate is low
