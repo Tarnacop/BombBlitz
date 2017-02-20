@@ -117,8 +117,8 @@ public class ServerThread implements Runnable {
 				if (now.getEpochSecond() - e.getValue().getTimeStamp() > config.getClientTimeOut()) {
 					pServerf("keepAliveTask: Removing %s due to timeout\n", e.getKey());
 					/*
-					 * TODO need to remove every reference of the client on the
-					 * server(from client table, room list and game sessions)
+					 * remove every reference of the client on the server(client
+					 * table, room list and game sessions)
 					 */
 					removeClient(e.getValue());
 				} else {
@@ -197,6 +197,11 @@ public class ServerThread implements Runnable {
 		ServerClientInfo clientInfo = clientTable.get(sockAddr);
 		if (clientInfo != null) {
 			clientInfo.updateTimeStamp();
+			/*
+			 * TODO log the sequence number of last 100 received packets from
+			 * this client and drop duplicate packets based on the sequence
+			 * number
+			 */
 		} else {
 			/*
 			 * if the client does not exist on the server and the message type
@@ -578,7 +583,6 @@ public class ServerThread implements Runnable {
 
 			// remove the client from room
 			removeClientFromRoom(client);
-			// TODO is the client also in game ?
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_ROOM_HAVELEFT, true);
 
@@ -920,8 +924,6 @@ public class ServerThread implements Runnable {
 
 		clientTable.remove(client.getSocketAddress());
 
-		// TODO remove references to the client in game (if the player is in a
-		// game)
 	}
 
 	private void removeClientFromRoom(ServerClientInfo client) {
@@ -956,9 +958,6 @@ public class ServerThread implements Runnable {
 		client.setInRoom(false);
 		client.setRoom(null);
 		client.setReadyToPlay(false);
-
-		// TODO remove references to the client in game (if the player is in a
-		// game)
 
 	}
 

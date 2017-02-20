@@ -377,6 +377,10 @@ public class ServerGame implements Runnable {
 		 * TODO one AI thread seems to be unable to be stopped when there are 1
 		 * human player and 3 AI players in a game
 		 */
+		/*
+		 * TODO sometimes AI keeps attacking players who have 0 lives(maybe due
+		 * to isAlive still being true ?)
+		 */
 
 		// tell clients the game is over
 		sendByteBuffer.position(3);

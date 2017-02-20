@@ -148,7 +148,6 @@ public class ClientThread implements Runnable {
 			if (now.getEpochSecond() - serverInfo.getTimeStamp() > serverTimeOut) {
 				pClient("keepAliveTask: Warning, connection to server is possibly timeout, setting connected to false");
 
-				// TODO do something when server timeout
 				setConnected(false);
 
 				for (ClientNetInterface e : netList) {
@@ -257,13 +256,16 @@ public class ClientThread implements Runnable {
 			sendByteBuffer.putShort(3, messageSequence);
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 2, serverSockAddr);
 			sendPacket(p, ProtocolConstant.MSG_C_NET_ACK);
+			/*
+			 * TODO log the sequence number of last 100 received packets and
+			 * drop duplicate packets based on the sequence number
+			 */
 		}
 
 		switch (messageType) {
 		case ProtocolConstant.MSG_S_NET_ACCEPT: {
 			// pClient("Connection has been accepted by the server");
 
-			// TODO do something
 			setConnected(true);
 			setInRoom(false, -1);
 
@@ -277,7 +279,6 @@ public class ClientThread implements Runnable {
 		case ProtocolConstant.MSG_S_NET_REJECT: {
 			// pClient("Connection has been rejected by the server");
 
-			// TODO do something
 			setConnected(false);
 
 			for (ClientNetInterface e : netList) {
@@ -290,7 +291,6 @@ public class ClientThread implements Runnable {
 		case ProtocolConstant.MSG_S_NET_ALREADYCONNECTED: {
 			// pClient("You have already connected to the server");
 
-			// TODO do something
 			setConnected(true);
 
 			for (ClientNetInterface e : netList) {
@@ -304,7 +304,6 @@ public class ClientThread implements Runnable {
 			// pClient("You have not connected to the server, setting connected
 			// to false");
 
-			// TODO do something
 			setConnected(false);
 
 			for (ClientNetInterface e : netList) {
@@ -318,7 +317,6 @@ public class ClientThread implements Runnable {
 			// pClient("You have disconnected from the server, setting connected
 			// to false");
 
-			// TODO do something
 			setConnected(false);
 
 			for (ClientNetInterface e : netList) {
@@ -365,7 +363,6 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			// TODO
 			for (ClientNetInterface e : netList) {
 				e.playerListReceived();
 			}
@@ -381,7 +378,6 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			// TODO
 			for (ClientNetInterface e : netList) {
 				e.roomListReceived();
 			}
@@ -406,7 +402,6 @@ public class ClientThread implements Runnable {
 
 			setInRoom(true, roomID);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.roomAccepted();
 			}
@@ -417,7 +412,6 @@ public class ClientThread implements Runnable {
 		case ProtocolConstant.MSG_S_LOBBY_ROOMREJECT: {
 			// pClient("Room creation/join has been rejected by the server");
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.roomRejected();
 			}
@@ -430,7 +424,6 @@ public class ClientThread implements Runnable {
 
 			setInRoom(false, -1);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.notInRoom();
 			}
@@ -453,7 +446,6 @@ public class ClientThread implements Runnable {
 
 			setInRoom(true, roomID);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.alreadyInRoom();
 			}
@@ -466,7 +458,6 @@ public class ClientThread implements Runnable {
 
 			setInRoom(false, -1);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.haveLeftRoom();
 			}
@@ -501,7 +492,6 @@ public class ClientThread implements Runnable {
 			setMapWidth(mapWidth);
 			setMapHeight(mapHeight);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.gameStarted();
 			}
@@ -530,7 +520,6 @@ public class ClientThread implements Runnable {
 			// pClient("Received game state for room with ID " + roomID);
 			// pClient(gameState.toString());
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.gameStateReceived();
 			}
@@ -554,7 +543,6 @@ public class ClientThread implements Runnable {
 			setInRoom(true, roomID);
 			setInGame(false);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.gameEnded();
 			}
