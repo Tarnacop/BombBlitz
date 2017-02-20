@@ -32,7 +32,6 @@ public class PhysicsEngine
     {
         this.gameState = gameState;
         okToPlaceBomb = new HashMap<>();
-        System.out.println("Instantiated okToPlaceBomb");
     }
 
     /**
