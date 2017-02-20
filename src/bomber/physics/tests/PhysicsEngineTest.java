@@ -16,7 +16,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 /**
- * Created by Alexandruro on 26.01.2017.
+ * Created by Alexandru Rosu on 26.01.2017.
  */
 public class PhysicsEngineTest
 {
@@ -71,7 +71,7 @@ public class PhysicsEngineTest
         {
             engine.update();
             //System.out.println(buddy.getPos());
-            assertTrue("Collision was not detected successfully (problem at a right corner)", buddy.getPos().x+PhysicsEngine.playerPixelWidth<192);
+            assertTrue("Collision was not detected successfully (problem at a right corner)", buddy.getPos().x+ Constants.playerPixelWidth<192);
         }
 
         kState.setMovement(Movement.DOWN);
@@ -79,7 +79,7 @@ public class PhysicsEngineTest
         {
             engine.update();
             //System.out.println(buddy.getPos());
-            assertTrue("Collision was not detected successfully (problem at a down corner)", buddy.getPos().y+PhysicsEngine.playerPixelHeight<256);
+            assertTrue("Collision was not detected successfully (problem at a down corner)", buddy.getPos().y+ Constants.playerPixelHeight<256);
         }
 
         kState.setMovement(Movement.LEFT);

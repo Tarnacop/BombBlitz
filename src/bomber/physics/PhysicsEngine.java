@@ -13,13 +13,6 @@ import java.util.Optional;
 public class PhysicsEngine
 {
 
-    public static final int playerPixelWidth = 32;
-    public static final int playerPixelHeight = 32;
-    public static final int bombPixelWidth = 50;
-    public static final int bombPixelHeight = 50;
-    public static final int default_time = 2000;
-    public static final int mapBlockToGridMultiplier = 64;
-
     private GameState gameState;
 
     private HashMap<String, Boolean> okToPlaceBomb;
@@ -48,9 +41,9 @@ public class PhysicsEngine
 
     private Point getBombLocation(Point playerPosition)
     {
-        int xOffset = (mapBlockToGridMultiplier - bombPixelWidth)/2;
-        int YOffset = (mapBlockToGridMultiplier - bombPixelHeight)/2;
-        return new Point((playerPosition.x+playerPixelWidth/2)/64 * 64+xOffset, (playerPosition.y+playerPixelHeight/2)/64*64+YOffset);
+        int xOffset = (Constants.mapBlockToGridMultiplier - Constants.bombPixelWidth)/2;
+        int YOffset = (Constants.mapBlockToGridMultiplier - Constants.bombPixelHeight)/2;
+        return new Point((playerPosition.x+ Constants.playerPixelWidth/2)/64 * 64+xOffset, (playerPosition.y+ Constants.playerPixelHeight/2)/64*64+YOffset);
     }
 
     public synchronized void update(int milliseconds)
@@ -62,7 +55,7 @@ public class PhysicsEngine
         for(int x=0; x<width; x++)
             for(int y=0; y<height; y++)
                 if (map.getGridBlockAt(x,y) == Block.BLAST)
-                    map.setGridBlockAt(new Point(x,y), Block.BLANK);
+                    map.setGridBlockAt(new Point(x,y), Block.BLANK); // TODO: get the block from gameLogic
 
         // update bombs
         ArrayList<Bomb> toBeDeleted = new ArrayList<>();
@@ -91,9 +84,6 @@ public class PhysicsEngine
 
         // Initialise data
         Point pos = player.getPos();
-        Map map = gameState.getMap();
-
-
 
         // -------- Movement --------
         Movement movement = player.getKeyState().getMovement();
@@ -105,7 +95,7 @@ public class PhysicsEngine
 
             // Initialise data
             int speed = (int) (milliseconds*player.getSpeed()/1000);
-            Rectangle initialPlayerRect = new Rectangle(pos.x, pos.y, playerPixelWidth, playerPixelHeight);
+            Rectangle initialPlayerRect = new Rectangle(pos.x, pos.y, Constants.playerPixelWidth, Constants.playerPixelHeight);
             Point fromDirection = null;
             switch (movement)
             {
@@ -131,10 +121,10 @@ public class PhysicsEngine
 
             // Collision with bombs
             // If the dimensions ever change, this should be checked
-            Rectangle translatedPlayerRect = new Rectangle(pos.x, pos.y, playerPixelWidth, playerPixelHeight);
+            Rectangle translatedPlayerRect = new Rectangle(pos.x, pos.y, Constants.playerPixelWidth, Constants.playerPixelHeight);
             for(Bomb bomb: gameState.getBombs())
             {
-                Rectangle bombRect = new Rectangle(bomb.getPos().x, bomb.getPos().y, bombPixelWidth, bombPixelHeight);
+                Rectangle bombRect = new Rectangle(bomb.getPos().x, bomb.getPos().y, Constants.bombPixelWidth, Constants.bombPixelHeight);
                 if(!bombRect.intersects(initialPlayerRect))
                     while(bombRect.intersects(translatedPlayerRect))
                     {
@@ -144,18 +134,16 @@ public class PhysicsEngine
             }
 
             // Collision with solid/soft blocks
-            translatePoint(pos, revertPositionDelta(fromDirection, map, pos)); // check up-left corner
+            revertPosition(fromDirection, new Point(pos), pos); // check up-left corner
 
-            Point upRightCorner = new Point(pos.x + playerPixelWidth, pos.y);
-            translatePoint(pos, revertPositionDelta(fromDirection, map, upRightCorner));
+            Point upRightCorner = new Point(pos.x + Constants.playerPixelWidth, pos.y);
+            revertPosition(fromDirection, upRightCorner, pos);
 
-            Point downLeftCorner = new Point(pos.x, pos.y + playerPixelHeight);
-            translatePoint(pos, revertPositionDelta(fromDirection, map, downLeftCorner));
+            Point downLeftCorner = new Point(pos.x, pos.y + Constants.playerPixelHeight);
+            revertPosition(fromDirection, downLeftCorner, pos);
 
-            Point downRightCorner = new Point(pos.x + playerPixelWidth, pos.y + playerPixelHeight);
-            translatePoint(pos, revertPositionDelta(fromDirection, map, downRightCorner));
-
-            // TODO: Collision with power-ups
+            Point downRightCorner = new Point(pos.x + Constants.playerPixelWidth, pos.y + Constants.playerPixelHeight);
+            revertPosition(fromDirection, downRightCorner, pos);
 
         }
 
@@ -168,7 +156,7 @@ public class PhysicsEngine
                     bombCount++;
             if (bombCount < player.getMaxNrOfBombs())
             {
-                plantBomb(player, default_time);
+                plantBomb(player, Constants.defaultBombTime);
                 okToPlaceBomb.put(player.getName(), false);
             }
         }
@@ -177,8 +165,7 @@ public class PhysicsEngine
 
 
         // -------- Damage --------
-        if (map.getPixelBlockAt(pos.x, pos.y)==Block.BLAST || map.getPixelBlockAt(pos.x+playerPixelWidth,pos.y+playerPixelHeight)==Block.BLAST
-                || map.getPixelBlockAt(pos.x,pos.y+playerPixelHeight)==Block.BLAST || map.getPixelBlockAt(pos.x+playerPixelWidth,pos.y)==Block.BLAST)
+        if (playerTouchesBlock(pos, Block.BLAST))
         {
             player.setLives(player.getLives()-1);
             if (player.getLives() == 0)
@@ -186,6 +173,27 @@ public class PhysicsEngine
             gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
         }
 
+        // -------- Getting power-ups --------
+        if (playerTouchesBlock(pos, Block.MINUS_BOMB))
+            player.setMaxNrOfBombs(Math.max(1, player.getMaxNrOfBombs()-1));
+        else if (playerTouchesBlock(pos, Block.PLUS_BOMB))
+            player.setMaxNrOfBombs(player.getMaxNrOfBombs()+1);
+        else if (playerTouchesBlock(pos, Block.MINUS_RANGE))
+            player.setBombRange(Math.max(Constants.minimumBombRange, player.getBombRange()- Constants.bombRangeChange));
+        else if (playerTouchesBlock(pos, Block.PLUS_RANGE))
+            player.setBombRange(Math.min(Constants.maximumBombRange, player.getBombRange()+ Constants.bombRangeChange));
+        else if (playerTouchesBlock(pos, Block.MINUS_SPEED))
+            player.setSpeed(Constants.lowPlayerSpeed);
+        else if (playerTouchesBlock(pos, Block.PLUS_SPEED))
+            player.setSpeed(Constants.highPlayerSpeed);
+
+    }
+
+    private boolean playerTouchesBlock(Point pos, Block block)
+    {
+        Map map = gameState.getMap();
+        return map.getPixelBlockAt(pos.x, pos.y)== block || map.getPixelBlockAt(pos.x+ Constants.playerPixelWidth,pos.y+ Constants.playerPixelHeight)== block
+                || map.getPixelBlockAt(pos.x,pos.y+ Constants.playerPixelHeight)== block || map.getPixelBlockAt(pos.x+ Constants.playerPixelWidth,pos.y)== block;
     }
 
     private void translatePoint(Point point, Point delta)
@@ -201,13 +209,14 @@ public class PhysicsEngine
         gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
     }
 
-    private Point revertPositionDelta(Point fromDirection, Map map, Point initialCorner)
+    private void revertPosition(Point fromDirection, Point corner, Point playerPos)
     {
-        Point corner = new Point(initialCorner);
+        Map map = gameState.getMap();
         while(map.getPixelBlockAt(corner.x, corner.y) == Block.SOLID || map.getPixelBlockAt(corner.x, corner.y) == Block.SOFT)
+        {
             translatePoint(corner, fromDirection);
-        // TODO: can do pos.translate here instead of returning. see if this is cleaner
-        return new Point(corner.x-initialCorner.x, corner.y-initialCorner.y);
+            translatePoint(playerPos, fromDirection);
+        }
     }
 
 
