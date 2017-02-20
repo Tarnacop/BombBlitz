@@ -57,7 +57,9 @@ public class PhysicsEngine
 
     public void plantBomb(Player player, int time)
     {
-        gameState.getBombs().add(new Bomb(player.getName(),  getBombLocation(player.getPos()), time, player.getBombRange()));
+        Bomb bomb = new Bomb(player.getName(),  getBombLocation(player.getPos()), time, player.getBombRange());
+        bomb.setPlayerID(player.getPlayerID());
+        gameState.getBombs().add(bomb);
         gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
     }
 
@@ -69,6 +71,8 @@ public class PhysicsEngine
         Point pos = player.getPos();
         Movement movement = player.getKeyState().getMovement();
         Point fromDirection = null;
+        if (movement != Movement.NONE)
+            gameState.getAudioEvents().add(AudioEvent.MOVEMENT);
         switch (movement)
         {
             case UP:
@@ -93,8 +97,6 @@ public class PhysicsEngine
         Map map = gameState.getMap();
 
         // check for bomb placement
-        if(okToPlaceBomb == null)
-        	System.err.println("Why is this happeningggggggggg?");
         if(player.getKeyState().isBomb() 
         		&& okToPlaceBomb.get(player.getName())!=null && okToPlaceBomb.get(player.getName()))
         {
@@ -112,6 +114,13 @@ public class PhysicsEngine
         }
         if(!player.getKeyState().isBomb())
             okToPlaceBomb.put(player.getName(), true);
+
+//        Rectangle playerRect = new Rectangle(pos.x, pos.y, playerPixelWidth, playerPixelHeight);
+//        for(Bomb bomb: gameState.getBombs())
+//        {
+//            Rectangle bombRect = new Rectangle(bomb.getPos().x, bomb.getPos().y, bombPixelWidth, bombPixelHeight);
+//
+//        }
 
         // collision detection
         // TODO refactor (put this test up higher and test speed & direction)

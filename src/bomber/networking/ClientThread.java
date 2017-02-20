@@ -55,6 +55,11 @@ public class ClientThread implements Runnable {
 	private boolean inRoom = false;
 	private int roomID = -1;
 
+	// the ID, width and height of the map in which the client will play
+	private int mapID = 0;
+	private byte mapWidth = 16;
+	private byte mapHeight = 16;
+
 	// whether the client is in game(a client must be in room when it is in
 	// game)
 	private boolean inGame = false;
@@ -143,7 +148,6 @@ public class ClientThread implements Runnable {
 			if (now.getEpochSecond() - serverInfo.getTimeStamp() > serverTimeOut) {
 				pClient("keepAliveTask: Warning, connection to server is possibly timeout, setting connected to false");
 
-				// TODO do something when server timeout
 				setConnected(false);
 
 				for (ClientNetInterface e : netList) {
@@ -252,13 +256,16 @@ public class ClientThread implements Runnable {
 			sendByteBuffer.putShort(3, messageSequence);
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 2, serverSockAddr);
 			sendPacket(p, ProtocolConstant.MSG_C_NET_ACK);
+			/*
+			 * TODO log the sequence number of last 100 received packets and
+			 * drop duplicate packets based on the sequence number
+			 */
 		}
 
 		switch (messageType) {
 		case ProtocolConstant.MSG_S_NET_ACCEPT: {
 			// pClient("Connection has been accepted by the server");
 
-			// TODO do something
 			setConnected(true);
 			setInRoom(false, -1);
 
@@ -272,7 +279,6 @@ public class ClientThread implements Runnable {
 		case ProtocolConstant.MSG_S_NET_REJECT: {
 			// pClient("Connection has been rejected by the server");
 
-			// TODO do something
 			setConnected(false);
 
 			for (ClientNetInterface e : netList) {
@@ -285,7 +291,6 @@ public class ClientThread implements Runnable {
 		case ProtocolConstant.MSG_S_NET_ALREADYCONNECTED: {
 			// pClient("You have already connected to the server");
 
-			// TODO do something
 			setConnected(true);
 
 			for (ClientNetInterface e : netList) {
@@ -299,7 +304,6 @@ public class ClientThread implements Runnable {
 			// pClient("You have not connected to the server, setting connected
 			// to false");
 
-			// TODO do something
 			setConnected(false);
 
 			for (ClientNetInterface e : netList) {
@@ -313,7 +317,6 @@ public class ClientThread implements Runnable {
 			// pClient("You have disconnected from the server, setting connected
 			// to false");
 
-			// TODO do something
 			setConnected(false);
 
 			for (ClientNetInterface e : netList) {
@@ -360,7 +363,6 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			// TODO
 			for (ClientNetInterface e : netList) {
 				e.playerListReceived();
 			}
@@ -376,7 +378,6 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			// TODO
 			for (ClientNetInterface e : netList) {
 				e.roomListReceived();
 			}
@@ -401,7 +402,6 @@ public class ClientThread implements Runnable {
 
 			setInRoom(true, roomID);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.roomAccepted();
 			}
@@ -412,7 +412,6 @@ public class ClientThread implements Runnable {
 		case ProtocolConstant.MSG_S_LOBBY_ROOMREJECT: {
 			// pClient("Room creation/join has been rejected by the server");
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.roomRejected();
 			}
@@ -425,7 +424,6 @@ public class ClientThread implements Runnable {
 
 			setInRoom(false, -1);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.notInRoom();
 			}
@@ -448,7 +446,6 @@ public class ClientThread implements Runnable {
 
 			setInRoom(true, roomID);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.alreadyInRoom();
 			}
@@ -461,7 +458,6 @@ public class ClientThread implements Runnable {
 
 			setInRoom(false, -1);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.haveLeftRoom();
 			}
@@ -470,7 +466,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_ROOM_GAMESTART: {
-			if (packet.getLength() < 7) {
+			if (packet.getLength() < 13) {
 				return;
 			}
 
@@ -480,12 +476,22 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
+			int mapID = recvByteBuffer.getInt(7);
+			if (mapID < 0) {
+				pClient("Server bug, mapID should not be negative");
+			}
+
+			byte mapWidth = recvByteBuffer.get(11);
+			byte mapHeight = recvByteBuffer.get(12);
+
 			// pClient("Game has started in room with ID " + roomID);
 
 			setInRoom(true, roomID);
 			setInGame(true);
+			setMapID(mapID);
+			setMapWidth(mapWidth);
+			setMapHeight(mapHeight);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.gameStarted();
 			}
@@ -514,7 +520,6 @@ public class ClientThread implements Runnable {
 			// pClient("Received game state for room with ID " + roomID);
 			// pClient(gameState.toString());
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.gameStateReceived();
 			}
@@ -538,7 +543,6 @@ public class ClientThread implements Runnable {
 			setInRoom(true, roomID);
 			setInGame(false);
 
-			// TODO do something
 			for (ClientNetInterface e : netList) {
 				e.gameEnded();
 			}
@@ -807,6 +811,56 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
+	 * Get the ID of the map in which the client will play. This should only be
+	 * called when the client is in a room
+	 * 
+	 * @return a non-negative map ID
+	 */
+	public int getMapID() {
+		return mapID;
+	}
+
+	private void setMapID(int mapID) {
+		if (mapID >= 0) {
+			this.mapID = mapID;
+		}
+	}
+
+	/**
+	 * Get the grid width of the map in which the client will play. This should
+	 * only be called when the game is about to start(when gameStarted() method
+	 * in the interface is called)
+	 * 
+	 * @return the grid width of the map
+	 */
+	public byte getMapWidth() {
+		return mapWidth;
+	}
+
+	private void setMapWidth(byte mapWidth) {
+		if (mapWidth > 0 && mapWidth <= 16) {
+			this.mapWidth = mapWidth;
+		}
+	}
+
+	/**
+	 * Get the grid height of the map in which the client will play. This should
+	 * only be called when the game is about to start(when gameStarted() method
+	 * in the interface is called)
+	 * 
+	 * @return the grid height of the map
+	 */
+	public byte getMapHeight() {
+		return mapHeight;
+	}
+
+	private void setMapHeight(byte mapHeight) {
+		if (mapHeight > 0 && mapHeight <= 16) {
+			this.mapHeight = mapHeight;
+		}
+	}
+
+	/**
 	 * Send a room creation request to the server
 	 * 
 	 * @param roomName
@@ -873,6 +927,52 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
+	 * Send an "add one AI to room" request to the server
+	 * 
+	 * @throws IOException
+	 */
+	public synchronized void addAI() throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly already not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI_ADD);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
+	}
+
+	/**
+	 * Send a "remove one AI from room" request to the server
+	 * 
+	 * @throws IOException
+	 */
+	public synchronized void removeAI() throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly already not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI_REMOVE);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
+	}
+
+	/**
 	 * Tell the server whether the client is ready to start the game(when it is
 	 * in a room). A game will be started by the server when all the clients in
 	 * the room are ready to play
@@ -918,7 +1018,7 @@ public class ClientThread implements Runnable {
 	 * Terminate the thread. It is advisable to leave the room and disconnect
 	 * from the server first
 	 */
-	public synchronized void exit() {
+	public void exit() {
 		socket.close();
 	}
 
