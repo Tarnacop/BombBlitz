@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 /**
- * Created by Alexandruro on 15.01.2017.
+ * Created by Alexandru Rosu on 15.01.2017.
  */
 public class PhysicsEngine
 {
@@ -46,7 +46,6 @@ public class PhysicsEngine
         return maybePlayer.orElse(null);
     }
 
-
     private Point getBombLocation(Point playerPosition)
     {
         int xOffset = (mapBlockToGridMultiplier - bombPixelWidth)/2;
@@ -54,13 +53,35 @@ public class PhysicsEngine
         return new Point((playerPosition.x+playerPixelWidth/2)/64 * 64+xOffset, (playerPosition.y+playerPixelHeight/2)/64*64+YOffset);
     }
 
-    public void plantBomb(Player player, int time)
+    public synchronized void update(int milliseconds)
     {
-        Bomb bomb = new Bomb(player.getName(),  getBombLocation(player.getPos()), time, player.getBombRange());
-        bomb.setPlayerID(player.getPlayerID());
-        gameState.getBombs().add(bomb);
-        gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
+        // update map (blast)
+        Map map = gameState.getMap();
+        int width = gameState.getMap().getGridMap().length;
+        int height = gameState.getMap().getGridMap()[0].length;
+        for(int x=0; x<width; x++)
+            for(int y=0; y<height; y++)
+                if (map.getGridBlockAt(x,y) == Block.BLAST)
+                    map.setGridBlockAt(new Point(x,y), Block.BLANK);
+
+        // update bombs
+        ArrayList<Bomb> toBeDeleted = new ArrayList<>();
+        gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted, milliseconds));
+        toBeDeleted.forEach(b -> gameState.getBombs().remove(b));
+
+        // update players
+        gameState.getPlayers().forEach(p -> updatePlayer(p, milliseconds));
     }
+
+    public synchronized void update()
+    {
+        update(1000);
+    }
+
+
+    // -----------------------------
+    // Player update related methods
+    // -----------------------------
 
     private void updatePlayer(Player player, int milliseconds)
     {
@@ -106,6 +127,8 @@ public class PhysicsEngine
                     break;
             }
 
+            assert(fromDirection != null);
+
             // Collision with bombs
             // If the dimensions ever change, this should be checked
             Rectangle translatedPlayerRect = new Rectangle(pos.x, pos.y, playerPixelWidth, playerPixelHeight);
@@ -116,7 +139,7 @@ public class PhysicsEngine
                     while(bombRect.intersects(translatedPlayerRect))
                     {
                         translatedPlayerRect.translate(fromDirection.x, fromDirection.y);
-                        pos.translate(fromDirection.x, fromDirection.y);
+                        translatePoint(pos, fromDirection);
                     }
             }
 
@@ -170,39 +193,27 @@ public class PhysicsEngine
         point.translate(delta.x, delta.y);
     }
 
+    public void plantBomb(Player player, int time)
+    {
+        Bomb bomb = new Bomb(player.getName(),  getBombLocation(player.getPos()), time, player.getBombRange());
+        bomb.setPlayerID(player.getPlayerID());
+        gameState.getBombs().add(bomb);
+        gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
+    }
+
     private Point revertPositionDelta(Point fromDirection, Map map, Point initialCorner)
     {
         Point corner = new Point(initialCorner);
-        while(map.getPixelBlockAt((int)corner.getX(), (int)corner.getY()) == Block.SOLID || map.getPixelBlockAt((int)corner.getX(), (int)corner.getY()) == Block.SOFT)
-            corner.translate((int)fromDirection.getX(), (int)fromDirection.getY());
+        while(map.getPixelBlockAt(corner.x, corner.y) == Block.SOLID || map.getPixelBlockAt(corner.x, corner.y) == Block.SOFT)
+            translatePoint(corner, fromDirection);
         // TODO: can do pos.translate here instead of returning. see if this is cleaner
         return new Point(corner.x-initialCorner.x, corner.y-initialCorner.y);
     }
 
-    public synchronized void update(int miliseconds)
-    {
-        // update map (blast)
-        Map map = gameState.getMap();
-        int width = gameState.getMap().getGridMap().length;
-        int height = gameState.getMap().getGridMap()[0].length;
-        for(int x=0; x<width; x++)
-            for(int y=0; y<height; y++)
-                if (map.getGridBlockAt(x,y) == Block.BLAST)
-                    map.setGridBlockAt(new Point(x,y), Block.BLANK);
 
-        // update bombs
-        ArrayList<Bomb> toBeDeleted = new ArrayList<>();
-        gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted, miliseconds));
-        toBeDeleted.forEach(b -> gameState.getBombs().remove(b));
-
-        // update players
-        gameState.getPlayers().forEach(p -> updatePlayer(p, miliseconds));
-    }
-
-    public synchronized void update()
-    {
-        update(1000);
-    }
+    // ---------------------------
+    // Bomb update related methods
+    // ---------------------------
 
     private void updateBomb(Bomb bomb, ArrayList<Bomb> toBeDeleted, int milliseconds)
     {
@@ -217,9 +228,9 @@ public class PhysicsEngine
         }
     }
 
-    // direction: 0 all, 1 up, 2 right, 3 down, 4 left
     private void addBlast(int x, int y, int radius, int direction)
     {
+        // direction: 0 all, 1 up, 2 right, 3 down, 4 left
         Point pos = new Point(x, y);
         if(!gameState.getMap().isInGridBounds(pos))
             return;
