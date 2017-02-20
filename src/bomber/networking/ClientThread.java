@@ -55,6 +55,11 @@ public class ClientThread implements Runnable {
 	private boolean inRoom = false;
 	private int roomID = -1;
 
+	// the ID, width and height of the map in which the client will play
+	private int mapID = 0;
+	private byte mapWidth = 16;
+	private byte mapHeight = 16;
+
 	// whether the client is in game(a client must be in room when it is in
 	// game)
 	private boolean inGame = false;
@@ -470,7 +475,7 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_ROOM_GAMESTART: {
-			if (packet.getLength() < 7) {
+			if (packet.getLength() < 13) {
 				return;
 			}
 
@@ -480,10 +485,21 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
+			int mapID = recvByteBuffer.getInt(7);
+			if (mapID < 0) {
+				pClient("Server bug, mapID should not be negative");
+			}
+
+			byte mapWidth = recvByteBuffer.get(11);
+			byte mapHeight = recvByteBuffer.get(12);
+
 			// pClient("Game has started in room with ID " + roomID);
 
 			setInRoom(true, roomID);
 			setInGame(true);
+			setMapID(mapID);
+			setMapWidth(mapWidth);
+			setMapHeight(mapHeight);
 
 			// TODO do something
 			for (ClientNetInterface e : netList) {
@@ -807,6 +823,56 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
+	 * Get the ID of the map in which the client will play. This should only be
+	 * called when the client is in a room
+	 * 
+	 * @return a non-negative map ID
+	 */
+	public int getMapID() {
+		return mapID;
+	}
+
+	private void setMapID(int mapID) {
+		if (mapID >= 0) {
+			this.mapID = mapID;
+		}
+	}
+
+	/**
+	 * Get the grid width of the map in which the client will play. This should
+	 * only be called when the game is about to start(when gameStarted() method
+	 * in the interface is called)
+	 * 
+	 * @return the grid width of the map
+	 */
+	public byte getMapWidth() {
+		return mapWidth;
+	}
+
+	private void setMapWidth(byte mapWidth) {
+		if (mapWidth > 0 && mapWidth <= 16) {
+			this.mapWidth = mapWidth;
+		}
+	}
+
+	/**
+	 * Get the grid height of the map in which the client will play. This should
+	 * only be called when the game is about to start(when gameStarted() method
+	 * in the interface is called)
+	 * 
+	 * @return the grid height of the map
+	 */
+	public byte getMapHeight() {
+		return mapHeight;
+	}
+
+	private void setMapHeight(byte mapHeight) {
+		if (mapHeight > 0 && mapHeight <= 16) {
+			this.mapHeight = mapHeight;
+		}
+	}
+
+	/**
 	 * Send a room creation request to the server
 	 * 
 	 * @param roomName
@@ -870,6 +936,52 @@ public class ClientThread implements Runnable {
 
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_ROOM_LEAVE, true);
+	}
+
+	/**
+	 * Send an "add one AI to room" request to the server
+	 * 
+	 * @throws IOException
+	 */
+	public synchronized void addAI() throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly already not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI_ADD);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
+	}
+
+	/**
+	 * Send a "remove one AI from room" request to the server
+	 * 
+	 * @throws IOException
+	 */
+	public synchronized void removeAI() throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly already not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI_REMOVE);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
 	}
 
 	/**

@@ -80,8 +80,16 @@ public class ProtocolConstant {
 	 * readtToPlay flag
 	 */
 
-	public static final byte MSG_C_ROOM_SETINFO = 0x0c;
-	public static final byte MSG_C_ROOM_GETINFO = 0x0d;
+	public static final byte MSG_C_ROOM_SETINFO = 0x0c; // TODO
+	public static final byte MSG_C_ROOM_SETINFO_AI = 0x03;
+	public static final byte MSG_C_ROOM_SETINFO_AI_ADD = 0x00;
+	public static final byte MSG_C_ROOM_SETINFO_AI_REMOVE = 0x01;
+	/* Header: 1 byte message type + 2 byte sequence + 4 byte room ID */
+	/* Valid format: Header + any one of the below */
+	/* add AI: 1 byte constant 0x3 + 1 byte constant 0x0 */
+	/* remove AI: 1 byte constant 0x3 + 1 byte constant 0x1 */
+
+	public static final byte MSG_C_ROOM_GETINFO = 0x0d; // TODO
 
 	// public static final byte MSG_C_ROOM_SENDTEXT = 0x0e;
 
@@ -134,15 +142,15 @@ public class ProtocolConstant {
 	 * of players in this packet to total number of players, since we don't
 	 * expect to have the number of players one packet does not fit(32 players)
 	 */
-	/* TODO we encode player IDs and names only */
+	/* TODO only player IDs and names are encoded, may add inRoom flag later */
 
 	public static final byte MSG_S_LOBBY_ROOMLIST = 0x48; // Bit set
 	/*
 	 * 1 byte message type + 2 byte sequence + 4 byte total number of rooms + 4
 	 * byte packet index + 4 byte max index + 4 byte number of rooms in this
-	 * packet + array of (4 byte room id + 1 byte name length + bytes of name
-	 * string + 1 byte player number + 1 byte max player limit + 1 byte inGame
-	 * boolean flag + 4 byte game map id)
+	 * packet + array of (4 byte room id + 1 byte room name length + bytes of
+	 * room name string + 1 byte number of players(human + AI) + 1 byte max
+	 * player limit + 1 byte inGame boolean flag + 4 byte game map id)
 	 */
 	/*
 	 * TODO max number of rooms is limited to 32 for the same reason above.
@@ -169,20 +177,50 @@ public class ProtocolConstant {
 	public static final byte MSG_S_ROOM_HAVELEFT = 0x4d; // Bit set
 	// 1 byte message type + 2 byte sequence
 
-	public static final byte MSG_S_ROOM_ROOMINFO = 0x4e;
+	public static final byte MSG_S_ROOM_ROOMINFO = 0x4e; // TODO
+	/*
+	 * This type of message should be sent upon each room info update(when a
+	 * room is newly created, or a client changes the info of the room)
+	 */
 	/*
 	 * 1 byte message type + 2 byte sequence + 4 byte room id + 1 byte name
-	 * length + bytes of name string + 1 byte player number + 1 byte max player
-	 * limit + 1 byte inGame flag + 4 byte game map id + array of up to 4 player
-	 * info(4 byte player id + 1 byte player name length + bytes of player
-	 * string + 1 byte isReadyToPlay flag)
+	 * length + bytes of name string + 1 byte human player number + 1 byte AI
+	 * player number + 1 byte max player limit + 1 byte inGame flag + 4 byte
+	 * game map id + array of up to 4 human player info(4 byte player id + 1
+	 * byte player name length + bytes of player string + 1 byte isReadyToPlay
+	 * flag) + array of up to 4 AI player info(1 byte AI id)
 	 */
 
 	public static final byte MSG_S_ROOM_GAMESTART = 0x4f; // Bit set
-	// 1 byte message type + 2 byte sequence + 4 byte room id
+	/*
+	 * 1 byte message type + 2 byte sequence + 4 byte room id + 4 byte game map
+	 * id + 1 byte map width + 1 byte map height
+	 */
 
 	public static final byte MSG_S_ROOM_GAMESTATE = 0x50; // Bit not set
-	// TODO need to document the format of this message
+	/*
+	 * Header: 1 byte message type + 2 byte sequence + 4 byte room id
+	 */
+	/*
+	 * Map: 1 byte width(in the range [1,16]) + 1 byte height(in the range
+	 * [1,16]) + 32 byte bit array for bit 3 + 32 byte bit array for bit 2 + 32
+	 * byte bit array for bit 1 + 32 byte bit array for bit 0
+	 */
+	/*
+	 * Players: 1 byte number of players + array of (4 byte player id + 4 byte
+	 * pixel position x + 4 byte pixel position y + 4 byte lives + 8 byte speed
+	 * in double precision floating point + 4 byte bomb range + 4 byte max bombs
+	 * + 2 byte keyboard state bit array + 1 byte isAlive)
+	 */
+	/*
+	 * Bombs: 1 byte number of bombs + array of (4 byte player id + 4 byte pixel
+	 * position x + 4 byte pixel position y + 4 byte time to detonate + 4 byte
+	 * radius)
+	 */
+	/*
+	 * Audio Events: 2 byte audio event bit array
+	 */
+	// TODO map id may need to contained in this message
 
 	public static final byte MSG_S_ROOM_GAMEOVER = 0x51; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room id
