@@ -3,6 +3,9 @@ package bomber.AI;
 
 import java.awt.Point;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import bomber.game.GameState;
 import bomber.game.Movement;
 import bomber.game.Player;
@@ -58,7 +61,8 @@ public class ExtremeAI extends AITemplate {
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() && getMovesToEnemyExcludeAIs() == null && gameAI.isAlive()) {
+		while (moves != null && !moves.isEmpty() && getMovesToEnemyExcludeAIs() == null && gameAI.isAlive()
+				&& (!checkIfAIsReachable() || isPerformer())) {
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -84,6 +88,26 @@ public class ExtremeAI extends AITemplate {
 			}
 		}
 
+	}
+	
+	
+	
+	private boolean isPerformer()
+	{
+		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());
+		if(!players.isEmpty()) return players.get(0).equals(gameAI);
+		return false;
+	}
+	
+	
+	private boolean checkIfAIsReachable()
+	{
+		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());
+		for(Player p : players)
+		{
+			if(!p.equals(gameAI) && finder.findRoute(gameAI.getGridPos(), p.getGridPos())!=null) return true;
+		}
+		return false;
 	}
 
 	/**
@@ -123,8 +147,8 @@ public class ExtremeAI extends AITemplate {
 			// if enemy is not in the range get the plan how to reach enemy and
 			// fullfill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs())) != null) {
-	
-				performPlannedMoves(moves);
+				if(!checkIfAIsReachable() || isPerformer())
+					performPlannedMoves(moves);
 			}
 
 			gameAI.getKeyState().setBomb(false);

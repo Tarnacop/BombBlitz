@@ -186,7 +186,6 @@ public abstract class AITemplate extends Thread {
 			return moves;
 		List<Player> players = gameState.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive())
 				.collect(Collectors.toList());
-		;
 		for (Player p : players) {
 
 			moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
