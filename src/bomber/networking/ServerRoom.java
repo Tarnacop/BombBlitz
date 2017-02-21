@@ -15,7 +15,9 @@ public class ServerRoom {
 	// name of the room, uniqueness required
 	private String name = null;
 	// list of players in the room
-	private ArrayList<ServerClientInfo> playerList = new ArrayList<ServerClientInfo>(4);
+	private List<ServerClientInfo> playerList = new ArrayList<ServerClientInfo>();
+	// list of AI in the room
+	private List<ServerAI> aiList = new ArrayList<ServerAI>();
 	// max number of players allowed in the room (in the range [2,4])
 	private byte maxPlayer = 4;
 	// flag indicating whether the game is in progress
@@ -125,13 +127,23 @@ public class ServerRoom {
 	}
 
 	/**
-	 * Get the list of players in the room. It is not advisable to modify the
-	 * list directly
+	 * Returns true if all players in the room are ready to play the game
 	 * 
-	 * @return the list of players in the room
+	 * @return true if all players in the room are ready to play the game
 	 */
-	public List<ServerClientInfo> getPlayerList() {
-		return playerList;
+	public boolean allPlayersReady() {
+		synchronized (playerList) {
+			boolean allPlayersReady = true;
+			for (ServerClientInfo c : playerList) {
+				if (c == null) {
+					System.err.println("Bug: playerList should not contain null");
+				} else {
+					allPlayersReady = c.isReadyToPlay() && allPlayersReady;
+				}
+			}
+			return allPlayersReady;
+		}
+
 	}
 
 	/**
@@ -153,7 +165,7 @@ public class ServerRoom {
 	 * @return
 	 */
 	public boolean createGame(int tickRate, ServerThread serverThread) {
-		game = new ServerGame(id, mapID, playerList, tickRate, serverThread);
+		game = new ServerGame(id, mapID, playerList, aiList, tickRate, serverThread);
 		return game.isMapIDValid();
 	}
 
@@ -170,12 +182,30 @@ public class ServerRoom {
 	}
 
 	/**
-	 * Get the number of players in the room
+	 * Get the number of players in the room (human + AI players)
 	 * 
 	 * @return the number of players in the room
 	 */
 	public int getPlayerNumber() {
+		return playerList.size() + aiList.size();
+	}
+
+	/**
+	 * Get the number of human players in the room
+	 * 
+	 * @return the number of human players in the room
+	 */
+	public int getHumanPlayerNumber() {
 		return playerList.size();
+	}
+
+	/**
+	 * Get the number of AI players in the room
+	 * 
+	 * @return the number of AI players in the room
+	 */
+	public int getAIPlayerNumber() {
+		return aiList.size();
 	}
 
 	/**
@@ -185,12 +215,13 @@ public class ServerRoom {
 	 *            the player to be added
 	 */
 	public void addPlayer(ServerClientInfo player) {
-		if (playerList.size() >= 4) {
-			System.err.println("Unexpected addPlayer(): Room full");
+		if (getPlayerNumber() >= getMaxPlayer()) {
+			System.err.println("Unexpected addPlayer(): Room is full");
 			return;
 		}
 
 		if (player == null) {
+			System.err.println("Unexpected addPlayer(): Player is null");
 			return;
 		}
 
@@ -211,6 +242,39 @@ public class ServerRoom {
 	 */
 	public void removePlayer(ServerClientInfo player) {
 		playerList.remove(player);
+	}
+
+	/**
+	 * Add an AI player to the room
+	 */
+	public void addAI() {
+		if (getPlayerNumber() >= getMaxPlayer()) {
+			// System.err.println("Unexpected addAI(): Room is full");
+			return;
+		}
+
+		aiList.add(new ServerAI((byte) aiList.size()));
+	}
+
+	/**
+	 * Remove an AI player from the room
+	 */
+	public void removeAI() {
+		if (aiList.size() > 0) {
+			// remove the AI which is created most recently
+			aiList.remove(aiList.size() - 1);
+		}
+	}
+
+	/**
+	 * Returns true if the room contains the specified player
+	 * 
+	 * @param player
+	 *            the player whose presence in the room is to be tested
+	 * @return true if the room contains the specified player
+	 */
+	public boolean containsPlayer(ServerClientInfo player) {
+		return playerList.contains(player);
 	}
 
 	/**
