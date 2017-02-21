@@ -55,7 +55,7 @@ public class EasyAI extends AITemplate {
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek())) {
+					while (!safetyCh.checkMoveSafety(moves.peek())&& gameAI.isAlive()) {
 					}
 				}
 			}

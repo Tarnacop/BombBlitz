@@ -46,7 +46,7 @@ public class MediumAI extends AITemplate {
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek()) ) {
+					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive() ) {
 						if(safetyCh.inDanger()) break;
 					}
 				}
@@ -68,7 +68,6 @@ public class MediumAI extends AITemplate {
 
 			// if AI is in dangger then escape only with 75% possibility
 			if (safetyCh.inDanger() && random.nextInt(100) > 25) {
-				System.out.println("1");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 
@@ -77,7 +76,6 @@ public class MediumAI extends AITemplate {
 			// if enemy is in bomb range then place the bomb and go to the
 			//// // safe location only with 30% possibility
 			else if (safetyCh.isEnemyInBombRange() && random.nextInt(10) > 4) {
-				System.out.println("2");
 				gameAI.getKeyState().setBomb(true);
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
@@ -92,10 +90,8 @@ public class MediumAI extends AITemplate {
 
 			// otherwise just generate a random goal and star fullfilling it
 			else {
-				System.out.println("3");
 				int x = random.nextInt(gameState.getMap().getGridMap()[0].length);
 				int y = random.nextInt(gameState.getMap().getGridMap().length);
-				System.out.println(x + "  " + y);
 				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
 				performPlannedMoves(moves);
 			}

@@ -139,7 +139,7 @@ public class RouteFinder {
 		// we check if the coordiantes are valid
 		// if not we return
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
-				|| map[x][y] == Block.SOLID)
+				|| map[x][y] == Block.SOLID )
 			return;
 
 		// if the neighbour is in the visited list we return
@@ -523,7 +523,7 @@ public class RouteFinder {
 		// TODO finish not implemented
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
-
+		if(start ==null || goal == null) return null;
 		int hValue = Math.abs(goal.x - start.x) + Math.abs(goal.y - start.y);
 		Node startNode = new Node(0, hValue, null, start);
 		open.add(startNode);
@@ -658,5 +658,24 @@ public class RouteFinder {
 
 		return pos;
 	}
+	
+	
+	
+	public LinkedList<AIActions> canPutBombAndEscapeExcludeAIs() {
+		LinkedList<AIActions> moves = null;
+		if (safetyCh.isEnemyInBombRangeExludeAIs()) {
+			ArrayList<Point> bombs = safetyCh.getTilesAffectedByBombs();
+			ArrayList<Point> coverage = safetyCh.getBombCoverage(
+					new Bomb(gameAI.getName(), gameAI.getPos(), PhysicsEngine.default_time, gameAI.getBombRange()),
+					getMap());
+			bombs.addAll(coverage);
+			moves = escapeFromExplotion(bombs);
+
+		}
+		if ((moves != null) && (moves.size() < 4))
+			return moves;
+		return null;
+	}
+
 
 }

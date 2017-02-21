@@ -2,6 +2,8 @@ package bomber.AI;
 
 import java.awt.Point;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import bomber.game.GameState;
 import bomber.game.Movement;
@@ -19,7 +21,7 @@ public abstract class AITemplate extends Thread {
 
 	/** The game state. */
 	protected GameState gameState;
-	
+
 	/** The Constant scalar. */
 	protected static final int scalar = 64;
 
@@ -40,7 +42,7 @@ public abstract class AITemplate extends Thread {
 		this.safetyCh = new SafetyChecker(gameState, ai);
 		this.finder = new RouteFinder(gameState, ai, safetyCh);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -56,7 +58,6 @@ public abstract class AITemplate extends Thread {
 		move();
 		System.out.println("AI Stopped.");
 	}
-	
 
 	/**
 	 * Updated position.
@@ -86,8 +87,7 @@ public abstract class AITemplate extends Thread {
 		}
 		return aiPos;
 	}
-	
-	
+
 	/**
 	 * From AI moves to game moves. Changes the AI moves to the general game
 	 * moves
@@ -117,8 +117,7 @@ public abstract class AITemplate extends Thread {
 
 		return m;
 	}
-	
-	
+
 	/**
 	 * Check ig the AI reached destination when making a single move
 	 *
@@ -135,8 +134,7 @@ public abstract class AITemplate extends Thread {
 		check &= (updatedFinalPixelPos.y <= currentPixel.y);
 		return !check;
 	}
-	
-	
+
 	/**
 	 * Make single move.
 	 *
@@ -157,7 +155,7 @@ public abstract class AITemplate extends Thread {
 		gameAI.getKeyState().setMovement(Movement.NONE);
 
 	}
-	
+
 	/**
 	 * Gets the moves to enemy.
 	 *
@@ -176,8 +174,7 @@ public abstract class AITemplate extends Thread {
 		}
 		return null;
 	}
-	
-	
+
 	/**
 	 * Gets the moves to enemy.
 	 *
@@ -187,19 +184,22 @@ public abstract class AITemplate extends Thread {
 		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs());
 		if (moves != null)
 			return moves;
-		for (Player p : gameState.getPlayers()) {
-			if (!p.equals(gameAI)) {
-				moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
-				if (moves != null)
-					return moves;
-			}
+		List<Player> players = gameState.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive())
+				.collect(Collectors.toList());
+		;
+		for (Player p : players) {
+
+			moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
+			if (moves != null)
+				return moves;
+
 		}
 		return null;
 	}
-	
+
 	protected abstract void performMoves(LinkedList<AIActions> moves, boolean inDanger);
 
-	protected abstract void performPlannedMoves(LinkedList<AIActions> moves) ;
+	protected abstract void performPlannedMoves(LinkedList<AIActions> moves);
 
-	protected abstract void move() ;
+	protected abstract void move();
 }
