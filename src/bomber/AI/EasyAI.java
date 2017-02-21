@@ -24,12 +24,12 @@ public class EasyAI extends AITemplate {
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 
 		if (inDanger)
-			while (moves != null && !moves.isEmpty()) {
+			while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
-					&& !safetyCh.isEnemyInBombRange()) {
+					&& !safetyCh.isEnemyInBombRange() && gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 	}
@@ -40,7 +40,7 @@ public class EasyAI extends AITemplate {
 
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() ){
+		while (moves != null && !moves.isEmpty() && gameAI.isAlive() ){
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {

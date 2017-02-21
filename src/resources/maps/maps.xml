@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<maps>
+	<map>
+		<!--- map representatio-->
+		<!--- X: hard(not explodable) block)-->
+		<!--- O: soft (explodable) block-->
+		<!--- _: empty space-->
+		<!--- *: spawn point-->
+		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
+		<item>X,*,_,X,X,X,X,X,X,X,_,*,X</item>
+		<item>X,_,X,X,X,X,X,X,X,X,X,_,X</item>
+		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
+		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
+		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
+		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
+		<item>X,X,X,X,O,O,O,O,O,X,X,X,X</item>
+		<item>X,X,X,X,X,X,X,X,X,X,X,_,X</item>
+		<item>X,X,X,X,X,X,X,X,X,X,X,_,X</item>
+		<item>X,_,X,X,X,X,X,X,X,X,X,_,X</item>
+		<item>X,*,_,X,X,X,X,X,X,X,_,*,X</item>
+		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
+	</map>
+</maps>
