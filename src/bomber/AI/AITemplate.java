@@ -177,6 +177,26 @@ public abstract class AITemplate extends Thread {
 		return null;
 	}
 	
+	
+	/**
+	 * Gets the moves to enemy.
+	 *
+	 * @return the moves to enemy
+	 */
+	protected LinkedList<AIActions> getMovesToEnemyExcludeAIs() {
+		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs());
+		if (moves != null)
+			return moves;
+		for (Player p : gameState.getPlayers()) {
+			if (!p.equals(gameAI)) {
+				moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
+				if (moves != null)
+					return moves;
+			}
+		}
+		return null;
+	}
+	
 	protected abstract void performMoves(LinkedList<AIActions> moves, boolean inDanger);
 
 	protected abstract void performPlannedMoves(LinkedList<AIActions> moves) ;

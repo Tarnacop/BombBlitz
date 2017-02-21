@@ -3,6 +3,8 @@ package bomber.AI;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -156,7 +158,7 @@ public class SafetyChecker {
 		Point playerPos = gameAI.getGridPos();
 		int bombRange = gameAI.getBombRange();
 		for (Player p : state.getPlayers()) {
-			if (p.equals(gameAI))
+			if (p.equals(gameAI) || !p.isAlive())
 				continue;
 			
 			if (isStraightDistance(playerPos, p.getGridPos(), bombRange) || p.getGridPos().equals(gameAI.getGridPos()))
@@ -205,5 +207,34 @@ public class SafetyChecker {
 
 		return false;
 	}
+	
+	
+	//----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------
+	//------------------------EXTREME AI------------------------------------------------
+	//----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------
+	
+	/**
+	 * Checks if enemy is in bomb range.
+	 *
+	 * @return true, if enemy is in bomb range
+	 */
+	public boolean isEnemyInBombRangeExludeAIs() {
+		Point playerPos = gameAI.getGridPos();
+		int bombRange = gameAI.getBombRange();
+		List<Player> players = state.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());;
+		for (Player p : players) {
+			
+			if (isStraightDistance(playerPos, p.getGridPos(), bombRange) || p.getGridPos().equals(gameAI.getGridPos()))
+				return true;
 
+		}
+		return false;
+	}
+	
+	
 }

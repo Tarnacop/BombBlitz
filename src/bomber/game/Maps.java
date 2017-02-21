@@ -17,7 +17,6 @@ public class Maps {
 
 	public List<Map> getMaps() {
 
-		System.out.println(parser.getMaps().get(0).getSpawnPoints());
 		return parser.getMaps();
 	}
 }

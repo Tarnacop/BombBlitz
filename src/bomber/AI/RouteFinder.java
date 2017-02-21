@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -64,9 +65,11 @@ public class RouteFinder {
 	public LinkedList<AIActions> findRoute(Point start, Point goal) {
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
-
+		
+		if(start == null || goal == null) return null;
 		// heuristic value h
-		int hValue = Math.abs(goal.x - start.x) + Math.abs(goal.y - start.y);
+		int hValue = Math.abs(goal.x - start.x) + 
+				Math.abs(goal.y - start.y);
 		Node startNode = new Node(0, hValue, null, start);
 
 		// adding start node to the queue
@@ -349,7 +352,7 @@ public class RouteFinder {
 		Point pos = null;
 		int distance = Integer.MAX_VALUE;
 		for (Player p : state.getPlayers()) {
-			if (!p.equals(gameAI)
+			if (!p.equals(gameAI) && p.isAlive()
 					&& (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
 				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
 				pos = p.getGridPos();
@@ -628,6 +631,32 @@ public class RouteFinder {
 		{
 			return actions;
 		}
+	}
+	
+	
+//	------------------------
+	
+	
+	
+	
+	/**
+	 * Gets the nearest enemy.
+	 *
+	 * @return the nearest enemy of the AI.
+	 */
+	public Point getNearestEnemyExcludeAIs() {
+		Point aiPos = gameAI.getGridPos();
+		Point pos = null;
+		int distance = Integer.MAX_VALUE;
+		List<Player> players = state.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());;
+		for (Player p : players) {
+			if ((Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
+				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
+				pos = p.getGridPos();
+			}
+		}
+
+		return pos;
 	}
 
 }

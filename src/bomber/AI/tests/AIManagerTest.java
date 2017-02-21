@@ -12,6 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -80,8 +81,8 @@ public class AIManagerTest {
 
 	@Test
 	public void test() throws InterruptedException {
-		GameAI ai = new GameAI("ai",new Point(2*scalar,3*scalar),3,10,state, null);
-		Player ai2 = new GameAI("ai",new Point(6*scalar,5*scalar),3,10,state, null);
+		GameAI ai = new GameAI("ai",new Point(2*scalar,3*scalar),3,10,state, null, AIDifficulty.HARD);
+		Player ai2 = new GameAI("ai",new Point(6*scalar,5*scalar),3,10,state, null, AIDifficulty.HARD);
 		players.add(ai);
 		players.add(ai2);
 		state.setPlayers(players);
