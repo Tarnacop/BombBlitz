@@ -141,11 +141,11 @@ public class RouteFinder {
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID)
 			return;
-
-		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
-
-		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(neigh)).findFirst().isPresent())
-			return;
+//
+//		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
+//
+//		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(neigh)).findFirst().isPresent())
+//			return;
 		// if the neighbour is in the visited list we return
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
@@ -197,10 +197,10 @@ public class RouteFinder {
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOLID)
 			return;
 
-		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
-
-		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(neigh)).findFirst().isPresent())
-			return;
+//		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
+//
+//		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(neigh)).findFirst().isPresent())
+//			return;
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
 				return;
@@ -654,7 +654,7 @@ public class RouteFinder {
 		int distance = Integer.MAX_VALUE;
 		List<Player> players = state.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive())
 				.collect(Collectors.toList());
-		;
+		
 		for (Player p : players) {
 			if ((Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
 				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
