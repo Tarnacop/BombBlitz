@@ -525,7 +525,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         		+ "\n\nImages:\nMain Menu Background - From the TRaK2 Texture set\nby Georges 'TRaK' Grondin.";
         
         Label creditsLabel = createLabel(credits);
-        VBox creditsBox = verticalMenu(creditsLabel, backButtonCredits);
+        VBox creditsBox = verticalMenu(
+        		creditsLabel, backButtonCredits);
         BorderPane creditsMenu = createBackgroundPane(creditsBox);
         
         Scene creditsScene = createScene(creditsMenu);
