@@ -101,6 +101,10 @@ public class TestClientMain {
 
 						System.out.println("roomID: " + client.getRoomID());
 
+					} else if (cmds[0].equals("mapid")) {
+
+						System.out.println("mapID: " + client.getMapID());
+
 					} else if (cmds[0].equals("leaveroom")) {
 
 						client.leaveRoom();
@@ -155,6 +159,34 @@ public class TestClientMain {
 						} else {
 							client.readyToPlay(false);
 						}
+
+					} else if (cmds[0].equals("setroomname")) {
+
+						client.setRoomName(cmds[1]);
+
+					} else if (cmds[0].equals("setmaxplayer")) {
+
+						byte maxPlayer = 4;
+						try {
+							maxPlayer = Byte.parseByte(cmds[1]);
+						} catch (NumberFormatException e) {
+							System.out.println("Failed to parse max player");
+							continue;
+						}
+
+						client.setRoomMaxPlayer(maxPlayer);
+
+					} else if (cmds[0].equals("setmapid")) {
+
+						int mapID = -1;
+						try {
+							mapID = Integer.parseInt(cmds[1]);
+						} catch (NumberFormatException e) {
+							System.out.println("Failed to parse map id");
+							continue;
+						}
+
+						client.setRoomMapID(mapID);
 
 					} else if (cmds[0].equals("sendraw")) {
 

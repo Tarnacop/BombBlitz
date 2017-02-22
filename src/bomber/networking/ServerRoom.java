@@ -19,7 +19,7 @@ public class ServerRoom {
 	// list of AI in the room
 	private List<ServerAI> aiList = new ArrayList<ServerAI>();
 	// max number of players allowed in the room (in the range [2,4])
-	private byte maxPlayer = 4;
+	private int maxPlayer = 4;
 	// flag indicating whether the game is in progress
 	// private boolean inGame = false;
 	// the map ID
@@ -44,8 +44,12 @@ public class ServerRoom {
 		} else {
 			this.name = name;
 		}
-		playerList.add(firstPlayer);
-		this.mapID = mapID;
+
+		if (firstPlayer != null) {
+			playerList.add(firstPlayer);
+		}
+
+		setMapID(mapID);
 	}
 
 	/**
@@ -61,17 +65,20 @@ public class ServerRoom {
 	 * @param mapID
 	 *            the initial map ID of the room
 	 */
-	public ServerRoom(String name, ServerClientInfo firstPlayer, byte maxPlayer, int mapID) {
+	public ServerRoom(String name, ServerClientInfo firstPlayer, int maxPlayer, int mapID) {
 		if (name == null) {
 			this.name = "Room " + id;
 		} else {
 			this.name = name;
 		}
-		playerList.add(firstPlayer);
-		if (maxPlayer >= 2 && maxPlayer <= 4) {
-			this.setMaxPlayer(maxPlayer);
+
+		if (firstPlayer != null) {
+			playerList.add(firstPlayer);
 		}
-		this.mapID = mapID;
+
+		setMaxPlayer(maxPlayer);
+
+		setMapID(mapID);
 	}
 
 	/**
@@ -82,8 +89,10 @@ public class ServerRoom {
 	 */
 	public ServerRoom(ServerClientInfo firstPlayer) {
 		this.name = "Room " + id;
-		playerList.add(firstPlayer);
-		this.mapID = 0;
+
+		if (firstPlayer != null) {
+			playerList.add(firstPlayer);
+		}
 	}
 
 	/**
@@ -278,22 +287,50 @@ public class ServerRoom {
 	}
 
 	/**
+	 * Get an array of human players in this room
+	 * 
+	 * @return an array of human players in this room
+	 */
+	public ServerClientInfo[] getHumanPlayers() {
+		ServerClientInfo[] players = new ServerClientInfo[playerList.size()];
+		for (int i = 0; i < playerList.size(); i++) {
+			players[i] = playerList.get(i);
+		}
+		return players;
+	}
+
+	/**
+	 * Get an array of AI players in this room
+	 * 
+	 * @return an array of AI players in this room
+	 */
+	public ServerAI[] getAIPlayers() {
+		ServerAI[] players = new ServerAI[aiList.size()];
+		for (int i = 0; i < aiList.size(); i++) {
+			players[i] = aiList.get(i);
+		}
+		return players;
+	}
+
+	/**
 	 * Get the max number of players allowed in this room
 	 * 
 	 * @return the max number of players
 	 */
-	public byte getMaxPlayer() {
+	public int getMaxPlayer() {
 		return maxPlayer;
 	}
 
 	/**
-	 * Set the max number of players allowed in this room (in the range [2,4])
+	 * Set the max number of players allowed in this room (in the range [2,4]).
+	 * Note that the max number of players cannot be changed when it is smaller
+	 * than the number of players currently in the room
 	 * 
 	 * @param maxPlayer
 	 *            the max number of players
 	 */
-	public void setMaxPlayer(byte maxPlayer) {
-		if (maxPlayer >= 2 && maxPlayer <= 4) {
+	public void setMaxPlayer(int maxPlayer) {
+		if (maxPlayer >= 2 && maxPlayer <= 4 && maxPlayer >= getPlayerNumber()) {
 			this.maxPlayer = maxPlayer;
 		}
 	}
@@ -314,7 +351,9 @@ public class ServerRoom {
 	 *            the map ID
 	 */
 	public void setMapID(int mapID) {
-		this.mapID = mapID;
+		if (mapID >= 0) {
+			this.mapID = mapID;
+		}
 	}
 
 }

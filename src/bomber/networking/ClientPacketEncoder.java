@@ -58,9 +58,6 @@ public class ClientPacketEncoder {
 		buffer.position(15);
 		int numPlayers = buffer.getInt();
 
-		// System.out.printf("%d %d %d %d\n", totalPlayers, packetIndex,
-		// maxIndex, numPlayers);
-
 		buffer.position(19);
 		List<ClientServerPlayer> playerList = new ArrayList<ClientServerPlayer>();
 		for (int i = 0; i < numPlayers; i++) {
@@ -92,7 +89,7 @@ public class ClientPacketEncoder {
 	}
 
 	/**
-	 * Decode List of ClientServerRoom from bytes in MSG_S_LOBBY_ROOMLIST
+	 * Decode List of ClientServerLobbyRoom from bytes in MSG_S_LOBBY_ROOMLIST
 	 * format. The first three bytes in the destination byte array are reserved
 	 * for message type and sequence number and will be ignored. The caller
 	 * should ensure the first three bytes are correct before calling this
@@ -102,7 +99,7 @@ public class ClientPacketEncoder {
 	 *            the source byte array
 	 * @param length
 	 *            the length of the data in the byte array
-	 * @return a list of ClientServerRoom
+	 * @return a list of ClientServerLobbyRoom
 	 * @throws IOException
 	 */
 	public static List<ClientServerLobbyRoom> decodeRoomList(byte[] src, int length) throws IOException {
@@ -126,9 +123,6 @@ public class ClientPacketEncoder {
 		// int maxIndex = buffer.getInt();
 		buffer.position(15);
 		int numRooms = buffer.getInt();
-
-		// System.out.printf("%d %d %d %d\n", totalPlayers, packetIndex,
-		// maxIndex, numPlayers);
 
 		buffer.position(19);
 		List<ClientServerLobbyRoom> roomList = new ArrayList<ClientServerLobbyRoom>();
@@ -188,6 +182,113 @@ public class ClientPacketEncoder {
 		}
 
 		return roomList;
+	}
+
+	/**
+	 * Decode ClientServerRoom from bytes in MSG_S_ROOM_ROOMINFO format. The
+	 * first three bytes in the destination byte array are reserved for message
+	 * type and sequence number and will be ignored. The caller should ensure
+	 * the first three bytes are correct before calling this method.
+	 * 
+	 * @param src
+	 *            the source byte array
+	 * @param length
+	 *            the length of the data in the byte array
+	 * @return a ClientServerRoom
+	 * @throws IOException
+	 */
+	public static ClientServerRoom decodeRoom(byte[] src, int length) throws IOException {
+		if (src == null) {
+			throw new IOException("src is null");
+		}
+
+		if (length > src.length) {
+			throw new IOException("length is invalid");
+		}
+
+		if (length < 1 + 2 + 4 + 1) {
+			throw new IOException("packet format is invalid");
+		}
+
+		ByteBuffer buffer = ByteBuffer.wrap(src, 0, length);
+		buffer.position(3);
+
+		// get room ID
+		int roomID = buffer.getInt();
+
+		// get room name
+		byte roomNameLength = buffer.get();
+		if (roomNameLength < 1 || length < buffer.position() + roomNameLength) {
+			throw new IOException("packet format is invalid");
+		}
+		byte[] roomNameData = new byte[roomNameLength];
+		buffer.get(roomNameData);
+		String name = new String(roomNameData, 0, roomNameLength, "UTF-8");
+
+		/*
+		 * get number of human players, AI players, max players, inGame flag and
+		 * map ID
+		 */
+		if (length < buffer.position() + 1 + 1 + 1 + 1 + 4) {
+			throw new IOException("packet format is invalid");
+		}
+		byte humanPlayerNumber = buffer.get();
+		byte aiPlayerNumber = buffer.get();
+		byte maxPlayer = buffer.get();
+		boolean inGame = buffer.get() != 0;
+		int mapID = buffer.getInt();
+
+		// get human player info
+		List<ClientServerPlayer> humanPlayerList = new ArrayList<ClientServerPlayer>(4);
+		for (int i = 0; i < humanPlayerNumber; i++) {
+			if (length < buffer.position() + 4 + 1) {
+				throw new IOException("packet format is invalid");
+			}
+
+			// get player ID
+			int playerID = buffer.getInt();
+
+			// get player name
+			byte playerNameLength = buffer.get();
+			if (playerNameLength < 1 || length < buffer.position() + playerNameLength) {
+				throw new IOException("packet format is invalid");
+			}
+			byte[] playerNameData = new byte[playerNameLength];
+			buffer.get(playerNameData);
+			String playerName = new String(playerNameData, 0, playerNameLength, "UTF-8");
+
+			if (length < buffer.position() + 1) {
+				throw new IOException("packet format is invalid");
+			}
+
+			boolean readyToPlay = buffer.get() != 0;
+
+			humanPlayerList.add(new ClientServerPlayer(playerID, playerName, readyToPlay));
+		}
+
+		// get AI player info
+		List<ClientServerAI> aiPlayerList = new ArrayList<ClientServerAI>(4);
+		for (int i = 0; i < aiPlayerNumber; i++) {
+			if (length < buffer.position() + 1) {
+				throw new IOException("packet format is invalid");
+			}
+
+			// get player ID
+			byte playerID = buffer.get();
+
+			aiPlayerList.add(new ClientServerAI(playerID));
+		}
+
+		if (length != buffer.position()) {
+			throw new IOException("packet format is invalid");
+		}
+
+		ClientServerRoom room = new ClientServerRoom(roomID, name, humanPlayerNumber, aiPlayerNumber, maxPlayer, inGame,
+				mapID);
+		room.setHumanPlayerList(humanPlayerList);
+		room.setAIPlayerList(aiPlayerList);
+
+		return room;
 	}
 
 	/**
@@ -611,9 +712,11 @@ public class ClientPacketEncoder {
 		if (BitArray.getBit(audioState, 4)) {
 			audioEventList.add(AudioEvent.POWERUP);
 		}
+
 		GameState gameState = new GameState(new Map("map", gridMap, new ArrayList<>()), playerList);
 		gameState.setBombs(bombList);
 		gameState.setAudioEvents(audioEventList);
+
 		return gameState;
 	}
 

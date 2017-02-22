@@ -185,6 +185,99 @@ public class ServerPacketEncoder {
 	}
 
 	/**
+	 * Encode ServerRoom into MSG_S_ROOM_ROOMINFO format. The first three bytes
+	 * in the destination byte array are reserved for message type and sequence
+	 * number and will not be overwritten by this method. The caller should set
+	 * the first three bytes properly before sending.
+	 * 
+	 * @param room
+	 *            the room
+	 * @param dest
+	 *            the destination byte array that will be sent over the network
+	 * @return the number of bytes of the encoded data in the byte array
+	 * @throws IOException
+	 */
+	public static int encodeRoom(ServerRoom room, byte[] dest) throws IOException {
+		if (room == null || dest == null) {
+			throw new IOException("room or dest is null");
+		}
+
+		// length required before room name
+		int len = 1 + 2 + 4;
+		if (dest.length < len) {
+			throw new IOException("dest is too short");
+		}
+
+		// wrap byte array into a ByteBuffer
+		ByteBuffer buffer = ByteBuffer.wrap(dest);
+
+		// put room id into byte array
+		buffer.position(3);
+		buffer.putInt(room.getID());
+
+		// put room name into byte array
+		byte[] roomNameData = room.getName().getBytes("UTF-8");
+		if (dest.length < buffer.position() + 1 + roomNameData.length) {
+			throw new IOException("dest is too short");
+		}
+		buffer.put((byte) roomNameData.length);
+		buffer.put(roomNameData);
+
+		/*
+		 * put number of human players, AI players, max players, inGame flag and
+		 * map ID
+		 */
+		if (dest.length < buffer.position() + 1 + 1 + 1 + 1 + 4) {
+			throw new IOException("dest is too short");
+		}
+		buffer.put((byte) room.getHumanPlayerNumber());
+		buffer.put((byte) room.getAIPlayerNumber());
+		buffer.put((byte) room.getMaxPlayer());
+		if (room.isInGame()) {
+			buffer.put((byte) 1);
+		} else {
+			buffer.put((byte) 0);
+		}
+		buffer.putInt(room.getMapID());
+
+		// put human player info
+		ServerClientInfo[] humanPlayers = room.getHumanPlayers();
+		for (int i = 0; i < humanPlayers.length; i++) {
+			ServerClientInfo player = humanPlayers[i];
+			byte[] nameData = player.getName().getBytes("UTF-8");
+			if (dest.length < buffer.position() + 4 + 1 + nameData.length + 1) {
+				throw new IOException("dest is too short");
+			}
+			// put player id
+			buffer.putInt(player.getID());
+			// put player name
+			buffer.put((byte) nameData.length);
+			buffer.put(nameData);
+			// put ready to play flag
+			if (player.isReadyToPlay()) {
+				buffer.put((byte) 1);
+			} else {
+				buffer.put((byte) 0);
+			}
+		}
+
+		// put AI player info
+		ServerAI[] aiPlayers = room.getAIPlayers();
+		for (int i = 0; i < aiPlayers.length; i++) {
+			ServerAI ai = aiPlayers[i];
+			byte id = ai.getID();
+			if (dest.length < buffer.position() + 1) {
+				throw new IOException("dest is too short");
+			}
+			// put AI id
+			buffer.put(id);
+		}
+
+		len = buffer.position();
+		return len;
+	}
+
+	/**
 	 * Encode GameState into MSG_S_ROOM_GAMESTATE format. The first three bytes
 	 * in the destination byte array are reserved for message type and sequence
 	 * number and will not be overwritten by this method. The caller should set

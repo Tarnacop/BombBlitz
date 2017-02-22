@@ -442,8 +442,8 @@ public class ServerThread implements Runnable {
 				return;
 			}
 
-			// check whether there is duplicate room name
-			if (roomTable.contains(roomName) || roomTable.size() >= clientTable.size()) {
+			// check whether there are more rooms than clients
+			if (roomTable.size() >= clientTable.size()) {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 				return;
@@ -462,7 +462,16 @@ public class ServerThread implements Runnable {
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT, true);
 
-			// TODO send room info MSG_S_ROOM_ROOMINFO to this client
+			// send room info MSG_S_ROOM_ROOMINFO to this client
+			int encodedRoomLen = 0;
+			try {
+				encodedRoomLen = ServerPacketEncoder.encodeRoom(room, sendBuffer);
+			} catch (IOException e) {
+				pServer("Failed to encode room: " + e);
+				return;
+			}
+			DatagramPacket roomP = new DatagramPacket(sendBuffer, 0, encodedRoomLen, sockAddr);
+			sendPacket(roomP, ProtocolConstant.MSG_S_ROOM_ROOMINFO, true);
 
 			break;
 		}
@@ -533,10 +542,18 @@ public class ServerThread implements Runnable {
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT, true);
 
-			/*
-			 * TODO send room info MSG_S_ROOM_ROOMINFO to all clients in this
-			 * room
-			 */
+			// send room info MSG_S_ROOM_ROOMINFO to all clients in this room
+			int encodedRoomLen = 0;
+			try {
+				encodedRoomLen = ServerPacketEncoder.encodeRoom(room, sendBuffer);
+			} catch (IOException e) {
+				pServer("Failed to encode room: " + e);
+				return;
+			}
+			for (ServerClientInfo c : room.getHumanPlayers()) {
+				DatagramPacket roomP = new DatagramPacket(sendBuffer, 0, encodedRoomLen, c.getSocketAddress());
+				sendPacket(roomP, ProtocolConstant.MSG_S_ROOM_ROOMINFO, true);
+			}
 
 			break;
 
@@ -596,9 +613,20 @@ public class ServerThread implements Runnable {
 			sendPacket(p, ProtocolConstant.MSG_S_ROOM_HAVELEFT, true);
 
 			/*
-			 * TODO send room info MSG_S_ROOM_ROOMINFO to remaining clients in
-			 * this room
+			 * send room info MSG_S_ROOM_ROOMINFO to remaining clients in this
+			 * room
 			 */
+			int encodedRoomLen = 0;
+			try {
+				encodedRoomLen = ServerPacketEncoder.encodeRoom(room, sendBuffer);
+			} catch (IOException e) {
+				pServer("Failed to encode room: " + e);
+				return;
+			}
+			for (ServerClientInfo c : room.getHumanPlayers()) {
+				DatagramPacket roomP = new DatagramPacket(sendBuffer, 0, encodedRoomLen, c.getSocketAddress());
+				sendPacket(roomP, ProtocolConstant.MSG_S_ROOM_ROOMINFO, true);
+			}
 
 			break;
 
@@ -657,15 +685,23 @@ public class ServerThread implements Runnable {
 			// update the client info
 			client.setReadyToPlay(readyToPlay);
 
+			// send room info MSG_S_ROOM_ROOMINFO to all clients in this room
+			int encodedRoomLen = 0;
+			try {
+				encodedRoomLen = ServerPacketEncoder.encodeRoom(room, sendBuffer);
+			} catch (IOException e) {
+				pServer("Failed to encode room: " + e);
+				return;
+			}
+			for (ServerClientInfo c : room.getHumanPlayers()) {
+				DatagramPacket roomP = new DatagramPacket(sendBuffer, 0, encodedRoomLen, c.getSocketAddress());
+				sendPacket(roomP, ProtocolConstant.MSG_S_ROOM_ROOMINFO, true);
+			}
+
 			// if readyToPlay is false, the game definitely won't start
 			if (!readyToPlay) {
 				return;
 			}
-
-			/*
-			 * TODO send room info MSG_S_ROOM_ROOMINFO to all clients in this
-			 * room
-			 */
 
 			// check whether there is already a game in progress
 			if (room.isInGame()) {
@@ -689,7 +725,7 @@ public class ServerThread implements Runnable {
 				/*
 				 * ServerGame should be responsible for sending updated game
 				 * states to clients in this particular game session(game start,
-				 * game state and game over messages) while ServerThread will
+				 * game state and game end messages) while ServerThread will
 				 * update the KeyboardState of the players itself
 				 */
 				room.getGame().start();
@@ -700,7 +736,7 @@ public class ServerThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_C_ROOM_SETINFO: {
-			if (packet.getLength() < 7) {
+			if (packet.getLength() < 8) {
 				pServer("Failed to decode readyToPlay request from " + sockAddr);
 				return;
 			}
@@ -746,27 +782,48 @@ public class ServerThread implements Runnable {
 				return;
 			}
 
-			// TODO unfinished
 			// change the room info
-			if (packet.getLength() >= 9) {
-				recvByteBuffer.position(7);
-				byte changeType = recvByteBuffer.get();
-				if (changeType == ProtocolConstant.MSG_C_ROOM_SETINFO_AI) {
-					byte op = recvByteBuffer.get();
-					if (op == ProtocolConstant.MSG_C_ROOM_SETINFO_AI_ADD) {
-						// pServer("Adding one AI to room " + room.getID());
-						room.addAI();
-					} else if (op == ProtocolConstant.MSG_C_ROOM_SETINFO_AI_REMOVE) {
-						// pServer("Removing one AI from room " + room.getID());
-						room.removeAI();
-					}
+			recvByteBuffer.position(7);
+			byte changeType = recvByteBuffer.get();
+			if (changeType == ProtocolConstant.MSG_C_ROOM_SETINFO_NAME && packet.getLength() > 9) {
+				byte nameLength = recvByteBuffer.get();
+				if (nameLength < 1 || nameLength > config.getMaxNameLength() || packet.getLength() < 9 + nameLength) {
+					return;
+				} else {
+					String name = new String(recvBuffer, 9, nameLength, "UTF-8");
+					room.setName(name);
 				}
+			} else if (changeType == ProtocolConstant.MSG_C_ROOM_SETINFO_MAXPLAYER && packet.getLength() >= 9) {
+				byte maxPlayer = recvByteBuffer.get();
+				room.setMaxPlayer(maxPlayer);
+			} else if (changeType == ProtocolConstant.MSG_C_ROOM_SETINFO_MAPID && packet.getLength() >= 12) {
+				int mapID = recvByteBuffer.getInt();
+				room.setMapID(mapID);
+			} else if (changeType == ProtocolConstant.MSG_C_ROOM_SETINFO_AI && packet.getLength() >= 9) {
+				byte op = recvByteBuffer.get();
+				if (op == ProtocolConstant.MSG_C_ROOM_SETINFO_AI_ADD) {
+					room.addAI();
+				} else if (op == ProtocolConstant.MSG_C_ROOM_SETINFO_AI_REMOVE) {
+					room.removeAI();
+				} else {
+					return;
+				}
+			} else {
+				return;
 			}
 
-			/*
-			 * TODO send room info MSG_S_ROOM_ROOMINFO to all clients in this
-			 * room
-			 */
+			// send room info MSG_S_ROOM_ROOMINFO to all clients in this room
+			int encodedRoomLen = 0;
+			try {
+				encodedRoomLen = ServerPacketEncoder.encodeRoom(room, sendBuffer);
+			} catch (IOException e) {
+				pServer("Failed to encode room: " + e);
+				return;
+			}
+			for (ServerClientInfo c : room.getHumanPlayers()) {
+				DatagramPacket roomP = new DatagramPacket(sendBuffer, 0, encodedRoomLen, c.getSocketAddress());
+				sendPacket(roomP, ProtocolConstant.MSG_S_ROOM_ROOMINFO, true);
+			}
 
 			break;
 

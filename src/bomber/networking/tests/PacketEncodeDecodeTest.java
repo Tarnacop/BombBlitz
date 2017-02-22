@@ -15,8 +15,10 @@ import bomber.game.Map;
 import bomber.game.Movement;
 import bomber.game.Player;
 import bomber.networking.ClientPacketEncoder;
+import bomber.networking.ClientServerAI;
 import bomber.networking.ClientServerLobbyRoom;
 import bomber.networking.ClientServerPlayer;
+import bomber.networking.ClientServerRoom;
 import bomber.networking.ServerClientInfo;
 import bomber.networking.ServerClientTable;
 import bomber.networking.ServerPacketEncoder;
@@ -86,6 +88,45 @@ public class PacketEncodeDecodeTest {
 		for (ClientServerLobbyRoom r : roomList) {
 			System.out.printf("ID: %d, Name: %s, Number of players: %d, Max players: %d, inGame: %b, Map ID: %d\n",
 					r.getID(), r.getName(), r.getPlayerNumber(), r.getMaxPlayer(), r.isInGame(), r.getMapID());
+		}
+
+		System.out.println();
+
+		// room test
+		SocketAddress sockAddr = new InetSocketAddress("12.12.12.12", 12);
+		ServerClientInfo client = new ServerClientInfo(sockAddr, "client " + 12);
+		ServerRoom room = new ServerRoom("Test Room", client, 3, 1);
+		room.addAI();
+		room.addAI();
+
+		try {
+			ret = ServerPacketEncoder.encodeRoom(room, arr);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		System.out.println("encodeRoom returns " + ret);
+		System.out.println(ServerThread.toHex(arr, ret));
+
+		ClientServerRoom roomDecoded = null;
+		try {
+			roomDecoded = ClientPacketEncoder.decodeRoom(arr, ret);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		System.out.println("decodeRoom:");
+		System.out.printf(
+				"room ID: %d, room name: %s, human player: %d, AI player: %d, max player: %d, inGame: %b, map ID: %d\n",
+				room.getID(), room.getName(), room.getHumanPlayerNumber(), room.getAIPlayerNumber(),
+				room.getMaxPlayer(), room.isInGame(), room.getMapID());
+		System.out.println("Human players:");
+		for (ClientServerPlayer p : roomDecoded.getHumanPlayerList()) {
+			System.out.printf("player ID: %d, name: %s, ready: %b\n", p.getID(), p.getName(), p.isReadyToPlay());
+		}
+		System.out.println("AI players:");
+		for (ClientServerAI a : roomDecoded.getAIPlayerList()) {
+			System.out.printf("player ID: %d\n", a.getID());
 		}
 
 		System.out.println();
