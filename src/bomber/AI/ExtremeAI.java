@@ -126,18 +126,18 @@ public class ExtremeAI extends AITemplate {
 
 			// if enemy is in range and it is possible to place bomb and escape
 			// then do it
-//			else if ((moves = finder.canPutBombAndEscapeExcludeAIs()) != null) {
-//				gameAI.getKeyState().setBomb(true);
-//				performMoves(moves, true);
-//			}
-
-			// // if enemy is in bomb range then place the bomb and go to the
-			////// // safe location
-			else if (safetyCh.isEnemyInBombRangeExludeAIs()) {
+			else if ((moves = finder.canPutBombAndEscapeExcludeAIs()) != null) {
 				gameAI.getKeyState().setBomb(true);
-				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
+
+			// // if enemy is in bomb range then place the bomb and go to the
+//			////// // safe location
+//			else if (safetyCh.isEnemyInBombRangeExludeAIs()) {
+//				gameAI.getKeyState().setBomb(true);
+//				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+//				performMoves(moves, true);
+//			}
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemyExcludeAIs()) != null) {
