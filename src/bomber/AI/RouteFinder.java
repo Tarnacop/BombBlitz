@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 
 import bomber.game.Block;
 import bomber.game.Bomb;
+import bomber.game.Constants;
 import bomber.game.GameState;
 import bomber.game.Player;
 import bomber.physics.PhysicsEngine;
@@ -555,7 +556,7 @@ public class RouteFinder {
 		if (safetyCh.isEnemyInBombRange()) {
 			ArrayList<Point> bombs = safetyCh.getTilesAffectedByBombs();
 			ArrayList<Point> coverage = safetyCh.getBombCoverage(
-					new Bomb(gameAI.getName(), gameAI.getPos(), PhysicsEngine.default_time, gameAI.getBombRange()),
+					new Bomb(gameAI.getName(), gameAI.getPos(), Constants.defaultBombTime, gameAI.getBombRange()),
 					getMap());
 			bombs.addAll(coverage);
 			moves = escapeFromExplotion(bombs);

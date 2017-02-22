@@ -1,0 +1,20 @@
+.button{
+	-fx-background-color: transparent;
+        -fx-background-image: url("images/button.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.button:hover{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/buttonhover.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.button:armed{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/buttonclick.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}

@@ -36,8 +36,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import bomber.game.Block;
 import bomber.game.Game;
+import bomber.game.GameState;
 import bomber.game.Map;
 import bomber.game.Maps;
+import bomber.game.OnlineGame;
 import bomber.game.Response;
 import bomber.networking.ClientNetInterface;
 import bomber.networking.ClientServerLobbyRoom;
@@ -124,8 +126,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Scene currentScene;
 	private Font font;
 	
+	private UserInterface ui;
+	
+	private boolean createdRoom;
+	private Scene roomScene;
+	private Button backButtonRooms;
+	
 	public UserInterface(){
 		//for JavaFX
+		
+		this.ui = this;
 		this.font = Font.loadFont(UserInterface.class.getResource("minecraft.ttf").toExternalForm(), 20);
 
 		this.playerName = new SimpleStringProperty("Player 1");
@@ -171,6 +181,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         singleMenu = new BorderPane();
         
         mainScene = new Scene(mainMenu, 1000, 600);
+        String css = this.getClass().getResource("resources/stylesheet.css").toExternalForm(); 
+        mainScene.getStylesheets().add(css);
         settingsScene = new Scene(settingsMenu, 1000, 600);
         
         keyScene = new Scene(keyMenu, 1000, 600);
@@ -188,12 +200,10 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         ipBox = new HBox();
         
-        //ipText = new TextField("IP Address");
-        ipText = new TextField("10.20.170.99");
+        ipText = new TextField("IP Address");
         slashLabel = new Label("/");
         slashLabel.setFont(font);
-        //portNum = new TextField("Port Number");
-        portNum = new TextField("1234");
+        portNum = new TextField("Port Number");
         
         ipBox.setSpacing(10);
         ipBox.setPrefSize(200, 50);
@@ -243,21 +253,23 @@ public class UserInterface extends Application implements ClientNetInterface{
         singleBtn = new Button("Single Player");
         singleBtn.setPrefWidth(200);
         singleBtn.setFont(font);
-        singleBtn.setStyle(""
-        		+ "-fx-background-color: transparent;"
-        		+ "-fx-background-image: url(\"resources/images/button.png\");"
-        		+ "-fx-background-size:100% 100%;"
-        		+ "-fx-background-repeat:no-repeat;");
+        singleBtn.getStyleClass().add(".button");
+//        singleBtn.setStyle(""
+//        		+ "-fx-background-color: transparent;"
+//        		+ "-fx-background-image: url(\"resources/images/button.png\");"
+//        		+ "-fx-background-size:100% 100%;"
+//        		+ "-fx-background-repeat:no-repeat;");
         singleBtn.setOnAction(e -> advance(mainScene, singleScene));
         
         multiBtn = new Button("Multiplayer");
         multiBtn.setPrefWidth(200);
         multiBtn.setFont(font);
-        multiBtn.setStyle(""
-        		+ "-fx-background-color: transparent;"
-        		+ "-fx-background-image: url(\"resources/images/button.png\");"
-        		+ "-fx-background-size:100% 100%;"
-        		+ "-fx-background-repeat:no-repeat;");
+        multiBtn.getStyleClass().add(".button");
+//        multiBtn.setStyle(""
+//        		+ "-fx-background-color: transparent;"
+//        		+ "-fx-background-image: url(\"resources/images/button.png\");"
+//        		+ "-fx-background-size:100% 100%;"
+//        		+ "-fx-background-repeat:no-repeat;");
         multiBtn.setOnAction(e -> advance(mainScene, multiScene));
         
         settingsBtn = new Button("Settings");
@@ -314,7 +326,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         singleButtonPane.setAlignment(Pos.CENTER);
         singleButtonPane.getChildren().add(singleBtn);
         
-        Image mainImage = new Image("resources/images/background.png");
+        Image mainImage = new Image("bomber/UI/resources/images/background.png");
         ImageView mainImageView = new ImageView(mainImage);
         imagePane = new Pane();
         imagePane.getChildren().add(mainImageView); 
@@ -322,7 +334,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         mainImageView.fitWidthProperty().bind(imagePane.widthProperty()); 
         mainImageView.fitHeightProperty().bind(imagePane.heightProperty());
         
-        Image logoImage = new Image("resources/images/logo.png");
+        Image logoImage = new Image("bomber/UI/resources/images/logo.png");
         ImageView logoImageView = new ImageView(logoImage);
         HBox logoPane = new HBox();
         logoPane.setSpacing(20);
@@ -488,7 +500,27 @@ public class UserInterface extends Application implements ClientNetInterface{
         roomsPlayersPane.setAlignment(Pos.CENTER);
         roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
         
-        serverMenu.getChildren().addAll(disconnectBtn, roomsPlayersPane);
+
+        VBox roomMenu = new VBox();
+        Button createRoomBtn = new Button("New\nRoom");
+        createRoomBtn.setOnAction(e -> createRoom());
+        
+        Button addAi = new Button("Add Ai");
+        addAi.setOnAction(e -> incrementAi());
+        
+        Button removeAi = new Button("Remove Ai");
+        removeAi.setOnAction(e -> decrementAi());
+        
+        Button startGame = new Button("Start Game");
+        startGame.setOnAction(e -> beginOnlineGame());
+        
+        roomScene = new Scene(roomMenu, 1000, 600);
+        
+        backButtonRooms = new Button("Back");
+        backButtonRooms.setOnAction(e -> previous());
+        roomMenu.getChildren().addAll(backButtonRooms, addAi, removeAi, startGame);
+        
+        serverMenu.getChildren().addAll(disconnectBtn, createRoomBtn, roomsPlayersPane);
         
         connectPane = new VBox();
         connectPane.setAlignment(Pos.CENTER);
@@ -499,6 +531,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         multiMenu.setCenter(connectPane);
         
         
+        
+        
         primaryStage.setScene(mainScene);
         primaryStage.setOnCloseRequest(e -> disconnect());
         primaryStage.show();
@@ -506,6 +540,31 @@ public class UserInterface extends Application implements ClientNetInterface{
         
 	}
 	
+	private void beginOnlineGame() {
+		
+		try {
+			this.client.readyToPlay(true);
+			for(int x = 0; x < this.aiNumber.get(); x++){
+				this.client.addAI();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void createRoom() {
+	
+		try {
+			this.client.createRoom("Room 1", (byte) 4, 1);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			advance(currentScene, roomScene);
+		}
+	}
+
 	private Object setRight() {
 		// TODO Auto-generated method stub
 		return null;
@@ -584,7 +643,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		nameText.setText("Enter Name");
 		//ipText.setText("Enter IP Address");
-		ipText.setText("10.20.170.99");
+		ipText.setText("10.20.171.10");
 		//portNum.setText("Enter Port Number");
 		portNum.setText("1234");
 	}
@@ -679,6 +738,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally{
+			advance(currentScene, roomScene);
 		}
 	}
 
@@ -696,6 +757,15 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void previous() {
+		try {
+		if(this.client != null && this.client.isInRoom()){
+			
+				this.client.leaveRoom();
+			
+		}} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
 		
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
@@ -706,6 +776,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
+		
+		}
 	}
 	
 	private void advance(Scene thisScene, Scene nextScene) {
@@ -825,10 +897,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void roomListReceived() {
+		System.out.println("Adding display rooms event to queue");
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
+				System.out.println("Displaying Rooms");
 				displayRooms();
 			}
 			   
@@ -837,14 +911,28 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void roomAccepted() {
-		// TODO Auto-generated method stub
-		
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				System.out.println("Room creation accepted");
+				createdRoom = true;
+			}
+			   
+		});
 	}
 
 	@Override
 	public void roomRejected() {
-		// TODO Auto-generated method stub
-		
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				System.out.println("Room creation rejected");
+				createdRoom = false;
+			}
+			   
+		});
 	}
 
 	@Override
@@ -867,8 +955,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void gameStarted() {
-		// TODO Auto-generated method stub
-		
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				int mapID = client.getMapID();
+				GameState gameState = client.getGameState();
+				Platform.setImplicitExit(false);
+				OnlineGame game = new OnlineGame(ui, client, gameState, maps.get(1), playerName.get(), controls);
+			}
+			   
+		});
 	}
 
 	@Override
