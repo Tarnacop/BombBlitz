@@ -984,7 +984,7 @@ public class ServerThread implements Runnable {
 		socket.receive(packet);
 	}
 
-	private void removeClient(ServerClientInfo client) {
+	private synchronized void removeClient(ServerClientInfo client) {
 		if (client == null) {
 			return;
 		}
@@ -995,7 +995,7 @@ public class ServerThread implements Runnable {
 
 	}
 
-	private void removeClientFromRoom(ServerClientInfo client) {
+	private synchronized void removeClientFromRoom(ServerClientInfo client) {
 		if (client == null) {
 			return;
 		}
