@@ -106,7 +106,7 @@ public class ProtocolConstant {
 
 	// Network connection
 	public static final byte MSG_S_NET_ACCEPT = 0x40; // Bit set
-	// 1 byte message type + 2 byte sequence
+	// 1 byte message type + 2 byte sequence + 4 byte client id
 
 	public static final byte MSG_S_NET_REJECT = 0x41; // Bit not set
 	// 1 byte message type + 2 byte sequence
@@ -220,7 +220,6 @@ public class ProtocolConstant {
 	/*
 	 * Audio Events: 2 byte audio event bit array
 	 */
-	// TODO map id may need to contained in this message
 
 	public static final byte MSG_S_ROOM_GAMEOVER = 0x51; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room id

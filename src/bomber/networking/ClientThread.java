@@ -51,6 +51,9 @@ public class ClientThread implements Runnable {
 	// whether the connection has been established
 	private boolean connected = false;
 
+	// the ID of the client
+	private int clientID = -1;
+
 	// whether the client is in room(a client can either in lobby or in room)
 	private boolean inRoom = false;
 	private int roomID = -1;
@@ -266,8 +269,20 @@ public class ClientThread implements Runnable {
 		case ProtocolConstant.MSG_S_NET_ACCEPT: {
 			// pClient("Connection has been accepted by the server");
 
+			// this message must contain a client ID
+			if (packet.getLength() < 7) {
+				return;
+			}
+
+			int id = recvByteBuffer.getInt(3);
+			if (id < 0) {
+				pClient("Server bug, clientID should not be negative");
+				return;
+			}
+
 			setConnected(true);
 			setInRoom(false, -1);
+			setClientID(id);
 
 			for (ClientNetInterface e : netList) {
 				e.connectionAccepted();
@@ -482,7 +497,15 @@ public class ClientThread implements Runnable {
 			}
 
 			byte mapWidth = recvByteBuffer.get(11);
+			if (mapWidth < 1 || mapWidth > 16) {
+				pClient("Server bug, mapWidth should be in the range [1,16]");
+				mapWidth = 16;
+			}
 			byte mapHeight = recvByteBuffer.get(12);
+			if (mapHeight < 1 || mapHeight > 16) {
+				pClient("Server bug, mapHeight should be in the range [1,16]");
+				mapHeight = 16;
+			}
 
 			// pClient("Game has started in room with ID " + roomID);
 
@@ -500,18 +523,15 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_ROOM_GAMESTATE: {
-			if (packet.getLength() < 7) {
-				return;
-			}
-
-			int roomID = recvByteBuffer.getInt(3);
-			if (roomID < 0) {
-				pClient("Server bug, roomID should not be negative");
-				return;
-			}
+			/*
+			 * if (packet.getLength() < 7) { return; }
+			 * 
+			 * int roomID = recvByteBuffer.getInt(3); if (roomID < 0) { pClient(
+			 * "Server bug, roomID should not be negative"); return; }
+			 */
 
 			try {
-				gameState = ClientPacketEncoder.decodeGameState(recvBuffer, packet.getLength());
+				gameState = ClientPacketEncoder.decodeGameState(gameState, recvBuffer, packet.getLength());
 			} catch (IOException e) {
 				pClient("Failed to decode game state");
 				return;
@@ -617,6 +637,7 @@ public class ClientThread implements Runnable {
 		} else {
 			this.connected = false;
 			setInRoom(false, -1);
+			setClientID(-1);
 		}
 	}
 
@@ -672,7 +693,7 @@ public class ClientThread implements Runnable {
 	 * Remove all client network event listeners
 	 */
 	public synchronized void removeAllNetListener() {
-		netList.removeIf(e -> true);
+		netList.clear();
 	}
 
 	/**
@@ -739,6 +760,20 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
+	 * Get the ID of the client
+	 * 
+	 * @return a non-negative client ID, or -1 when the client is not connected
+	 *         to the server
+	 */
+	public int getClientID() {
+		return clientID;
+	}
+
+	private void setClientID(int clientID) {
+		this.clientID = clientID;
+	}
+
+	/**
 	 * Tell whether the client is in a room
 	 * 
 	 * @return true if the client is in a room, false if the client is in lobby
@@ -788,7 +823,7 @@ public class ClientThread implements Runnable {
 
 	/**
 	 * Get the last received game state from the server. Note that a "null" will
-	 * be returned if the client has not received any game state from the server
+	 * be returned if the client has not received any game state from server yet
 	 * 
 	 * @return a GameState
 	 */

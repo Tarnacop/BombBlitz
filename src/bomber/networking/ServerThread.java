@@ -286,7 +286,8 @@ public class ServerThread implements Runnable {
 			clientTable.put(client);
 
 			// tell the client that the connection has been accepted
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+			sendByteBuffer.putInt(3, client.getID());
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_NET_ACCEPT, true);
 
 			pServerf("Accepted new client with name %s, id %d from %s\n", client.getName(), client.getID(),
@@ -326,7 +327,9 @@ public class ServerThread implements Runnable {
 				for (PacketHistoryEntry e : clientInfo.getPacketHistoryList()) {
 					if (e != null && !e.isAcked() && e.getSequence() == recvByteBuffer.getShort(3)) {
 						e.setAcked(true);
-						clientInfo.setRoundTripDelay(System.currentTimeMillis() - e.getCreationTimeStamp());
+						long lastDelay = clientInfo.getRoundTripDelay();
+						long thisDelay = System.currentTimeMillis() - e.getCreationTimeStamp();
+						clientInfo.setRoundTripDelay(lastDelay + (long) (0.1f * (float) (thisDelay - lastDelay)));
 					}
 				}
 			}

@@ -58,6 +58,10 @@ public class TestClientMain {
 
 						client.disconnect();
 
+					} else if (cmds[0].equals("id") || cmds[0].equals("clientid")) {
+
+						System.out.println("clientID: " + client.getClientID());
+
 					} else if (cmds[0].equals("upl") || cmds[0].equals("updateplayerlist")) {
 
 						client.updatePlayerList();
