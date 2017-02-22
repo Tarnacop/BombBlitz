@@ -7,7 +7,9 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import bomber.game.AudioEvent;
 import bomber.game.Block;
+import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Map;
 import bomber.game.Movement;
@@ -115,6 +117,14 @@ public class PacketEncodeDecodeTest {
 		Map testMap = new Map("test map", testGridMap, new ArrayList<>());
 
 		GameState testGameState = new GameState(testMap, testPlayerList);
+		List<Bomb> testBombList = testGameState.getBombs();
+		testBombList.add(new Bomb("test Bomb", new Point(5, 5), 5, 5));
+		List<AudioEvent> testAudioList = testGameState.getAudioEvents();
+		testAudioList.add(AudioEvent.EXPLOSION);
+		testAudioList.add(AudioEvent.PLACE_BOMB);
+		testAudioList.add(AudioEvent.PLAYER_DEATH);
+		testAudioList.add(AudioEvent.MOVEMENT);
+		testAudioList.add(AudioEvent.POWERUP);
 
 		System.out.println("GameState to test:");
 		System.out.println(testGameState);
@@ -128,12 +138,17 @@ public class PacketEncodeDecodeTest {
 		System.out.println(ServerThread.toHex(arr, ret));
 
 		try {
-			testGameState = ClientPacketEncoder.decodeGameState(arr, ret);
+			testGameState = ClientPacketEncoder.decodeGameState(12, testGameState, arr, ret);
+			// testGameState = ClientPacketEncoder.decodeGameState(arr, ret);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println("decodeGameState:");
 		System.out.println(testGameState);
+		System.out.println("numAudioEvents: " + testGameState.getAudioEvents().size());
+		for (AudioEvent a : testGameState.getAudioEvents()) {
+			System.out.println("Audio: " + a);
+		}
 
 	}
 
