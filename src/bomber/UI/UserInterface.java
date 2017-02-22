@@ -21,7 +21,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -53,14 +56,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private final String appName = "Bomb Blitz v1";
 	private SimpleStringProperty playerName;
 	private Stage currentStage;
-	private BorderPane mainMenu;
-	private VBox settingsMenu, keyMenu;
+	private VBox keyMenu;
 	private VBox serverMenu;
 	private BorderPane multiMenu;
 	private BorderPane singleMenu;
-	private Scene mainScene, settingsScene, keyScene, multiScene, serverScene, singleScene;
+	private Scene mainScene, keyScene, multiScene, serverScene, singleScene;
 	private TextField nameText, ipText;
-	private Button nameBtn, singleBtn, multiBtn, settingsBtn, controlsBtn, audioBtn, graphicsBtn, startBtn;
+	private Button nameBtn, settingsBtn, controlsBtn, startBtn;
 	private Button backBtn1, backBtn2, backBtn3, backBtn4;
 	private Button rightMapToggle, leftMapToggle, upAiToggle, downAiToggle;
 	private Button connectBtn;
@@ -78,8 +80,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private HBox currentName;
 	private HBox nameSetter;
 	
-	private VBox singleButtonPane;
-	private Pane imagePane;
 	private VBox mapBox;
 	private VBox aiBox;
 	private Label displayAi;
@@ -93,11 +93,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private HBox backBox1;
 	private HBox backBox2;
 	private VBox connectPane;
-	private VBox loadMenu;
 	private ClientThread client;
 	private Button disconnectBtn;
 	private Label roomsTitle;
-	private Label roomTitle;
 	private Label playersTitle;
 	private VBox roomsListPane;
 	private VBox roomsPlayersPane;
@@ -109,7 +107,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button downBtn;
 	private Button leftBtn;
 	private Button rightBtn;
-	private Button spaceBtn;
 	private Label upLabel;
 	private Label downLabel;
 	private Label rightLabel;
@@ -122,18 +119,24 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private HBox rightPane;
 	private HBox leftPane;
 	private HBox bombPane;
-	private boolean connected;
-	private boolean connectionBroke;
 	private boolean expectingConnection;
 	private Scene currentScene;
 	private Font font;
 	
 	private UserInterface ui;
 	
-	private boolean createdRoom;
 	private Scene roomScene;
 	private Button backButtonRooms;
 	private String css;
+	private Scene creditsScene;
+	private BorderPane creditsMenu;
+	private VBox roomMenu;
+	private Button createRoomBtn;
+	private Button addAi;
+	private ButtonBase removeAi;
+	private Button startGame;
+	private BorderPane mainMenu;
+	private SimpleStringProperty currentNameText;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -156,47 +159,19 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 	
 	public static void begin(){
-
         launch();
 	}
 
 	@Override
 	public void start(Stage primaryStage){
 
-		this.currentStage = primaryStage;
-		this.currentStage.setMinHeight(600);
-		this.currentStage.setMinWidth(1000);
+		currentStage = primaryStage;
+		currentStage.setMinHeight(600);
+		currentStage.setMinWidth(1000);
 		primaryStage.setTitle(this.appName);
+		previousScenes = new Stack<Scene>();
+		initScenes();
 		
-        mainMenu = new BorderPane(); 
-        
-        namePane = new HBox();
-        
-        settingsMenu = new VBox();
-        
-        keyMenu = new VBox();
-        
-        multiMenu = new BorderPane();
-        
-        loadMenu = new VBox();
-        serverMenu = new VBox();
-        
-        singleMenu = new BorderPane();
-        
-        mainScene = createScene(mainMenu);
-       
-        settingsScene = createScene(settingsMenu);
-        
-        keyScene = createScene(keyMenu);
-        multiScene = createScene(multiMenu);
-
-        serverScene = createScene(serverMenu);
-        singleScene = createScene(singleMenu);
-        
-        previousScenes = new Stack<Scene>();
-        
-        nameText = new TextField("Enter Name");
-        
         enterLabel = new Label("Enter Server Details:");
         enterLabel.setFont(font);
         
@@ -215,17 +190,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         connectBtn = new Button("Connect");
         connectBtn.setAlignment(Pos.CENTER);
         connectBtn.setOnAction(e -> connect(multiScene, ipText.getText(), Integer.parseInt(portNum.getText())));
-        
-        currentNameLabel = new Label("Current Name:");
-        currentNameLabel.setFont(font);
-        
-        displayName = new Label();
-        displayName.setFont(font);
-        displayName.textProperty().bind(this.playerName);
-        
-        nameBtn = new Button("Set Name");
-        nameBtn.setPrefWidth(200);
-        nameBtn.setOnAction(e -> setName(nameText.getText()));
         
         //button to start the game
         startBtn = new Button("Start\nGame");
@@ -252,19 +216,12 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBtn5.setAlignment(Pos.CENTER);
         backBtn5.setOnAction(e -> previous());
         
-        singleBtn = createButton("Single Player", 200, 50, mainScene, singleScene);
-        multiBtn = createButton("Multiplayer", 200, 50, mainScene, multiScene);
-        
         settingsBtn = new Button("Settings");
         settingsBtn.setPrefWidth(200);
         settingsBtn.setOnAction(e -> advance(mainScene, keyScene));//TODO
         
         controlsBtn = new Button("Control Options");
         controlsBtn.setOnAction(e -> advance(mainScene, keyScene));
-        
-        audioBtn = new Button("Audio Options");
-        
-        graphicsBtn = new Button("Graphics Options");
         
         currentMapLabel = new Label("Current Map:");
         currentMapLabel.setFont(font);
@@ -292,59 +249,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         downAiToggle = new Button("v");
         downAiToggle.setPrefWidth(50);
         downAiToggle.setOnAction(e -> decrementAi());
-        
-        currentName = new HBox();
-        currentName.setSpacing(10);
-        currentName.getChildren().addAll(currentNameLabel, displayName);
-        
-        nameSetter = new HBox();
-        nameSetter.setSpacing(10);
-        nameSetter.getChildren().addAll(nameText, nameBtn);
-        
-        namePane.setSpacing(50);
-        namePane.getChildren().addAll(currentName, nameSetter);
-        namePane.setAlignment(Pos.CENTER);
-        
-        singleButtonPane = new VBox();
-        singleButtonPane.setAlignment(Pos.CENTER);
-        singleButtonPane.getChildren().add(singleBtn);
-        
-        Image mainImage = new Image("bomber/UI/resources/images/background.png");
-        ImageView mainImageView = new ImageView(mainImage);
-        imagePane = new Pane();
-        imagePane.getChildren().add(mainImageView); 
-        imagePane.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        mainImageView.fitWidthProperty().bind(imagePane.widthProperty()); 
-        mainImageView.fitHeightProperty().bind(imagePane.heightProperty());
-        
-        Image logoImage = new Image("bomber/UI/resources/images/logo.png");
-        ImageView logoImageView = new ImageView(logoImage);
-        HBox logoPane = new HBox();
-        logoPane.setSpacing(20);
-        logoPane.setAlignment(Pos.CENTER);
-        VBox menuBox = new VBox();
-        menuBox.setSpacing(20);
-        menuBox.setAlignment(Pos.CENTER);
-        menuBox.getChildren().addAll(singleBtn, multiBtn);
-        logoPane.getChildren().addAll(logoImageView, menuBox);
-        //logoImageView.fitWidthProperty().bind(imagePane.widthProperty().divide(3)); 
-        //logoImageView.fitHeightProperty().bind(imagePane.heightProperty().divide(3));
-//        mainMenu.setStyle("-fx-background-image: url(\"resources/images/menu_background.png\");"
-//        		+ "-fx-background-repeat:no-repeat;"
-//        		+ "-fx-background-size:cover;"
-//        		+ "-fx-background-position:center;"
-//        		+ "-fx-overflow:hidden;");
-        StackPane background = new StackPane();
-        background.setAlignment(Pos.CENTER);
-        background.getChildren().add(imagePane);
-        background.getChildren().add(logoPane);
-        mainMenu.setCenter(background);
-        //mainMenu.setTop(namePane);
-        //mainMenu.setLeft(singleButtonPane);
-        //mainMenu.setRight(multiBtn);
-        //TODO mainMenu.setBottom(settingsBtn);
-        
-        //addElements(settingsMenu, controlsBtn, audioBtn, graphicsBtn, backBtn1);
         
         upBtn = new Button("" + this.controls.get(Response.UP_MOVE));
         upBtn.setPrefWidth(200);
@@ -483,17 +387,17 @@ public class UserInterface extends Application implements ClientNetInterface{
         roomsPlayersPane.setAlignment(Pos.CENTER);
         roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
         
-        VBox roomMenu = new VBox();
-        Button createRoomBtn = new Button("New\nRoom");
+        roomMenu = new VBox();
+        createRoomBtn = new Button("New\nRoom");
         createRoomBtn.setOnAction(e -> createRoom());
         
-        Button addAi = new Button("Add Ai");
+        addAi = new Button("Add Ai");
         addAi.setOnAction(e -> incrementAi());
         
-        Button removeAi = new Button("Remove Ai");
+        removeAi = new Button("Remove Ai");
         removeAi.setOnAction(e -> decrementAi());
         
-        Button startGame = new Button("Start Game");
+        startGame = new Button("Start Game");
         startGame.setOnAction(e -> beginOnlineGame());
         
         roomScene = new Scene(roomMenu, 1000, 600);
@@ -512,29 +416,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         multiMenu.setTop(backBox2);
         multiMenu.setCenter(connectPane);
         
-        Button backButtonCredits = createBackButton();
-        
-        String credits = "Credits:\n"
-        		+ "\nGraphics - Alexandru Blindu"
-        		+ "\nPhysics - Alexandru Rosu"
-        		+ "\nAI - Jokubas Liutkus"
-        		+ "\nUI/Game Logic - Owen Jenkins"
-        		+ "\nNetworking - Qiyang Li"
-        		+ "\n"
-        		+ "\n\nFonts:\nCredit to 'PurePixel'"
-        		+ "\n\nImages:\nMain Menu Background - From the TRaK2 Texture set\nby Georges 'TRaK' Grondin.";
-        
-        Label creditsLabel = createLabel(credits);
-        VBox creditsBox = verticalMenu(
-        		creditsLabel, backButtonCredits);
-        BorderPane creditsMenu = createBackgroundPane(creditsBox);
-        
-        Scene creditsScene = createScene(creditsMenu);
-        
-        Button creditsBtn = createButton("Credits", 200, 50, mainScene, creditsScene);
-        
-        menuBox.getChildren().add(creditsBtn);
-        
         primaryStage.setScene(mainScene);
         primaryStage.setOnCloseRequest(e -> disconnect());
         primaryStage.show();
@@ -542,10 +423,95 @@ public class UserInterface extends Application implements ClientNetInterface{
         
 	}
 	
-	private BorderPane createBackgroundPane(Node content){
+	private void initScenes(){
+		
+		mainMenu = new BorderPane(); 
+		creditsMenu = new BorderPane();
+        keyMenu = new VBox();
+        multiMenu = new BorderPane();
+        serverMenu = new VBox();
+        singleMenu = new BorderPane();
+        
+        //settingsScene = createScene(settingsMenu);
+        //keyScene = createScene(keyMenu);
+        multiScene = createScene(multiMenu);
+        serverScene = createScene(serverMenu);
+        singleScene = createScene(singleMenu);
+        mainScene = createScene(mainMenu);
+		creditsScene = createScene(creditsMenu);
+		
+		initMain();
+		initCredits();
+		initSingle();
+		
+	}
+	
+	private void initSingle() {
+		
+	}
+
+	private void initCredits() {
+		
+		Button backButtonCredits = createBackButton();
+
+		String credits = "Credits:\n"
+				+ "\nGraphics - Alexandru Blindu"
+				+ "\nPhysics/Audio - Alexandru Rosu"
+				+ "\nAI - Jokubas Liutkus"
+				+ "\nUI/Game Logic - Owen Jenkins"
+				+ "\nNetworking - Qiyang Li"
+				+ "\n\nFonts:\nCredit to 'PurePixel'"
+				+ "\n\nImages:\nMain Menu Background - From the TRaK2 Texture set\nby Georges 'TRaK' Grondin."
+				+ "\n\nButtons: Credit to 'Buch', http://opengameart.org/users/buch";
+
+		Label creditsLabel = createLabel(credits, true, true);
+		VBox creditsBox = new VBox();
+		creditsBox.setAlignment(Pos.CENTER);
+		creditsBox.setSpacing(20);
+		creditsBox.getChildren().addAll(creditsLabel, backButtonCredits);
+
+		setBackgroundPane(creditsMenu, creditsBox);
+	}
+
+	private void initMain() {
+		
+		this.currentNameText = new SimpleStringProperty("Current Name:");
+		nameText = createTextField("Enter Name");
+		
+        nameBtn = createButton("Set Name", 200, 50);
+        nameBtn.setOnAction(e -> setName(nameText.getText()));
+        
+        Button singlePlayerBtn = createSceneButton("Single Player", 200, 50, mainScene, singleScene);
+        Button multiPlayerBtn = createSceneButton("Multiplayer", 200, 50, mainScene, multiScene);
+        Button creditsBtn = createSceneButton("Credits", 200, 50, mainScene, creditsScene);
+        
+        Image logoImage = new Image("bomber/UI/resources/images/logo.png");
+        ImageView logoImageView = new ImageView(logoImage);
+        
+        HBox logoPane = new HBox();
+        logoPane.setSpacing(20);
+        logoPane.setAlignment(Pos.CENTER);
+
+        VBox menuBox = new VBox();
+        menuBox.setSpacing(30);
+        menuBox.setAlignment(Pos.CENTER);
+        logoPane.getChildren().addAll(logoImageView, menuBox);
+        
+        VBox namePane = new VBox();
+        namePane.setAlignment(Pos.CENTER);
+        namePane.setSpacing(0);
+        namePane.getStyleClass().add("namebox");
+        namePane.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
+        		nameText, nameBtn);
+        
+        menuBox.getChildren().addAll(namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn);
+        setBackgroundPane(mainMenu, logoPane);
+	}
+
+	private void setBackgroundPane(BorderPane pane, Node content){
 		Image mainImage = new Image("bomber/UI/resources/images/background.png");
         ImageView mainImageView = new ImageView(mainImage);
-        imagePane = new Pane();
+        Pane imagePane = new Pane();
         imagePane.getChildren().add(mainImageView); 
         imagePane.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
         mainImageView.fitWidthProperty().bind(imagePane.widthProperty()); 
@@ -554,9 +520,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         background.setAlignment(Pos.CENTER);
         background.getChildren().add(imagePane);
         background.getChildren().add(content);
-        BorderPane backgroundPane = new BorderPane();
-        backgroundPane.setCenter(background);
-        return backgroundPane;
+        pane.setCenter(background);
 	}
 	
 	private Scene createScene(Parent menu){
@@ -565,40 +529,66 @@ public class UserInterface extends Application implements ClientNetInterface{
 		return scene;
 	}
 	
-	private VBox verticalMenu(Node... elements){
-		VBox menu = new VBox();
-		menu.setSpacing(20);
-		menu.setAlignment(Pos.CENTER);
-		menu.getChildren().addAll(elements);
-		return menu;
-	}
-	
-	private Label createLabel(String text){
+	private Label createLabel(String text, boolean shaded, boolean white){
 		Label label = new Label(text);
 		label.setFont(font);
-		label.setTextFill(Color.WHITE);
+		if(white)label.setTextFill(Color.WHITE);
 		label.setAlignment(Pos.CENTER);
+		if(shaded){
+			label.getStyleClass().add("shaded");
+		}
+		return label;
+	}
+	
+	private TextField createTextField(String defaultText){
+		TextField text = new TextField();
+		text.setPromptText(defaultText);
+		text.getStyleClass().add("textfield");
+		text.setFont(font);
+		text.setAlignment(Pos.CENTER);
+		return text;
+	}
+	
+	private Label createBoundLabel(SimpleStringProperty property, boolean shaded, boolean white) {
+		Label label = new Label();
+		label.setFont(font);
+		if(white)label.setTextFill(Color.WHITE);
+		label.setAlignment(Pos.CENTER);
+		label.textProperty().bind(property);
+		if(shaded){
+			label.getStyleClass().add("shaded");
+		}
 		return label;
 	}
 
+	private Button createButton(String label, double width, double height) {
+		Button button = new Button(label);
+		button.setFont(font);
+		button.setPrefWidth(width);
+		button.setPrefHeight(height);
+		button.setAlignment(Pos.CENTER);
+		button.getStyleClass().add("menubutton");
+		return button;
+	}
+	
 	private Button createBackButton(){
 		Button button = new Button("Back");
 		button.setFont(font);
 		button.setPrefWidth(200);
 		button.setPrefHeight(50);
 		button.setAlignment(Pos.CENTER);
-		button.getStyleClass().add(".button");
+		button.getStyleClass().add("menubutton");
 		button.setOnAction(e -> previous());
 		return button;
 	}
 	
-	private Button createButton(String label, double width, double height, Scene currentScene, Scene nextScene){
+	private Button createSceneButton(String label, double width, double height, Scene currentScene, Scene nextScene){
 		Button button = new Button(label);
 		button.setFont(font);
 		button.setPrefWidth(width);
 		button.setPrefHeight(height);
 		button.setAlignment(Pos.CENTER);
-		button.getStyleClass().add(".button");
+		button.getStyleClass().add("menubutton");
 		button.setOnAction(e -> advance(currentScene, nextScene));
 		return button;
 	}
@@ -704,7 +694,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	private void resetFields(){
 		
-		nameText.setText("Enter Name");
+		this.currentNameText.set("Current Name:");
 		//ipText.setText("Enter IP Address");
 		ipText.setText("10.20.171.10");
 		//portNum.setText("Enter Port Number");
@@ -714,7 +704,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private void connect(Scene thisScene, String hostName, int port) {
 		
 		System.out.println("Attempting connection to: " + hostName + ", port = " + port);
-		this.connectionBroke = false;
 		this.client = null;
 		try {
 			client = new ClientThread(hostName, port);
@@ -833,9 +822,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
-		System.out.println("Moving from " + this.currentScene);
+		System.out.println("was at " + this.currentScene);
 		this.currentStage.setScene(this.previousScenes.pop());
-		System.out.println("Moved back to " + this.currentScene);
+		System.out.println("now at " + this.currentScene);
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
@@ -850,6 +839,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		
 		this.previousScenes.push(thisScene);
+		System.out.println("Added " + thisScene);
 		this.currentStage.setScene(nextScene);
 		this.currentScene = nextScene;
 		
@@ -861,9 +851,18 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	public void setName(String string){
 		
-		this.playerName.set(string);
+		if(string.length() > 0 && string.length() < 12){
+			this.playerName.set(string);
+			this.currentNameText.set("Current Name:");
+		}
+		else if(string.length() > 0){
+			this.currentNameText.set("Current Name:\n( Too long! )");
+		}
+		else{
+			this.currentNameText.set("Current Name:\n( Too short! )");
+		}
 	}
-	
+
 	public void beginGame(Map map, String playerName, HashMap<Response, Integer> controls, int aiNum) {
 		
 		Block[][] masterMap = this.map.getGridMap();
@@ -939,7 +938,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				connectionBroke = true;
 				disconnect();
 			}
 			   
@@ -979,7 +977,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				System.out.println("Room creation accepted");
-				createdRoom = true;
 			}
 			   
 		});
@@ -992,7 +989,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				System.out.println("Room creation rejected");
-				createdRoom = false;
 			}
 			   
 		});
@@ -1022,10 +1018,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				int mapID = client.getMapID();
+				client.getMapID();
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
-				OnlineGame game = new OnlineGame(ui, client, gameState, maps.get(1), playerName.get(), controls);
+				new OnlineGame(ui, client, gameState, maps.get(1), playerName.get(), controls);
 			}
 			   
 		});
