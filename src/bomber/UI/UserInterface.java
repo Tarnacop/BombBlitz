@@ -14,11 +14,12 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -32,6 +33,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import bomber.game.Block;
@@ -131,13 +133,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private boolean createdRoom;
 	private Scene roomScene;
 	private Button backButtonRooms;
+	private String css;
 	
 	public UserInterface(){
 		//for JavaFX
 		
 		this.ui = this;
 		this.font = Font.loadFont(UserInterface.class.getResource("minecraft.ttf").toExternalForm(), 20);
-
+		this.css = this.getClass().getResource("resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty("Player 1");
 		this.aiNumber = new SimpleIntegerProperty(1);
 		Maps maps = new Maps();
@@ -180,16 +183,15 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         singleMenu = new BorderPane();
         
-        mainScene = new Scene(mainMenu, 1000, 600);
-        String css = this.getClass().getResource("resources/stylesheet.css").toExternalForm(); 
-        mainScene.getStylesheets().add(css);
-        settingsScene = new Scene(settingsMenu, 1000, 600);
+        mainScene = createScene(mainMenu);
+       
+        settingsScene = createScene(settingsMenu);
         
-        keyScene = new Scene(keyMenu, 1000, 600);
-        multiScene = new Scene(multiMenu, 1000, 600);
+        keyScene = createScene(keyMenu);
+        multiScene = createScene(multiMenu);
 
-        serverScene = new Scene(serverMenu, 1000, 600);
-        singleScene = new Scene(singleMenu, 1000, 600);
+        serverScene = createScene(serverMenu);
+        singleScene = createScene(singleMenu);
         
         previousScenes = new Stack<Scene>();
         
@@ -250,27 +252,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBtn5.setAlignment(Pos.CENTER);
         backBtn5.setOnAction(e -> previous());
         
-        singleBtn = new Button("Single Player");
-        singleBtn.setPrefWidth(200);
-        singleBtn.setFont(font);
-        singleBtn.getStyleClass().add(".button");
-//        singleBtn.setStyle(""
-//        		+ "-fx-background-color: transparent;"
-//        		+ "-fx-background-image: url(\"resources/images/button.png\");"
-//        		+ "-fx-background-size:100% 100%;"
-//        		+ "-fx-background-repeat:no-repeat;");
-        singleBtn.setOnAction(e -> advance(mainScene, singleScene));
-        
-        multiBtn = new Button("Multiplayer");
-        multiBtn.setPrefWidth(200);
-        multiBtn.setFont(font);
-        multiBtn.getStyleClass().add(".button");
-//        multiBtn.setStyle(""
-//        		+ "-fx-background-color: transparent;"
-//        		+ "-fx-background-image: url(\"resources/images/button.png\");"
-//        		+ "-fx-background-size:100% 100%;"
-//        		+ "-fx-background-repeat:no-repeat;");
-        multiBtn.setOnAction(e -> advance(mainScene, multiScene));
+        singleBtn = createButton("Single Player", 200, 50, mainScene, singleScene);
+        multiBtn = createButton("Multiplayer", 200, 50, mainScene, multiScene);
         
         settingsBtn = new Button("Settings");
         settingsBtn.setPrefWidth(200);
@@ -500,7 +483,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         roomsPlayersPane.setAlignment(Pos.CENTER);
         roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
         
-
         VBox roomMenu = new VBox();
         Button createRoomBtn = new Button("New\nRoom");
         createRoomBtn.setOnAction(e -> createRoom());
@@ -530,14 +512,94 @@ public class UserInterface extends Application implements ClientNetInterface{
         multiMenu.setTop(backBox2);
         multiMenu.setCenter(connectPane);
         
+        Button backButtonCredits = createBackButton();
         
+        String credits = "Credits:\n"
+        		+ "\nGraphics - Alexandru Blindu"
+        		+ "\nPhysics - Alexandru Rosu"
+        		+ "\nAI - Jokubas Liutkus"
+        		+ "\nUI/Game Logic - Owen Jenkins"
+        		+ "\nNetworking - Qiyang Li"
+        		+ "\n"
+        		+ "\n\nFonts:\nCredit to 'PurePixel'"
+        		+ "\n\nImages:\nMain Menu Background - From the TRaK2 Texture set\nby Georges 'TRaK' Grondin.";
         
+        Label creditsLabel = createLabel(credits);
+        VBox creditsBox = verticalMenu(creditsLabel, backButtonCredits);
+        BorderPane creditsMenu = createBackgroundPane(creditsBox);
+        
+        Scene creditsScene = createScene(creditsMenu);
+        
+        Button creditsBtn = createButton("Credits", 200, 50, mainScene, creditsScene);
+        
+        menuBox.getChildren().add(creditsBtn);
         
         primaryStage.setScene(mainScene);
         primaryStage.setOnCloseRequest(e -> disconnect());
         primaryStage.show();
         
         
+	}
+	
+	private BorderPane createBackgroundPane(Node content){
+		Image mainImage = new Image("bomber/UI/resources/images/background.png");
+        ImageView mainImageView = new ImageView(mainImage);
+        imagePane = new Pane();
+        imagePane.getChildren().add(mainImageView); 
+        imagePane.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        mainImageView.fitWidthProperty().bind(imagePane.widthProperty()); 
+        mainImageView.fitHeightProperty().bind(imagePane.heightProperty());
+        StackPane background = new StackPane();
+        background.setAlignment(Pos.CENTER);
+        background.getChildren().add(imagePane);
+        background.getChildren().add(content);
+        BorderPane backgroundPane = new BorderPane();
+        backgroundPane.setCenter(background);
+        return backgroundPane;
+	}
+	
+	private Scene createScene(Parent menu){
+		Scene scene = new Scene(menu, 1000, 600);
+		scene.getStylesheets().add(css);
+		return scene;
+	}
+	
+	private VBox verticalMenu(Node... elements){
+		VBox menu = new VBox();
+		menu.setSpacing(20);
+		menu.setAlignment(Pos.CENTER);
+		menu.getChildren().addAll(elements);
+		return menu;
+	}
+	
+	private Label createLabel(String text){
+		Label label = new Label(text);
+		label.setFont(font);
+		label.setTextFill(Color.WHITE);
+		label.setAlignment(Pos.CENTER);
+		return label;
+	}
+
+	private Button createBackButton(){
+		Button button = new Button("Back");
+		button.setFont(font);
+		button.setPrefWidth(200);
+		button.setPrefHeight(50);
+		button.setAlignment(Pos.CENTER);
+		button.getStyleClass().add(".button");
+		button.setOnAction(e -> previous());
+		return button;
+	}
+	
+	private Button createButton(String label, double width, double height, Scene currentScene, Scene nextScene){
+		Button button = new Button(label);
+		button.setFont(font);
+		button.setPrefWidth(width);
+		button.setPrefHeight(height);
+		button.setAlignment(Pos.CENTER);
+		button.getStyleClass().add(".button");
+		button.setOnAction(e -> advance(currentScene, nextScene));
+		return button;
 	}
 	
 	private void beginOnlineGame() {
