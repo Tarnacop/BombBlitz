@@ -196,6 +196,9 @@ public class ClientPacketEncoder {
 	 * and sequence number and will be ignored. The caller should ensure the
 	 * first three bytes are correct before calling this method.
 	 * 
+	 * @param clientID
+	 *            the id of the client, so that the keyboard state of the client
+	 *            itself will not be overwritten by this method
 	 * @param gameState
 	 *            the game state to modify, or null to create a new game state
 	 * @param src
@@ -206,7 +209,14 @@ public class ClientPacketEncoder {
 	 *         GameState object if it is null
 	 * @throws IOException
 	 */
-	public static GameState decodeGameState(GameState gameState, byte[] src, int length) throws IOException {
+	public static GameState decodeGameState(int clientID, GameState gameState, byte[] src, int length)
+			throws IOException {
+		if (gameState == null) {
+			// gameState = new GameState(new Map("map", new
+			// Block[gridMapWidth][gridMapHeight], null), null);
+			return decodeGameState(src, length);
+		}
+
 		if (src == null) {
 			throw new IOException("src is null");
 		}
@@ -230,12 +240,6 @@ public class ClientPacketEncoder {
 		byte gridMapHeight = buffer.get();
 		if (gridMapHeight < 1 || gridMapHeight > 16) {
 			throw new IOException("gridMap height is not in the range [1,16]");
-		}
-
-		if (gameState == null) {
-			// gameState = new GameState(new Map("map", new
-			// Block[gridMapWidth][gridMapHeight], null), null);
-			return decodeGameState(src, length);
 		}
 
 		if (gameState.getMap() == null || gameState.getMap().getGridMap() == null
@@ -342,22 +346,23 @@ public class ClientPacketEncoder {
 				k = new KeyboardState();
 				player.setKeyState(k);
 			}
-			k.setMovement(Movement.NONE);
-			k.setBomb(false);
 
-			if (BitArray.getBit(keyState, 0)) {
+			if (id != clientID) {
 				k.setMovement(Movement.NONE);
-			} else if (BitArray.getBit(keyState, 1)) {
-				k.setMovement(Movement.UP);
-			} else if (BitArray.getBit(keyState, 2)) {
-				k.setMovement(Movement.DOWN);
-			} else if (BitArray.getBit(keyState, 3)) {
-				k.setMovement(Movement.LEFT);
-			} else if (BitArray.getBit(keyState, 4)) {
-				k.setMovement(Movement.RIGHT);
+				k.setBomb(false);
+				if (BitArray.getBit(keyState, 0)) {
+					k.setMovement(Movement.NONE);
+				} else if (BitArray.getBit(keyState, 1)) {
+					k.setMovement(Movement.UP);
+				} else if (BitArray.getBit(keyState, 2)) {
+					k.setMovement(Movement.DOWN);
+				} else if (BitArray.getBit(keyState, 3)) {
+					k.setMovement(Movement.LEFT);
+				} else if (BitArray.getBit(keyState, 4)) {
+					k.setMovement(Movement.RIGHT);
+				}
+				k.setBomb(BitArray.getBit(keyState, 5));
 			}
-			k.setBomb(BitArray.getBit(keyState, 5));
-
 			player.setName("player " + id);
 			player.getPos().x = posX;
 			player.getPos().y = posY;
@@ -366,7 +371,7 @@ public class ClientPacketEncoder {
 			player.setPlayerID(id);
 			player.setBombRange(bombRange);
 			player.setMaxNrOfBombs(maxBomb);
-			player.setKeyState(k);
+			// player.setKeyState(k);
 			player.setAlive(isAlive);
 		}
 
@@ -412,26 +417,48 @@ public class ClientPacketEncoder {
 		List<AudioEvent> audioEventList = gameState.getAudioEvents();
 
 		short audioState = buffer.getShort();
-		if (BitArray.getBit(audioState, 0)) {
-			if (!audioEventList.contains(AudioEvent.PLACE_BOMB)) {
-				audioEventList.add(AudioEvent.PLACE_BOMB);
+
+		/*
+		 * TODO AudioManager should also lock audioEventList to avoid
+		 * ConcurrentModificationException
+		 */
+		/* TODO Audio can often cause OutOfMemoryError during a game */
+		synchronized (audioEventList) {
+			if (BitArray.getBit(audioState, 0)) {
+				if (!audioEventList.contains(AudioEvent.PLACE_BOMB)) {
+					audioEventList.add(AudioEvent.PLACE_BOMB);
+				}
+			} else {
+				audioEventList.removeIf(e -> e == AudioEvent.PLACE_BOMB);
 			}
-		} else {
-			audioEventList.removeIf(e -> e == AudioEvent.PLACE_BOMB);
-		}
-		if (BitArray.getBit(audioState, 1)) {
-			if (!audioEventList.contains(AudioEvent.EXPLOSION)) {
-				audioEventList.add(AudioEvent.EXPLOSION);
+			if (BitArray.getBit(audioState, 1)) {
+				if (!audioEventList.contains(AudioEvent.EXPLOSION)) {
+					audioEventList.add(AudioEvent.EXPLOSION);
+				}
+			} else {
+				audioEventList.removeIf(e -> e == AudioEvent.EXPLOSION);
 			}
-		} else {
-			audioEventList.removeIf(e -> e == AudioEvent.EXPLOSION);
-		}
-		if (BitArray.getBit(audioState, 2)) {
-			if (!audioEventList.contains(AudioEvent.PLAYER_DEATH)) {
-				audioEventList.add(AudioEvent.PLAYER_DEATH);
+			if (BitArray.getBit(audioState, 2)) {
+				if (!audioEventList.contains(AudioEvent.PLAYER_DEATH)) {
+					audioEventList.add(AudioEvent.PLAYER_DEATH);
+				}
+			} else {
+				audioEventList.removeIf(e -> e == AudioEvent.PLAYER_DEATH);
 			}
-		} else {
-			audioEventList.removeIf(e -> e == AudioEvent.PLAYER_DEATH);
+			if (BitArray.getBit(audioState, 3)) {
+				if (!audioEventList.contains(AudioEvent.MOVEMENT)) {
+					audioEventList.add(AudioEvent.MOVEMENT);
+				}
+			} else {
+				audioEventList.removeIf(e -> e == AudioEvent.MOVEMENT);
+			}
+			if (BitArray.getBit(audioState, 4)) {
+				if (!audioEventList.contains(AudioEvent.POWERUP)) {
+					audioEventList.add(AudioEvent.POWERUP);
+				}
+			} else {
+				audioEventList.removeIf(e -> e == AudioEvent.POWERUP);
+			}
 		}
 
 		return gameState;
@@ -577,6 +604,12 @@ public class ClientPacketEncoder {
 		}
 		if (BitArray.getBit(audioState, 2)) {
 			audioEventList.add(AudioEvent.PLAYER_DEATH);
+		}
+		if (BitArray.getBit(audioState, 3)) {
+			audioEventList.add(AudioEvent.MOVEMENT);
+		}
+		if (BitArray.getBit(audioState, 4)) {
+			audioEventList.add(AudioEvent.POWERUP);
 		}
 		GameState gameState = new GameState(new Map("map", gridMap, new ArrayList<>()), playerList);
 		gameState.setBombs(bombList);

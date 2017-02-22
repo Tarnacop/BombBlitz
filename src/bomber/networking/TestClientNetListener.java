@@ -1,5 +1,7 @@
 package bomber.networking;
 
+import bomber.game.AudioEvent;
+
 public class TestClientNetListener implements ClientNetInterface {
 
 	private ClientThread client;
@@ -15,7 +17,7 @@ public class TestClientNetListener implements ClientNetInterface {
 
 	@Override
 	public void connectionAccepted() {
-		System.out.println("Client has connected to the server successfully");
+		System.out.println("Client has connected to the server successfully, ID: " + client.getClientID());
 	}
 
 	@Override
@@ -80,6 +82,11 @@ public class TestClientNetListener implements ClientNetInterface {
 	public void gameStateReceived() {
 		System.out.println("Client has received a game state from the server");
 		System.out.println(client.getGameState());
+		System.out.println("numAudioEvents: " + client.getGameState().getAudioEvents().size());
+		for (AudioEvent a : client.getGameState().getAudioEvents()) {
+			System.out.print(a + " ");
+		}
+		System.out.println();
 	}
 
 	@Override

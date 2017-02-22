@@ -469,6 +469,10 @@ public class ServerPacketEncoder {
 				audioState = BitArray.setBit(audioState, 1, true);
 			} else if (e == AudioEvent.PLAYER_DEATH) {
 				audioState = BitArray.setBit(audioState, 2, true);
+			} else if (e == AudioEvent.MOVEMENT) {
+				audioState = BitArray.setBit(audioState, 3, true);
+			} else if (e == AudioEvent.POWERUP) {
+				audioState = BitArray.setBit(audioState, 4, true);
 			}
 		}
 

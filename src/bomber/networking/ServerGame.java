@@ -351,6 +351,15 @@ public class ServerGame implements Runnable {
 				}
 			}
 
+			/*
+			 * TODO physics still does not check if there are duplicate audio
+			 * events in the audio event list, and since movement is very
+			 * frequent, the list is filled with movement sound which is quite
+			 * annoying
+			 */
+			// TODO so empty the audio event list
+			gameState.getAudioEvents().clear();
+
 			// sleep according to tick rate
 			busyTime = (int) (System.currentTimeMillis() - loopStartTime);
 			sleepTime = interval - busyTime;

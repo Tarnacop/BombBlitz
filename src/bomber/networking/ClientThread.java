@@ -394,7 +394,6 @@ public class ClientThread implements Runnable {
 			}
 
 			for (ClientNetInterface e : netList) {
-				System.out.println("Sending Room list");
 				e.roomListReceived();
 			}
 
@@ -532,7 +531,9 @@ public class ClientThread implements Runnable {
 			 */
 
 			try {
-				gameState = ClientPacketEncoder.decodeGameState(gameState, recvBuffer, packet.getLength());
+				// gameState = ClientPacketEncoder.decodeGameState(clientID,
+				// gameState, recvBuffer, packet.getLength());
+				gameState = ClientPacketEncoder.decodeGameState(recvBuffer, packet.getLength());
 			} catch (IOException e) {
 				pClient("Failed to decode game state");
 				return;

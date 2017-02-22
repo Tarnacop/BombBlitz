@@ -168,6 +168,12 @@ public class ServerThread implements Runnable {
 			} catch (IOException e) {
 				pServer("" + e);
 				scheduledExecutor.shutdown();
+				// terminate active game sessions
+				for (Entry<Integer, ServerRoom> e1 : roomTable.entrySet2()) {
+					if (e1 != null && e1.getValue() != null && e1.getValue().getGame() != null) {
+						e1.getValue().getGame().terminate();
+					}
+				}
 				socket.close();
 				break;
 			}
@@ -781,8 +787,11 @@ public class ServerThread implements Runnable {
 			short keyState = recvByteBuffer.getShort(7);
 			KeyboardState keyboardState = ServerPacketEncoder.shortToKeyboardState(keyState);
 
-			pServer("Received movement from " + sockAddr + ", roomID: " + roomID + ", direction: "
-					+ keyboardState.getMovement() + ", bomb: " + keyboardState.isBomb());
+			/*
+			 * pServer("Received movement from " + sockAddr + ", roomID: " +
+			 * roomID + ", direction: " + keyboardState.getMovement() +
+			 * ", bomb: " + keyboardState.isBomb());
+			 */
 
 			// check whether the client is already in a room
 			ServerClientInfo client = clientTable.get(sockAddr);
