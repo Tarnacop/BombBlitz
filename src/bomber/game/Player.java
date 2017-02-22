@@ -154,4 +154,9 @@ public class Player {
 	{
 		this.maxNrOfBombs = maxNrOfBombs;
 	}
+
+	public void addMesh(Mesh mesh) {
+
+		this.mesh = mesh;
+	}
 }

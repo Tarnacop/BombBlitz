@@ -394,6 +394,7 @@ public class ClientThread implements Runnable {
 			}
 
 			for (ClientNetInterface e : netList) {
+				System.out.println("Sending Room list");
 				e.roomListReceived();
 			}
 
