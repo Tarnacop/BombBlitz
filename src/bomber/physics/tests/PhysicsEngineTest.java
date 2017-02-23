@@ -16,7 +16,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 /**
- * Created by Alexandruro on 26.01.2017.
+ * Created by Alexandru Rosu on 26.01.2017.
  */
 public class PhysicsEngineTest
 {
@@ -34,7 +34,7 @@ public class PhysicsEngineTest
                             {BLANK, BLANK, SOFT, BLANK, SOLID, SOLID, SOLID, SOFT, BLANK, SOFT, SOLID},
                             {BLANK, BLANK, BLANK, BLANK, SOFT, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT},
                             {SOLID, SOFT, SOLID, SOFT, SOLID, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT}};
-        map = new Map(blocks);
+        map = new Map("Test map", blocks, null);
 
         players = new ArrayList<>();
         buddy = new Player("Buddy", new Point(5,5), 3, 10, null);
@@ -71,7 +71,7 @@ public class PhysicsEngineTest
         {
             engine.update();
             //System.out.println(buddy.getPos());
-            assertTrue("Collision was not detected successfully (problem at a right corner)", buddy.getPos().x+PhysicsEngine.playerPixelWidth<192);
+            assertTrue("Collision was not detected successfully (problem at a right corner)", buddy.getPos().x+ Constants.playerPixelWidth<192);
         }
 
         kState.setMovement(Movement.DOWN);
@@ -79,7 +79,7 @@ public class PhysicsEngineTest
         {
             engine.update();
             //System.out.println(buddy.getPos());
-            assertTrue("Collision was not detected successfully (problem at a down corner)", buddy.getPos().y+PhysicsEngine.playerPixelHeight<256);
+            assertTrue("Collision was not detected successfully (problem at a down corner)", buddy.getPos().y+ Constants.playerPixelHeight<256);
         }
 
         kState.setMovement(Movement.LEFT);
@@ -107,9 +107,6 @@ public class PhysicsEngineTest
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
         engine.plantBomb(buddy, 0);
-
-        System.out.println("Player: " + buddy.getPos());
-        System.out.println("His bomb: " + gameState.getBombs().get(0).getPos());
 
         assertTrue("Bomb was not planted.", 1==gameState.getBombs().size());
 

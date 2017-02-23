@@ -28,7 +28,9 @@ public class AIManager extends AITemplate{
 		super(ai, gameState);
 	}
 
+
 	
+
 
 	/**
 	 * Perform sequence of moves.

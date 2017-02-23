@@ -1,4 +1,4 @@
-package bomber.networking;
+package bomber.networking.tests;
 
 import java.awt.Point;
 import java.io.IOException;
@@ -12,8 +12,17 @@ import bomber.game.GameState;
 import bomber.game.Map;
 import bomber.game.Movement;
 import bomber.game.Player;
+import bomber.networking.ClientPacketEncoder;
+import bomber.networking.ClientServerLobbyRoom;
+import bomber.networking.ClientServerPlayer;
+import bomber.networking.ServerClientInfo;
+import bomber.networking.ServerClientTable;
+import bomber.networking.ServerPacketEncoder;
+import bomber.networking.ServerRoom;
+import bomber.networking.ServerRoomTable;
+import bomber.networking.ServerThread;
 
-public class TestPacketEncoder {
+public class PacketEncodeDecodeTest {
 
 	public static void main(String[] args) {
 

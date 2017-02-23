@@ -7,6 +7,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import bomber.AI.AIDifficulty;
+import bomber.AI.GameAI;
+import bomber.game.Block;
 import bomber.game.GameState;
 import bomber.game.KeyboardState;
 import bomber.game.Map;
@@ -30,6 +33,8 @@ public class ServerGame implements Runnable {
 
 	private List<ServerClientInfo> playerList;
 
+	private List<ServerAI> aiList;
+
 	private int tickRate;
 
 	private int interval;
@@ -42,7 +47,7 @@ public class ServerGame implements Runnable {
 
 	private boolean shouldRun;
 
-	public ServerGame(int roomID, int mapID, List<ServerClientInfo> playerList, int tickRate,
+	public ServerGame(int roomID, int mapID, List<ServerClientInfo> playerList, List<ServerAI> aiList, int tickRate,
 			ServerThread serverThread) {
 		/*
 		 * TODO currently if the map with this id cannot be found, we use test
@@ -51,6 +56,7 @@ public class ServerGame implements Runnable {
 		this.roomID = roomID;
 		this.mapID = mapID;
 		this.playerList = playerList;
+		this.aiList = aiList;
 		this.tickRate = tickRate;
 		if (this.tickRate < 1) {
 			this.tickRate = 1;
@@ -163,24 +169,58 @@ public class ServerGame implements Runnable {
 			return;
 		}
 
-		// initialise gameState
+		// initialise human & AI players and gameState
 		List<Player> players = new ArrayList<Player>();
-		for (int i = 0; i < playerList.size(); i++) {
-			/*
-			 * TODO we can choose the initial position of the player based on
-			 * the index
-			 */
-			// currently just use hard-coded initial position
-			ServerClientInfo c = playerList.get(i);
-			if (c == null) {
-				System.out.println("ServerGame: playerList contains null");
-			} else {
-				Player p = new Player(c.getName(), new Point(64, 64), 100, 300, null);
-				p.setPlayerID(c.getID());
-				players.add(p);
+		Map map = mapList.get(mapID);
+
+		gameState = new GameState(map, players);
+
+		List<Point> spawnPoints = map.getSpawnPoints();
+		int posIndex = 0;
+		synchronized (playerList) {
+			for (int i = 0; i < playerList.size(); i++) {
+				ServerClientInfo c = playerList.get(i);
+				if (c == null) {
+					System.out.println("ServerGame: playerList contains null");
+				} else {
+					Point initPos = null;
+					if (spawnPoints == null || spawnPoints.size() < posIndex + 1) {
+						initPos = new Point(64, 64);
+					} else {
+						initPos = spawnPoints.get(posIndex);
+						if (initPos == null) {
+							initPos = new Point(64, 64);
+						}
+					}
+					Player p = new Player(c.getName(), initPos, 3, 300, null);
+					p.setPlayerID(c.getID());
+					players.add(p);
+					posIndex += 1;
+				}
 			}
 		}
-		gameState = new GameState(mapList.get(mapID), players);
+
+		for (int i = 0; i < aiList.size(); i++) {
+			ServerAI ai = aiList.get(i);
+			if (ai == null) {
+				System.out.println("ServerGame: aiList contains null");
+			} else {
+				Point initPos = null;
+				if (spawnPoints == null || spawnPoints.size() < posIndex + 1) {
+					initPos = new Point(64, 64);
+				} else {
+					initPos = spawnPoints.get(posIndex);
+					if (initPos == null) {
+						initPos = new Point(64, 64);
+					}
+				}
+				GameAI a = new GameAI("AI " + ai.getID(), initPos, 3, 300, gameState, null, AIDifficulty.EXTREME);
+				a.setPlayerID(ai.getID() + 32);
+				players.add(a);
+				ai.setGameAI(a);
+				posIndex += 1;
+			}
+		}
 
 		// initialise send buffer
 		byte[] sendBuffer = new byte[2000];
@@ -194,28 +234,70 @@ public class ServerGame implements Runnable {
 		// tell clients the game is started
 		sendByteBuffer.position(3);
 		sendByteBuffer.putInt(roomID);
-		packet.setLength(1 + 2 + 4);
-
-		for (ServerClientInfo c : playerList) {
-			packet.setSocketAddress(c.getSocketAddress());
-			try {
-				serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTART, true);
-			} catch (IOException e) {
-				System.out.println("ServerGame: failed to send packet: " + e);
+		sendByteBuffer.putInt(mapID);
+		{
+			// get the width and height of the map
+			byte width = 16;
+			byte height = 16;
+			Block[][] gridMap = map.getGridMap();
+			if (gridMap != null) {
+				byte twidth = (byte) gridMap.length;
+				if (twidth > 0 && twidth <= 16) {
+					width = twidth;
+					Block[] column = gridMap[0];
+					if (column != null) {
+						byte theight = (byte) column.length;
+						if (theight > 0 && theight <= 16) {
+							height = theight;
+						}
+					}
+				}
 			}
+			sendByteBuffer.put(width);
+			sendByteBuffer.put(height);
+		}
+		packet.setLength(1 + 2 + 4 + 4 + 1 + 1);
+
+		synchronized (playerList) {
+			for (ServerClientInfo c : playerList) {
+				if (c == null) {
+					continue;
+				}
+				packet.setSocketAddress(c.getSocketAddress());
+				try {
+					serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTART, true);
+				} catch (IOException e) {
+					System.out.println("ServerGame: failed to send packet: " + e);
+				}
+			}
+		}
+
+		// start AI threads
+		for (ServerAI a : aiList) {
+			GameAI ai = a.getGameAI();
+			if (ai == null) {
+				continue;
+			}
+			ai.begin();
 		}
 
 		long loopStartTime = System.currentTimeMillis();
 		int busyTime = 0;
 		int sleepTime = interval;
 
-		// thread will end when it is interrupted or the game is over
+		// thread will end when terminate() is called or the game is over
 		while (shouldRun && !gameState.gameOver()) {
 			loopStartTime = System.currentTimeMillis();
 
+			// game is over when no human player is left in the room
+			if (playerList.size() < 1) {
+				System.out.printf("ServerGame: ending game in room %d due to no human players in room\n", roomID);
+				terminate();
+			}
+
 			// game is over when only one player is left in the room
-			if (playerList.size() < 2) {
-				System.out.printf("ServerGame: ending game in room %d due to less than 2 players left\n", roomID);
+			if (playerList.size() + aiList.size() < 2) {
+				System.out.printf("ServerGame: ending game in room %d due to fewer than 2 players in room\n", roomID);
 				terminate();
 			}
 
@@ -226,12 +308,14 @@ public class ServerGame implements Runnable {
 				 * ServerClientInfo in playerList ?
 				 */
 				boolean shouldRemove = true;
-				for (ServerClientInfo c : playerList) {
-					if (p != null && c != null && p.getPlayerID() == c.getID()) {
-						shouldRemove = false;
+				synchronized (playerList) {
+					for (ServerClientInfo c : playerList) {
+						if (p != null && c != null && p.getPlayerID() == c.getID()) {
+							shouldRemove = false;
+						}
 					}
 				}
-				if (shouldRemove && p != null) {
+				if (shouldRemove && p != null && p.getPlayerID() < 32 && p.getLives() != 0 && p.isAlive()) {
 					// If no, kill this player
 					System.out.printf("ServerGame: killing player %d due to not in room\n", p.getPlayerID());
 					p.setLives(0);
@@ -241,6 +325,10 @@ public class ServerGame implements Runnable {
 
 			// update gameState
 			physics.update(interval);
+			/*
+			 * TODO physics is very likely to have
+			 * ArrayIndexOutOfBoundsException when tick rate is low
+			 */
 
 			// encode gameState
 			try {
@@ -251,14 +339,16 @@ public class ServerGame implements Runnable {
 			}
 			packet.setLength(packetLen);
 
-			// send new gameState to clients
-			for (ServerClientInfo c : playerList) {
+			synchronized (playerList) {
+				// send new gameState to clients
+				for (ServerClientInfo c : playerList) {
 
-				packet.setSocketAddress(c.getSocketAddress());
-				try {
-					serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTATE, false);
-				} catch (IOException e) {
-					System.out.println("ServerGame: failed to send packet: " + e);
+					packet.setSocketAddress(c.getSocketAddress());
+					try {
+						serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTATE, false);
+					} catch (IOException e) {
+						System.out.println("ServerGame: failed to send packet: " + e);
+					}
 				}
 			}
 
@@ -273,30 +363,40 @@ public class ServerGame implements Runnable {
 				}
 			}
 
-			/*
-			 * System.out.printf(
-			 * "ServerGame: tickrate: %d, interval: %d busy time: %d sleep time: %d\n"
-			 * , tickRate, interval, busyTime, sleepTime);
-			 */
 		}
+
+		// terminate AI threads if there is any
+		for (ServerAI a : aiList) {
+			GameAI ai = a.getGameAI();
+			if (ai == null) {
+				continue;
+			}
+			ai.setLives(0);
+			ai.setAlive(false);
+		}
+		/*
+		 * TODO one AI thread seems to be unable to be stopped when there are 1
+		 * human player and 3 AI players in a game
+		 */
+		/*
+		 * TODO sometimes AI keeps attacking players who have 0 lives(maybe due
+		 * to isAlive still being true ?)
+		 */
 
 		// tell clients the game is over
 		sendByteBuffer.position(3);
 		sendByteBuffer.putInt(roomID);
 		packet.setLength(1 + 2 + 4);
 
-		for (ServerClientInfo c : playerList) {
-			packet.setSocketAddress(c.getSocketAddress());
-			try {
-				serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMEOVER, true);
-			} catch (IOException e) {
-				System.out.println("ServerGame: failed to send packet: " + e);
-			}
-		}
-
-		// set all the players to not ready after the game
-		for (ServerClientInfo c : playerList) {
-			if (c != null) {
+		synchronized (playerList) {
+			for (ServerClientInfo c : playerList) {
+				packet.setSocketAddress(c.getSocketAddress());
+				try {
+					serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMEOVER, true);
+				} catch (IOException e) {
+					System.out.println("ServerGame: failed to send packet: " + e);
+				}
+				// set all the players to not ready after the game
 				c.setReadyToPlay(false);
 			}
 		}
