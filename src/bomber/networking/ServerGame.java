@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
 import bomber.game.Block;
 import bomber.game.GameState;
@@ -213,7 +214,7 @@ public class ServerGame implements Runnable {
 						initPos = new Point(64, 64);
 					}
 				}
-				GameAI a = new GameAI("AI " + ai.getID(), initPos, 3, 300, gameState, null);
+				GameAI a = new GameAI("AI " + ai.getID(), initPos, 3, 300, gameState, null, AIDifficulty.EXTREME);
 				a.setPlayerID(ai.getID() + 32);
 				players.add(a);
 				ai.setGameAI(a);

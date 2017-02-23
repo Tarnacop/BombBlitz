@@ -3,6 +3,9 @@ package bomber.AI;
 
 import java.awt.Point;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import bomber.game.GameState;
 import bomber.game.Movement;
 import bomber.game.Player;
@@ -13,8 +16,7 @@ import bomber.game.Player;
  *
  * @author Jokubas Liutkus The Class AIManager for making moves.
  */
-public class AIManager extends AITemplate{
-
+public class ExtremeAI extends AITemplate {
 
 	/**
 	 * Instantiates a new AI manager.
@@ -24,13 +26,9 @@ public class AIManager extends AITemplate{
 	 * @param gameState
 	 *            the game state
 	 */
-	public AIManager(GameAI ai, GameState gameState) {
+	public ExtremeAI(GameAI ai, GameState gameState) {
 		super(ai, gameState);
 	}
-
-
-	
-
 
 	/**
 	 * Perform sequence of moves.
@@ -43,12 +41,12 @@ public class AIManager extends AITemplate{
 	 */
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
-			while (moves != null && !moves.isEmpty() && gameAI.isAlive() ) {
+			while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
-					&& !safetyCh.isEnemyInBombRange() && gameAI.isAlive()) {
+					&& !safetyCh.isEnemyInBombRangeExludeAIs() && gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 	}
@@ -63,7 +61,8 @@ public class AIManager extends AITemplate{
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive()) {
+		while (moves != null && !moves.isEmpty() && getMovesToEnemyExcludeAIs() == null && gameAI.isAlive()
+				&& (!checkIfAIsReachable() || isPerformer())) {
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -79,6 +78,7 @@ public class AIManager extends AITemplate{
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
 					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive()) {
+
 					}
 				}
 			} 
@@ -87,9 +87,28 @@ public class AIManager extends AITemplate{
 				makeSingleMove(action);
 			}
 		}
-	}
 
+	}
 	
+	
+	
+	private boolean isPerformer()
+	{
+		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());
+		if(!players.isEmpty()) return players.get(0).equals(gameAI);
+		return false;
+	}
+	
+	
+	private boolean checkIfAIsReachable()
+	{
+		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());
+		for(Player p : players)
+		{
+			if(!p.equals(gameAI) && finder.findRoute(gameAI.getGridPos(), p.getGridPos())!=null) return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Main method for controlling what moves to make.
@@ -102,33 +121,33 @@ public class AIManager extends AITemplate{
 			if (safetyCh.inDanger()) {
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
-				
+
 			}
-			
-//			//if enemy is in range and it is possible to place bomb and escape then do it
-//			else if((moves = finder.canPutBombAndEscape()) != null){
-//				System.out.println("Bomb");
-//				gameAI.getKeyState().setBomb(true);
-//				performMoves(moves, true);
-//			}
-//			
-			
-			
-			// if enemy is in bomb range then place the bomb and go to the
-////			// safe location
-			else if (safetyCh.isEnemyInBombRange()) {
+
+			// if enemy is in range and it is possible to place bomb and escape
+			// then do it
+			else if ((moves = finder.canPutBombAndEscapeExcludeAIs()) != null) {
 				gameAI.getKeyState().setBomb(true);
-				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
+
+			// // if enemy is in bomb range then place the bomb and go to the
+//			////// // safe location
+//			else if (safetyCh.isEnemyInBombRangeExludeAIs()) {
+//				gameAI.getKeyState().setBomb(true);
+//				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+//				performMoves(moves, true);
+//			}
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
-			else if ((moves = getMovesToEnemy()) != null) {
+			else if ((moves = getMovesToEnemyExcludeAIs()) != null) {
 				performMoves(moves, false);
 			}
-			// if enemy is not in the range get the plan how to reach enemy and fullfill it
-			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
-				performPlannedMoves(moves);
+			// if enemy is not in the range get the plan how to reach enemy and
+			// fullfill it
+			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs())) != null) {
+				if(!checkIfAIsReachable() || isPerformer())
+					performPlannedMoves(moves);
 			}
 
 			gameAI.getKeyState().setBomb(false);
