@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
 import bomber.AI.RouteFinder;
 import bomber.AI.SafetyChecker;
@@ -70,7 +71,7 @@ public abstract class MainTestTemplate {
 		state = new GameState(map, players);
 		state.setBombs(bombs);
 
-		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state, null);
+		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state, null, AIDifficulty.HARD);
 		players.add(ai);
 		checker = new SafetyChecker(state, ai);
 		finder = new RouteFinder(state, ai,checker);

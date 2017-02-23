@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -66,6 +67,8 @@ public class RouteFinder {
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
 
+		if (start == null || goal == null)
+			return null;
 		// heuristic value h
 		int hValue = Math.abs(goal.x - start.x) + Math.abs(goal.y - start.y);
 		Node startNode = new Node(0, hValue, null, start);
@@ -139,7 +142,11 @@ public class RouteFinder {
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID)
 			return;
-
+//
+//		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
+//
+//		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(neigh)).findFirst().isPresent())
+//			return;
 		// if the neighbour is in the visited list we return
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
@@ -191,6 +198,10 @@ public class RouteFinder {
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOLID)
 			return;
 
+//		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
+//
+//		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(neigh)).findFirst().isPresent())
+//			return;
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
 				return;
@@ -283,7 +294,10 @@ public class RouteFinder {
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID)
 			return;
+		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
 
+		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(tile)).findFirst().isPresent())
+			return;
 		for (Node nd : closed)
 			if (nd.getCoord().equals(tile))
 				return;
@@ -350,7 +364,7 @@ public class RouteFinder {
 		Point pos = null;
 		int distance = Integer.MAX_VALUE;
 		for (Player p : state.getPlayers()) {
-			if (!p.equals(gameAI)
+			if (!p.equals(gameAI) && p.isAlive()
 					&& (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
 				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
 				pos = p.getGridPos();
@@ -474,8 +488,7 @@ public class RouteFinder {
 
 		Block[][] map2 = getMap();
 		// copy the real map
-		Block[][] map = new Block[map2.length][map2[0].length];//Arrays.stream(getMap()).map(Block[]::clone).toArray(Block[][]::new);
-
+		Block[][] map = new Block[map2.length][map2[0].length];// Arrays.stream(getMap()).map(Block[]::clone).toArray(Block[][]::new);
 
 		for (int x = 0; x < map2.length; x++)
 			for (int y = 0; y < map2[0].length; y++)
@@ -493,7 +506,7 @@ public class RouteFinder {
 				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(safetyCh.getBombCoverage(
 						new Bomb(null, new Point(pos.x * scalar, pos.y * scalar), 0, gameAI.getBombRange()), map), pos,
 						map));
-
+				if(escapeMoves == null) return realMoves;
 				realMoves.addAll(escapeMoves);
 				realMoves.add(AIActions.NONE);
 				realMoves.addAll(reverseMoves(escapeMoves));
@@ -521,7 +534,8 @@ public class RouteFinder {
 		// TODO finish not implemented
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
-
+		if (start == null || goal == null)
+			return null;
 		int hValue = Math.abs(goal.x - start.x) + Math.abs(goal.y - start.y);
 		Node startNode = new Node(0, hValue, null, start);
 		open.add(startNode);
@@ -609,26 +623,63 @@ public class RouteFinder {
 		return getMovesFromPoints(finish);
 
 	}
-	
-	private class Pair
-	{
+
+	private class Pair {
 		private Point position;
 		private LinkedList<AIActions> actions;
-		private Pair(Point position, LinkedList<AIActions> actions)
-		{
+
+		private Pair(Point position, LinkedList<AIActions> actions) {
 			this.position = position;
 			this.actions = actions;
 		}
-		
-		private Point getPos()
-		{
+
+		private Point getPos() {
 			return position;
 		}
-		
-		private LinkedList<AIActions> getActions()
-		{
+
+		private LinkedList<AIActions> getActions() {
 			return actions;
 		}
+	}
+
+	// ------------------------
+
+	/**
+	 * Gets the nearest enemy.
+	 *
+	 * @return the nearest enemy of the AI.
+	 */
+	public Point getNearestEnemyExcludeAIs() {
+		Point aiPos = gameAI.getGridPos();
+		Point pos = null;
+		int distance = Integer.MAX_VALUE;
+		List<Player> players = state.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive())
+				.collect(Collectors.toList());
+		
+		for (Player p : players) {
+			if ((Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
+				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
+				pos = p.getGridPos();
+			}
+		}
+
+		return pos;
+	}
+
+	public LinkedList<AIActions> canPutBombAndEscapeExcludeAIs() {
+		LinkedList<AIActions> moves = null;
+		if (safetyCh.isEnemyInBombRangeExludeAIs()) {
+			ArrayList<Point> bombs = safetyCh.getTilesAffectedByBombs();
+			ArrayList<Point> coverage = safetyCh.getBombCoverage(
+					new Bomb(gameAI.getName(), gameAI.getPos(), 0, gameAI.getBombRange()),
+					getMap());
+			bombs.addAll(coverage);
+			moves = escapeFromExplotion(bombs);
+
+		}
+		if ((moves != null) && (moves.size() < 4))
+			return moves;
+		return null;
 	}
 
 }

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
 import bomber.AI.RouteFinder;
 import bomber.AI.SafetyChecker;
@@ -63,7 +64,7 @@ public class PlanningTest {
 
 		state = new GameState(map, null);
 
-		ai = new GameAI("ai", new Point(12,0), 3, 10, state, null);
+		ai = new GameAI("ai", new Point(12,0), 3, 10, state, null, AIDifficulty.HARD);
 		ai.setBombRange(3);
 		checker = new SafetyChecker(state, ai);
 		finder = new RouteFinder(state, ai,checker);
