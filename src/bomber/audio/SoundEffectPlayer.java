@@ -6,26 +6,34 @@ import sun.applet.Main;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Created by Alexandruro on 05.02.2017.
+ * Created by Alexandru Rosu on 05.02.2017.
  */
 public class SoundEffectPlayer extends Thread
 {
+
+    private float volume;
+
+    public SoundEffectPlayer()
+    {
+        volume = Constants.defaultVolume;
+    }
 
     private void playSound(String fileName)
     {
         try {
             Clip clip = AudioSystem.getClip();
-            AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    Main.class.getResourceAsStream(Constants.audioFilesPath + fileName));
+            InputStream rawStream = Main.class.getResourceAsStream(Constants.audioFilesPath + fileName);
+            if(rawStream == null)
+                throw new IOException();
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
             clip.open(inputStream);
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            AudioManager.setControlVolume(gainControl, volume);
             clip.start();
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (LineUnavailableException e) {
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             e.printStackTrace();
         }
     }
@@ -50,5 +58,10 @@ public class SoundEffectPlayer extends Thread
                 playSound(Constants.powerupFilename);
                 break;
         }
+    }
+
+    public void setVolume(float percent)
+    {
+        this.volume = percent;
     }
 }

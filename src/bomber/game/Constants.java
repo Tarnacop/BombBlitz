@@ -22,7 +22,7 @@ public class Constants
     public static final int highPlayerSpeed = 400;
 
     // Audio files
-    public static final String audioFilesPath = "/bomber/audio/";
+    public static final String audioFilesPath = "/resources/sounds/";
     public static final String musicFilename = "01_A_Night_Of_Dizzy_Spells.wav";
     public static final String explosionFilename = "sfx_exp_medium3.wav";
     public static final String bombPlaceFilename = "sfx_sound_neutral6.wav";
@@ -30,4 +30,5 @@ public class Constants
     public static final String playerDeathFilename = "sfx_sounds_error1.wav";
     public static final String powerupFilename = "sfx_sounds_neutral6.wav"; // TODO: find a sound
 
+    public static final float defaultVolume = 75;
 }
