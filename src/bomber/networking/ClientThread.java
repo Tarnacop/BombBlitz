@@ -549,9 +549,15 @@ public class ClientThread implements Runnable {
 			 */
 
 			try {
-				// gameState = ClientPacketEncoder.decodeGameState(clientID,
-				// gameState, recvBuffer, packet.getLength());
-				gameState = ClientPacketEncoder.decodeGameState(recvBuffer, packet.getLength());
+				/*
+				 * gameState = ClientPacketEncoder.decodeGameState(recvBuffer,
+				 * packet.getLength());
+				 */
+				/*
+				 * modifying a game state instead of keep creating new ones
+				 * reduced JVM memory usage from around 200 MB to 70 MB
+				 */
+				gameState = ClientPacketEncoder.decodeGameState(clientID, gameState, recvBuffer, packet.getLength());
 			} catch (IOException e) {
 				pClient("Failed to decode game state");
 				return;

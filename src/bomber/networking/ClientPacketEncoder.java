@@ -523,7 +523,9 @@ public class ClientPacketEncoder {
 		 * TODO AudioManager should also lock audioEventList to avoid
 		 * ConcurrentModificationException
 		 */
-		/* TODO Audio can often cause OutOfMemoryError during a game */
+		/*
+		 * TODO Audio can cause OutOfMemoryError during game
+		 */
 		synchronized (audioEventList) {
 			if (BitArray.getBit(audioState, 0)) {
 				if (!audioEventList.contains(AudioEvent.PLACE_BOMB)) {
