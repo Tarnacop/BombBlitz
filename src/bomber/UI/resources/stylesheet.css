@@ -1,20 +1,49 @@
-.button{
+.menubutton{
 	-fx-background-color: transparent;
         -fx-background-image: url("images/button.png");
         -fx-background-size:100% 100%;
         -fx-background-repeat:no-repeat;
 }
 
-.button:hover{
+.menubutton:hover{
 	-fx-background-color: transparent;
 	-fx-background-image: url("images/buttonhover.png");
         -fx-background-size:100% 100%;
         -fx-background-repeat:no-repeat;
 }
 
-.button:armed{
+.menubutton:armed{
 	-fx-background-color: transparent;
 	-fx-background-image: url("images/buttonclick.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.label.shaded{
+	-fx-background-color: black;
+	-fx-opacity:50%;
+	-fx-padding: 5px;
+}
+
+.textfield{
+	-fx-padding: 5px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/textfield.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.namebox{
+	-fx-padding: 20px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/fancybox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.mapbox{
+	-fx-padding: 25px;
+	-fx-background-image: url("images/mapbox.png");
         -fx-background-size:100% 100%;
         -fx-background-repeat:no-repeat;
 }
