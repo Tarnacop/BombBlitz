@@ -36,6 +36,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -492,15 +493,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 		for(int x = 0; x < gridMap.length; x++){
 			for(int y = 0; y < gridMap[0].length; y++){
 				
-				Paint paint = null;
+				String image = "";
 				switch(gridMap[x][y]){
-				case BLANK: paint = Color.KHAKI; break;
-				case SOLID: paint = Color.GREY; break;
-				case SOFT: paint = Color.BEIGE; break;
+				case BLANK: image = "blank"; break;
+				case SOLID: image = "solid"; break;
+				case SOFT: image = "soft"; break;
 				default:
 					break;
 				}
-				Rectangle rect = new Rectangle(xscalar, yscalar, paint);
+				Rectangle rect = new Rectangle(xscalar, yscalar);
+				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/" + image + ".png")));
+					    	    
 				rect.setStroke(Color.BLACK);
 				rect.setX(xscalar*x + 50);
 				rect.setY(yscalar*y + 50);
