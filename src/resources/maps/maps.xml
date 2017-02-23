@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <maps>
-	<!--- map representation-->
-	<!--- X: hard(not explodable) block)-->
-	<!--- O: soft (explodable) block-->
-	<!--- _: empty space-->
-	<!--- *: spawn point-->
+	<!-- Map representation-->
+	<!-- X: hard(not explodable) block)-->
+	<!-- O: soft (explodable) block-->
+	<!-- _: empty space-->
+	<!-- *: spawn point-->
 	<map>
 		<name>Random</name>
 		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>

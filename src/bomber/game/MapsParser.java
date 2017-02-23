@@ -40,18 +40,7 @@ public class MapsParser extends DefaultHandler {
 		// Finally, tell the parser to parse the input and notify the handler
 		sp.parse("src/resources/maps/maps.xml", this);
 		
-		for(Map bl: maps)
-		{
-			for(int x =0; x<bl.getGridMap().length; x++)
-			{
-				for(int y=0; y<bl.getGridMap()[0].length; y++)
-				{
-					System.out.print(bl.getGridMap()[x][y] + " ");
-				}
-				System.out.println();
-			}
-		}
-
+	
 	}
 
 	/*
