@@ -87,6 +87,13 @@ public class ProtocolConstant {
 	public static final byte MSG_C_ROOM_SETINFO_AI = 0x03;
 	public static final byte MSG_C_ROOM_SETINFO_AI_ADD = 0x00;
 	public static final byte MSG_C_ROOM_SETINFO_AI_REMOVE = 0x01;
+	// TODO AI difficulty settings
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY = 0x02;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY = 0x00;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM = 0x01;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD = 0x02;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME = 0x03;
+
 	/* Header: 1 byte message type + 2 byte sequence + 4 byte room ID */
 	/* Valid format: Header + any one of the below */
 	/*
@@ -101,6 +108,10 @@ public class ProtocolConstant {
 	 */
 	/* add AI: 1 byte constant 0x3 + 1 byte constant 0x0 */
 	/* remove AI: 1 byte constant 0x3 + 1 byte constant 0x1 */
+	/*
+	 * set AI difficulty: 1 byte constant 0x3 + 1 byte constant 0x2 + 1 byte AI
+	 * difficulty
+	 */
 
 	// public static final byte MSG_C_ROOM_GETINFO = 0x0d;
 
