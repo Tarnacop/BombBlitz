@@ -1,3 +1,4 @@
+
 .menubutton{
 	-fx-background-color: transparent;
         -fx-background-image: url("images/button.png");
@@ -26,6 +27,7 @@
 }
 
 .textfield{
+	-fx-font-family: minecraft;
 	-fx-padding: 5px;
 	-fx-background-color: transparent;
 	-fx-background-image: url("images/textfield.png");
@@ -41,6 +43,14 @@
         -fx-background-repeat:no-repeat;
 }
 
+.nopadbox{
+	-fx-padding:5px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/box.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
 .namebox{
 	-fx-padding: 20px;
 	-fx-background-color: transparent;
@@ -49,8 +59,14 @@
         -fx-background-repeat:no-repeat;
 }
 
-.mapbox{
+.creditsbox{
 	-fx-padding: 25px;
+	-fx-background-image: url("images/mapbox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.mapbox{
 	-fx-background-image: url("images/mapbox.png");
         -fx-background-size:100% 100%;
         -fx-background-repeat:no-repeat;
