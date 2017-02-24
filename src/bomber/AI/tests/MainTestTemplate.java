@@ -44,7 +44,7 @@ public abstract class MainTestTemplate {
 			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]
 			[ ][x][ ][x][ ][x][ ][x][ ][x][ ][x][ ]
 			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][ ]*/
-	
+
 		Block[][] blocks = {{Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK},
@@ -58,7 +58,7 @@ public abstract class MainTestTemplate {
 				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK},
 				  {Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK}};	
-		
+	
 		map = new Map("",blocks,null);
 
 		bombs = new ArrayList<>();
@@ -71,7 +71,7 @@ public abstract class MainTestTemplate {
 		state = new GameState(map, players);
 		state.setBombs(bombs);
 
-		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state, null, AIDifficulty.HARD);
+		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state, null, AIDifficulty.EXTREME);
 		players.add(ai);
 		checker = new SafetyChecker(state, ai);
 		finder = new RouteFinder(state, ai,checker);

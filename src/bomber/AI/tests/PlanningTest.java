@@ -3,11 +3,8 @@ package bomber.AI.tests;
 import static org.junit.Assert.*;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import bomber.AI.AIDifficulty;
@@ -15,10 +12,8 @@ import bomber.AI.GameAI;
 import bomber.AI.RouteFinder;
 import bomber.AI.SafetyChecker;
 import bomber.game.Block;
-import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Map;
-import bomber.game.Player;
 
 public class PlanningTest {
 
@@ -68,12 +63,12 @@ public class PlanningTest {
 		ai.setBombRange(3);
 		checker = new SafetyChecker(state, ai);
 		finder = new RouteFinder(state, ai,checker);
-		
+	
 	}
 
 	@Test
 	public void test() {
-		System.out.println(finder.getPlanToEnemy(new Point(12,0), new Point(12,12)));
+		assertEquals(28, finder.getPlanToEnemy(new Point(12,0), new Point(12,12)).size());
 	}
 
 }

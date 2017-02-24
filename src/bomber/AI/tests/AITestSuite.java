@@ -11,7 +11,8 @@ import org.junit.runners.Suite;
 	EnemyCheckTest.class,
 	InDangerTest.class,
 	MoveSafetyTest.class,
-	NereastNeighbourTest.class
+	NereastNeighbourTest.class,
+	PlanningTest.class
 })
 
 
