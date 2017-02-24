@@ -15,6 +15,7 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -87,7 +88,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label displayAi;
 	private HBox aiPane;
 	private Label aiLabel;
-	private VBox centerBox;
+	private HBox centerBox;
 	private List<Map> maps;
 	private HBox ipBox;
 	private Label enterLabel;
@@ -140,6 +141,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private BorderPane mainMenu;
 	private SimpleStringProperty currentNameText;
 	private Pane mapCanvas;
+	private int windowHeight;
+	private int windowWidth;
+	private HBox mapPane;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -159,6 +163,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.controls.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
 		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
+		this.windowHeight = 600;
+		this.windowWidth = 900;
 	}
 	
 	public static void begin(){
@@ -169,8 +175,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	public void start(Stage primaryStage){
 
 		currentStage = primaryStage;
-		currentStage.setMinHeight(700);
-		currentStage.setMinWidth(1000);
+		currentStage.setMinHeight(600);
+		currentStage.setMinWidth(900);
 		primaryStage.setTitle(this.appName);
 		previousScenes = new Stack<Scene>();
 		initScenes();
@@ -402,14 +408,15 @@ public class UserInterface extends Application implements ClientNetInterface{
 		 * |	1	Ai Players			 	+-------+	|
 		 * |	v							|		|	|
 		 * |								|START	|	|
-		 * |	[x] Ai fight each other		|GAME	|	|
+		 * |								|GAME	|	|
 		 * |								+-------+	|
 		 * |	[Easy] Ai difficulty					|
 		 * +--------------------------------------------+
 		 */
 		
 		mapCanvas = new Pane();
-		mapCanvas.setPrefHeight(Integer.MAX_VALUE);
+		mapCanvas.setPrefHeight(300);
+		mapCanvas.setPrefWidth(300);
 		mapCanvas.widthProperty().addListener(e -> drawMap(mapCanvas));
 		mapCanvas.heightProperty().addListener(e -> drawMap(mapCanvas));
 		
@@ -418,7 +425,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		mapContainer.setSpacing(20);
 		mapContainer.setPadding(new Insets(0, 20, 0, 20));
 		mapContainer.setAlignment(Pos.CENTER);
-		mapContainer.getChildren().addAll(createLabel("Current Map:", false, true), createBoundLabel(this.mapName, false, true), mapCanvas);
+		Label mapNameLabel = createBoundLabel(this.mapName, false, false);
+		mapNameLabel.getStyleClass().add("textfield");
+		mapContainer.getChildren().addAll(createLabel("Current Map:", false, true), mapNameLabel, mapCanvas);
 		
 		BorderPane singleBox = new BorderPane();
 		
@@ -432,24 +441,28 @@ public class UserInterface extends Application implements ClientNetInterface{
         //back button
         backBtn3 = createBackButton();
         
-        rightMapToggle = new Button("->");
-        rightMapToggle.setPrefHeight(Integer.MAX_VALUE);
+        rightMapToggle = new Button();
+        rightMapToggle.getStyleClass().add("maptoggleright");
+        rightMapToggle.setPrefHeight(300);
+        rightMapToggle.setPrefWidth(70);
         rightMapToggle.setOnAction(e -> incremenetMap());
         
-        leftMapToggle = new Button("<-");
-        leftMapToggle.setPrefHeight(Integer.MAX_VALUE);
+        leftMapToggle = new Button();
+        leftMapToggle.getStyleClass().add("maptoggleleft");
+        leftMapToggle.setPrefHeight(300);
+        leftMapToggle.setPrefWidth(70);
         leftMapToggle.setOnAction(e -> decrementMap());
         
-        upAiToggle = new Button("^");
+        upAiToggle = new Button();
         upAiToggle.setPrefWidth(50);
+        upAiToggle.getStyleClass().add("aitoggleup");
         upAiToggle.setOnAction(e -> incrementAi());
         
-        displayAi = new Label();
-        displayAi.setFont(font);
-        displayAi.textProperty().bind(this.aiNumber.asString());
+        displayAi = createBoundLabel(this.aiNumber, false, false);
         
-        downAiToggle = new Button("v");
+        downAiToggle = new Button();
         downAiToggle.setPrefWidth(50);
+        downAiToggle.getStyleClass().add("aitoggledown");
         downAiToggle.setOnAction(e -> decrementAi());
         
         aiBox = new VBox();
@@ -457,23 +470,26 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiBox.setSpacing(20);
         aiBox.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
         
-        aiLabel = new Label("Number of\nAI Players");
-        aiLabel.setFont(font);
+        aiLabel = createLabel("Number of\nAI Players", false, false);
         
         aiPane = new HBox();
         aiPane.setAlignment(Pos.CENTER);
+        aiPane.setPrefHeight(300);
+        aiPane.getStyleClass().add("box");
         aiPane.setSpacing(30);
         aiPane.getChildren().addAll(aiBox, aiLabel);
         
-        centerBox = new VBox();
-        centerBox.setAlignment(Pos.CENTER);
-        centerBox.setSpacing(30);
-        centerBox.getChildren().add(aiPane);
+        mapPane = new HBox();
+        mapPane.setAlignment(Pos.CENTER);
+        mapPane.getChildren().addAll(leftMapToggle, mapContainer, rightMapToggle);
         
-        singleBox.setCenter(mapContainer);
+        centerBox = new HBox();
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setSpacing(20);
+        centerBox.getChildren().addAll(aiPane, mapPane);
+        
+        singleBox.setCenter(centerBox);
         singleBox.setTop(backBtn3);
-        singleBox.setLeft(leftMapToggle);
-        singleBox.setRight(rightMapToggle);
         singleBox.setBottom(startBtnPane);
         
         setBackgroundPane(singleMenu, singleBox);
@@ -595,7 +611,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 	
 	private Scene createScene(Parent menu){
-		Scene scene = new Scene(menu, 1000, 700);
+		Scene scene = new Scene(menu, windowWidth, windowHeight);
 		scene.getStylesheets().add(css);
 		return scene;
 	}
@@ -618,6 +634,18 @@ public class UserInterface extends Application implements ClientNetInterface{
 		text.setFont(font);
 		text.setAlignment(Pos.CENTER);
 		return text;
+	}
+	
+	private Label createBoundLabel(SimpleIntegerProperty property, boolean shaded, boolean white) {
+		Label label = new Label();
+		label.setFont(font);
+		if(white)label.setTextFill(Color.WHITE);
+		label.setAlignment(Pos.CENTER);
+		label.textProperty().bind(property.asString());
+		if(shaded){
+			label.getStyleClass().add("shaded");
+		}
+		return label;
 	}
 	
 	private Label createBoundLabel(SimpleStringProperty property, boolean shaded, boolean white) {
@@ -741,14 +769,24 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private void decrementMap() {
 		int index = this.maps.indexOf(this.map);
-		if(index > 0)this.map = this.maps.get(index-1);
+		if(index > 0){
+			this.map = this.maps.get(index-1);
+		}
+		else{
+			this.map = this.maps.get(this.maps.size()-1);
+		}
 		this.mapName.set(this.map.getName());
 		drawMap(mapCanvas);
 	}
 
 	private void incremenetMap() {
 		int index = this.maps.indexOf(this.map);
-		if(index < (this.maps.size()-1))this.map = this.maps.get(index+1);
+		if(index < (this.maps.size()-1)){
+			this.map = this.maps.get(index+1);
+		}
+		else{
+			this.map = this.maps.get(0);
+		}
 		this.mapName.set(this.map.getName());
 		drawMap(mapCanvas);
 	}
@@ -924,6 +962,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	public void setName(String string){
 		
+		string = string.trim();
 		if(string.length() > 0 && string.length() < 12){
 			this.playerName.set(string);
 			this.currentNameText.set("Current Name:");
