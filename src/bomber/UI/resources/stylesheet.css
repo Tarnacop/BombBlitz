@@ -1,3 +1,4 @@
+
 .menubutton{
 	-fx-background-color: transparent;
         -fx-background-image: url("images/button.png");
@@ -26,9 +27,26 @@
 }
 
 .textfield{
+	-fx-font-family: minecraft;
 	-fx-padding: 5px;
 	-fx-background-color: transparent;
 	-fx-background-image: url("images/textfield.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.box{
+	-fx-padding: 20px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/box.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.nopadbox{
+	-fx-padding:5px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/box.png");
         -fx-background-size:100% 100%;
         -fx-background-repeat:no-repeat;
 }
@@ -41,9 +59,100 @@
         -fx-background-repeat:no-repeat;
 }
 
-.mapbox{
+.creditsbox{
 	-fx-padding: 25px;
 	-fx-background-image: url("images/mapbox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.mapbox{
+	-fx-background-image: url("images/mapbox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.maptoggleright{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/rightbutton.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.maptoggleright:hover{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/rightbuttonhover.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.maptoggleright:armed{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/rightbuttonclick.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+
+.maptoggleleft{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/leftbutton.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.maptoggleleft:hover{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/leftbuttonhover.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.maptoggleleft:armed{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/leftbuttonclick.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.aitoggleup{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/upbutton.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.aitoggleup:hover{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/upbuttonhover.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.aitoggleup:armed{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/upbuttonclick.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.aitoggledown{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/downbutton.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.aitoggledown:hover{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/downbuttonhover.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.aitoggledown:armed{
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/downbuttonclick.png");
         -fx-background-size:100% 100%;
         -fx-background-repeat:no-repeat;
 }

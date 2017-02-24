@@ -33,10 +33,12 @@ public class Game implements GameInterface {
 	private AudioManager audio;
 	private UserInterface ui;
 	private int aiNum;
+	private AIDifficulty aiDiff;
 
-	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum) {
+	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff) {
 
 		this.aiNum = aiNum;
+		this.aiDiff = aiDiff;
 		this.ui = ui;
 		this.map = map;
 		this.playerName = playerName;
@@ -79,7 +81,7 @@ public class Game implements GameInterface {
 			this.physics = new PhysicsEngine(gameState);
 
 			for(int x = 1; x <= this.aiNum; x++){
-				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, new Mesh(32, 32, colours), AIDifficulty.EXTREME);
+				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, new Mesh(32, 32, colours), this.aiDiff);
 				list.add(ai);
 				ai.begin();
 			}
