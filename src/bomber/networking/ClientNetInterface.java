@@ -86,6 +86,12 @@ public interface ClientNetInterface {
 	public void haveLeftRoom();
 
 	/**
+	 * This method will be called when the client has received updated info of
+	 * the room that the client is in from the server
+	 */
+	public void roomReceived();
+
+	/**
 	 * This method will be called when the client has received message from the
 	 * server indicating the game has started
 	 */

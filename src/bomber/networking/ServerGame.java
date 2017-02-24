@@ -280,6 +280,11 @@ public class ServerGame implements Runnable {
 			}
 			ai.begin();
 		}
+		/*
+		 * TODO AI is memory consuming. When there are only human players, the
+		 * server memory usage is only around 100 MB while the addition of one
+		 * AI increases memory usage to 700MB
+		 */
 
 		long loopStartTime = System.currentTimeMillis();
 		int busyTime = 0;
@@ -298,6 +303,22 @@ public class ServerGame implements Runnable {
 			// game is over when only one player is left in the room
 			if (playerList.size() + aiList.size() < 2) {
 				System.out.printf("ServerGame: ending game in room %d due to fewer than 2 players in room\n", roomID);
+				terminate();
+			}
+
+			// game is over when no human player is alive
+			int humanPlayer = 0;
+			int deadHumanPlayer = 0;
+			for (Player p : players) {
+				if (p != null && p.getPlayerID() < 32) {
+					humanPlayer += 1;
+					if (p.getLives() == 0 || !p.isAlive()) {
+						deadHumanPlayer += 1;
+					}
+				}
+			}
+			if (humanPlayer == deadHumanPlayer) {
+				System.out.printf("ServerGame: ending game in room %d due to no human players alive\n", roomID);
 				terminate();
 			}
 
@@ -322,6 +343,15 @@ public class ServerGame implements Runnable {
 					p.setAlive(false);
 				}
 			}
+
+			/*
+			 * TODO physics still does not check if there are duplicate audio
+			 * events in the audio event list. Since movement is very frequent,
+			 * the list is filled with movement sound, so we empty the audio
+			 * event list each time game state is updated
+			 */
+			// System.out.println(gameState.getAudioEvents().size());
+			gameState.getAudioEvents().clear();
 
 			// update gameState
 			physics.update(interval);
@@ -374,14 +404,6 @@ public class ServerGame implements Runnable {
 			ai.setLives(0);
 			ai.setAlive(false);
 		}
-		/*
-		 * TODO one AI thread seems to be unable to be stopped when there are 1
-		 * human player and 3 AI players in a game
-		 */
-		/*
-		 * TODO sometimes AI keeps attacking players who have 0 lives(maybe due
-		 * to isAlive still being true ?)
-		 */
 
 		// tell clients the game is over
 		sendByteBuffer.position(3);
