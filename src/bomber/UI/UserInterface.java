@@ -176,7 +176,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
 		this.windowHeight = 800;
-		this.windowWidth = 1000;
+		this.windowWidth = 1100;
 	}
 	
 	public static void begin(){
@@ -188,7 +188,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 		currentStage = primaryStage;
 		currentStage.setMinHeight(800);
-		currentStage.setMinWidth(1000);
+		currentStage.setMinWidth(1100);
 		primaryStage.setTitle(this.appName);
 		previousScenes = new Stack<Scene>();
 		initScenes();
@@ -405,27 +405,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private void initSingle() {
 		
-		/**LAYOUT
-		 * +--------------------------------------------+
-		 * |	(hbox)	|(vbox)	Level 1		|			| 
-		 * |	+---+	+-------------------+	+---+	|								
-		 * |	|	|	|				   	|	|	|	|		
-		 * |	|<- |	|					|	|->	|	|				
-		 * |	|	|	|					|	|	|	|
-		 * |	|	|	|		MAP			|	|	|	|
-		 * |	|	|	|					|	|	|	|
-		 * |	|	|	|					|	|	|	|
-		 * |	+---+	+-------------------+	+---+	|		
-		 * |	^		(vbox)					(hbox)	|
-		 * |	1	Ai Players			 	+-------+	|
-		 * |	v							|		|	|
-		 * |								|START	|	|
-		 * |								|GAME	|	|
-		 * |								+-------+	|
-		 * |	[Easy] Ai difficulty					|
-		 * +--------------------------------------------+
-		 */
-		
 		mapCanvas = new Pane();
 		mapCanvas.setMinHeight(300);
 		mapCanvas.setMinWidth(300);
@@ -435,11 +414,23 @@ public class UserInterface extends Application implements ClientNetInterface{
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
 		mapContainer.setAlignment(Pos.CENTER);
-		mapContainer.setSpacing(10);
-		mapContainer.setPadding(new Insets(10));
 		Label mapNameLabel = createBoundLabel(this.mapName, false, false);
 		mapNameLabel.getStyleClass().add("textfield");
-		mapContainer.getChildren().addAll(createLabel("Current Map:", false, true), mapNameLabel, mapCanvas);
+		Image keyImage = new Image("bomber/UI/resources/images/key.png");
+        ImageView mapKey = new ImageView(keyImage);
+        
+        VBox currentPane = new VBox();
+        currentPane.setAlignment(Pos.CENTER);
+        currentPane.setSpacing(10);
+        currentPane.getChildren().addAll(createLabel("Current Map:", false, true), mapNameLabel);
+        
+        HBox keyPane = new HBox();
+        keyPane.setAlignment(Pos.CENTER);
+        keyPane.setSpacing(40);
+        keyPane.setPadding(new Insets(20));
+        keyPane.getChildren().addAll(currentPane, mapKey);
+        
+		mapContainer.getChildren().addAll(keyPane, mapCanvas);
 		
 		BorderPane singleBox = new BorderPane();
 		
@@ -535,7 +526,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiDiffBox.setAlignment(Pos.CENTER);
         aiDiffBox.getStyleClass().add("box");
         aiDiffBox.setSpacing(20);
-        aiDiffBox.getChildren().addAll(createLabel("Ai Difficulty:", false, false), aiDifficultyChoice, aiExplanation);
+        aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), aiDifficultyChoice, aiExplanation);
         
         aiContainer = new VBox();
         aiContainer.setAlignment(Pos.CENTER);
@@ -549,6 +540,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         rightMapToggle.prefHeightProperty().bind(mapPane.heightProperty());
         leftMapToggle.prefHeightProperty().bind(mapPane.heightProperty());
+        
+        mapPane.maxHeightProperty().bind(aiBox.heightProperty());
         
         VBox mapPad = new VBox();
 		mapPad.setAlignment(Pos.CENTER);
@@ -576,14 +569,46 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	private void drawMap(Pane mapCanvas) {
 
-		double canvasWidth = mapCanvas.getWidth() - 100;
-		double canvasHeight = mapCanvas.getHeight() - 100;
+		int xpadding = 250;
+		int ypadding = 50;
+		
+		mapCanvas.getChildren().clear();
+		Rectangle torch1 = new Rectangle();
+		torch1.setWidth(100);
+		torch1.setHeight(100);
+		torch1.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch1.setX(20);
+		torch1.setY(20);
+		
+		Rectangle torch2 = new Rectangle();
+		torch2.setWidth(100);
+		torch2.setHeight(100);
+		torch2.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch2.setX(mapCanvas.getWidth()-xpadding+130);
+		torch2.setY(20);
+		
+		Rectangle torch3 = new Rectangle();
+		torch3.setWidth(100);
+		torch3.setHeight(100);
+		torch3.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch3.setX(mapCanvas.getWidth()-xpadding+130);
+		torch3.setY(160);
+		
+		Rectangle torch4 = new Rectangle();
+		torch4.setWidth(100);
+		torch4.setHeight(100);
+		torch4.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch4.setX(20);
+		torch4.setY(160);
+		
+		mapCanvas.getChildren().addAll(torch1, torch2, torch3, torch4);
+		
+		double canvasWidth = mapCanvas.getWidth() - xpadding;
+		double canvasHeight = mapCanvas.getHeight() - ypadding;
 		
 		Block[][] gridMap = this.map.getGridMap();
 		double xscalar = canvasWidth/gridMap.length;
 		double yscalar = canvasHeight/gridMap[0].length;
-		
-		mapCanvas.getChildren().clear();
 		
 		for(int x = 0; x < gridMap.length; x++){
 			for(int y = 0; y < gridMap[0].length; y++){
@@ -600,18 +625,24 @@ public class UserInterface extends Application implements ClientNetInterface{
 				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/" + image + ".png")));
 					    	    
 				rect.setStroke(Color.BLACK);
-				rect.setX(xscalar*x + 50);
-				rect.setY(yscalar*y + 50);
+				rect.setX((xpadding/2) + xscalar*x);
+				rect.setY((ypadding/2) + yscalar*y);
 				mapCanvas.getChildren().add(rect);
 			}
 		}
 		
-		for(Point pos : this.map.getSpawnPoints()){
+		for(int x = 0; x < this.map.getSpawnPoints().size(); x++){
+			Point pos = this.map.getSpawnPoints().get(x);
 			Rectangle rect = new Rectangle(10, 10);
-			rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/spawnpoint.png")));
+			if(x == 0){
+				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/playerspawnpoint.png")));
+			}
+			else{
+				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/spawnpoint.png")));
+			}
 			rect.setStroke(Color.BLACK);
-			rect.setX(xscalar*(pos.x/64) + 52);
-			rect.setY(yscalar*(pos.y/64) + 52);
+			rect.setX((xpadding/2) + 5 + xscalar*(pos.x/64));
+			rect.setY((ypadding/2) + 5 + yscalar*(pos.y/64));
 			mapCanvas.getChildren().add(rect);
 		}
 	}
