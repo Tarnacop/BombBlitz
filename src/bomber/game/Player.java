@@ -18,7 +18,7 @@ public class Player {
 	private KeyboardState keyState;
 	private boolean isAlive;
 	private Mesh mesh;
-
+	
 	public Player(String name, Point pos, int lives, double speed, Mesh mesh) {
 
 		this.name = name;
@@ -153,5 +153,10 @@ public class Player {
 	public void setMaxNrOfBombs(int maxNrOfBombs)
 	{
 		this.maxNrOfBombs = maxNrOfBombs;
+	}
+
+	public void addMesh(Mesh mesh) {
+
+		this.mesh = mesh;
 	}
 }

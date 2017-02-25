@@ -16,15 +16,9 @@ public class GameAI extends Player {
 	private GameState state;
 
 	/** The AI manager thread. */
-	private Thread aiManager;
+	private Thread ai;
+	
 
-	
-	
-	
-	private Thread easyAI;
-	
-	
-	private Thread mediumAI;
 	/**
 	 * Instantiates a new game AI.
 	 *
@@ -41,12 +35,10 @@ public class GameAI extends Player {
 	 * @param mesh
 	 *            the mesh
 	 */
-	public GameAI(String name, Point pos, int lives, double speed, GameState gameState, Mesh mesh) {
+	public GameAI(String name, Point pos, int lives, double speed, GameState gameState, Mesh mesh, AIDifficulty diff) {
 		super(name, pos, lives, speed, mesh);
 		this.state = gameState;
-		aiManager = new AIManager(this, state);
-		easyAI = new EasyAI(this, state);
-		mediumAI = new MediumAI(this, state);
+		setDifficulty(diff);
 	}
 
 	/**
@@ -54,19 +46,44 @@ public class GameAI extends Player {
 	 * 
 	 */
 	public void begin() {
-		System.out.println("Pos: " + this.getPos().x + ", " + this.getPos().y);
-//		aiManager.start();
-//		easyAI.start();
-		mediumAI.start();
+		ai.start();
 		
 	}
 
+	public void stopAI()
+	{
+		this.setAlive(false);
+	}
+	
+	public void setDifficulty(AIDifficulty diff)
+	{
+		switch(diff)
+		{
+		case EASY:
+			ai = new EasyAI(this, state);
+			break;
+		case MEDIUM:
+			ai = new MediumAI(this, state);
+			break;
+		case HARD:
+			ai = new HardAI(this, state);
+			break;
+		case EXTREME:
+			ai = new ExtremeAI(this, state);
+			break;
+		default:
+			ai = new HardAI(this, state);
+			break;
+		}
+
+	}
+	
 	/**
 	 * Pause thread.
 	 */
 	public void pauseThread() {
 		try {
-			aiManager.wait();
+			ai.wait();
 		} catch (InterruptedException e) {
 			
 		}
@@ -76,7 +93,7 @@ public class GameAI extends Player {
 	 * Resume thread.
 	 */
 	public void resumeThread() {
-		aiManager.notify();
+		ai.notify();
 	}
 
 }

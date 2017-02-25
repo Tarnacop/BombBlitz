@@ -1,35 +1,39 @@
 package bomber.audio;
 
 import bomber.game.AudioEvent;
+import bomber.game.Constants;
 import sun.applet.Main;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Created by Alexandruro on 05.02.2017.
+ * Created by Alexandru Rosu on 05.02.2017.
  */
 public class SoundEffectPlayer extends Thread
 {
 
-    public static final String explosionFilename = "sfx_exp_medium3.wav";
-    public static final String bombPlaceFilename = "sfx_sound_neutral6.wav";
-    public static final String movementFilename = "sfx_movement_footsteps1a.wav";
-    public static final String playerDeathFilename = "sfx_sounds_error1.wav";
+    private float volume;
+
+    public SoundEffectPlayer()
+    {
+        volume = Constants.defaultVolume;
+    }
 
     private void playSound(String fileName)
     {
         try {
             Clip clip = AudioSystem.getClip();
-            AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    Main.class.getResourceAsStream(AudioManager.audioFilesPath + fileName));
+            InputStream rawStream = Main.class.getResourceAsStream(Constants.audioFilesPath + fileName);
+            if(rawStream == null)
+                throw new IOException();
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
             clip.open(inputStream);
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            AudioManager.setControlVolume(gainControl, volume);
             clip.start();
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (LineUnavailableException e) {
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             e.printStackTrace();
         }
     }
@@ -39,17 +43,25 @@ public class SoundEffectPlayer extends Thread
         switch (event)
         {
             case PLACE_BOMB:
-                playSound(bombPlaceFilename);
+                playSound(Constants.bombPlaceFilename);
                 break;
             case EXPLOSION:
-                playSound(explosionFilename);
+                playSound(Constants.explosionFilename);
                 break;
             case PLAYER_DEATH:
-                playSound(playerDeathFilename);
+                playSound(Constants.playerDeathFilename);
                 break;
             case MOVEMENT:
-                playSound(movementFilename);
+                playSound(Constants.movementFilename);
+                break;
+            case POWERUP:
+                playSound(Constants.powerupFilename);
                 break;
         }
+    }
+
+    public void setVolume(float percent)
+    {
+        this.volume = percent;
     }
 }

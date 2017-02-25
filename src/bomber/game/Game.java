@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
 import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
@@ -32,10 +33,12 @@ public class Game implements GameInterface {
 	private AudioManager audio;
 	private UserInterface ui;
 	private int aiNum;
+	private AIDifficulty aiDiff;
 
-	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum) {
+	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff) {
 
 		this.aiNum = aiNum;
+		this.aiDiff = aiDiff;
 		this.ui = ui;
 		this.map = map;
 		this.playerName = playerName;
@@ -67,7 +70,7 @@ public class Game implements GameInterface {
 			List<Point> spawns = this.map.getSpawnPoints();
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 
-			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 5, 300, new Mesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 100, 300, new Mesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
@@ -78,7 +81,7 @@ public class Game implements GameInterface {
 			this.physics = new PhysicsEngine(gameState);
 
 			for(int x = 1; x <= this.aiNum; x++){
-				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, new Mesh(32, 32, colours));
+				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, new Mesh(32, 32, colours), this.aiDiff);
 				list.add(ai);
 				ai.begin();
 			}

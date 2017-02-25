@@ -1,5 +1,7 @@
 package bomber.networking;
 
+import bomber.game.AudioEvent;
+
 public class TestClientNetListener implements ClientNetInterface {
 
 	private ClientThread client;
@@ -15,7 +17,7 @@ public class TestClientNetListener implements ClientNetInterface {
 
 	@Override
 	public void connectionAccepted() {
-		System.out.println("Client has connected to the server successfully");
+		System.out.println("Client has connected to the server successfully, ID: " + client.getClientID());
 	}
 
 	@Override
@@ -71,6 +73,25 @@ public class TestClientNetListener implements ClientNetInterface {
 	}
 
 	@Override
+	public void roomReceived() {
+		System.out.println("Client has received updated room info from the server");
+		ClientServerRoom room = client.getRoom();
+		System.out.printf(
+				"room ID: %d, room name: %s, human player: %d, AI player: %d, max player: %d, inGame: %b, map ID: %d\n",
+				room.getID(), room.getName(), room.getHumanPlayerNumber(), room.getAIPlayerNumber(),
+				room.getMaxPlayer(), room.isInGame(), room.getMapID());
+		System.out.println("Human players:");
+		for (ClientServerPlayer p : room.getHumanPlayerList()) {
+			System.out.printf("player ID: %d, name: %s, ready: %b\n", p.getID(), p.getName(), p.isReadyToPlay());
+		}
+		System.out.println("AI players:");
+		for (ClientServerAI a : room.getAIPlayerList()) {
+			System.out.printf("player ID: %d\n", a.getID());
+		}
+		System.out.println();
+	}
+
+	@Override
 	public void gameStarted() {
 		System.out.printf("Client has received game start message from the server, map ID: %d, width: %d, height: %d\n",
 				client.getMapID(), client.getMapWidth(), client.getMapHeight());
@@ -80,6 +101,11 @@ public class TestClientNetListener implements ClientNetInterface {
 	public void gameStateReceived() {
 		System.out.println("Client has received a game state from the server");
 		System.out.println(client.getGameState());
+		System.out.println("Number of Audio Events: " + client.getGameState().getAudioEvents().size());
+		for (AudioEvent a : client.getGameState().getAudioEvents()) {
+			System.out.print(a + " ");
+		}
+		System.out.println();
 	}
 
 	@Override

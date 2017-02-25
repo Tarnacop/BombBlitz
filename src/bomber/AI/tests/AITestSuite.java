@@ -6,12 +6,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({
-	AStarRouteFinderTest.class,
-	EscapeRouteFinderTest .class,
-	EnemyCheckTest.class,
-	InDangerTest.class,
-	MoveSafetyTest.class,
-	NereastNeighbourTest.class
+	AITests.class,
+	PlanningTest.class
 })
 
 

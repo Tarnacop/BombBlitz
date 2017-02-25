@@ -1,3 +1,4 @@
+
 package bomber.AI;
 
 import java.awt.Point;
@@ -6,32 +7,48 @@ import java.util.Random;
 
 import bomber.game.GameState;
 
+/**
+ * The Class MediumAI.
+ * 
+ * @author Jokubas Liutkus
+ */
 public class MediumAI extends AITemplate {
 
+	/**
+	 * Instantiates a new medium AI.
+	 *
+	 * @param ai the ai
+	 * @param gameState the game state
+	 */
 	public MediumAI(GameAI ai, GameState gameState) {
 		super(ai, gameState);
-		// TODO Auto-generated constructor stub
 	}
 
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#performMoves(java.util.LinkedList, boolean)
+	 */
 	@Override
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
-			while (moves != null && !moves.isEmpty()) {
+			while (moves != null && !moves.isEmpty()&& gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
-					&& !safetyCh.isEnemyInBombRange()) {
+					&& !safetyCh.isEnemyInBombRange()&& gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 
 	}
 
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#performPlannedMoves(java.util.LinkedList)
+	 */
 	@Override
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty()  ) {
+		while (moves != null && !moves.isEmpty() && gameAI.isAlive() ) {
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -46,7 +63,7 @@ public class MediumAI extends AITemplate {
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek()) ) {
+					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive() ) {
 						if(safetyCh.inDanger()) break;
 					}
 				}
@@ -59,6 +76,9 @@ public class MediumAI extends AITemplate {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#move()
+	 */
 	@Override
 	protected void move() {
 		LinkedList<AIActions> moves;
@@ -68,7 +88,6 @@ public class MediumAI extends AITemplate {
 
 			// if AI is in dangger then escape only with 75% possibility
 			if (safetyCh.inDanger() && random.nextInt(100) > 25) {
-				System.out.println("1");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 
@@ -77,7 +96,6 @@ public class MediumAI extends AITemplate {
 			// if enemy is in bomb range then place the bomb and go to the
 			//// // safe location only with 30% possibility
 			else if (safetyCh.isEnemyInBombRange() && random.nextInt(10) > 4) {
-				System.out.println("2");
 				gameAI.getKeyState().setBomb(true);
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
@@ -92,10 +110,8 @@ public class MediumAI extends AITemplate {
 
 			// otherwise just generate a random goal and star fullfilling it
 			else {
-				System.out.println("3");
 				int x = random.nextInt(gameState.getMap().getGridMap()[0].length);
 				int y = random.nextInt(gameState.getMap().getGridMap().length);
-				System.out.println(x + "  " + y);
 				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
 				performPlannedMoves(moves);
 			}

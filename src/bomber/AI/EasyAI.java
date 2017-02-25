@@ -6,41 +6,50 @@ import java.util.Random;
 
 import bomber.game.GameState;
 
+/**
+ * The Class EasyAI.
+ * 
+ * @author Jokubas Liutkus
+ */
 public class EasyAI extends AITemplate {
 
 	/**
-	 * Instantiates a new AI manager.
+	 * Instantiates a new easy AI.
 	 *
-	 * @param ai
-	 *            the AI
-	 * @param gameState
-	 *            the game state
+	 * @param ai the ai
+	 * @param gameState the game state
 	 */
 	public EasyAI(GameAI ai, GameState gameState) {
 		super(ai, gameState);
 	}
 
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#performMoves(java.util.LinkedList, boolean)
+	 */
 	@Override
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 
 		if (inDanger)
-			while (moves != null && !moves.isEmpty()) {
+			while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
-					&& !safetyCh.isEnemyInBombRange()) {
+					&& !safetyCh.isEnemyInBombRange() && gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#performPlannedMoves(java.util.LinkedList)
+	 */
 	@Override
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() ){
+		while (moves != null && !moves.isEmpty() && gameAI.isAlive() ){
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -48,14 +57,13 @@ public class EasyAI extends AITemplate {
 				try {
 					sleep(100);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 				}
 				gameAI.getKeyState().setBomb(false);
 			}
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek())) {
+					while (!safetyCh.checkMoveSafety(moves.peek())&& gameAI.isAlive()) {
 					}
 				}
 			}
@@ -65,7 +73,10 @@ public class EasyAI extends AITemplate {
 			}
 		}
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#move()
+	 */
 	@Override
 	protected void move() {
 		LinkedList<AIActions> moves;
@@ -73,29 +84,23 @@ public class EasyAI extends AITemplate {
 		
 		while (gameAI.isAlive()) {
 
-			// if AI is in dangger then escape only with 50% possibility
+			// if AI is in danger then escape only with 50% possibility
 			if (safetyCh.inDanger() && random.nextBoolean()) {
-				System.out.println("1");
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 
 			}
-
-			// if enemy is in bomb range then place the bomb and go to the
-			//// // safe location only with 30% possibility
+			// if enemy is in the bomb range then place the bomb and go to the
+			// safe location only with 30% possibility
 			else if (safetyCh.isEnemyInBombRange() && random.nextInt(10) > 4) {
-				System.out.println("2");
 				gameAI.getKeyState().setBomb(true); 
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
-			
-//			otherwise just generate a random goal and star fullfilling it
+			// otherwise just generate a random goal 
 			else{
-				System.out.println("3");
 				int x = random.nextInt(gameState.getMap().getGridMap()[0].length);
 				int y = random.nextInt(gameState.getMap().getGridMap().length);
-				System.out.println(x + "  "  + y);
 				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x,y));
 				performPlannedMoves(moves);
 			}

@@ -80,16 +80,29 @@ public class ProtocolConstant {
 	 * readtToPlay flag
 	 */
 
-	public static final byte MSG_C_ROOM_SETINFO = 0x0c; // TODO
+	public static final byte MSG_C_ROOM_SETINFO = 0x0c; // Bit set
+	public static final byte MSG_C_ROOM_SETINFO_NAME = 0x00;
+	public static final byte MSG_C_ROOM_SETINFO_MAXPLAYER = 0x01;
+	public static final byte MSG_C_ROOM_SETINFO_MAPID = 0x02;
 	public static final byte MSG_C_ROOM_SETINFO_AI = 0x03;
 	public static final byte MSG_C_ROOM_SETINFO_AI_ADD = 0x00;
 	public static final byte MSG_C_ROOM_SETINFO_AI_REMOVE = 0x01;
 	/* Header: 1 byte message type + 2 byte sequence + 4 byte room ID */
 	/* Valid format: Header + any one of the below */
+	/*
+	 * set room name: 1 byte constant 0x0 + 1 byte name length + bytes of room
+	 * name
+	 */
+	/*
+	 * set max number of players: 1 byte constant 0x1 + 1 byte number of players
+	 */
+	/*
+	 * set map ID: 1 byte constant 0x2 + 4 byte map ID
+	 */
 	/* add AI: 1 byte constant 0x3 + 1 byte constant 0x0 */
 	/* remove AI: 1 byte constant 0x3 + 1 byte constant 0x1 */
 
-	public static final byte MSG_C_ROOM_GETINFO = 0x0d; // TODO
+	// public static final byte MSG_C_ROOM_GETINFO = 0x0d;
 
 	// public static final byte MSG_C_ROOM_SENDTEXT = 0x0e;
 
@@ -106,7 +119,7 @@ public class ProtocolConstant {
 
 	// Network connection
 	public static final byte MSG_S_NET_ACCEPT = 0x40; // Bit set
-	// 1 byte message type + 2 byte sequence
+	// 1 byte message type + 2 byte sequence + 4 byte client id
 
 	public static final byte MSG_S_NET_REJECT = 0x41; // Bit not set
 	// 1 byte message type + 2 byte sequence
@@ -177,7 +190,7 @@ public class ProtocolConstant {
 	public static final byte MSG_S_ROOM_HAVELEFT = 0x4d; // Bit set
 	// 1 byte message type + 2 byte sequence
 
-	public static final byte MSG_S_ROOM_ROOMINFO = 0x4e; // TODO
+	public static final byte MSG_S_ROOM_ROOMINFO = 0x4e; // Bit set
 	/*
 	 * This type of message should be sent upon each room info update(when a
 	 * room is newly created, or a client changes the info of the room)
@@ -220,7 +233,6 @@ public class ProtocolConstant {
 	/*
 	 * Audio Events: 2 byte audio event bit array
 	 */
-	// TODO map id may need to contained in this message
 
 	public static final byte MSG_S_ROOM_GAMEOVER = 0x51; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte room id

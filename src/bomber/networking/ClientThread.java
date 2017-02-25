@@ -24,12 +24,7 @@ public class ClientThread implements Runnable {
 
 	private final InetSocketAddress serverSockAddr;
 
-	/*
-	 * optional: wrap the variables below into a configuration object when there
-	 * are too many
-	 */
-	// time out value for server
-	// currently 25 seconds only, for testing
+	// time out value for server, currently 25 seconds
 	private long serverTimeOut = 25;
 	// the interval at which the client will test whether the connection is
 	// timeout
@@ -51,6 +46,9 @@ public class ClientThread implements Runnable {
 	// whether the connection has been established
 	private boolean connected = false;
 
+	// the ID of the client
+	private int clientID = -1;
+
 	// whether the client is in room(a client can either in lobby or in room)
 	private boolean inRoom = false;
 	private int roomID = -1;
@@ -69,6 +67,9 @@ public class ClientThread implements Runnable {
 
 	// list of rooms in the server lobby
 	private List<ClientServerLobbyRoom> roomList = new ArrayList<ClientServerLobbyRoom>();
+
+	// room the client is currently in
+	private ClientServerRoom room = null;
 
 	// last received game state will be here
 	private GameState gameState = null;
@@ -266,8 +267,20 @@ public class ClientThread implements Runnable {
 		case ProtocolConstant.MSG_S_NET_ACCEPT: {
 			// pClient("Connection has been accepted by the server");
 
+			// this message must contain a client ID
+			if (packet.getLength() < 7) {
+				return;
+			}
+
+			int id = recvByteBuffer.getInt(3);
+			if (id < 0) {
+				pClient("Server bug, clientID should not be negative");
+				return;
+			}
+
 			setConnected(true);
 			setInRoom(false, -1);
+			setClientID(id);
 
 			for (ClientNetInterface e : netList) {
 				e.connectionAccepted();
@@ -465,6 +478,26 @@ public class ClientThread implements Runnable {
 			break;
 		}
 
+		case ProtocolConstant.MSG_S_ROOM_ROOMINFO: {
+
+			try {
+				room = ClientPacketEncoder.decodeRoom(recvBuffer, packet.getLength());
+			} catch (IOException e) {
+				pClient("Failed to decode room: " + e);
+				return;
+			}
+
+			setInRoom(true, room.getID());
+			setMapID(room.getMapID());
+
+			for (ClientNetInterface e : netList) {
+				e.roomReceived();
+			}
+
+			break;
+
+		}
+
 		case ProtocolConstant.MSG_S_ROOM_GAMESTART: {
 			if (packet.getLength() < 13) {
 				return;
@@ -482,7 +515,15 @@ public class ClientThread implements Runnable {
 			}
 
 			byte mapWidth = recvByteBuffer.get(11);
+			if (mapWidth < 1 || mapWidth > 16) {
+				pClient("Server bug, mapWidth should be in the range [1,16]");
+				mapWidth = 16;
+			}
 			byte mapHeight = recvByteBuffer.get(12);
+			if (mapHeight < 1 || mapHeight > 16) {
+				pClient("Server bug, mapHeight should be in the range [1,16]");
+				mapHeight = 16;
+			}
 
 			// pClient("Game has started in room with ID " + roomID);
 
@@ -500,18 +541,23 @@ public class ClientThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_S_ROOM_GAMESTATE: {
-			if (packet.getLength() < 7) {
-				return;
-			}
-
-			int roomID = recvByteBuffer.getInt(3);
-			if (roomID < 0) {
-				pClient("Server bug, roomID should not be negative");
-				return;
-			}
+			/*
+			 * if (packet.getLength() < 7) { return; }
+			 * 
+			 * int roomID = recvByteBuffer.getInt(3); if (roomID < 0) { pClient(
+			 * "Server bug, roomID should not be negative"); return; }
+			 */
 
 			try {
-				gameState = ClientPacketEncoder.decodeGameState(recvBuffer, packet.getLength());
+				/*
+				 * gameState = ClientPacketEncoder.decodeGameState(recvBuffer,
+				 * packet.getLength());
+				 */
+				/*
+				 * modifying a game state instead of keep creating new ones
+				 * reduced JVM memory usage from around 200 MB to 70 MB
+				 */
+				gameState = ClientPacketEncoder.decodeGameState(clientID, gameState, recvBuffer, packet.getLength());
 			} catch (IOException e) {
 				pClient("Failed to decode game state");
 				return;
@@ -617,6 +663,7 @@ public class ClientThread implements Runnable {
 		} else {
 			this.connected = false;
 			setInRoom(false, -1);
+			setClientID(-1);
 		}
 	}
 
@@ -672,7 +719,7 @@ public class ClientThread implements Runnable {
 	 * Remove all client network event listeners
 	 */
 	public synchronized void removeAllNetListener() {
-		netList.removeIf(e -> true);
+		netList.clear();
 	}
 
 	/**
@@ -739,6 +786,20 @@ public class ClientThread implements Runnable {
 	}
 
 	/**
+	 * Get the ID of the client
+	 * 
+	 * @return a non-negative client ID, or -1 when the client is not connected
+	 *         to the server
+	 */
+	public int getClientID() {
+		return clientID;
+	}
+
+	private void setClientID(int clientID) {
+		this.clientID = clientID;
+	}
+
+	/**
 	 * Tell whether the client is in a room
 	 * 
 	 * @return true if the client is in a room, false if the client is in lobby
@@ -788,12 +849,23 @@ public class ClientThread implements Runnable {
 
 	/**
 	 * Get the last received game state from the server. Note that a "null" will
-	 * be returned if the client has not received any game state from the server
+	 * be returned if the client has not received any game state from server yet
 	 * 
 	 * @return a GameState
 	 */
 	public GameState getGameState() {
 		return gameState;
+	}
+
+	/**
+	 * Get the last received room the client is in from the server. Note that a
+	 * "null" will be returned if the client has not joined/received any room
+	 * info from server yet
+	 * 
+	 * @return a ClientServerRoom
+	 */
+	public ClientServerRoom getRoom() {
+		return room;
 	}
 
 	/**
@@ -871,7 +943,7 @@ public class ClientThread implements Runnable {
 	 *            the ID of the map
 	 * @throws IOException
 	 */
-	public synchronized void createRoom(String roomName, byte maxPlayer, int mapID) throws IOException {
+	public synchronized void createRoom(String roomName, int maxPlayer, int mapID) throws IOException {
 		if (roomName == null || roomName.length() < 1) {
 			throw new IOException("name cannot be null or have zero length");
 		}
@@ -881,7 +953,7 @@ public class ClientThread implements Runnable {
 		publicSendByteBuffer.position(3);
 		publicSendByteBuffer.put((byte) nameData.length);
 		publicSendByteBuffer.put(nameData);
-		publicSendByteBuffer.put(maxPlayer);
+		publicSendByteBuffer.put((byte) maxPlayer);
 		publicSendByteBuffer.putInt(mapID);
 
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 1 + nameData.length + 1 + 4, serverSockAddr);
@@ -924,6 +996,87 @@ public class ClientThread implements Runnable {
 
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_ROOM_LEAVE, true);
+	}
+
+	/**
+	 * Send a "set room name" request to the server
+	 * 
+	 * @param name
+	 *            the name of the room
+	 * @throws IOException
+	 */
+	public synchronized void setRoomName(String name) throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly already not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		if (name == null || name.length() < 1) {
+			throw new IOException("name cannot be null or have zero length");
+		}
+		byte[] nameData = name.getBytes("UTF-8");
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_NAME);
+		publicSendByteBuffer.put((byte) nameData.length);
+		publicSendByteBuffer.put(nameData);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1 + nameData.length, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
+	}
+
+	/**
+	 * Send a "set max number of players in room" request to the server
+	 * 
+	 * @param maxPlayer
+	 *            the max number of players in the room
+	 * @throws IOException
+	 */
+	public synchronized void setRoomMaxPlayer(int maxPlayer) throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly already not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_MAXPLAYER);
+		publicSendByteBuffer.put((byte) maxPlayer);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
+	}
+
+	/**
+	 * Send a "set map ID of room" request to the server
+	 * 
+	 * @param mapID
+	 *            the ID of the map
+	 * @throws IOException
+	 */
+	public synchronized void setRoomMapID(int mapID) throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly already not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_MAPID);
+		publicSendByteBuffer.putInt(mapID);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 4, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
 	}
 
 	/**

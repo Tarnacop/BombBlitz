@@ -9,7 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * of room) to ServerClientInfo respectively
  */
 public class ServerRoomTable {
-	private ConcurrentHashMap<String, ServerRoom> nameTable = new ConcurrentHashMap<String, ServerRoom>();
+	// private ConcurrentHashMap<String, ServerRoom> nameTable = new
+	// ConcurrentHashMap<String, ServerRoom>();
 	private ConcurrentHashMap<Integer, ServerRoom> idTable = new ConcurrentHashMap<Integer, ServerRoom>();
 	private final int maxTableSize;
 
@@ -56,7 +57,7 @@ public class ServerRoomTable {
 		}
 
 		room.setID(id);
-		nameTable.put(room.getName(), room);
+		// nameTable.put(room.getName(), room);
 		idTable.put(room.getID(), room);
 
 	}
@@ -67,17 +68,17 @@ public class ServerRoomTable {
 	 * @param key
 	 *            the name of the room to be removed
 	 */
-	public synchronized void remove(String key) {
-		ServerRoom room = nameTable.get(key);
-		if (room == null) {
-			return;
-		}
-
-		int id = room.getID();
-
-		nameTable.remove(key);
-		idTable.remove(id);
-	}
+	// public synchronized void remove(String key) {
+	// ServerRoom room = nameTable.get(key);
+	// if (room == null) {
+	// return;
+	// }
+	//
+	// int id = room.getID();
+	//
+	// nameTable.remove(key);
+	// idTable.remove(id);
+	// }
 
 	/**
 	 * Remove a room from the table
@@ -91,9 +92,9 @@ public class ServerRoomTable {
 			return;
 		}
 
-		String name = room.getName();
+		// String name = room.getName();
 
-		nameTable.remove(name);
+		// nameTable.remove(name);
 		idTable.remove(key);
 	}
 
@@ -114,9 +115,9 @@ public class ServerRoomTable {
 	 *            the name of the room
 	 * @return the room or null when the room doesn't exist
 	 */
-	public ServerRoom get(String key) {
-		return nameTable.get(key);
-	}
+	// public ServerRoom get(String key) {
+	// return nameTable.get(key);
+	// }
 
 	/**
 	 * Returns the value to which the specified key is mapped, or null if this
@@ -135,9 +136,9 @@ public class ServerRoomTable {
 	 * 
 	 * @return the set
 	 */
-	public Set<Entry<String, ServerRoom>> entrySet() {
-		return nameTable.entrySet();
-	}
+	// public Set<Entry<String, ServerRoom>> entrySet() {
+	// return nameTable.entrySet();
+	// }
 
 	/**
 	 * Returns a Set view of the mappings contained in this map
@@ -166,9 +167,9 @@ public class ServerRoomTable {
 	 *            the name of the room
 	 * @return true if the table contains the room
 	 */
-	public boolean contains(String name) {
-		return nameTable.containsKey(name);
-	}
+	// public boolean contains(String name) {
+	// return nameTable.containsKey(name);
+	// }
 
 	/**
 	 * Returns true if the table contains a room with the id
