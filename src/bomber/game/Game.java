@@ -53,7 +53,7 @@ public class Game implements GameInterface {
 			
 			int width = this.map.getPixelMap().length;
 			int height = this.map.getPixelMap()[0].length;
-			this.graphics = new Graphics("Bomb Blitz", width, height, true, this);
+			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

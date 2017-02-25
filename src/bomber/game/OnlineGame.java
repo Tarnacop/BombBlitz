@@ -53,7 +53,7 @@ public class OnlineGame implements GameInterface {
 			
 			int width = this.map.getPixelMap().length;
 			int height = this.map.getPixelMap()[0].length;
-			this.graphics = new Graphics("Bomb Blitz", width, height, true, this);
+			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -74,7 +74,7 @@ public class OnlineGame implements GameInterface {
 				
 				player.addMesh(new Mesh(32, 32, colours));
 			}
-			this.keyState = this.gameState.getPlayers().get(0).getKeyState();
+			this.keyState = new KeyboardState();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -93,7 +93,6 @@ public class OnlineGame implements GameInterface {
 			
 			player.addMesh(new Mesh(32, 32, colours));
 		}
-		this.keyState = this.gameState.getPlayers().get(0).getKeyState();
 
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
