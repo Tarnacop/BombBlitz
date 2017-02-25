@@ -7,14 +7,18 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import bomber.game.AudioEvent;
 import bomber.game.Block;
+import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Map;
 import bomber.game.Movement;
 import bomber.game.Player;
 import bomber.networking.ClientPacketEncoder;
+import bomber.networking.ClientServerAI;
 import bomber.networking.ClientServerLobbyRoom;
 import bomber.networking.ClientServerPlayer;
+import bomber.networking.ClientServerRoom;
 import bomber.networking.ServerClientInfo;
 import bomber.networking.ServerClientTable;
 import bomber.networking.ServerPacketEncoder;
@@ -88,6 +92,45 @@ public class PacketEncodeDecodeTest {
 
 		System.out.println();
 
+		// room test
+		SocketAddress sockAddr = new InetSocketAddress("12.12.12.12", 12);
+		ServerClientInfo client = new ServerClientInfo(sockAddr, "client " + 12);
+		ServerRoom room = new ServerRoom("Test Room", client, 3, 1);
+		room.addAI();
+		room.addAI();
+
+		try {
+			ret = ServerPacketEncoder.encodeRoom(room, arr);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		System.out.println("encodeRoom returns " + ret);
+		System.out.println(ServerThread.toHex(arr, ret));
+
+		ClientServerRoom roomDecoded = null;
+		try {
+			roomDecoded = ClientPacketEncoder.decodeRoom(arr, ret);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		System.out.println("decodeRoom:");
+		System.out.printf(
+				"room ID: %d, room name: %s, human player: %d, AI player: %d, max player: %d, inGame: %b, map ID: %d\n",
+				room.getID(), room.getName(), room.getHumanPlayerNumber(), room.getAIPlayerNumber(),
+				room.getMaxPlayer(), room.isInGame(), room.getMapID());
+		System.out.println("Human players:");
+		for (ClientServerPlayer p : roomDecoded.getHumanPlayerList()) {
+			System.out.printf("player ID: %d, name: %s, ready: %b\n", p.getID(), p.getName(), p.isReadyToPlay());
+		}
+		System.out.println("AI players:");
+		for (ClientServerAI a : roomDecoded.getAIPlayerList()) {
+			System.out.printf("player ID: %d\n", a.getID());
+		}
+
+		System.out.println();
+
 		// game state test
 		Player testPlayer = new Player("testPlayer", new Point(64, 64), 100, 300, null);
 		testPlayer.getKeyState().setBomb(true);
@@ -115,6 +158,14 @@ public class PacketEncodeDecodeTest {
 		Map testMap = new Map("test map", testGridMap, new ArrayList<>());
 
 		GameState testGameState = new GameState(testMap, testPlayerList);
+		List<Bomb> testBombList = testGameState.getBombs();
+		testBombList.add(new Bomb("test Bomb", new Point(5, 5), 5, 5));
+		List<AudioEvent> testAudioList = testGameState.getAudioEvents();
+		testAudioList.add(AudioEvent.EXPLOSION);
+		testAudioList.add(AudioEvent.PLACE_BOMB);
+		testAudioList.add(AudioEvent.PLAYER_DEATH);
+		testAudioList.add(AudioEvent.MOVEMENT);
+		testAudioList.add(AudioEvent.POWERUP);
 
 		System.out.println("GameState to test:");
 		System.out.println(testGameState);
@@ -128,12 +179,17 @@ public class PacketEncodeDecodeTest {
 		System.out.println(ServerThread.toHex(arr, ret));
 
 		try {
-			testGameState = ClientPacketEncoder.decodeGameState(arr, ret);
+			testGameState = ClientPacketEncoder.decodeGameState(12, testGameState, arr, ret);
+			// testGameState = ClientPacketEncoder.decodeGameState(arr, ret);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println("decodeGameState:");
 		System.out.println(testGameState);
+		System.out.println("numAudioEvents: " + testGameState.getAudioEvents().size());
+		for (AudioEvent a : testGameState.getAudioEvents()) {
+			System.out.println("Audio: " + a);
+		}
 
 	}
 

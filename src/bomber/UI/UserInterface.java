@@ -8,6 +8,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
 import java.awt.Point;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +16,12 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -24,8 +29,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -36,10 +43,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import bomber.AI.AIDifficulty;
 import bomber.game.Block;
 import bomber.game.Game;
 import bomber.game.GameState;
@@ -80,13 +89,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private HBox namePane;
 	private HBox currentName;
 	private HBox nameSetter;
-	
+	private AIDifficulty aiDiff;
 	private VBox mapBox;
 	private VBox aiBox;
 	private Label displayAi;
 	private HBox aiPane;
 	private Label aiLabel;
-	private VBox centerBox;
+	private HBox centerBox;
 	private List<Map> maps;
 	private HBox ipBox;
 	private Label enterLabel;
@@ -139,6 +148,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private BorderPane mainMenu;
 	private SimpleStringProperty currentNameText;
 	private Pane mapCanvas;
+	private int windowHeight;
+	private int windowWidth;
+	private HBox mapPane;
+	private VBox aiContainer;
+	private Label aiExplanation;
+	private VBox aiDiffBox;
+	private Object aiDiffLabel;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -148,6 +164,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.css = this.getClass().getResource("resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty("Player 1");
 		this.aiNumber = new SimpleIntegerProperty(1);
+		this.aiDiff = AIDifficulty.EASY;
 		Maps maps = new Maps();
 		this.maps = maps.getMaps();
 		this.map = this.maps.get(0);
@@ -158,6 +175,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.controls.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
 		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
+		this.windowHeight = 800;
+		this.windowWidth = 1000;
 	}
 	
 	public static void begin(){
@@ -168,7 +187,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	public void start(Stage primaryStage){
 
 		currentStage = primaryStage;
-		currentStage.setMinHeight(700);
+		currentStage.setMinHeight(800);
 		currentStage.setMinWidth(1000);
 		primaryStage.setTitle(this.appName);
 		previousScenes = new Stack<Scene>();
@@ -401,29 +420,33 @@ public class UserInterface extends Application implements ClientNetInterface{
 		 * |	1	Ai Players			 	+-------+	|
 		 * |	v							|		|	|
 		 * |								|START	|	|
-		 * |	[x] Ai fight each other		|GAME	|	|
+		 * |								|GAME	|	|
 		 * |								+-------+	|
 		 * |	[Easy] Ai difficulty					|
 		 * +--------------------------------------------+
 		 */
 		
 		mapCanvas = new Pane();
-		mapCanvas.setPrefHeight(Integer.MAX_VALUE);
+		mapCanvas.setMinHeight(300);
+		mapCanvas.setMinWidth(300);
 		mapCanvas.widthProperty().addListener(e -> drawMap(mapCanvas));
 		mapCanvas.heightProperty().addListener(e -> drawMap(mapCanvas));
 		
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
-		mapContainer.setSpacing(20);
-		mapContainer.setPadding(new Insets(0, 20, 0, 20));
 		mapContainer.setAlignment(Pos.CENTER);
-		mapContainer.getChildren().addAll(createLabel("Current Map:", false, true), createBoundLabel(this.mapName, false, true), mapCanvas);
+		mapContainer.setSpacing(10);
+		mapContainer.setPadding(new Insets(10));
+		Label mapNameLabel = createBoundLabel(this.mapName, false, false);
+		mapNameLabel.getStyleClass().add("textfield");
+		mapContainer.getChildren().addAll(createLabel("Current Map:", false, true), mapNameLabel, mapCanvas);
 		
 		BorderPane singleBox = new BorderPane();
 		
 		//button to start the game
-        startBtn = createButton("Start Game", 200, 50);
+        startBtn = createButton("Start Game", 300, 75);
         HBox startBtnPane = new HBox();
+        startBtnPane.setPadding(new Insets(20, 0, 20, 0));
         startBtnPane.setAlignment(Pos.CENTER);
         startBtnPane.getChildren().add(startBtn);
         startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls, this.aiNumber.get()));
@@ -431,48 +454,121 @@ public class UserInterface extends Application implements ClientNetInterface{
         //back button
         backBtn3 = createBackButton();
         
-        rightMapToggle = new Button("->");
-        rightMapToggle.setPrefHeight(Integer.MAX_VALUE);
+        rightMapToggle = new Button();
+        rightMapToggle.getStyleClass().add("maptoggleright");
+        rightMapToggle.setPrefWidth(90);
+        
         rightMapToggle.setOnAction(e -> incremenetMap());
         
-        leftMapToggle = new Button("<-");
-        leftMapToggle.setPrefHeight(Integer.MAX_VALUE);
+        leftMapToggle = new Button();
+        leftMapToggle.getStyleClass().add("maptoggleleft");
+        
+        leftMapToggle.setPrefWidth(90);
         leftMapToggle.setOnAction(e -> decrementMap());
         
-        upAiToggle = new Button("^");
-        upAiToggle.setPrefWidth(50);
+        upAiToggle = new Button();
+        upAiToggle.setPrefWidth(30);
+        upAiToggle.getStyleClass().add("aitoggleup");
         upAiToggle.setOnAction(e -> incrementAi());
         
-        displayAi = new Label();
-        displayAi.setFont(font);
-        displayAi.textProperty().bind(this.aiNumber.asString());
+        displayAi = createBoundLabel(this.aiNumber, false, false);
+        displayAi.getStyleClass().add("textfield");
+        displayAi.setPrefWidth(30);
         
-        downAiToggle = new Button("v");
-        downAiToggle.setPrefWidth(50);
+        downAiToggle = new Button();
+        downAiToggle.setPrefWidth(30);
+        downAiToggle.getStyleClass().add("aitoggledown");
         downAiToggle.setOnAction(e -> decrementAi());
         
         aiBox = new VBox();
         aiBox.setAlignment(Pos.CENTER);
-        aiBox.setSpacing(20);
+        aiBox.getStyleClass().add("nopadbox");
+        aiBox.maxHeightProperty().bind(upAiToggle.heightProperty().add(displayAi.heightProperty().add(downAiToggle.heightProperty())));
         aiBox.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
         
-        aiLabel = new Label("Number of\nAI Players");
-        aiLabel.setFont(font);
-        
+        aiLabel = createLabel("Number of\nAI Players", false, false);
+        aiExplanation = createLabel("AI players will\nseek to\ndestroy you.", true, true);
+        aiExplanation.setAlignment(Pos.CENTER);
+        aiExplanation.setPrefWidth(200);
         aiPane = new HBox();
         aiPane.setAlignment(Pos.CENTER);
-        aiPane.setSpacing(30);
+        aiPane.getStyleClass().add("box");
+        aiPane.setSpacing(20);
         aiPane.getChildren().addAll(aiBox, aiLabel);
         
-        centerBox = new VBox();
-        centerBox.setAlignment(Pos.CENTER);
-        centerBox.setSpacing(30);
-        centerBox.getChildren().add(aiPane);
+        ChoiceBox<String> aiDifficultyChoice = new ChoiceBox<>();
+        aiDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
+        aiDifficultyChoice.setPrefHeight(50);
+        aiDifficultyChoice.setPrefWidth(200);
+        aiDifficultyChoice.getStyleClass().add("textfield");
+        aiDifficultyChoice.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
+        aiDifficultyChoice.getSelectionModel().select(1);
+        aiDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
+                ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> ob,
+					String oldValue, String newValue) {
+				switch(newValue){
+				case "Easy": 
+					aiDiff = AIDifficulty.EASY; 
+					aiExplanation.setText("AI players will\nmove randomly.");
+					break;
+				case "Medium": 
+					aiDiff = AIDifficulty.MEDIUM;
+					aiExplanation.setText("AI players will\nseek to\ndestroy you.");
+					break;
+				case "Hard": 
+					aiDiff = AIDifficulty.HARD; 
+					aiExplanation.setText("AI players will\nbe tough\nto beat!");
+					break;
+				case "Extreme": 
+					aiDiff = AIDifficulty.EXTREME;
+					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
+				}
+				
+				System.out.println("Set difficulty to " + newValue);
+			}
+        });
         
-        singleBox.setCenter(mapContainer);
-        singleBox.setTop(backBtn3);
-        singleBox.setLeft(leftMapToggle);
-        singleBox.setRight(rightMapToggle);
+        
+        aiDiffBox = new VBox();
+        aiDiffBox.setAlignment(Pos.CENTER);
+        aiDiffBox.getStyleClass().add("box");
+        aiDiffBox.setSpacing(20);
+        aiDiffBox.getChildren().addAll(createLabel("Ai Difficulty:", false, false), aiDifficultyChoice, aiExplanation);
+        
+        aiContainer = new VBox();
+        aiContainer.setAlignment(Pos.CENTER);
+        aiContainer.getStyleClass().add("box");
+        aiContainer.setSpacing(20);
+        aiContainer.getChildren().addAll(aiPane, aiDiffBox);
+        
+        mapPane = new HBox();
+        mapPane.setAlignment(Pos.CENTER);
+        mapPane.getChildren().addAll(leftMapToggle, mapContainer, rightMapToggle);
+        
+        rightMapToggle.prefHeightProperty().bind(mapPane.heightProperty());
+        leftMapToggle.prefHeightProperty().bind(mapPane.heightProperty());
+        
+        VBox mapPad = new VBox();
+		mapPad.setAlignment(Pos.CENTER);
+		mapPad.getChildren().add(mapPane);
+        
+		VBox aiPad = new VBox();
+		aiPad.setAlignment(Pos.CENTER);
+		aiPad.getChildren().add(aiContainer);
+		
+        centerBox = new HBox();
+        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setSpacing(20);
+        centerBox.getChildren().addAll(aiPad, mapPad);
+        
+        HBox backBtnPane = new HBox();
+        backBtnPane.getChildren().add(backBtn3);
+        backBtnPane.setPadding(new Insets(20, 10, 20, 10));
+        
+        singleBox.setCenter(centerBox);
+        singleBox.setTop(backBtnPane);
         singleBox.setBottom(startBtnPane);
         
         setBackgroundPane(singleMenu, singleBox);
@@ -492,15 +588,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 		for(int x = 0; x < gridMap.length; x++){
 			for(int y = 0; y < gridMap[0].length; y++){
 				
-				Paint paint = null;
+				String image = "";
 				switch(gridMap[x][y]){
-				case BLANK: paint = Color.KHAKI; break;
-				case SOLID: paint = Color.GREY; break;
-				case SOFT: paint = Color.BEIGE; break;
+				case BLANK: image = "blank"; break;
+				case SOLID: image = "solid"; break;
+				case SOFT: image = "soft"; break;
 				default:
 					break;
 				}
-				Rectangle rect = new Rectangle(xscalar, yscalar, paint);
+				Rectangle rect = new Rectangle(xscalar, yscalar);
+				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/" + image + ".png")));
+					    	    
 				rect.setStroke(Color.BLACK);
 				rect.setX(xscalar*x + 50);
 				rect.setY(yscalar*y + 50);
@@ -509,10 +607,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		}
 		
 		for(Point pos : this.map.getSpawnPoints()){
-			Rectangle rect = new Rectangle(10, 10, Color.RED);
+			Rectangle rect = new Rectangle(10, 10);
+			rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/spawnpoint.png")));
 			rect.setStroke(Color.BLACK);
-			rect.setX(xscalar*(pos.x/64) + 60);
-			rect.setY(yscalar*(pos.y/64) + 60);
+			rect.setX(xscalar*(pos.x/64) + 52);
+			rect.setY(yscalar*(pos.y/64) + 52);
 			mapCanvas.getChildren().add(rect);
 		}
 	}
@@ -532,7 +631,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 				+ "\n\nButtons: Credit to 'Buch', http://opengameart.org/users/buch";
 
 		Label creditsLabel = createLabel(credits, false, true);
-		creditsLabel.getStyleClass().add("mapbox");
+		creditsLabel.getStyleClass().add("creditsbox");
 		VBox creditsBox = new VBox();
 		creditsBox.setAlignment(Pos.CENTER);
 		creditsBox.setSpacing(20);
@@ -592,7 +691,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 	
 	private Scene createScene(Parent menu){
-		Scene scene = new Scene(menu, 1000, 700);
+		Scene scene = new Scene(menu, windowWidth, windowHeight);
 		scene.getStylesheets().add(css);
 		return scene;
 	}
@@ -615,6 +714,18 @@ public class UserInterface extends Application implements ClientNetInterface{
 		text.setFont(font);
 		text.setAlignment(Pos.CENTER);
 		return text;
+	}
+	
+	private Label createBoundLabel(SimpleIntegerProperty property, boolean shaded, boolean white) {
+		Label label = new Label();
+		label.setFont(font);
+		if(white)label.setTextFill(Color.WHITE);
+		label.setAlignment(Pos.CENTER);
+		label.textProperty().bind(property.asString());
+		if(shaded){
+			label.getStyleClass().add("shaded");
+		}
+		return label;
 	}
 	
 	private Label createBoundLabel(SimpleStringProperty property, boolean shaded, boolean white) {
@@ -738,14 +849,24 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private void decrementMap() {
 		int index = this.maps.indexOf(this.map);
-		if(index > 0)this.map = this.maps.get(index-1);
+		if(index > 0){
+			this.map = this.maps.get(index-1);
+		}
+		else{
+			this.map = this.maps.get(this.maps.size()-1);
+		}
 		this.mapName.set(this.map.getName());
 		drawMap(mapCanvas);
 	}
 
 	private void incremenetMap() {
 		int index = this.maps.indexOf(this.map);
-		if(index < (this.maps.size()-1))this.map = this.maps.get(index+1);
+		if(index < (this.maps.size()-1)){
+			this.map = this.maps.get(index+1);
+		}
+		else{
+			this.map = this.maps.get(0);
+		}
 		this.mapName.set(this.map.getName());
 		drawMap(mapCanvas);
 	}
@@ -921,6 +1042,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	public void setName(String string){
 		
+		string = string.trim();
 		if(string.length() > 0 && string.length() < 12){
 			this.playerName.set(string);
 			this.currentNameText.set("Current Name:");
@@ -947,7 +1069,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Map mapCopy = new Map(map.getName(), arrayCopy, map.getSpawnPoints());
 
 		Platform.setImplicitExit(false);
-		new Game(this, mapCopy, playerName, controls, aiNum);
+		new Game(this, mapCopy, playerName, controls, aiNum, aiDiff);
 	}
 
 	@Override
@@ -1132,5 +1254,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 			}
 			   
 		});
+	}
+
+	@Override
+	public void roomReceived() {
+		// TODO Auto-generated method stub
+		
 	}
 }

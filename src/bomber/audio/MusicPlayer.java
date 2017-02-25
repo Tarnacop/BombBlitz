@@ -1,17 +1,17 @@
 package bomber.audio;
 
+import bomber.game.Constants;
 import sun.applet.Main;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Created by Alexandruro on 05.02.2017.
+ * Created by Alexandru Rosu on 05.02.2017.
  */
 public class MusicPlayer extends Thread
 {
-
-    public static final String musicFilename = "01_A_Night_Of_Dizzy_Spells.wav";
 
     private Clip clip;
 
@@ -19,16 +19,23 @@ public class MusicPlayer extends Thread
     {
         try {
             clip = AudioSystem.getClip();
-            AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                    Main.class.getResourceAsStream(AudioManager.audioFilesPath + musicFilename));
+            InputStream rawStream = Main.class.getResourceAsStream(Constants.audioFilesPath + Constants.musicFilename);
+            if(rawStream == null)
+                throw new IOException();
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
             clip.open(inputStream);
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (LineUnavailableException e) {
+
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            System.err.println("Could not load sound: " + Constants.audioFilesPath );
             e.printStackTrace();
         }
+    }
+
+
+    public void setVolume(float percent)
+    {
+        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        AudioManager.setControlVolume(gainControl, percent);
     }
 
     public void run()
@@ -47,16 +54,5 @@ public class MusicPlayer extends Thread
         clip.start();
         clip.loop(Integer.MAX_VALUE);
     }
-
-    /*
-    public boolean isPlaying()
-    {
-        return clip.isRunning();
-        //return clip.isActive();
-        //return clip.isOpen();
-    }
-    */
-
-
 
 }
