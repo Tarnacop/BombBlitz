@@ -386,25 +386,16 @@ public class ClientPacketEncoder {
 
 		for (int x = 0; x < gridMapWidth; x++) {
 			for (int y = 0; y < gridMapHeight; y++) {
-				Block b = Block.BLANK;
+				Block b;
 
-				boolean bits[] = new boolean[4];
+				byte bits = 0;
 				int bitIndex = x + y * gridMapWidth;
-
 				for (int i = 3; i >= 0; i--) {
-					bits[i] = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					boolean bit = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					bits = BitArray.setBit(bits, i, bit);
 				}
 
-				if (!bits[3] && !bits[2] && !bits[1] && !bits[0]) {
-					b = Block.BLANK;
-				} else if (!bits[3] && !bits[2] && !bits[1] && bits[0]) {
-					b = Block.BLAST;
-				} else if (!bits[3] && !bits[2] && bits[1] && !bits[0]) {
-					b = Block.SOFT;
-				} else if (!bits[3] && !bits[2] && bits[1] && bits[0]) {
-					b = Block.SOLID;
-				}
-
+				b = byteToBlock(bits);
 				if (gridMap[x][y] != b) {
 					gridMap[x][y] = b;
 				}
@@ -528,6 +519,7 @@ public class ClientPacketEncoder {
 			audioEventList.add(AudioEvent.PLAYER_DEATH);
 		}
 		if (BitArray.getBit(audioState, 3)) {
+			// TODO movement sound disabled due to client audio bug
 			// audioEventList.add(AudioEvent.MOVEMENT);
 		}
 		if (BitArray.getBit(audioState, 4)) {
@@ -598,21 +590,16 @@ public class ClientPacketEncoder {
 		}
 		for (int x = 0; x < gridMapWidth; x++) {
 			for (int y = 0; y < gridMapHeight; y++) {
-				Block b = Block.BLANK;
-				boolean bits[] = new boolean[4];
+				Block b;
+
+				byte bits = 0;
 				int bitIndex = x + y * gridMapWidth;
 				for (int i = 3; i >= 0; i--) {
-					bits[i] = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					boolean bit = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					bits = BitArray.setBit(bits, i, bit);
 				}
-				if (!bits[3] && !bits[2] && !bits[1] && !bits[0]) {
-					b = Block.BLANK;
-				} else if (!bits[3] && !bits[2] && !bits[1] && bits[0]) {
-					b = Block.BLAST;
-				} else if (!bits[3] && !bits[2] && bits[1] && !bits[0]) {
-					b = Block.SOFT;
-				} else if (!bits[3] && !bits[2] && bits[1] && bits[0]) {
-					b = Block.SOLID;
-				}
+
+				b = byteToBlock(bits);
 				gridMap[x][y] = b;
 			}
 		}
@@ -680,6 +667,7 @@ public class ClientPacketEncoder {
 			audioEventList.add(AudioEvent.PLAYER_DEATH);
 		}
 		if (BitArray.getBit(audioState, 3)) {
+			// TODO movement sound disabled due to client audio bug
 			// audioEventList.add(AudioEvent.MOVEMENT);
 		}
 		if (BitArray.getBit(audioState, 4)) {
@@ -726,6 +714,65 @@ public class ClientPacketEncoder {
 		}
 
 		return keyState;
+	}
+
+	/**
+	 * Convert byte into Block (only bit 3 to bit 0 in the byte are used)
+	 * 
+	 * @param b
+	 *            the byte
+	 * @return the Block
+	 */
+	public static Block byteToBlock(byte b) {
+		Block block = null;
+
+		switch (b) {
+		case 0:
+			block = Block.BLANK;
+			break;
+
+		case 1:
+			block = Block.SOLID;
+			break;
+
+		case 2:
+			block = Block.SOFT;
+			break;
+
+		case 3:
+			block = Block.BLAST;
+			break;
+
+		case 4:
+			block = Block.PLUS_BOMB;
+			break;
+
+		case 5:
+			block = Block.MINUS_BOMB;
+			break;
+
+		case 6:
+			block = Block.PLUS_RANGE;
+			break;
+
+		case 7:
+			block = Block.MINUS_RANGE;
+			break;
+
+		case 8:
+			block = Block.PLUS_SPEED;
+			break;
+
+		case 9:
+			block = Block.MINUS_SPEED;
+			break;
+
+		default:
+			block = Block.BLANK;
+			break;
+		}
+
+		return block;
 	}
 
 }

@@ -453,34 +453,12 @@ public class ServerPacketEncoder {
 
 				Block b = gridMap[x][y];
 
-				boolean bits[] = new boolean[4];
-
-				if (b == Block.BLANK) {
-					bits[3] = false;
-					bits[2] = false;
-					bits[1] = false;
-					bits[0] = false;
-				} else if (b == Block.BLAST) {
-					bits[3] = false;
-					bits[2] = false;
-					bits[1] = false;
-					bits[0] = true;
-				} else if (b == Block.SOFT) {
-					bits[3] = false;
-					bits[2] = false;
-					bits[1] = true;
-					bits[0] = false;
-				} else if (b == Block.SOLID) {
-					bits[3] = false;
-					bits[2] = false;
-					bits[1] = true;
-					bits[0] = true;
-				}
+				byte bits = blockToByte(b);
 
 				int bitIndex = x + y * gridMapWidth;
 
 				for (int i = 3; i >= 0; i--) {
-					if (bits[i]) {
+					if (BitArray.getBit(bits, i)) {
 						bitArr[i][bitIndex / 64] = BitArray.setBit(bitArr[i][bitIndex / 64], bitIndex % 64, true);
 					}
 				}
@@ -569,7 +547,6 @@ public class ServerPacketEncoder {
 			}
 		}
 
-		//audioState = 0; // TODO temporarily disable audio due to client bug
 		buffer.putShort(audioState);
 
 		// final length check
@@ -606,5 +583,64 @@ public class ServerPacketEncoder {
 		keyboardState.setBomb(BitArray.getBit(k, 5));
 
 		return keyboardState;
+	}
+
+	/**
+	 * Convert Block into byte (only bit 3 to bit 0 in the byte are used)
+	 * 
+	 * @param block
+	 *            the Block
+	 * @return the byte
+	 */
+	public static byte blockToByte(Block block) {
+		byte b = 0;
+
+		switch (block) {
+		case BLANK:
+			b = 0;
+			break;
+
+		case SOLID:
+			b = 1;
+			break;
+
+		case SOFT:
+			b = 2;
+			break;
+
+		case BLAST:
+			b = 3;
+			break;
+
+		case PLUS_BOMB:
+			b = 4;
+			break;
+
+		case MINUS_BOMB:
+			b = 5;
+			break;
+
+		case PLUS_RANGE:
+			b = 6;
+			break;
+
+		case MINUS_RANGE:
+			b = 7;
+			break;
+
+		case PLUS_SPEED:
+			b = 8;
+			break;
+
+		case MINUS_SPEED:
+			b = 9;
+			break;
+
+		default:
+			b = 0;
+			break;
+		}
+
+		return b;
 	}
 }

@@ -109,8 +109,8 @@ public class ProtocolConstant {
 	/* add AI: 1 byte constant 0x3 + 1 byte constant 0x0 */
 	/* remove AI: 1 byte constant 0x3 + 1 byte constant 0x1 */
 	/*
-	 * set AI difficulty: 1 byte constant 0x3 + 1 byte constant 0x2 + 1 byte AI
-	 * difficulty
+	 * TODO set AI difficulty: 1 byte constant 0x3 + 1 byte constant 0x2 + 1
+	 * byte AI id + 1 byte AI difficulty
 	 */
 
 	// public static final byte MSG_C_ROOM_GETINFO = 0x0d;
