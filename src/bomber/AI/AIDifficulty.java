@@ -1,5 +1,17 @@
 package bomber.AI;
 
+/**
+ * @author Jokubas Liutkus
+ * The Enum AIDifficulty.
+ */
 public enum AIDifficulty {
-	EASY, MEDIUM, HARD, EXTREME //Extreme only on the single player
+
+	/** The easy. */
+	EASY,
+	/** The medium. */
+	MEDIUM,
+	/** The hard. */
+	HARD,
+	/** The extreme. */
+	EXTREME 
 }

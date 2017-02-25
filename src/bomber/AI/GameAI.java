@@ -17,6 +17,7 @@ public class GameAI extends Player {
 
 	/** The AI manager thread. */
 	private Thread ai;
+	
 
 	/**
 	 * Instantiates a new game AI.
@@ -37,25 +38,7 @@ public class GameAI extends Player {
 	public GameAI(String name, Point pos, int lives, double speed, GameState gameState, Mesh mesh, AIDifficulty diff) {
 		super(name, pos, lives, speed, mesh);
 		this.state = gameState;
-		switch(diff)
-		{
-		case EASY:
-			ai = new EasyAI(this, state);
-			break;
-		case MEDIUM:
-			ai = new MediumAI(this, state);
-			break;
-		case HARD:
-			ai = new AIManager(this, state);
-			break;
-		case EXTREME:
-			ai = new ExtremeAI(this, state);
-			break;
-		default:
-			ai = new AIManager(this, state);
-			break;
-		}
-
+		setDifficulty(diff);
 	}
 
 	/**
@@ -67,6 +50,34 @@ public class GameAI extends Player {
 		
 	}
 
+	public void stopAI()
+	{
+		this.setAlive(false);
+	}
+	
+	public void setDifficulty(AIDifficulty diff)
+	{
+		switch(diff)
+		{
+		case EASY:
+			ai = new EasyAI(this, state);
+			break;
+		case MEDIUM:
+			ai = new MediumAI(this, state);
+			break;
+		case HARD:
+			ai = new HardAI(this, state);
+			break;
+		case EXTREME:
+			ai = new ExtremeAI(this, state);
+			break;
+		default:
+			ai = new HardAI(this, state);
+			break;
+		}
+
+	}
+	
 	/**
 	 * Pause thread.
 	 */

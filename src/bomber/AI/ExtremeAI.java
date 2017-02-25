@@ -1,25 +1,22 @@
 
 package bomber.AI;
 
-import java.awt.Point;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import bomber.game.GameState;
-import bomber.game.Movement;
 import bomber.game.Player;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class AIManager.
+ * The Class HardAI for making moves.
  *
- * @author Jokubas Liutkus The Class AIManager for making moves.
+ * @author Jokubas Liutkus 
  */
 public class ExtremeAI extends AITemplate {
 
 	/**
-	 * Instantiates a new AI manager.
+	 * Instantiates a new hard AI.
 	 *
 	 * @param ai
 	 *            the AI

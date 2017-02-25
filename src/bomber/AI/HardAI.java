@@ -1,19 +1,17 @@
 
 package bomber.AI;
 
-import java.awt.Point;
 import java.util.LinkedList;
-import bomber.game.GameState;
-import bomber.game.Movement;
-import bomber.game.Player;
 
-// TODO: Auto-generated Javadoc
+import bomber.game.GameState;
+
+
 /**
  * The Class AIManager.
  *
  * @author Jokubas Liutkus The Class AIManager for making moves.
  */
-public class AIManager extends AITemplate{
+public class HardAI extends AITemplate{
 
 
 	/**
@@ -24,22 +22,19 @@ public class AIManager extends AITemplate{
 	 * @param gameState
 	 *            the game state
 	 */
-	public AIManager(GameAI ai, GameState gameState) {
+	public HardAI(GameAI ai, GameState gameState) {
 		super(ai, gameState);
 	}
+
 
 
 	
 
 
-	/**
-	 * Perform sequence of moves.
-	 *
-	 * @param moves
-	 *            the list of moves
-	 * @param inDanger
-	 *            the variable determining if the escape moves are passed in
-	 *            that case make moves without considering anything else
+
+	
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#performMoves(java.util.LinkedList, boolean)
 	 */
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
@@ -53,12 +48,9 @@ public class AIManager extends AITemplate{
 			}
 	}
 
-	/**
-	 * Perform planned moves.
-	 * When none of the players are reachable
-	 *
-	 * @param moves
-	 *            the moves
+	
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#performPlannedMoves(java.util.LinkedList)
 	 */
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
@@ -91,8 +83,9 @@ public class AIManager extends AITemplate{
 
 	
 
-	/**
-	 * Main method for controlling what moves to make.
+	
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#move()
 	 */
 	protected void move() {
 		LinkedList<AIActions> moves;

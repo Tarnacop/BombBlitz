@@ -9,7 +9,14 @@ import bomber.game.GameState;
 import bomber.game.Movement;
 import bomber.game.Player;
 
+/**
+ * The Class AITemplate. Consists of main utility functions for AI to run.
+ * 
+ * @author Jokubas Liutkus
+ * 
+ */
 public abstract class AITemplate extends Thread {
+
 	/** The game AI. */
 	protected GameAI gameAI;
 
@@ -60,7 +67,7 @@ public abstract class AITemplate extends Thread {
 	}
 
 	/**
-	 * Updated position.
+	 * Updates the current AI position according to the particular move
 	 *
 	 * @param move
 	 *            the AI move
@@ -117,15 +124,15 @@ public abstract class AITemplate extends Thread {
 
 		return m;
 	}
-
+	
 	/**
-	 * Check ig the AI reached destination when making a single move
+	 * Check if the AI reached destination when making a single move.
 	 *
 	 * @param currentPixel
 	 *            the pixel position of the AI
 	 * @param updatedFinalPixelPos
-	 *            the updated final pixel position which to be reached
-	 * @return true, if needs to stop moving
+	 *            the updated final pixel position which has to be reached
+	 * @return true, if it is needed to stop moving
 	 */
 	protected boolean checkIfReachedDestination(Point currentPixel, Point updatedFinalPixelPos) {
 		boolean check = (currentPixel.x - updatedFinalPixelPos.x) < (scalar - playerSize);
@@ -137,6 +144,8 @@ public abstract class AITemplate extends Thread {
 
 	/**
 	 * Make single move.
+	 * 
+	 * Method to make a single move.
 	 *
 	 * @param move
 	 *            the move to be made
@@ -162,9 +171,14 @@ public abstract class AITemplate extends Thread {
 	 * @return the moves to enemy
 	 */
 	protected LinkedList<AIActions> getMovesToEnemy() {
+		
+		//find the route to the nearest enemy
+		//moves == null if there are soft block to the enemy
 		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy());
 		if (moves != null)
 			return moves;
+		
+		// else we loop through each enemy looking for the possible access
 		for (Player p : gameState.getPlayers()) {
 			if (!p.equals(gameAI)) {
 				moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
@@ -176,11 +190,15 @@ public abstract class AITemplate extends Thread {
 	}
 
 	/**
-	 * Gets the moves to enemy.
+	 * Gets the moves to enemy excluding the AI.
+	 * Other AIs are ignored.
 	 *
-	 * @return the moves to enemy
+	 * @return the moves to enemy ignoring other AIs
 	 */
 	protected LinkedList<AIActions> getMovesToEnemyExcludeAIs() {
+		
+		//find the route to the nearest enemy
+		//moves == null if there are soft block to the enemy
 		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs());
 		if (moves != null)
 			return moves;
@@ -196,9 +214,28 @@ public abstract class AITemplate extends Thread {
 		return null;
 	}
 
+	/**
+	 * Perform sequence of moves.
+	 *
+	 * @param moves
+	 *            the list of moves
+	 * @param inDanger
+	 *            the variable determining if the escape moves are passed in
+	 *            that case make moves without considering anything else
+	 */
 	protected abstract void performMoves(LinkedList<AIActions> moves, boolean inDanger);
 
+	/**
+	 * Perform planned moves.
+	 * When none of the players are reachable
+	 *
+	 * @param moves
+	 *            the moves
+	 */
 	protected abstract void performPlannedMoves(LinkedList<AIActions> moves);
 
+	/**
+	 * Main method for controlling what moves to make.
+	 */
 	protected abstract void move();
 }
