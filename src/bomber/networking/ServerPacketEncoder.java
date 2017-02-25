@@ -569,7 +569,7 @@ public class ServerPacketEncoder {
 			}
 		}
 
-		audioState = 0; // TODO temporarily disable audio due to client bug
+		//audioState = 0; // TODO temporarily disable audio due to client bug
 		buffer.putShort(audioState);
 
 		// final length check

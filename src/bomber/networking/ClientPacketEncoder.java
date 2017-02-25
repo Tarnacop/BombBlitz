@@ -512,57 +512,28 @@ public class ClientPacketEncoder {
 
 		// Audio Events
 		buffer.position(7 + 130 + 1 + 35 * numPlayer + 1 + 20 * numBomb);
-		if (gameState.getAudioEvents() == null) {
-			gameState.setAudioEvents(new ArrayList<>(16));
-		}
-		List<AudioEvent> audioEventList = gameState.getAudioEvents();
-
 		short audioState = buffer.getShort();
 
 		/*
-		 * TODO AudioManager should also lock audioEventList to avoid
-		 * ConcurrentModificationException
-		 */
-		/*
 		 * TODO Audio can cause OutOfMemoryError during game
 		 */
-		synchronized (audioEventList) {
-			if (BitArray.getBit(audioState, 0)) {
-				if (!audioEventList.contains(AudioEvent.PLACE_BOMB)) {
-					audioEventList.add(AudioEvent.PLACE_BOMB);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.PLACE_BOMB);
-			}
-			if (BitArray.getBit(audioState, 1)) {
-				if (!audioEventList.contains(AudioEvent.EXPLOSION)) {
-					audioEventList.add(AudioEvent.EXPLOSION);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.EXPLOSION);
-			}
-			if (BitArray.getBit(audioState, 2)) {
-				if (!audioEventList.contains(AudioEvent.PLAYER_DEATH)) {
-					audioEventList.add(AudioEvent.PLAYER_DEATH);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.PLAYER_DEATH);
-			}
-			if (BitArray.getBit(audioState, 3)) {
-				if (!audioEventList.contains(AudioEvent.MOVEMENT)) {
-					audioEventList.add(AudioEvent.MOVEMENT);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.MOVEMENT);
-			}
-			if (BitArray.getBit(audioState, 4)) {
-				if (!audioEventList.contains(AudioEvent.POWERUP)) {
-					audioEventList.add(AudioEvent.POWERUP);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.POWERUP);
-			}
+		List<AudioEvent> audioEventList = new ArrayList<>(16);
+		if (BitArray.getBit(audioState, 0)) {
+			audioEventList.add(AudioEvent.PLACE_BOMB);
 		}
+		if (BitArray.getBit(audioState, 1)) {
+			audioEventList.add(AudioEvent.EXPLOSION);
+		}
+		if (BitArray.getBit(audioState, 2)) {
+			audioEventList.add(AudioEvent.PLAYER_DEATH);
+		}
+		if (BitArray.getBit(audioState, 3)) {
+			// audioEventList.add(AudioEvent.MOVEMENT);
+		}
+		if (BitArray.getBit(audioState, 4)) {
+			audioEventList.add(AudioEvent.POWERUP);
+		}
+		gameState.setAudioEvents(audioEventList);
 
 		return gameState;
 	}
@@ -709,7 +680,7 @@ public class ClientPacketEncoder {
 			audioEventList.add(AudioEvent.PLAYER_DEATH);
 		}
 		if (BitArray.getBit(audioState, 3)) {
-			audioEventList.add(AudioEvent.MOVEMENT);
+			// audioEventList.add(AudioEvent.MOVEMENT);
 		}
 		if (BitArray.getBit(audioState, 4)) {
 			audioEventList.add(AudioEvent.POWERUP);
