@@ -1,4 +1,4 @@
-package bomber.physics.tests;
+package test.physics;
 
 import bomber.game.*;
 import bomber.physics.PhysicsEngine;

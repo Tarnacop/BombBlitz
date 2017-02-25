@@ -1,4 +1,4 @@
-package bomber.networking.tests;
+package test.networking;
 
 import java.awt.Point;
 import java.io.IOException;

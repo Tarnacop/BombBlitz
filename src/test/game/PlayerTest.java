@@ -1,4 +1,4 @@
-package bomber.game.tests;
+package test.game;
 
 import static org.junit.Assert.*;
 
@@ -6,7 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GameStateTest {
+public class PlayerTest {
 
 	@Before
 	public void setUp() throws Exception {
