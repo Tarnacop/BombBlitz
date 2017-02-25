@@ -1,3 +1,4 @@
+
 package bomber.AI;
 
 import java.awt.Point;
@@ -6,13 +7,26 @@ import java.util.Random;
 
 import bomber.game.GameState;
 
+/**
+ * The Class MediumAI.
+ * 
+ * @author Jokubas Liutkus
+ */
 public class MediumAI extends AITemplate {
 
+	/**
+	 * Instantiates a new medium AI.
+	 *
+	 * @param ai the ai
+	 * @param gameState the game state
+	 */
 	public MediumAI(GameAI ai, GameState gameState) {
 		super(ai, gameState);
-		// TODO Auto-generated constructor stub
 	}
 
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#performMoves(java.util.LinkedList, boolean)
+	 */
 	@Override
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
@@ -27,6 +41,9 @@ public class MediumAI extends AITemplate {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#performPlannedMoves(java.util.LinkedList)
+	 */
 	@Override
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
@@ -59,6 +76,9 @@ public class MediumAI extends AITemplate {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see bomber.AI.AITemplate#move()
+	 */
 	@Override
 	protected void move() {
 		LinkedList<AIActions> moves;

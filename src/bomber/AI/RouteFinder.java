@@ -2,11 +2,9 @@ package bomber.AI;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
@@ -15,12 +13,13 @@ import bomber.game.Bomb;
 import bomber.game.Constants;
 import bomber.game.GameState;
 import bomber.game.Player;
-import bomber.physics.PhysicsEngine;
 
 /**
  * The Class RouteFinder.
  *
- * @author Jokubas Liutkus The Class RouteFinder. For finding different routes
+ * @author Jokubas Liutkus 
+ * 
+ * The Class RouteFinder. For finding different routes
  *         and planning.
  */
 public class RouteFinder {
@@ -565,6 +564,13 @@ public class RouteFinder {
 
 	}
 	
+	/**
+	 * Can put bomb and escape.
+	 * 
+	 * Method for checking if the AI can put bomb and safely escape
+	 *
+	 * @return the linked list of moves
+	 */
 	public LinkedList<AIActions> canPutBombAndEscape() {
 		LinkedList<AIActions> moves = null;
 		if (safetyCh.isEnemyInBombRange()) {
@@ -582,17 +588,16 @@ public class RouteFinder {
 	}
 
 	/**
-	 * Escape from explotion.
+	 * Escape from explosion.
 	 *
 	 * @param dangerTiles
 	 *            the danger tiles
 	 * @param pos
-	 *            the pos
+	 *            the positions
 	 * @param map
 	 *            the map
-	 * @return the linked list
+	 * @return the linked list of moves
 	 */
-	// change this method
 	private LinkedList<AIActions> escapeFromExplotion(ArrayList<Point> dangerTiles, Point pos, Block[][] map) {
 		LinkedList<Node> open = new LinkedList<>();
 		HashSet<Node> closed = new HashSet<>();
@@ -646,6 +651,10 @@ public class RouteFinder {
 
 	/**
 	 * Gets the nearest enemy.
+	 * 
+	 * Returns the nearest enemy excluding AIs
+	 * 
+	 * AIs can collaborate in that way.
 	 *
 	 * @return the nearest enemy of the AI.
 	 */
@@ -666,6 +675,15 @@ public class RouteFinder {
 		return pos;
 	}
 
+	/**
+	 * Can put bomb and escape.
+	 * 
+	 * Method for checking if the AI can put bomb and safely escape.
+	 * 
+	 * Excludes other AIs so that AIs can collaborate
+	 *
+	 * @return the linked list of moves
+	 */
 	public LinkedList<AIActions> canPutBombAndEscapeExcludeAIs() {
 		LinkedList<AIActions> moves = null;
 		if (safetyCh.isEnemyInBombRangeExludeAIs()) {

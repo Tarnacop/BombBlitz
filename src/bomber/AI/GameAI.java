@@ -66,13 +66,13 @@ public class GameAI extends Player {
 			ai = new MediumAI(this, state);
 			break;
 		case HARD:
-			ai = new AIManager(this, state);
+			ai = new HardAI(this, state);
 			break;
 		case EXTREME:
 			ai = new ExtremeAI(this, state);
 			break;
 		default:
-			ai = new AIManager(this, state);
+			ai = new HardAI(this, state);
 			break;
 		}
 
