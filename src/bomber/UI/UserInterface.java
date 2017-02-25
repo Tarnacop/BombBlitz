@@ -32,6 +32,7 @@ import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -153,6 +154,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private VBox aiContainer;
 	private Label aiExplanation;
 	private VBox aiDiffBox;
+	private Object aiDiffLabel;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -173,8 +175,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.controls.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
 		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
-		this.windowHeight = 700;
-		this.windowWidth = 900;
+		this.windowHeight = 800;
+		this.windowWidth = 1000;
 	}
 	
 	public static void begin(){
@@ -185,8 +187,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	public void start(Stage primaryStage){
 
 		currentStage = primaryStage;
-		currentStage.setMinHeight(700);
-		currentStage.setMinWidth(900);
+		currentStage.setMinHeight(800);
+		currentStage.setMinWidth(1000);
 		primaryStage.setTitle(this.appName);
 		previousScenes = new Stack<Scene>();
 		initScenes();
@@ -485,7 +487,9 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiBox.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
         
         aiLabel = createLabel("Number of\nAI Players", false, false);
-        
+        aiExplanation = createLabel("AI players will\nseek to\ndestroy you.", true, true);
+        aiExplanation.setAlignment(Pos.CENTER);
+        aiExplanation.setPrefWidth(200);
         aiPane = new HBox();
         aiPane.setAlignment(Pos.CENTER);
         aiPane.getStyleClass().add("box");
@@ -493,25 +497,39 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiPane.getChildren().addAll(aiBox, aiLabel);
         
         ChoiceBox<String> aiDifficultyChoice = new ChoiceBox<>();
+        aiDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
+        aiDifficultyChoice.setPrefHeight(50);
+        aiDifficultyChoice.setPrefWidth(200);
         aiDifficultyChoice.getStyleClass().add("textfield");
         aiDifficultyChoice.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
+        aiDifficultyChoice.getSelectionModel().select(1);
         aiDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
                 ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> ob,
 					String oldValue, String newValue) {
 				switch(newValue){
-				case "Easy": aiDiff = AIDifficulty.EASY; break;
-				case "Medium": aiDiff = AIDifficulty.MEDIUM; break;
-				case "Hard": aiDiff = AIDifficulty.HARD; break;
-				case "Extreme": aiDiff = AIDifficulty.EXTREME;
+				case "Easy": 
+					aiDiff = AIDifficulty.EASY; 
+					aiExplanation.setText("AI players will\nmove randomly.");
+					break;
+				case "Medium": 
+					aiDiff = AIDifficulty.MEDIUM;
+					aiExplanation.setText("AI players will\nseek to\ndestroy you.");
+					break;
+				case "Hard": 
+					aiDiff = AIDifficulty.HARD; 
+					aiExplanation.setText("AI players will\nbe tough\nto beat!");
+					break;
+				case "Extreme": 
+					aiDiff = AIDifficulty.EXTREME;
+					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
 				}
 				
 				System.out.println("Set difficulty to " + newValue);
 			}
-    });
+        });
         
-        aiExplanation = new Label();
         
         aiDiffBox = new VBox();
         aiDiffBox.setAlignment(Pos.CENTER);
@@ -532,10 +550,18 @@ public class UserInterface extends Application implements ClientNetInterface{
         rightMapToggle.prefHeightProperty().bind(mapPane.heightProperty());
         leftMapToggle.prefHeightProperty().bind(mapPane.heightProperty());
         
+        VBox mapPad = new VBox();
+		mapPad.setAlignment(Pos.CENTER);
+		mapPad.getChildren().add(mapPane);
+        
+		VBox aiPad = new VBox();
+		aiPad.setAlignment(Pos.CENTER);
+		aiPad.getChildren().add(aiContainer);
+		
         centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setSpacing(20);
-        centerBox.getChildren().addAll(aiContainer, mapPane);
+        centerBox.getChildren().addAll(aiPad, mapPad);
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn3);

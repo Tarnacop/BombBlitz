@@ -28,6 +28,7 @@
 
 .textfield{
 	-fx-font-family: minecraft;
+	-fx-font-size: 20;
 	-fx-padding: 5px;
 	-fx-background-color: transparent;
 	-fx-background-image: url("images/textfield.png");
