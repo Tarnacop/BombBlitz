@@ -13,22 +13,39 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * The Class MapsParser.
+ * 
+ * @author Jokubas Liutkus
+ */
 public class MapsParser extends DefaultHandler {
 
 	/** The Constant scalar. */
-	protected static final int scalar = 64;
+	private static final int scalar = 64;
 
-	/** The Constant playerSize. */
-	protected static final int playerSize = 32;
-
-	
+	/** The map. */
 	private ArrayList<String> map;
+	
+	/** The temp. */
 	private String temp;
+	
+	/** The name. */
 	private String name;
+	
+	/** The maps. */
 	private ArrayList<Map> maps = new ArrayList<>();
+	
+	/** The spawn points. */
 	private ArrayList<Point> spawnPoints;
 	
 
+	/**
+	 * Instantiates a new maps parser.
+	 *
+	 * @throws ParserConfigurationException the parser configuration exception
+	 * @throws SAXException the SAX exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public MapsParser() throws ParserConfigurationException, SAXException, IOException {
 		
 		// Create a "parser factory" for creating SAX parsers
@@ -40,21 +57,24 @@ public class MapsParser extends DefaultHandler {
 		// Finally, tell the parser to parse the input and notify the handler
 		sp.parse("src/resources/maps/maps.xml", this);
 		
-		for(Map bl: maps)
-		{
-			for(int x =0; x<bl.getGridMap().length; x++)
-			{
-				for(int y=0; y<bl.getGridMap()[0].length; y++)
-				{
-					System.out.print(bl.getGridMap()[x][y] + " ");
-				}
-				System.out.println();
-			}
-			System.out.println('\n');
-		}
+//		for(Map bl: maps)
+//		{
+//			for(int x =0; x<bl.getGridMap().length; x++)
+//			{
+//				for(int y=0; y<bl.getGridMap()[0].length; y++)
+//				{
+//					System.out.print(bl.getGridMap()[x][y] + " ");
+//				}
+//				System.out.println();
+//			}
+//			System.out.println('\n');
+//		}
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
+	 */
 	/*
 	 * When the parser encounters plain text (not XML elements), it calls(this
 	 * method, which accumulates them in a string buffer
@@ -63,6 +83,9 @@ public class MapsParser extends DefaultHandler {
 		temp = new String(buffer, start, length);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+	 */
 	/*
 	 * Every time the parser encounters the beginning of a new element, it calls
 	 * this method, which resets the string buffer
@@ -75,6 +98,9 @@ public class MapsParser extends DefaultHandler {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+	 */
 	/*
 	 * When the parser encounters the end of an element, it calls this method
 	 */
@@ -93,11 +119,22 @@ public class MapsParser extends DefaultHandler {
 	}
 	
 	
+	/**
+	 * Gets the maps
+	 *
+	 * @return the maps
+	 */
 	public List<Map> getMaps()
 	{
 		return maps;
 	}
 
+	/**
+	 * Parses the map.
+	 *
+	 * @param map the map
+	 * @return the map
+	 */
 	private Map parseMap(ArrayList<String> map) {
 		String[] t;
 		Block[] block;
