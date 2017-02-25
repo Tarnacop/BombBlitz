@@ -564,7 +564,7 @@ public class RouteFinder {
 		return getPathWithBombs(getMovesFromPoints(finish), start);
 
 	}
-
+	
 	public LinkedList<AIActions> canPutBombAndEscape() {
 		LinkedList<AIActions> moves = null;
 		if (safetyCh.isEnemyInBombRange()) {
@@ -624,23 +624,23 @@ public class RouteFinder {
 
 	}
 
-	private class Pair {
-		private Point position;
-		private LinkedList<AIActions> actions;
-
-		private Pair(Point position, LinkedList<AIActions> actions) {
-			this.position = position;
-			this.actions = actions;
-		}
-
-		private Point getPos() {
-			return position;
-		}
-
-		private LinkedList<AIActions> getActions() {
-			return actions;
-		}
-	}
+//	private class Pair {
+//		private Point position;
+//		private LinkedList<AIActions> actions;
+//
+//		private Pair(Point position, LinkedList<AIActions> actions) {
+//			this.position = position;
+//			this.actions = actions;
+//		}
+//
+//		private Point getPos() {
+//			return position;
+//		}
+//
+//		private LinkedList<AIActions> getActions() {
+//			return actions;
+//		}
+//	}
 
 	// ------------------------
 

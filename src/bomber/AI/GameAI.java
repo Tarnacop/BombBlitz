@@ -17,6 +17,7 @@ public class GameAI extends Player {
 
 	/** The AI manager thread. */
 	private Thread ai;
+	
 
 	/**
 	 * Instantiates a new game AI.
@@ -37,6 +38,25 @@ public class GameAI extends Player {
 	public GameAI(String name, Point pos, int lives, double speed, GameState gameState, Mesh mesh, AIDifficulty diff) {
 		super(name, pos, lives, speed, mesh);
 		this.state = gameState;
+		setDifficulty(diff);
+	}
+
+	/**
+	 * Begin. Run this when the game starts
+	 * 
+	 */
+	public void begin() {
+		ai.start();
+		
+	}
+
+	public void stopAI()
+	{
+		this.setAlive(false);
+	}
+	
+	public void setDifficulty(AIDifficulty diff)
+	{
 		switch(diff)
 		{
 		case EASY:
@@ -57,16 +77,7 @@ public class GameAI extends Player {
 		}
 
 	}
-
-	/**
-	 * Begin. Run this when the game starts
-	 * 
-	 */
-	public void begin() {
-		ai.start();
-		
-	}
-
+	
 	/**
 	 * Pause thread.
 	 */
