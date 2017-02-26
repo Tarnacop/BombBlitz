@@ -188,8 +188,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	public void start(Stage primaryStage){
 
 		currentStage = primaryStage;
-		currentStage.setMinHeight(800);
-		//currentStage.setMinWidth(1100);
+		currentStage.setMinHeight(windowHeight);
+		currentStage.setMinWidth(windowWidth);
 		primaryStage.setTitle(this.appName);
 		previousScenes = new Stack<Scene>();
 		initScenes();
