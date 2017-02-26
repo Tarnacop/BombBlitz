@@ -35,10 +35,24 @@ public class ProtocolConstant {
 	// Range from 0x00 to 0x3f (up to 64 types of message)
 
 	// Network connection
+	public static final byte MSG_C_NET_GETNONCE = 0x10; // TODO
+	/*
+	 * TODO may add a nonce in each new connection request to ensure a two-way
+	 * communication between the server and client and reduce the possibility of
+	 * the server being used for UDP amplification attack
+	 */
+	/*
+	 * 1 byte message type + 2 byte sequence + 8 byte constant 0
+	 */
+
 	public static final byte MSG_C_NET_CONNECT = 0x00; // Bit set
 	/*
 	 * 1 byte message type + 2 byte sequence + 1 byte name string length + name
 	 * string bytes
+	 */
+	/*
+	 * TODO new connection format: 1 byte message type + 2 byte sequence + 8
+	 * byte nonce + 1 byte name string length + name string bytes
 	 */
 
 	public static final byte MSG_C_NET_DISCONNECT = 0x01; // Bit set
@@ -128,14 +142,17 @@ public class ProtocolConstant {
 	// Range from 0x40 to 0x7f (up to 64 types of message)
 
 	// Network connection
+	public static final byte MSG_S_NET_NONCE = 0x52; // TODO
+	// 1 byte message type + 2 byte sequence + 8 byte nonce
+
 	public static final byte MSG_S_NET_ACCEPT = 0x40; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte client id
 
 	public static final byte MSG_S_NET_REJECT = 0x41; // Bit not set
 	// 1 byte message type + 2 byte sequence
 	/*
-	 * TODO rejection message should contain a reason: server full, duplicate
-	 * name, invalid name length
+	 * TODO rejection message may contain a reason: server full, duplicate name,
+	 * invalid name length, invalid nonce
 	 */
 
 	public static final byte MSG_S_NET_ALREADYCONNECTED = 0x42; // Bit set

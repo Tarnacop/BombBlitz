@@ -3,7 +3,9 @@ package bomber.networking;
 import java.net.DatagramPacket;
 import java.net.SocketAddress;
 import java.time.Instant;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 /**
  * Server side representation of (the state of) a client
@@ -38,10 +40,18 @@ public class ServerClientInfo {
 	private short nextPacketSequence = 0;
 
 	// keep track of up to 100 packets sent to the client
-	private int nextPacketHistoryListIndex = 0;
+	private int nextPacketHistoryIndex = 0;
 	private final int maxPacketHistoryIndex = 99;
 	private ArrayList<PacketHistoryEntry> packetHistoryList = new ArrayList<PacketHistoryEntry>(
 			maxPacketHistoryIndex + 1);
+
+	/*
+	 * keep track of up to 100 packet sequence and time stamp received from the
+	 * client for duplicate packet detection
+	 */
+	private int nextSequenceHistoryIndex = 0;
+	private final int maxSequenceHistoryIndex = 99;
+	private ArrayList<Entry<Short, Long>> sequenceHistoryList = new ArrayList<>(maxSequenceHistoryIndex + 1);
 
 	/**
 	 * Construct a new client representation for the server
@@ -57,6 +67,9 @@ public class ServerClientInfo {
 		this.timeStamp = Instant.now().getEpochSecond();
 		for (int i = 0; i <= maxPacketHistoryIndex; i++) {
 			packetHistoryList.add(null);
+		}
+		for (int i = 0; i <= maxSequenceHistoryIndex; i++) {
+			sequenceHistoryList.add(null);
 		}
 	}
 
@@ -170,19 +183,50 @@ public class ServerClientInfo {
 	public void insertPacket(short packetSequence, DatagramPacket packet) {
 		// index wraps around when there are already 100 packets in history
 		// (older packets will be overwritten)
-		if (nextPacketHistoryListIndex > maxPacketHistoryIndex) {
-			nextPacketHistoryListIndex = 0;
+		if (nextPacketHistoryIndex > maxPacketHistoryIndex) {
+			nextPacketHistoryIndex = 0;
 		}
 
-		PacketHistoryEntry phe = packetHistoryList.get(nextPacketHistoryListIndex);
+		PacketHistoryEntry phe = packetHistoryList.get(nextPacketHistoryIndex);
 		if (phe == null) {
-			packetHistoryList.set(nextPacketHistoryListIndex,
+			packetHistoryList.set(nextPacketHistoryIndex,
 					new PacketHistoryEntry(packetSequence, packet.getData(), packet.getLength()));
 		} else {
 			phe.reset(packetSequence, packet.getData(), packet.getLength());
 		}
 
-		nextPacketHistoryListIndex++;
+		nextPacketHistoryIndex++;
+	}
+
+	/**
+	 * Determine whether a packet received from the client is duplicate based on
+	 * its sequence number
+	 * 
+	 * @param sequence
+	 *            the sequence number of the packet
+	 * @return true if the packet is duplicate
+	 */
+	public boolean isSequenceDuplicate(short sequence) {
+		for (Entry<Short, Long> e : sequenceHistoryList) {
+			if (e != null && e.getKey() == sequence) {
+				if (System.currentTimeMillis() - e.getValue() < 25000) {
+					return true;
+				} else {
+					e.setValue(System.currentTimeMillis());
+					return false;
+				}
+			}
+		}
+
+		if (nextSequenceHistoryIndex > maxSequenceHistoryIndex) {
+			nextSequenceHistoryIndex = 0;
+		}
+
+		Entry<Short, Long> entry = new AbstractMap.SimpleEntry<Short, Long>(sequence, System.currentTimeMillis());
+		sequenceHistoryList.set(nextSequenceHistoryIndex, entry);
+		nextSequenceHistoryIndex++;
+
+		return false;
 	}
 
 	/**

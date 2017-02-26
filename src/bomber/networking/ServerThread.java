@@ -143,10 +143,13 @@ public class ServerThread implements Runnable {
 				ArrayList<PacketHistoryEntry> packetList = e.getValue().getPacketHistoryList();
 				for (PacketHistoryEntry f : packetList) {
 					if (f != null && !f.isAcked() && f.getRetransmissionCount() < config.getMaxRetransmitCount()) {
-						pServerf(
-								"retransmitTask: Retransmitting packet %d created at %d with length %d and retransmission count %d to client %s\n",
-								f.getSequence(), f.getCreationTimeStamp(), f.getPacketLength(),
-								f.getRetransmissionCountAndIncrement(), e.getKey());
+						/*
+						 * pServerf(
+						 * "retransmitTask: Retransmitting packet %d created at %d with length %d and retransmission count %d to client %s\n"
+						 * , f.getSequence(), f.getCreationTimeStamp(),
+						 * f.getPacketLength(),
+						 * f.getRetransmissionCountAndIncrement(), e.getKey());
+						 */
 						try {
 							sendPacket(new DatagramPacket(f.getPacketData(), f.getPacketLength(), e.getKey()));
 						} catch (IOException e1) {
@@ -214,10 +217,12 @@ public class ServerThread implements Runnable {
 		if (clientInfo != null) {
 			clientInfo.updateTimeStamp();
 			/*
-			 * TODO log the sequence number of last 100 received packets from
-			 * this client and drop duplicate packets based on the sequence
-			 * number
+			 * log the sequence number of last 100 received packets from this
+			 * client and drop duplicate packets based on the sequence number
 			 */
+			if (messageHasSequence && clientInfo.isSequenceDuplicate(messageSequence)) {
+				return;
+			}
 		} else {
 			/*
 			 * if the client does not exist on the server and the message type
@@ -924,39 +929,6 @@ public class ServerThread implements Runnable {
 
 			break;
 
-		}
-
-		// TODO testing cases
-		case 's': {
-			pServer("Message type 's', table size: " + clientTable.size());
-
-			String reply = "table size: " + clientTable.size() + "\n";
-			byte[] replyData = reply.getBytes("UTF-8");
-
-			sendByteBuffer.position(3);
-			sendByteBuffer.put(replyData);
-
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + replyData.length, sockAddr);
-			sendPacket(p, (byte) 'm', true);
-
-			break;
-		}
-
-		case 't': {
-			long time = System.currentTimeMillis();
-
-			pServerf("Message type 't', time: %d\n", time);
-
-			String reply = "time: " + time + "\n";
-			byte[] replyData = reply.getBytes("UTF-8");
-
-			sendByteBuffer.position(3);
-			sendByteBuffer.put(replyData);
-
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + replyData.length, sockAddr);
-			sendPacket(p, (byte) 'm', true);
-
-			break;
 		}
 
 		default: {

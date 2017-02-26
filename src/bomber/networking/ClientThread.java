@@ -192,7 +192,7 @@ public class ClientThread implements Runnable {
 				pClient("listRequestTask: " + e);
 			}
 
-			// TODO request detailed room info when the client is in room
+			// optional: request detailed room info when the client is in room
 
 		};
 		scheduledExecutor.scheduleWithFixedDelay(listRequestTask, 0, listRequestInterval, TimeUnit.SECONDS);
@@ -202,10 +202,13 @@ public class ClientThread implements Runnable {
 			ArrayList<PacketHistoryEntry> packetList = serverInfo.getPacketHistoryList();
 			for (PacketHistoryEntry f : packetList) {
 				if (f != null && !f.isAcked() && f.getRetransmissionCount() < maxRetransmitCount) {
-					pClientf(
-							"retransmitTask: Retransmitting packet %d created at %d with length %d and retransmission count %d to server %s\n",
-							f.getSequence(), f.getCreationTimeStamp(), f.getPacketLength(),
-							f.getRetransmissionCountAndIncrement(), serverSockAddr);
+					/*
+					 * pClientf(
+					 * "retransmitTask: Retransmitting packet %d created at %d with length %d and retransmission count %d to server %s\n"
+					 * , f.getSequence(), f.getCreationTimeStamp(),
+					 * f.getPacketLength(),
+					 * f.getRetransmissionCountAndIncrement(), serverSockAddr);
+					 */
 					try {
 						sendPacket(new DatagramPacket(f.getPacketData(), f.getPacketLength(), serverSockAddr));
 					} catch (IOException e) {
@@ -259,9 +262,12 @@ public class ClientThread implements Runnable {
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 2, serverSockAddr);
 			sendPacket(p, ProtocolConstant.MSG_C_NET_ACK);
 			/*
-			 * TODO log the sequence number of last 100 received packets and
-			 * drop duplicate packets based on the sequence number
+			 * log the sequence number of last 100 received packets and drop
+			 * duplicate packets based on the sequence number
 			 */
+			if (messageHasSequence && serverInfo.isSequenceDuplicate(messageSequence)) {
+				return;
+			}
 		}
 
 		switch (messageType) {
@@ -597,15 +603,6 @@ public class ClientThread implements Runnable {
 			break;
 		}
 
-		// TODO testing case
-		case 'm': {
-
-			String msg = new String(recvBuffer, 3, packet.getLength() - 3);
-			pClient(msg);
-
-			break;
-		}
-
 		default: {
 			pClient("Default case: message type " + String.format("0x%02x", messageType));
 		}
@@ -654,9 +651,10 @@ public class ClientThread implements Runnable {
 		printStream.println("Client: " + string);
 	}
 
-	private void pClientf(String string, Object... args) {
-		printStream.printf("Client: " + string, args);
-	}
+	/*
+	 * private void pClientf(String string, Object... args) {
+	 * printStream.printf("Client: " + string, args); }
+	 */
 
 	private synchronized void setConnected(boolean isConnected) {
 		if (isConnected) {
