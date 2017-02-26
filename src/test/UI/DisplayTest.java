@@ -1,4 +1,4 @@
-package bomber.UI.tests;
+package test.UI;
  
 /**
  * If this application shows a blank and responsive window
@@ -10,7 +10,7 @@ public class DisplayTest {
     public static void main(String[] args) {
 //        try {
 //            Display.setDisplayMode(new DisplayMode(640, 480));
-//            Display.setTitle("Episode 1 – Display Test");
+//            Display.setTitle("Episode 1 ï¿½ Display Test");
 //            Display.create();
 //        } catch (LWJGLException e) {
 //            System.err.println("Display wasn't initialized correctly.");
