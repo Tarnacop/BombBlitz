@@ -185,7 +185,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void start(Stage primaryStage){
-
+		
 		currentStage = primaryStage;
 		currentStage.setMinHeight(800);
 		currentStage.setMinWidth(1000);
