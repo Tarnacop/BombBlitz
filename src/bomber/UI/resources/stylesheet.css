@@ -59,6 +59,14 @@
         -fx-background-repeat:no-repeat;
 }
 
+.connectbox{
+	-fx-padding: 20px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/widefancybox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
 .creditsbox{
 	-fx-padding: 25px;
 	-fx-background-image: url("images/mapbox.png");
