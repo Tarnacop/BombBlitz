@@ -189,6 +189,15 @@ public class ServerThread implements Runnable {
 
 		SocketAddress sockAddr = packet.getSocketAddress();
 
+		// Steam-compatible A2S_INFO query response
+		if (packet.getLength() == 25 && recvByteBuffer.getInt(0) == 0xffffffff && recvByteBuffer.get(24) == 0) {
+			if (recvByteBuffer.getLong(4) == 0x54536F7572636520l && recvByteBuffer.getLong(12) == 0x456E67696E652051l
+					&& recvByteBuffer.getInt(20) == 0x75657279) {
+				sendSteamQueryResponse(sockAddr);
+				return;
+			}
+		}
+
 		byte messageType = (byte) (recvByteBuffer.get(0) & (~ProtocolConstant.MSG_B_HASSEQUENCE));
 		boolean messageHasSequence = (recvByteBuffer.get(0) & ProtocolConstant.MSG_B_HASSEQUENCE) != 0;
 		short messageSequence = 0;
@@ -932,6 +941,50 @@ public class ServerThread implements Runnable {
 		}
 
 		}
+	}
+
+	private void sendSteamQueryResponse(SocketAddress sockAddr) throws IOException {
+		sendByteBuffer.position(0);
+		// header
+		sendByteBuffer.putInt(0xffffffff);
+		sendByteBuffer.put((byte) 0x49);
+		// protocol version
+		sendByteBuffer.put((byte) 0x11);
+		// name of the server
+		String serverName = "Bomb Blitz Dedicated Server";
+		sendByteBuffer.put(serverName.getBytes("UTF-8"));
+		sendByteBuffer.put((byte) 0);
+		// map of the server
+		sendByteBuffer.putShort((short) 0x2000);
+		// name of the folder
+		sendByteBuffer.putShort((short) 0x2000);
+		// full name of the game
+		String fullName = "Bomb Blitz 1.1";
+		sendByteBuffer.put(fullName.getBytes("UTF-8"));
+		sendByteBuffer.put((byte) 0);
+		// id of game
+		sendByteBuffer.putShort((byte) 0);
+		// number of players
+		sendByteBuffer.put((byte) clientTable.size());
+		// maximum number of players
+		sendByteBuffer.put((byte) config.getMaxPlayer());
+		// number of bots
+		sendByteBuffer.put((byte) 0);
+		// type of server
+		sendByteBuffer.put((byte) 'd');
+		// environment of server
+		sendByteBuffer.put((byte) 'l');
+		// whether the server requires a password
+		sendByteBuffer.put((byte) 0);
+		// whether the server uses VAC
+		sendByteBuffer.put((byte) 0);
+		// version of the game
+		String version = "1.1";
+		sendByteBuffer.put(version.getBytes("UTF-8"));
+		sendByteBuffer.put((byte) 0);
+
+		DatagramPacket packet = new DatagramPacket(sendBuffer, sendByteBuffer.position(), sockAddr);
+		sendPacket(packet);
 	}
 
 	public synchronized void sendPacket(DatagramPacket packet) throws IOException {
