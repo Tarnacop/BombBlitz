@@ -66,8 +66,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private final String appName = "Bomb Blitz v1";
 	private SimpleStringProperty playerName;
 	private Stage currentStage;
-	private VBox keyMenu;
-	private VBox serverMenu;
+	private BorderPane keyMenu;
+	private BorderPane serverMenu;
 	private BorderPane multiMenu;
 	private BorderPane singleMenu;
 	private Scene mainScene, keyScene, multiScene, serverScene, singleScene;
@@ -189,14 +189,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 		currentStage = primaryStage;
 		currentStage.setMinHeight(800);
-		currentStage.setMinWidth(1100);
+		//currentStage.setMinWidth(1100);
 		primaryStage.setTitle(this.appName);
 		previousScenes = new Stack<Scene>();
 		initScenes();
 		
-        disconnectBtn = new Button("Disconnect");
-        disconnectBtn.setOnAction(e -> disconnect());
-        
         backBtn2 = new Button("Back");
         backBtn2.setOnAction(e -> previous());
         
@@ -272,56 +269,46 @@ public class UserInterface extends Application implements ClientNetInterface{
         bombPane.getChildren().addAll(bombLabel, bombBtn);
         bombPane.setSpacing(20);
         
-        keyMenu.setSpacing(20);
-        keyMenu.setAlignment(Pos.CENTER);
-        keyMenu.getChildren().addAll(upPane, downPane, rightPane, leftPane, bombPane, backBtn5);
-        
+//        keyMenu.setSpacing(20);
+//        keyMenu.setAlignment(Pos.CENTER);
+//        keyMenu.getChildren().addAll(upPane, downPane, rightPane, leftPane, bombPane, backBtn5);
+//        
         backBox1 = new HBox();
         backBox1.setAlignment(Pos.CENTER_LEFT);
         backBox1.getChildren().addAll(backBtn3);
         
-        roomsTitle = new Label("Rooms:");
-        roomsTitle.setFont(font);
+        primaryStage.setScene(mainScene);
+        primaryStage.setOnCloseRequest(e -> disconnect());
+        primaryStage.show();
+	}
+	
+	private void initScenes(){
+		
+		mainMenu = new BorderPane(); 
+		creditsMenu = new BorderPane();
+        keyMenu = new BorderPane();
+        connectMenu = new BorderPane();
+        serverMenu = new BorderPane();
+        singleMenu = new BorderPane();
         
-        roomsBox = new FlowPane();
-        roomsBox.setVgap(10);
-        roomsBox.setHgap(10);
-        roomsBox.setMinHeight(100);
-        //roomsBox.setStyle("-fx-background-color: aqua;"
-        //		+ "-fx-border-width: 2;"
-        //		+ "-fx-border-color: grey;");
-        
-        roomsListPane = new VBox();
-        roomsListPane.setSpacing(10);
-        roomsListPane.setAlignment(Pos.TOP_LEFT);
-        roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
-        
-        playersTitle = new Label("Online Players:");
-        playersTitle.setFont(font);
-        
-        playersBox = new VBox();
-        playersBox.setSpacing(20);
-        playersBox.setPadding(new Insets(10));
-        playersBox.setMinHeight(200);
-        playersBox.setStyle("-fx-background-color: plum;"
-        		+ "-fx-border-width: 2;"
-        		+ "-fx-border-color: grey;");
-        playersBox.setAlignment(Pos.TOP_LEFT);
-        
-        playersListPane = new VBox();
-        playersListPane.setSpacing(10);
-        playersListPane.getChildren().addAll(playersTitle, playersBox);
-        playersListPane.setAlignment(Pos.TOP_LEFT);
-        
-        roomsPlayersPane = new VBox();
-        roomsPlayersPane.setSpacing(40);
-        roomsPlayersPane.setPadding(new Insets(100));
-        roomsPlayersPane.setAlignment(Pos.CENTER);
-        roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
-        
-        roomMenu = new VBox();
-        createRoomBtn = new Button("New\nRoom");
-        createRoomBtn.setOnAction(e -> createRoom());
+        //settingsScene = createScene(settingsMenu);
+        //keyScene = createScene(keyMenu);
+        connectScene = createScene(connectMenu);
+        serverScene = createScene(serverMenu);
+        singleScene = createScene(singleMenu);
+        mainScene = createScene(mainMenu);
+		creditsScene = createScene(creditsMenu);
+		
+		initMainScene();
+		initCreditsScene();
+		initSingleScene();
+		initConnectScene();
+		initServerScene();
+		initRoomScene();
+	}
+	
+	private void initRoomScene() {
+		roomMenu = new VBox();
         
         addAi = new Button("Add Ai");
         addAi.setOnAction(e -> incrementAi());
@@ -338,36 +325,65 @@ public class UserInterface extends Application implements ClientNetInterface{
         backButtonRooms.setOnAction(e -> previous());
         roomMenu.getChildren().addAll(backButtonRooms, addAi, removeAi, startGame);
         
-        serverMenu.getChildren().addAll(disconnectBtn, createRoomBtn, roomsPlayersPane);
-        
-        primaryStage.setScene(mainScene);
-        primaryStage.setOnCloseRequest(e -> disconnect());
-        primaryStage.show();
 	}
-	
-	private void initScenes(){
+
+	private void initServerScene() {
 		
-		mainMenu = new BorderPane(); 
-		creditsMenu = new BorderPane();
-        keyMenu = new VBox();
-        connectMenu = new BorderPane();
-        serverMenu = new VBox();
-        singleMenu = new BorderPane();
-        
-        //settingsScene = createScene(settingsMenu);
-        //keyScene = createScene(keyMenu);
-        connectScene = createScene(connectMenu);
-        serverScene = createScene(serverMenu);
-        singleScene = createScene(singleMenu);
-        mainScene = createScene(mainMenu);
-		creditsScene = createScene(creditsMenu);
+		disconnectBtn = createBackButton("Disconnect", true);
+
+		HBox backBox = new HBox();
+		backBox.setAlignment(Pos.CENTER_LEFT);
+		backBox.setPadding(new Insets(20, 10, 20, 10));
+		backBox.getChildren().add(disconnectBtn);
 		
-		initMainScene();
-		initCreditsScene();
-		initSingleScene();
-		initConnectScene();
+		createRoomBtn = createButton("New Room", 200, 50);
+		createRoomBtn.setOnAction(e -> createRoom());
+
+		roomsTitle = createLabel("Rooms:", false, true);
+
+		roomsBox = new FlowPane();
+		roomsBox.setVgap(20);
+		roomsBox.setHgap(40);
+		roomsBox.setMinHeight(100);
+		
+		roomsListPane = new VBox();
+		roomsListPane.setSpacing(10);
+		roomsListPane.setAlignment(Pos.TOP_LEFT);
+		roomsListPane.minHeightProperty().bind(roomsBox.minHeightProperty());
+		roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
+
+		playersTitle = createLabel("Online Players:", false, true);
+
+		playersBox = new VBox();
+		playersBox.setSpacing(20);
+		playersBox.setMinHeight(200);
+		playersBox.setAlignment(Pos.TOP_LEFT);
+
+		playersListPane = new VBox();
+		playersListPane.setSpacing(10);
+		playersListPane.getChildren().addAll(playersTitle, playersBox);
+		playersListPane.setAlignment(Pos.TOP_LEFT);
+		playersListPane.minHeightProperty().bind(playersBox.minHeightProperty());
+		
+		roomsPlayersPane = new VBox();
+		roomsPlayersPane.setSpacing(40);
+		roomsPlayersPane.setAlignment(Pos.CENTER);
+		roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
+		roomsBox.maxWidthProperty().bind(roomsPlayersPane.widthProperty());
+		BorderPane serverPane = new BorderPane();
+		VBox serverBox = new VBox();
+		serverBox.setSpacing(20);
+		serverBox.setAlignment(Pos.CENTER);
+		roomsPlayersPane.getStyleClass().add("creditsbox");
+		roomsPlayersPane.minHeightProperty().bind(roomsListPane.minHeightProperty().add(playersListPane.minHeightProperty()));
+		serverBox.minHeightProperty().bind(roomsPlayersPane.minHeightProperty());
+		serverBox.getChildren().addAll(createRoomBtn, roomsPlayersPane);
+		serverPane.setTop(backBox);
+		serverPane.setPadding(new Insets(0, 20, 20, 20));
+		serverPane.setCenter(serverBox);
+		setBackgroundPane(serverMenu, serverPane);
 	}
-	
+
 	private void initConnectScene(){
 		
 		enterLabel = createLabel("Enter Server Details:", false, false);
@@ -386,9 +402,9 @@ public class UserInterface extends Application implements ClientNetInterface{
         ipBox.getChildren().addAll(ipText, slashLabel, portNum);
         
         connectBtn = createButton("Connect", 300, 75);
-        connectBtn.setOnAction(e -> connect(multiScene, ipText.getText(), Integer.parseInt(portNum.getText())));
+        connectBtn.setOnAction(e -> connect(serverScene, /*ipText.getText(), Integer.parseInt(portNum.getText())*/ "localhost", 1234));
         
-        backBtn4 = createBackButton("Back", true);
+        backBtn4 = createBackButton("Cancel", true);
 
         VBox connectBox = new VBox();
         connectBox.setSpacing(20);
@@ -873,6 +889,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		}
 		this.expectingConnection = false;
 
+		System.out.println(this.previousScenes);
 		if(this.previousScenes.size() != 0){
 			previous();
 		}
@@ -962,34 +979,28 @@ public class UserInterface extends Application implements ClientNetInterface{
 			VBox roomContainer = new VBox();
 			roomContainer.setMinHeight(100);
 			roomContainer.setMinWidth(100);
-			roomContainer.setStyle("-fx-background-color: blue;"
-					+ "-fx-border-width: 2;"
-					+ "-fx-border-color: grey;");
 			roomContainer.setAlignment(Pos.CENTER);
-			Label roomName = new Label(room.getName());
+			roomContainer.getStyleClass().add("namebox");
+			Label roomName = createLabel(room.getName(), false, false);
 			roomName.setPrefHeight(50);
 			roomName.setAlignment(Pos.CENTER);
-			//roomName.setPadding(new Insets(20));
-			roomName.setStyle("-fx-background-color: blue;"
-					+ "-fx-text-fill: white;");
-			//roomName.setFont(Font.font(font, FontWeight.BOLD, 40));
-			Button joinButton = new Button("JOIN");
-			joinButton.setPrefHeight(50);
-			joinButton.setOnAction(e -> joinRoom(room.getID()));
 			HBox roomPane = new HBox();
 			roomPane.setSpacing(15);
 			roomPane.setPrefHeight(50);
 			roomPane.setAlignment(Pos.CENTER);
-			Label numPlayers = new Label("" + room.getPlayerNumber());
-			Label slash = new Label("/");
-			Label maxPlayers = new Label("" + room.getMaxPlayer());
-			slash.setAlignment(Pos.CENTER);
-			//slash.setFont(Font.font(font, FontWeight.BOLD, 50));
-			numPlayers.setAlignment(Pos.CENTER);
-			//numPlayers.setFont(Font.font(font, FontWeight.BOLD, 50));
-			maxPlayers.setAlignment(Pos.CENTER);
-			//maxPlayers.setFont(Font.font(font, FontWeight.BOLD, 50));
-			roomPane.getChildren().addAll(joinButton, numPlayers, slash, maxPlayers);
+			Label numPlayers = createLabel(room.getPlayerNumber() + "/" + room.getMaxPlayer(), true, true);
+			if(room.getPlayerNumber() < room.getMaxPlayer()){
+				Button joinButton = createButton("Join", 100, 50);
+				joinButton.setOnAction(e -> joinRoom(room.getID()));
+				roomPane.getChildren().addAll(joinButton, numPlayers);
+			}
+			else{
+				Label fullLabel = createLabel("FULL", false, false);
+				fullLabel.setPrefWidth(100);
+				fullLabel.setPrefHeight(50);
+				fullLabel.getStyleClass().add("textfield");
+				roomPane.getChildren().addAll(fullLabel, numPlayers);
+			}
 			roomContainer.getChildren().addAll(roomName, roomPane);
 			
 			this.roomsBox.getChildren().add(roomContainer);
@@ -1015,8 +1026,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.playersBox.getChildren().clear();
 		
 		for(ClientServerPlayer player : connectedPlayers){
-			Label playerLabel = new Label("Connected (" + player.getID() + "): " + player.getName());
-			//playerLabel.setFont(Font.font(font, FontPosture.ITALIC, 15));
+			Label playerLabel = createLabel("- Player ID [ " + player.getID() + " ] : " + player.getName(), true, true);
 			this.playersBox.getChildren().add(playerLabel);
 		}
 	}
@@ -1035,7 +1045,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
-		System.out.println("was at " + this.currentScene);
+		System.out.println("am at " + this.currentScene);
 		this.currentStage.setScene(this.previousScenes.pop());
 		System.out.println("now at " + this.currentScene);
 		
@@ -1053,6 +1063,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		this.previousScenes.push(thisScene);
 		System.out.println("Added " + thisScene);
+		System.out.println(this.previousScenes);
 		this.currentStage.setScene(nextScene);
 		this.currentScene = nextScene;
 		
@@ -1114,7 +1125,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				if(expectingConnection){
-					advance(multiScene, serverScene);
+					advance(connectScene, serverScene);
 					displayPlayers();
 					displayRooms();
 				}
