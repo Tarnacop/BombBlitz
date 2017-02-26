@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.AudioEvent;
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -266,11 +267,15 @@ public class ServerPacketEncoder {
 		for (int i = 0; i < aiPlayers.length; i++) {
 			ServerAI ai = aiPlayers[i];
 			byte id = ai.getID();
-			if (dest.length < buffer.position() + 1) {
+			byte difficulty = aiDifficultyToByte(ai.getDifficulty());
+
+			if (dest.length < buffer.position() + 1 + 1) {
 				throw new IOException("dest is too short");
 			}
 			// put AI id
 			buffer.put(id);
+			// put AI difficulty
+			buffer.put(difficulty);
 		}
 
 		len = buffer.position();
@@ -642,5 +647,34 @@ public class ServerPacketEncoder {
 		}
 
 		return b;
+	}
+
+	/**
+	 * Convert AIDifficulty into byte
+	 * 
+	 * @param difficulty
+	 *            the AIDifficulty
+	 * @return the byte
+	 */
+	public static byte aiDifficultyToByte(AIDifficulty difficulty) {
+		byte aiDifficulty;
+		switch (difficulty) {
+		case EASY:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY;
+			break;
+		case MEDIUM:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM;
+			break;
+		case HARD:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD;
+			break;
+		case EXTREME:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME;
+			break;
+		default:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM;
+			break;
+		}
+		return aiDifficulty;
 	}
 }

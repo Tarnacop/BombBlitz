@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.GameState;
 import bomber.game.KeyboardState;
 
@@ -1007,7 +1008,7 @@ public class ClientThread implements Runnable {
 	 */
 	public synchronized void setRoomName(String name) throws IOException {
 		if (!inRoom) {
-			pClient("Warning: client is possibly already not in a room");
+			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
 			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
@@ -1038,7 +1039,7 @@ public class ClientThread implements Runnable {
 	 */
 	public synchronized void setRoomMaxPlayer(int maxPlayer) throws IOException {
 		if (!inRoom) {
-			pClient("Warning: client is possibly already not in a room");
+			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
 			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
@@ -1063,7 +1064,7 @@ public class ClientThread implements Runnable {
 	 */
 	public synchronized void setRoomMapID(int mapID) throws IOException {
 		if (!inRoom) {
-			pClient("Warning: client is possibly already not in a room");
+			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
 			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
@@ -1086,7 +1087,7 @@ public class ClientThread implements Runnable {
 	 */
 	public synchronized void addAI() throws IOException {
 		if (!inRoom) {
-			pClient("Warning: client is possibly already not in a room");
+			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
 			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
@@ -1109,7 +1110,7 @@ public class ClientThread implements Runnable {
 	 */
 	public synchronized void removeAI() throws IOException {
 		if (!inRoom) {
-			pClient("Warning: client is possibly already not in a room");
+			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
 			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
@@ -1122,6 +1123,55 @@ public class ClientThread implements Runnable {
 		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI_REMOVE);
 
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
+	}
+
+	/**
+	 * Send a "set AI difficulty in room" request to the server
+	 * 
+	 * @param id
+	 *            the id of the AI
+	 * @param difficulty
+	 *            the difficulty of the AI
+	 * @throws IOException
+	 */
+	public synchronized void setAIDifficulty(int id, AIDifficulty difficulty) throws IOException {
+		if (!inRoom) {
+			pClient("Warning: client is possibly not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		// prepare the buffer
+		publicSendByteBuffer.position(3);
+		publicSendByteBuffer.putInt(this.roomID);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI);
+		publicSendByteBuffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY);
+		publicSendByteBuffer.put((byte) id);
+
+		byte aiDifficulty;
+		switch (difficulty) {
+		case EASY:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY;
+			break;
+		case MEDIUM:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM;
+			break;
+		case HARD:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD;
+			break;
+		case EXTREME:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME;
+			break;
+		default:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM;
+			break;
+		}
+
+		publicSendByteBuffer.put(aiDifficulty);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1 + 1 + 1, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
 	}
 

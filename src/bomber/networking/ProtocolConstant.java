@@ -87,7 +87,6 @@ public class ProtocolConstant {
 	public static final byte MSG_C_ROOM_SETINFO_AI = 0x03;
 	public static final byte MSG_C_ROOM_SETINFO_AI_ADD = 0x00;
 	public static final byte MSG_C_ROOM_SETINFO_AI_REMOVE = 0x01;
-	// TODO AI difficulty settings
 	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY = 0x02;
 	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY = 0x00;
 	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM = 0x01;
@@ -109,8 +108,8 @@ public class ProtocolConstant {
 	/* add AI: 1 byte constant 0x3 + 1 byte constant 0x0 */
 	/* remove AI: 1 byte constant 0x3 + 1 byte constant 0x1 */
 	/*
-	 * TODO set AI difficulty: 1 byte constant 0x3 + 1 byte constant 0x2 + 1
-	 * byte AI id + 1 byte AI difficulty
+	 * set AI difficulty: 1 byte constant 0x3 + 1 byte constant 0x2 + 1 byte AI
+	 * id + 1 byte AI difficulty
 	 */
 
 	// public static final byte MSG_C_ROOM_GETINFO = 0x0d;
@@ -212,7 +211,8 @@ public class ProtocolConstant {
 	 * player number + 1 byte max player limit + 1 byte inGame flag + 4 byte
 	 * game map id + array of up to 4 human player info(4 byte player id + 1
 	 * byte player name length + bytes of player string + 1 byte isReadyToPlay
-	 * flag) + array of up to 4 AI player info(1 byte AI id)
+	 * flag) + array of up to 4 AI player info(1 byte AI id + 1 byte AI
+	 * difficulty)
 	 */
 
 	public static final byte MSG_S_ROOM_GAMESTART = 0x4f; // Bit set

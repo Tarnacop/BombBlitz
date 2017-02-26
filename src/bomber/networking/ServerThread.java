@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.KeyboardState;
 
 public class ServerThread implements Runnable {
@@ -814,6 +815,28 @@ public class ServerThread implements Runnable {
 					room.addAI();
 				} else if (op == ProtocolConstant.MSG_C_ROOM_SETINFO_AI_REMOVE) {
 					room.removeAI();
+				} else if (op == ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY && packet.getLength() >= 11) {
+					byte aiID = recvByteBuffer.get();
+					byte difficulty = recvByteBuffer.get();
+					AIDifficulty aiDifficulty;
+					switch (difficulty) {
+					case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY:
+						aiDifficulty = AIDifficulty.EASY;
+						break;
+					case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM:
+						aiDifficulty = AIDifficulty.MEDIUM;
+						break;
+					case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD:
+						aiDifficulty = AIDifficulty.HARD;
+						break;
+					case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME:
+						aiDifficulty = AIDifficulty.EXTREME;
+						break;
+					default:
+						aiDifficulty = AIDifficulty.MEDIUM;
+						break;
+					}
+					room.setAIDifficulty(aiID, aiDifficulty);
 				} else {
 					return;
 				}

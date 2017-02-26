@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.AudioEvent;
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -269,14 +270,17 @@ public class ClientPacketEncoder {
 		// get AI player info
 		List<ClientServerAI> aiPlayerList = new ArrayList<ClientServerAI>(4);
 		for (int i = 0; i < aiPlayerNumber; i++) {
-			if (length < buffer.position() + 1) {
+			if (length < buffer.position() + 1 + 1) {
 				throw new IOException("packet format is invalid");
 			}
 
-			// get player ID
+			// get AI ID
 			byte playerID = buffer.get();
+			// get AI difficulty
+			byte difficulty = buffer.get();
+			AIDifficulty aiDifficulty = byteToAIDifficulty(difficulty);
 
-			aiPlayerList.add(new ClientServerAI(playerID));
+			aiPlayerList.add(new ClientServerAI(playerID, aiDifficulty));
 		}
 
 		if (length != buffer.position()) {
@@ -408,18 +412,24 @@ public class ClientPacketEncoder {
 			gameState.setPlayers(new ArrayList<>(4));
 		}
 		List<Player> playerList = gameState.getPlayers();
-		while (playerList.size() > numPlayer) {
-			playerList.remove(playerList.size() - 1);
+		synchronized (playerList) {
+			while (playerList.size() > numPlayer) {
+				playerList.remove(playerList.size() - 1);
+			}
+			while (playerList.size() < numPlayer) {
+				playerList.add(null);
+			}
 		}
-		while (playerList.size() < numPlayer) {
-			playerList.add(null);
-		}
-
 		for (int i = 0; i < numPlayer; i++) {
-			Player player = playerList.get(i);
+			Player player;
+			synchronized (playerList) {
+				player = playerList.get(i);
+			}
 			if (player == null) {
 				player = new Player(null, new Point(0, 0), 3, 321, null);
-				playerList.set(i, player);
+				synchronized (playerList) {
+					playerList.set(i, player);
+				}
 			}
 
 			int id = buffer.getInt();
@@ -473,18 +483,24 @@ public class ClientPacketEncoder {
 			gameState.setBombs(new ArrayList<>());
 		}
 		List<Bomb> bombList = gameState.getBombs();
-		while (bombList.size() > numBomb) {
-			bombList.remove(bombList.size() - 1);
+		synchronized (bombList) {
+			while (bombList.size() > numBomb) {
+				bombList.remove(bombList.size() - 1);
+			}
+			while (bombList.size() < numBomb) {
+				bombList.add(null);
+			}
 		}
-		while (bombList.size() < numBomb) {
-			bombList.add(null);
-		}
-
 		for (int i = 0; i < numBomb; i++) {
-			Bomb bomb = bombList.get(i);
+			Bomb bomb;
+			synchronized (bombList) {
+				bomb = bombList.get(i);
+			}
 			if (bomb == null) {
 				bomb = new Bomb(null, new Point(0, 0), 0, 0);
-				bombList.set(i, bomb);
+				synchronized (bombList) {
+					bombList.set(i, bomb);
+				}
 			}
 
 			int playerID = buffer.getInt();
@@ -773,6 +789,37 @@ public class ClientPacketEncoder {
 		}
 
 		return block;
+	}
+
+	/**
+	 * Convert byte into AIDifficulty
+	 * 
+	 * @param b
+	 *            the byte
+	 * @return the AIDifficulty
+	 */
+	public static AIDifficulty byteToAIDifficulty(byte b) {
+		AIDifficulty aiDifficulty;
+
+		switch (b) {
+		case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY:
+			aiDifficulty = AIDifficulty.EASY;
+			break;
+		case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM:
+			aiDifficulty = AIDifficulty.MEDIUM;
+			break;
+		case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD:
+			aiDifficulty = AIDifficulty.HARD;
+			break;
+		case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME:
+			aiDifficulty = AIDifficulty.EXTREME;
+			break;
+		default:
+			aiDifficulty = AIDifficulty.MEDIUM;
+			break;
+		}
+
+		return aiDifficulty;
 	}
 
 }
