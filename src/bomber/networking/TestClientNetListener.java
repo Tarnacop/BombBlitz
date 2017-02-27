@@ -86,7 +86,7 @@ public class TestClientNetListener implements ClientNetInterface {
 		}
 		System.out.println("AI players:");
 		for (ClientServerAI a : room.getAIPlayerList()) {
-			System.out.printf("player ID: %d\n", a.getID());
+			System.out.printf("player ID: %d, difficulty: %s\n", a.getID(), a.getDifficulty());
 		}
 		System.out.println();
 	}

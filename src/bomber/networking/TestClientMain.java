@@ -200,7 +200,34 @@ public class TestClientMain {
 
 					}
 
+				} else if (cmds.length == 3) {
+					if (cmds[0].equals("setaidiff")) {
+
+						byte id;
+						try {
+							id = Byte.parseByte(cmds[1]);
+						} catch (NumberFormatException e) {
+							System.out.println("Failed to parse AI id");
+							continue;
+						}
+
+						byte difficulty;
+						try {
+							difficulty = Byte.parseByte(cmds[2]);
+						} catch (NumberFormatException e) {
+							System.out.println("Failed to parse AI difficulty");
+							continue;
+						}
+
+						client.setAIDifficulty(id, ClientPacketEncoder.byteToAIDifficulty(difficulty));
+
+					} else {
+
+						pInvalid();
+
+					}
 				} else if (cmds.length == 4) {
+
 					if (cmds[0].equals("createroom")) {
 
 						byte maxPlayer = 4;

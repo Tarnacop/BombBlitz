@@ -3,7 +3,9 @@ package bomber.networking;
 import java.net.DatagramPacket;
 import java.net.SocketAddress;
 import java.time.Instant;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 /**
  * Client side representation of (the state of) server
@@ -25,6 +27,14 @@ public class ClientServerInfo {
 	private ArrayList<PacketHistoryEntry> packetHistoryList = new ArrayList<PacketHistoryEntry>(
 			maxPacketHistoryIndex + 1);
 
+	/*
+	 * keep track of up to 100 packet sequence and time stamp received from the
+	 * client for duplicate packet detection
+	 */
+	private int nextSequenceHistoryIndex = 0;
+	private final int maxSequenceHistoryIndex = 99;
+	private ArrayList<Entry<Short, Long>> sequenceHistoryList = new ArrayList<>(maxSequenceHistoryIndex + 1);
+
 	/**
 	 * Construct a new server representation
 	 * 
@@ -36,6 +46,9 @@ public class ClientServerInfo {
 		this.timeStamp = Instant.now().getEpochSecond();
 		for (int i = 0; i <= maxPacketHistoryIndex; i++) {
 			packetHistoryList.add(null);
+		}
+		for (int i = 0; i <= maxSequenceHistoryIndex; i++) {
+			sequenceHistoryList.add(null);
 		}
 	}
 
@@ -110,6 +123,37 @@ public class ClientServerInfo {
 		}
 
 		nextPacketHistoryListIndex++;
+	}
+
+	/**
+	 * Determine whether a packet received from the server is duplicate based on
+	 * its sequence number
+	 * 
+	 * @param sequence
+	 *            the sequence number of the packet
+	 * @return true if the packet is duplicate
+	 */
+	public boolean isSequenceDuplicate(short sequence) {
+		for (Entry<Short, Long> e : sequenceHistoryList) {
+			if (e != null && e.getKey() == sequence) {
+				if (System.currentTimeMillis() - e.getValue() < 25000) {
+					return true;
+				} else {
+					e.setValue(System.currentTimeMillis());
+					return false;
+				}
+			}
+		}
+
+		if (nextSequenceHistoryIndex > maxSequenceHistoryIndex) {
+			nextSequenceHistoryIndex = 0;
+		}
+
+		Entry<Short, Long> entry = new AbstractMap.SimpleEntry<Short, Long>(sequence, System.currentTimeMillis());
+		sequenceHistoryList.set(nextSequenceHistoryIndex, entry);
+		nextSequenceHistoryIndex++;
+
+		return false;
 	}
 
 	public String toString() {

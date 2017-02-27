@@ -179,7 +179,7 @@ public class PacketEncodeDecodeTest {
 		System.out.println(ServerThread.toHex(arr, ret));
 
 		try {
-			testGameState = ClientPacketEncoder.decodeGameState(12, testGameState, arr, ret);
+			testGameState = ClientPacketEncoder.decodeGameState(testGameState, arr, ret);
 			// testGameState = ClientPacketEncoder.decodeGameState(arr, ret);
 		} catch (IOException e) {
 			e.printStackTrace();
