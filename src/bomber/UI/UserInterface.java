@@ -22,7 +22,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -111,7 +113,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private VBox roomsPlayersPane;
 	private VBox playersListPane;
 	private FlowPane roomsBox;
-	private VBox playersBox;
+	private FlowPane playersBox;
 	private Button backBtn5;
 	private Button upBtn;
 	private Button downBtn;
@@ -132,7 +134,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private boolean expectingConnection;
 	private Scene currentScene;
 	private Font font;
-	
+	private Label roomCreationLabel;
 	private UserInterface ui;
 	
 	private Scene roomScene;
@@ -156,6 +158,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private VBox aiDiffBox;
 	private BorderPane connectMenu;
 	private Scene connectScene;
+	private TextField roomNameField;
+	private SimpleIntegerProperty roomNumber;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -165,6 +169,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.css = this.getClass().getResource("resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty("Player 1");
 		this.aiNumber = new SimpleIntegerProperty(1);
+		this.roomNumber = new SimpleIntegerProperty(4);
+		this.roomCreationLabel = createLabel("Create and join a room\nwith these settings", false, true);
 		this.aiDiff = AIDifficulty.EASY;
 		Maps maps = new Maps();
 		this.maps = maps.getMaps();
@@ -336,9 +342,70 @@ public class UserInterface extends Application implements ClientNetInterface{
 		backBox.setPadding(new Insets(20, 10, 20, 10));
 		backBox.getChildren().add(disconnectBtn);
 		
-		createRoomBtn = createButton("New Room", 200, 50);
+		createRoomBtn = createButton("Create New Room", 250, 50);
 		createRoomBtn.setOnAction(e -> createRoom());
 
+        Button upRoomNumToggle = new Button();
+        upRoomNumToggle.setPrefWidth(30);
+        upRoomNumToggle.getStyleClass().add("aitoggleup");
+        upRoomNumToggle.setOnAction(e -> incrementRoomNum());
+        
+        Label displayRoomNum = createBoundLabel(this.roomNumber, false, false);
+        displayRoomNum.getStyleClass().add("textfield");
+        displayRoomNum.setPrefWidth(30);
+        
+        Button downRoomNumToggle = new Button();
+        downRoomNumToggle.setPrefWidth(30);
+        downRoomNumToggle.getStyleClass().add("aitoggledown");
+        downRoomNumToggle.setOnAction(e -> decrementRoomNum());
+        
+        VBox roomNumBox = new VBox();
+        roomNumBox.setAlignment(Pos.CENTER);
+        roomNumBox.getStyleClass().add("nopadbox");
+        roomNumBox.maxHeightProperty().bind(upRoomNumToggle.heightProperty().add(displayRoomNum.heightProperty().add(downRoomNumToggle.heightProperty())));
+        roomNumBox.getChildren().addAll(upRoomNumToggle, displayRoomNum, downRoomNumToggle);
+        
+        Label roomNumLabel = createLabel("Room\nCapacity", false, false);
+        
+        HBox roomNumPane = new HBox();
+        roomNumPane.setAlignment(Pos.CENTER);
+        roomNumPane.getStyleClass().add("namebox");
+        roomNumPane.setSpacing(20);
+        roomNumPane.setMinWidth(250);
+        roomNumPane.getChildren().addAll(roomNumBox, roomNumLabel);
+        
+        roomNameField = createTextField("Enter Name");
+        
+        VBox roomNameBox = new VBox();
+        roomNameBox.setSpacing(10);
+        roomNameBox.getStyleClass().add("namebox");
+        roomNameBox.setAlignment(Pos.CENTER);
+        roomNameBox.setMinWidth(200);
+        roomNameBox.getChildren().addAll(createLabel("Room Name:", false, false), roomNameField);
+        
+        VBox roomDisplay = new VBox();
+        roomDisplay.setSpacing(20);
+        roomDisplay.setAlignment(Pos.CENTER);
+        roomDisplay.setMinWidth(300);
+        roomDisplay.getChildren().addAll(this.roomCreationLabel, createRoomBtn);
+        
+        Rectangle torch1 = new Rectangle();
+		torch1.setWidth(60);
+		torch1.setHeight(80);
+		torch1.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		
+		Rectangle torch2 = new Rectangle();
+		torch2.setWidth(60);
+		torch2.setHeight(80);
+		torch2.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+        
+		HBox createRoomPane = new HBox();
+		createRoomPane.setAlignment(Pos.CENTER);
+		createRoomPane.setSpacing(20);
+		createRoomPane.getStyleClass().add("wideclearbox");
+		createRoomPane.maxWidthProperty().bind(roomNumPane.widthProperty().add(roomNameBox.widthProperty().add(roomDisplay.widthProperty())));
+		createRoomPane.getChildren().addAll(torch1, roomNumPane, roomNameBox, roomDisplay, torch2);
+		
 		roomsTitle = createLabel("Rooms:", false, true);
 
 		roomsBox = new FlowPane();
@@ -354,11 +421,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 		playersTitle = createLabel("Online Players:", false, true);
 
-		playersBox = new VBox();
-		playersBox.setSpacing(20);
+		playersBox = new FlowPane(Orientation.VERTICAL);
+		playersBox.setVgap(20);
+		playersBox.setHgap(20);
 		playersBox.setMinHeight(200);
-		playersBox.setAlignment(Pos.TOP_LEFT);
-
 		playersListPane = new VBox();
 		playersListPane.setSpacing(10);
 		playersListPane.getChildren().addAll(playersTitle, playersBox);
@@ -374,14 +440,22 @@ public class UserInterface extends Application implements ClientNetInterface{
 		VBox serverBox = new VBox();
 		serverBox.setSpacing(20);
 		serverBox.setAlignment(Pos.CENTER);
-		roomsPlayersPane.getStyleClass().add("creditsbox");
+		roomsPlayersPane.getStyleClass().add("wideclearbox");
 		roomsPlayersPane.minHeightProperty().bind(roomsListPane.minHeightProperty().add(playersListPane.minHeightProperty()));
 		serverBox.minHeightProperty().bind(roomsPlayersPane.minHeightProperty());
-		serverBox.getChildren().addAll(createRoomBtn, roomsPlayersPane);
+		serverBox.getChildren().addAll(createRoomPane, roomsPlayersPane);
 		serverPane.setTop(backBox);
 		serverPane.setPadding(new Insets(0, 20, 20, 20));
 		serverPane.setCenter(serverBox);
 		setBackgroundPane(serverMenu, serverPane);
+	}
+
+	private void decrementRoomNum() {
+		if(this.roomNumber.get() > 2)roomNumber.set(this.roomNumber.get()-1);
+	}
+
+	private void incrementRoomNum() {
+		if(this.roomNumber.get() < 4)roomNumber.set(this.roomNumber.get()+1);
 	}
 
 	private void initConnectScene(){
@@ -496,14 +570,15 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiBox.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
         
         aiLabel = createLabel("Number of\nAI Players", false, false);
-        aiExplanation = createLabel("AI players will\nseek to\ndestroy you.", true, true);
-        aiExplanation.setAlignment(Pos.CENTER);
-        aiExplanation.setPrefWidth(200);
+        
         aiPane = new HBox();
         aiPane.setAlignment(Pos.CENTER);
         aiPane.getStyleClass().add("namebox");
         aiPane.setSpacing(20);
         aiPane.getChildren().addAll(aiBox, aiLabel);
+        aiExplanation = createLabel("AI players will\nseek to\ndestroy you.", true, true);
+        aiExplanation.setAlignment(Pos.CENTER);
+        aiExplanation.setPrefWidth(200);
         
         ChoiceBox<String> aiDifficultyChoice = new ChoiceBox<>();
         aiDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
@@ -592,32 +667,32 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		mapCanvas.getChildren().clear();
 		Rectangle torch1 = new Rectangle();
-		torch1.setWidth(100);
-		torch1.setHeight(100);
+		torch1.setWidth(60);
+		torch1.setHeight(80);
 		torch1.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
-		torch1.setX(20);
-		torch1.setY(20);
+		torch1.setX(40);
+		torch1.setY(30);
 		
 		Rectangle torch2 = new Rectangle();
-		torch2.setWidth(100);
-		torch2.setHeight(100);
+		torch2.setWidth(60);
+		torch2.setHeight(80);
 		torch2.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
-		torch2.setX(mapCanvas.getWidth()-xpadding+130);
-		torch2.setY(20);
+		torch2.setX(mapCanvas.getWidth()-xpadding+150);
+		torch2.setY(30);
 		
 		Rectangle torch3 = new Rectangle();
-		torch3.setWidth(100);
-		torch3.setHeight(100);
+		torch3.setWidth(60);
+		torch3.setHeight(80);
 		torch3.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
-		torch3.setX(mapCanvas.getWidth()-xpadding+130);
-		torch3.setY(160);
+		torch3.setX(mapCanvas.getWidth()-xpadding+150);
+		torch3.setY(170);
 		
 		Rectangle torch4 = new Rectangle();
-		torch4.setWidth(100);
-		torch4.setHeight(100);
+		torch4.setWidth(60);
+		torch4.setHeight(80);
 		torch4.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
-		torch4.setX(20);
-		torch4.setY(160);
+		torch4.setX(40);
+		torch4.setY(170);
 		
 		mapCanvas.getChildren().addAll(torch1, torch2, torch3, torch4);
 		
@@ -834,13 +909,23 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	private void createRoom() {
 	
+		if(this.roomNameField.getText().length() < 1){
+			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Name too short! )");
+		}
+		else if(this.roomNameField.getText().length() > 11){
+			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Name too long! )");
+		}
+			else{
 		try {
-			this.client.createRoom("Room 1", (byte) 4, 1);
+			this.client.createRoom(this.roomNameField.getText(), (byte) this.roomNumber.get(), 1);
+			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Generating... )");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
 			advance(currentScene, roomScene);
+			this.roomCreationLabel.setText("Create and join a room\nwith these settings");
+		}
 		}
 	}
 
@@ -920,15 +1005,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void decrementAi() {
-		//System.out.println(this.aiNumber.get());
 		if(this.aiNumber.get() > 1)aiNumber.set(this.aiNumber.get()-1);
-		//System.out.println(" dec-> " + this.aiNumber.get());
 	}
 
 	private void incrementAi() {
-		//System.out.println(this.aiNumber.get());
 		if(this.aiNumber.get() < 3)aiNumber.set(this.aiNumber.get()+1);
-		//System.out.println(" inc-> " + this.aiNumber.get());
 	}
 	
 	private void connect(Scene thisScene, String hostName, int port) {
@@ -1052,6 +1133,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
 		
+		this.roomCreationLabel.setText("Create and join a room\nwith these settings");
+		this.currentNameText.set("Current Name:");
 		}
 	}
 	
