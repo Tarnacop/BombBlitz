@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 import bomber.game.KeyboardState;
 
-public class ClientMain {
+public class TestClientMain {
 
 	public static void main(String[] args) {
 		String hostname = null;
@@ -111,6 +111,14 @@ public class ClientMain {
 						short random = (short) new Random().nextInt();
 						KeyboardState k = ServerPacketEncoder.shortToKeyboardState(random);
 						client.sendMove(k);
+
+					} else if (cmds[0].equals("addai")) {
+
+						client.addAI();
+
+					} else if (cmds[0].equals("removeai")) {
+
+						client.removeAI();
 
 					} else {
 

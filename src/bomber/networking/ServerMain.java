@@ -15,6 +15,7 @@ public class ServerMain {
 		}
 
 		ServerConfiguration config = new ServerConfiguration();
+		config.setTickRate(60);
 
 		ServerThread server = null;
 		try {

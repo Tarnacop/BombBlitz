@@ -72,7 +72,8 @@ public class TestClientNetListener implements ClientNetInterface {
 
 	@Override
 	public void gameStarted() {
-		System.out.println("Client has received game start message from the server");
+		System.out.printf("Client has received game start message from the server, map ID: %d, width: %d, height: %d\n",
+				client.getMapID(), client.getMapWidth(), client.getMapHeight());
 	}
 
 	@Override
