@@ -29,6 +29,7 @@ public class ClientThread implements Runnable {
 	private long serverTimeOut = 25;
 	// the interval at which the client will test whether a new connection
 	// attempt is timeout
+	private long connectionAttemptTimeout = 15;
 	private long connectionAttemptTimeoutInterval = 3;
 	// the interval at which the client will test whether an established
 	// connection is timeout
@@ -156,7 +157,7 @@ public class ClientThread implements Runnable {
 		// connection attempt timeout task
 		Runnable connectionAttemptTimeoutTask = () -> {
 			if (attemptingConnection
-					&& Instant.now().getEpochSecond() - attemptingConnectionTimeStamp > serverTimeOut) {
+					&& Instant.now().getEpochSecond() - attemptingConnectionTimeStamp > connectionAttemptTimeout) {
 				setConnected(false);
 
 				for (ClientNetInterface e : netList) {
@@ -199,7 +200,7 @@ public class ClientThread implements Runnable {
 		};
 		scheduledExecutor.scheduleWithFixedDelay(keepAliveTask, keepAliveInterval, keepAliveInterval, TimeUnit.SECONDS);
 
-		// player list and room request task
+		// player list and room list request task
 		Runnable listRequestTask = () -> {
 			if (!isConnected()) {
 				setInRoom(false, -1);
