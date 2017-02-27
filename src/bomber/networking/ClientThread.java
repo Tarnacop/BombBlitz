@@ -160,7 +160,7 @@ public class ClientThread implements Runnable {
 				setConnected(false);
 
 				for (ClientNetInterface e : netList) {
-					e.disconnected();
+					e.connectionAttemptTimeout();
 				}
 
 				attemptingConnection = false;

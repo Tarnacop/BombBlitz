@@ -10,6 +10,12 @@ public interface ClientNetInterface {
 	public void disconnected();
 
 	/**
+	 * This method will be called when the client has not received response from
+	 * the server for a specific period after sending a connection request
+	 */
+	public void connectionAttemptTimeout();
+
+	/**
 	 * This method will be called when the client has received connection
 	 * accepted message from the server
 	 */

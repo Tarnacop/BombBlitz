@@ -15,6 +15,10 @@ public class TestClientNetListener implements ClientNetInterface {
 		System.out.println("Client has disconnected from the server");
 	}
 
+	public void connectionAttemptTimeout() {
+		System.out.println("Client has failed to connect to the server due to timeout");
+	}
+
 	@Override
 	public void connectionAccepted() {
 		System.out.println("Client has connected to the server successfully, ID: " + client.getClientID());
