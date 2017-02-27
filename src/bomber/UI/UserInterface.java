@@ -49,6 +49,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import bomber.AI.AIDifficulty;
 import bomber.game.Block;
@@ -416,7 +417,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		roomsListPane = new VBox();
 		roomsListPane.setSpacing(10);
 		roomsListPane.setAlignment(Pos.TOP_LEFT);
-		roomsListPane.minHeightProperty().bind(roomsBox.minHeightProperty());
+		roomsListPane.minHeightProperty().bind(roomsBox.minHeightProperty().add(100));
 		roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
 
 		playersTitle = createLabel("Online Players:", false, true);
@@ -476,7 +477,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         ipBox.getChildren().addAll(ipText, slashLabel, portNum);
         
         connectBtn = createButton("Connect", 300, 75);
-        connectBtn.setOnAction(e -> connect(serverScene, /*ipText.getText(), Integer.parseInt(portNum.getText())*/ "localhost", 1234));
+        connectBtn.setOnAction(e -> connect());
         
         backBtn4 = createBackButton("Cancel", true);
 
@@ -506,8 +507,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
 		mapContainer.setAlignment(Pos.CENTER);
-		Label mapNameLabel = createBoundLabel(this.mapName, false, false);
-		mapNameLabel.getStyleClass().add("textfield");
+		Label mapNameLabel = createBoundLabel(this.mapName, false, true);
+		mapNameLabel.getStyleClass().add("maplabel");
 		Image keyImage = new Image("bomber/UI/resources/images/key.png");
         ImageView mapKey = new ImageView(keyImage);
         
@@ -823,6 +824,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		label.setFont(font);
 		if(white)label.setTextFill(Color.WHITE);
 		label.setAlignment(Pos.CENTER);
+		label.setTextAlignment(TextAlignment.CENTER);
 		if(shaded){
 			label.getStyleClass().add("shaded");
 		}
@@ -1012,12 +1014,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 		if(this.aiNumber.get() < 3)aiNumber.set(this.aiNumber.get()+1);
 	}
 	
-	private void connect(Scene thisScene, String hostName, int port) {
+	private void connect() {
 		
-		System.out.println("Attempting connection to: " + hostName + ", port = " + port);
+		enterLabel.setText("Enter Server Details:");
+		String host = ipText.getText();
+		try{
+			int port = Integer.parseInt(portNum.getText());
+		
+		System.out.println("Attempting connection to: " + host + ", port = " + port);
 		this.client = null;
-		try {
-			client = new ClientThread(hostName, port);
+			client = new ClientThread(host, port);
 
 			client.addNetListener(this);
 
@@ -1027,12 +1033,28 @@ public class UserInterface extends Application implements ClientNetInterface{
 			client.connect(this.playerName.get());
 			client.updateRoomList();
 			client.updatePlayerList();
-		} catch (Exception e1) {
-		}finally{
 			
+			connectBtn.setOnAction(null);
+			connectBtn.getStyleClass().clear();
+			connectBtn.getStyleClass().add("textfield");
+			connectBtn.setText("Connecting...");
 			this.expectingConnection = true;
-				
+		} 
+		catch (NumberFormatException e1) {
+			enterLabel.setText("Enter Server Details:\n( Invalid Port Number! )");
+			connectBtn.setOnAction(e -> connect());
+			connectBtn.getStyleClass().clear();
+			connectBtn.getStyleClass().add("menubutton");
+			connectBtn.setText("Connect");
 		}
+		catch(IOException e2){
+			enterLabel.setText("Enter Server Details:\n( Couldn't open a connection! )");
+			connectBtn.setOnAction(e -> connect());
+			connectBtn.getStyleClass().clear();
+			connectBtn.getStyleClass().add("menubutton");
+			connectBtn.setText("Connect");
+		}
+		
 		
 //			// update my player list
 //			client.updatePlayerList();
@@ -1134,7 +1156,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.currentStage.setHeight(y);
 		
 		this.roomCreationLabel.setText("Create and join a room\nwith these settings");
+		enterLabel.setText("Enter Server Details:");
 		this.currentNameText.set("Current Name:");
+		
+		connectBtn.setOnAction(e -> connect());
+		connectBtn.getStyleClass().clear();
+		connectBtn.getStyleClass().add("menubutton");
+		connectBtn.setText("Connect");
 		}
 	}
 	
@@ -1208,6 +1236,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				if(expectingConnection){
+					
 					advance(connectScene, serverScene);
 					displayPlayers();
 					displayRooms();
@@ -1225,8 +1254,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				
-				disconnect();
+				enterLabel.setText("Enter Server Details:\n( A player with your name is already\nconncted to the server!\nChange and try again! )");
+				connectBtn.getStyleClass().clear();
+				connectBtn.getStyleClass().add("menubutton");
+				connectBtn.setText("Connect");
 			}
 			   
 		});
@@ -1244,7 +1275,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				disconnect();
+				enterLabel.setText("Enter Server Details:\n( Couldn't connect to server!\nMake sure server is running.)");
+				connectBtn.getStyleClass().clear();
+				connectBtn.getStyleClass().add("menubutton");
+				connectBtn.setText("Connect");
 			}
 			   
 		});
