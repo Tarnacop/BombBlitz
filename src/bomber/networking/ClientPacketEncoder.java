@@ -301,9 +301,6 @@ public class ClientPacketEncoder {
 	 * and sequence number and will be ignored. The caller should ensure the
 	 * first three bytes are correct before calling this method.
 	 * 
-	 * @param clientID
-	 *            the id of the client, so that the keyboard state of the client
-	 *            itself will not be overwritten by this method
 	 * @param gameState
 	 *            the game state to modify, or null to create a new game state
 	 * @param src
@@ -314,8 +311,7 @@ public class ClientPacketEncoder {
 	 *         GameState object if it is null
 	 * @throws IOException
 	 */
-	public static GameState decodeGameState(int clientID, GameState gameState, byte[] src, int length)
-			throws IOException {
+	public static GameState decodeGameState(GameState gameState, byte[] src, int length) throws IOException {
 		if (gameState == null) {
 			// gameState = new GameState(new Map("map", new
 			// Block[gridMapWidth][gridMapHeight], null), null);
@@ -449,22 +445,21 @@ public class ClientPacketEncoder {
 				player.setKeyState(k);
 			}
 
-			if (id != clientID) {
+			k.setMovement(Movement.NONE);
+			k.setBomb(false);
+			if (BitArray.getBit(keyState, 0)) {
 				k.setMovement(Movement.NONE);
-				k.setBomb(false);
-				if (BitArray.getBit(keyState, 0)) {
-					k.setMovement(Movement.NONE);
-				} else if (BitArray.getBit(keyState, 1)) {
-					k.setMovement(Movement.UP);
-				} else if (BitArray.getBit(keyState, 2)) {
-					k.setMovement(Movement.DOWN);
-				} else if (BitArray.getBit(keyState, 3)) {
-					k.setMovement(Movement.LEFT);
-				} else if (BitArray.getBit(keyState, 4)) {
-					k.setMovement(Movement.RIGHT);
-				}
-				k.setBomb(BitArray.getBit(keyState, 5));
+			} else if (BitArray.getBit(keyState, 1)) {
+				k.setMovement(Movement.UP);
+			} else if (BitArray.getBit(keyState, 2)) {
+				k.setMovement(Movement.DOWN);
+			} else if (BitArray.getBit(keyState, 3)) {
+				k.setMovement(Movement.LEFT);
+			} else if (BitArray.getBit(keyState, 4)) {
+				k.setMovement(Movement.RIGHT);
 			}
+			k.setBomb(BitArray.getBit(keyState, 5));
+
 			player.setName("player " + id);
 			player.getPos().x = posX;
 			player.getPos().y = posY;
@@ -473,7 +468,6 @@ public class ClientPacketEncoder {
 			player.setPlayerID(id);
 			player.setBombRange(bombRange);
 			player.setMaxNrOfBombs(maxBomb);
-			// player.setKeyState(k);
 			player.setAlive(isAlive);
 		}
 
@@ -559,7 +553,7 @@ public class ClientPacketEncoder {
 	 * @return a list of ClientServerRoom
 	 * @throws IOException
 	 */
-	public static GameState decodeGameState(byte[] src, int length) throws IOException {
+	private static GameState decodeGameState(byte[] src, int length) throws IOException {
 		if (src == null) {
 			throw new IOException("src is null");
 		}

@@ -47,6 +47,10 @@ public class ClientThread implements Runnable {
 	// whether the connection has been established
 	private boolean connected = false;
 
+	// the name of the client
+	private String name = "defname";
+	private String tmpName = "tmpname";
+
 	// the ID of the client
 	private int clientID = -1;
 
@@ -271,6 +275,32 @@ public class ClientThread implements Runnable {
 		}
 
 		switch (messageType) {
+		case ProtocolConstant.MSG_S_NET_NONCE: {
+			if (packet.getLength() < 11) {
+				return;
+			}
+
+			if (isConnected()) {
+				pClient("Warning: client has possibly already connected");
+			}
+
+			long nonce = recvByteBuffer.getLong(3);
+			byte[] nameData = tmpName.getBytes("UTF-8");
+			// System.out.println("Server nonce: " + nonce);
+
+			// prepare the buffer
+			sendByteBuffer.putLong(3, nonce);
+			sendByteBuffer.put(11, (byte) nameData.length);
+			sendByteBuffer.position(12);
+			sendByteBuffer.put(nameData);
+
+			// send the packet
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 8 + 1 + nameData.length, serverSockAddr);
+			sendPacket(p, ProtocolConstant.MSG_C_NET_CONNECT, true);
+
+			break;
+		}
+
 		case ProtocolConstant.MSG_S_NET_ACCEPT: {
 			// pClient("Connection has been accepted by the server");
 
@@ -285,6 +315,7 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
+			name = tmpName;
 			setConnected(true);
 			setInRoom(false, -1);
 			setClientID(id);
@@ -556,15 +587,7 @@ public class ClientThread implements Runnable {
 			 */
 
 			try {
-				/*
-				 * gameState = ClientPacketEncoder.decodeGameState(recvBuffer,
-				 * packet.getLength());
-				 */
-				/*
-				 * modifying a game state instead of keep creating new ones
-				 * reduced JVM memory usage from around 200 MB to 70 MB
-				 */
-				gameState = ClientPacketEncoder.decodeGameState(clientID, gameState, recvBuffer, packet.getLength());
+				gameState = ClientPacketEncoder.decodeGameState(gameState, recvBuffer, packet.getLength());
 			} catch (IOException e) {
 				pClient("Failed to decode game state");
 				return;
@@ -729,20 +752,23 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void connect(String name) throws IOException {
+		if (isConnected()) {
+			pClient("Warning: client has possibly already connected");
+		}
+
 		// ignore null or empty name
 		if (name == null || name.length() < 1) {
 			throw new IOException("name cannot be null or zero length");
 		}
-		byte[] nameData = name.getBytes("UTF-8");
+
+		tmpName = name;
 
 		// prepare the buffer
-		publicSendByteBuffer.put(3, (byte) nameData.length);
-		publicSendByteBuffer.position(4);
-		publicSendByteBuffer.put(nameData);
+		publicSendByteBuffer.putLong(3, 0);
 
 		// send the packet
-		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 1 + nameData.length, serverSockAddr);
-		sendPacket(p, ProtocolConstant.MSG_C_NET_CONNECT, true);
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 8, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_NET_GETNONCE, true);
 	}
 
 	/**
@@ -751,6 +777,10 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void updatePlayerList() throws IOException {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_GETPLAYERLIST, true);
 	}
@@ -761,6 +791,10 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void updateRoomList() throws IOException {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_LOBBY_GETROOMLIST, true);
 	}
@@ -771,6 +805,10 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void disconnect() throws IOException {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected already");
+		}
+
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_NET_DISCONNECT, true);
 	}
@@ -782,6 +820,15 @@ public class ClientThread implements Runnable {
 	 */
 	public boolean isConnected() {
 		return connected;
+	}
+
+	/**
+	 * Get the name of the client
+	 * 
+	 * @return the name of the client
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -813,7 +860,7 @@ public class ClientThread implements Runnable {
 	 * @return true if the client is in lobby, false if the client is in a room
 	 */
 	public boolean isInLobby() {
-		return !inRoom;
+		return !isInRoom();
 	}
 
 	/**
@@ -873,11 +920,6 @@ public class ClientThread implements Runnable {
 	 * @return a non-negative room ID, or -1 when the client is not in a room
 	 */
 	public int getRoomID() {
-		if (!inRoom) {
-			roomID = -1;
-			inGame = false;
-		}
-
 		return roomID;
 	}
 
@@ -943,6 +985,10 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void createRoom(String roomName, int maxPlayer, int mapID) throws IOException {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
 		if (roomName == null || roomName.length() < 1) {
 			throw new IOException("name cannot be null or have zero length");
 		}
@@ -967,6 +1013,10 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void joinRoom(int roomID) throws IOException {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
 		if (inRoom) {
 			pClient("Warning: client is possibly already in a room");
 		}
@@ -985,7 +1035,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void leaveRoom() throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly already not in a room");
 		}
 
@@ -1005,7 +1059,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void setRoomName(String name) throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
@@ -1036,7 +1094,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void setRoomMaxPlayer(int maxPlayer) throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
@@ -1061,7 +1123,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void setRoomMapID(int mapID) throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
@@ -1084,7 +1150,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void addAI() throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
@@ -1107,7 +1177,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void removeAI() throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
@@ -1134,7 +1208,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void setAIDifficulty(int id, AIDifficulty difficulty) throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly not in a room");
 		}
 		if (isInGame()) {
@@ -1183,7 +1261,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void readyToPlay(boolean readyToPlay) throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly not in a room yet");
 		}
 
@@ -1202,7 +1284,11 @@ public class ClientThread implements Runnable {
 	}
 
 	public synchronized void sendMove(KeyboardState keyboardState) throws IOException {
-		if (!inRoom) {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
 			pClient("Warning: client is possibly not in a room yet");
 		}
 
@@ -1220,6 +1306,7 @@ public class ClientThread implements Runnable {
 	 * from the server first
 	 */
 	public void exit() {
+		pClient("exit() called");
 		socket.close();
 	}
 
