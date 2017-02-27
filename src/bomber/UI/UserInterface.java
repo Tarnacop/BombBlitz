@@ -161,6 +161,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Scene connectScene;
 	private TextField roomNameField;
 	private SimpleIntegerProperty roomNumber;
+	private boolean expectingRoomCreation;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -328,7 +329,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         roomScene = new Scene(roomMenu, 1000, 600);
         
-        backButtonRooms = new Button("Back");
+        backButtonRooms = createBackButton("Leave Room", true);
         backButtonRooms.setOnAction(e -> previous());
         roomMenu.getChildren().addAll(backButtonRooms, addAi, removeAi, startGame);
         
@@ -910,23 +911,20 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void createRoom() {
-	
-		if(this.roomNameField.getText().length() < 1){
+		String text = this.roomNameField.getText().trim();
+		if(text.length() < 1){
 			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Name too short! )");
 		}
-		else if(this.roomNameField.getText().length() > 11){
+		else if(text.length() > 11){
 			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Name too long! )");
 		}
 			else{
 		try {
-			this.client.createRoom(this.roomNameField.getText(), (byte) this.roomNumber.get(), 1);
+			this.client.createRoom(text, (byte) this.roomNumber.get(), 1);
 			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Generating... )");
+			this.expectingRoomCreation = true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}finally{
-			advance(currentScene, roomScene);
-			this.roomCreationLabel.setText("Create and join a room\nwith these settings");
 		}
 		}
 	}
@@ -964,7 +962,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void disconnect() {
-		if (this.client != null) {
+		if (this.client != null && !this.client.isInRoom()) {
 			try {
 
 				this.client.disconnect();
@@ -974,10 +972,15 @@ public class UserInterface extends Application implements ClientNetInterface{
 				this.client = null;
 			}
 		}
+		else if(this.client != null && !this.client.isInRoom()){
+			try {
+				this.client.leaveRoom();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		this.expectingConnection = false;
-
-		System.out.println(this.previousScenes);
-		if(this.previousScenes.size() != 0){
+		if(previousScenes.size() != 0){
 			previous();
 		}
 	}
@@ -1031,8 +1034,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			networkThread.start();
 
 			client.connect(this.playerName.get());
-			client.updateRoomList();
-			client.updatePlayerList();
 			
 			connectBtn.setOnAction(null);
 			connectBtn.getStyleClass().clear();
@@ -1235,13 +1236,22 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
+				System.out.println("Expecting Connection: " + expectingConnection);
 				if(expectingConnection){
 					
 					advance(connectScene, serverScene);
+					try {
+						client.updateRoomList();
+						client.updatePlayerList();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					displayPlayers();
 					displayRooms();
+					expectingConnection = false;
+					System.out.println("CONNECTION ACCEPTED");
 				}
-				System.out.println("CONNECTION ACCEPTED");
 			}
 			   
 		});
@@ -1250,14 +1260,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 	@Override
 	public void connectionRejected() {
 		
+		System.out.println("CALLED CONNECTION REJECTED");
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
 				enterLabel.setText("Enter Server Details:\n( A player with your name is already\nconncted to the server!\nChange and try again! )");
 				connectBtn.getStyleClass().clear();
+				connectBtn.setOnAction(e -> connect());
 				connectBtn.getStyleClass().add("menubutton");
 				connectBtn.setText("Connect");
+				expectingConnection = false;
 			}
 			   
 		});
@@ -1271,14 +1284,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 	@Override
 	public void notConnected() {
 		
+		System.out.println("CALLED NOT CONNECTED");
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
-				enterLabel.setText("Enter Server Details:\n( Couldn't connect to server!\nMake sure server is running.)");
+				enterLabel.setText("Enter Server Details:\n( Couldn't connect to server!\nMake sure server is running. )");
 				connectBtn.getStyleClass().clear();
+				connectBtn.setOnAction(e -> connect());
 				connectBtn.getStyleClass().add("menubutton");
 				connectBtn.setText("Connect");
+				expectingConnection = false;
 			}
 			   
 		});
@@ -1317,6 +1333,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				System.out.println("Room creation accepted");
+				if(expectingRoomCreation){
+					advance(currentScene, roomScene);
+					roomCreationLabel.setText("Create and join a room\nwith these settings");
+					expectingRoomCreation = false;
+				}
 			}
 			   
 		});
@@ -1329,6 +1350,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				System.out.println("Room creation rejected");
+				expectingRoomCreation = false;
 			}
 			   
 		});
@@ -1408,5 +1430,23 @@ public class UserInterface extends Application implements ClientNetInterface{
 	public void roomReceived() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void connectionAttemptTimeout() {
+		System.out.println("CALLED CONNECTION TIMEOUT");
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				enterLabel.setText("Enter Server Details:\n( Timed out trying to connect!\nMake sure server is running. )");
+				connectBtn.getStyleClass().clear();
+				connectBtn.setOnAction(e -> connect());
+				connectBtn.getStyleClass().add("menubutton");
+				connectBtn.setText("Connect");
+				expectingConnection = false;
+			}
+			   
+		});
 	}
 }
