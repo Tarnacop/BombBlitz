@@ -27,8 +27,11 @@ public class ClientThread implements Runnable {
 
 	// time out value for server, currently 25 seconds
 	private long serverTimeOut = 25;
-	// the interval at which the client will test whether the connection is
-	// timeout
+	// the interval at which the client will test whether a new connection
+	// attempt is timeout
+	private long connectionAttemptTimeoutInterval = 3;
+	// the interval at which the client will test whether an established
+	// connection is timeout
 	private long keepAliveInterval = 10;
 	// the interval at which the client will request the latest list of players
 	// and rooms from the server
@@ -43,6 +46,13 @@ public class ClientThread implements Runnable {
 
 	// history of packets sent to server
 	private final ClientServerInfo serverInfo;
+
+	/*
+	 * whether there is a connection in progress(after connected() being called
+	 * but before server's response)
+	 */
+	private boolean attemptingConnection = false;
+	private long attemptingConnectionTimeStamp;
 
 	// whether the connection has been established
 	private boolean connected = false;
@@ -143,7 +153,23 @@ public class ClientThread implements Runnable {
 		pClient("ready to connect to " + serverSockAddr);
 
 		// set up tasks
-		// server keep alive task
+		// connection attempt timeout task
+		Runnable connectionAttemptTimeoutTask = () -> {
+			if (attemptingConnection
+					&& Instant.now().getEpochSecond() - attemptingConnectionTimeStamp > serverTimeOut) {
+				setConnected(false);
+
+				for (ClientNetInterface e : netList) {
+					e.disconnected();
+				}
+
+				attemptingConnection = false;
+			}
+		};
+		scheduledExecutor.scheduleWithFixedDelay(connectionAttemptTimeoutTask, connectionAttemptTimeoutInterval,
+				connectionAttemptTimeoutInterval, TimeUnit.SECONDS);
+
+		// established connection keep alive task
 		Runnable keepAliveTask = () -> {
 			if (!isConnected()) {
 				setInRoom(false, -1);
@@ -324,6 +350,8 @@ public class ClientThread implements Runnable {
 				e.connectionAccepted();
 			}
 
+			attemptingConnection = false;
+
 			break;
 		}
 
@@ -336,6 +364,8 @@ public class ClientThread implements Runnable {
 				e.connectionRejected();
 			}
 
+			attemptingConnection = false;
+
 			break;
 		}
 
@@ -347,6 +377,8 @@ public class ClientThread implements Runnable {
 			for (ClientNetInterface e : netList) {
 				e.alreadyConnected();
 			}
+
+			attemptingConnection = false;
 
 			break;
 		}
@@ -361,6 +393,8 @@ public class ClientThread implements Runnable {
 				e.notConnected();
 			}
 
+			attemptingConnection = false;
+
 			break;
 		}
 
@@ -373,6 +407,8 @@ public class ClientThread implements Runnable {
 			for (ClientNetInterface e : netList) {
 				e.disconnected();
 			}
+
+			attemptingConnection = false;
 
 			break;
 		}
@@ -752,6 +788,11 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void connect(String name) throws IOException {
+		if (attemptingConnection) {
+			pClient("Error: client is attemping a connection already, please call connect() again later");
+			return;
+		}
+
 		if (isConnected()) {
 			pClient("Warning: client has possibly already connected");
 		}
@@ -760,6 +801,9 @@ public class ClientThread implements Runnable {
 		if (name == null || name.length() < 1) {
 			throw new IOException("name cannot be null or zero length");
 		}
+
+		attemptingConnection = true;
+		attemptingConnectionTimeStamp = Instant.now().getEpochSecond();
 
 		tmpName = name;
 

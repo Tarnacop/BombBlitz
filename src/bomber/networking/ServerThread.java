@@ -310,7 +310,12 @@ public class ServerThread implements Runnable {
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
 			} else {
-				nonceTable.remove(sockAddr);
+				// nonceTable.remove(sockAddr);
+				/*
+				 * TODO currently nonceTable is cleared after exceeding a
+				 * particular size, later we need to delete a few oldest items
+				 * instead based on the time when a nonce was created
+				 */
 			}
 
 			// name length check
