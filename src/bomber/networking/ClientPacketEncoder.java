@@ -420,10 +420,8 @@ public class ClientPacketEncoder {
 			Player player;
 			synchronized (playerList) {
 				player = playerList.get(i);
-			}
-			if (player == null) {
-				player = new Player(null, new Point(0, 0), 3, 321, null);
-				synchronized (playerList) {
+				if (player == null) {
+					player = new Player(null, new Point(0, 0), 3, 321, null);
 					playerList.set(i, player);
 				}
 			}
@@ -489,10 +487,8 @@ public class ClientPacketEncoder {
 			Bomb bomb;
 			synchronized (bombList) {
 				bomb = bombList.get(i);
-			}
-			if (bomb == null) {
-				bomb = new Bomb(null, new Point(0, 0), 0, 0);
-				synchronized (bombList) {
+				if (bomb == null) {
+					bomb = new Bomb(null, new Point(0, 0), 0, 0);
 					bombList.set(i, bomb);
 				}
 			}
