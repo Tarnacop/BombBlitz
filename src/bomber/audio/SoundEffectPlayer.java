@@ -21,7 +21,7 @@ public class SoundEffectPlayer extends Thread
         volume = Constants.defaultVolume;
     }
 
-    private void playSound(String fileName)
+    public void playSound(String fileName)
     {
         try {
             Clip clip = AudioSystem.getClip();
@@ -34,6 +34,7 @@ public class SoundEffectPlayer extends Thread
             AudioManager.setControlVolume(gainControl, volume);
             clip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            System.err.println("Could not load sound: " + Constants.audioFilesPath + fileName);
             e.printStackTrace();
         }
     }
@@ -52,7 +53,7 @@ public class SoundEffectPlayer extends Thread
                 playSound(Constants.playerDeathFilename);
                 break;
             case MOVEMENT:
-                playSound(Constants.movementFilename);
+                //playSound(Constants.movementFilename);
                 break;
             case POWERUP:
                 playSound(Constants.powerupFilename);
