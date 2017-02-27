@@ -1,3 +1,4 @@
+
 .menubutton{
 	-fx-background-color: transparent;
         -fx-background-image: url("images/button.png");
@@ -43,6 +44,15 @@
         -fx-background-repeat:no-repeat;
 }
 
+.widebox{
+	-fx-padding: 20px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/widebox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+
 .nopadbox{
 	-fx-padding:5px;
 	-fx-background-color: transparent;
@@ -59,6 +69,14 @@
         -fx-background-repeat:no-repeat;
 }
 
+.connectbox{
+	-fx-padding: 20px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/widefancybox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
 .creditsbox{
 	-fx-padding: 25px;
 	-fx-background-image: url("images/mapbox.png");
@@ -68,6 +86,13 @@
 
 .mapbox{
 	-fx-background-image: url("images/mapbox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.wideclearbox{
+	-fx-padding: 25px;
+	-fx-background-image: url("images/wideclearbox.png");
         -fx-background-size:100% 100%;
         -fx-background-repeat:no-repeat;
 }
