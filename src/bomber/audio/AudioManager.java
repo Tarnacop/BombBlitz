@@ -2,6 +2,7 @@ package bomber.audio;
 
 import bomber.game.AudioEvent;
 import bomber.game.Constants;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import javax.sound.sampled.FloatControl;
 import java.util.List;
@@ -78,27 +79,34 @@ public class AudioManager
 
     public void playEventList(List<AudioEvent> eventList)
     {
-        eventList.forEach(event ->
-        {
-            SoundEffectPlayer effects = new SoundEffectPlayer();
-            effects.start();
-            effects.play(event);
-            effects.interrupt();
-        });
+        eventList.forEach(effects::play);
         eventList.clear();
     }
 
-    public static void main(String[] args)
+    public static void playMenuItemSelected()
+    {
+        SoundEffectPlayer effects = new SoundEffectPlayer();
+        effects.playSound(Constants.menuSoundFilename);
+        effects.interrupt();
+    }
+
+    public static void main(String[] args) throws InterruptedException
     {
         AudioManager audioManager = new AudioManager();
-        audioManager.playMusic();
+        //audioManager.playMusic();
         audioManager.setVolume(100);
+
+        AudioManager.playMenuItemSelected();
+
+        TimeUnit.SECONDS.sleep(2);
+
+        /*
+
 
         Scanner sc = new Scanner(System.in);
 
         while(true)
             audioManager.setVolume(sc.nextInt());
-
 
         /*
         for (int i = 100000; i >= 0; i--)

@@ -26,7 +26,7 @@ public class MusicPlayer extends Thread
             clip.open(inputStream);
 
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.err.println("Could not load sound: " + Constants.audioFilesPath );
+            System.err.println("Could not load sound: " + Constants.audioFilesPath + Constants.musicFilename);
             e.printStackTrace();
         }
     }
