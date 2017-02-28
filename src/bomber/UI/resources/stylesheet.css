@@ -1,3 +1,7 @@
+*{
+	-fx-border-color: white;
+	-fx-border-width: 2px;
+}
 
 .menubutton{
 	-fx-background-color: transparent;
