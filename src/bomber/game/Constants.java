@@ -29,6 +29,7 @@ public class Constants
     public static final String movementFilename = "sfx_movement_footsteps1a.wav";
     public static final String playerDeathFilename = "sfx_sounds_error1.wav";
     public static final String powerupFilename = "sfx_sounds_neutral6.wav"; // TODO: find a sound
+    public static final String menuSoundFilename = "271139_strange-dragoon_menu-select_converted.wav";
 
     public static final float defaultVolume = 75;
 }

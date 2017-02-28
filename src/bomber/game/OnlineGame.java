@@ -1,16 +1,11 @@
 package bomber.game;
 
-import java.awt.Point;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import bomber.AI.GameAI;
 import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
 import bomber.networking.ClientThread;
-import bomber.physics.PhysicsEngine;
 import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
 import bomber.renderer.Screen;
@@ -19,29 +14,30 @@ import bomber.renderer.shaders.Mesh;
 
 public class OnlineGame implements GameInterface {
 
-	private String playerName;
+	// private String playerName;
 	private Map map;
 	private HashMap<Response, Integer> controlScheme;
-	private Screen screen;
+	// private Screen screen;
 	private GameState gameState;
 	private KeyboardState keyState;
 	private Graphics graphics;
 	private Renderer renderer;
 	private boolean bombPressed;
 	private KeyboardInput input;
-	private Player player;
+	// private Player player;
 	private AudioManager audio;
 	private UserInterface ui;
-	private int aiNum;
+	// private int aiNum;
 	private ClientThread client;
 
-	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, Map map, String playerName, HashMap<Response, Integer> controls) {
+	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, Map map, String playerName,
+			HashMap<Response, Integer> controls) {
 
 		this.ui = ui;
 		this.gameState = gameState;
 		this.client = client;
 		this.map = map;
-		this.playerName = playerName;
+		// this.playerName = playerName;
 		this.controlScheme = controls;
 		this.bombPressed = false;
 		this.input = new KeyboardInput();
@@ -50,10 +46,10 @@ public class OnlineGame implements GameInterface {
 		audio.playMusic();
 
 		try {
-			
+
 			int width = this.map.getPixelMap().length;
 			int height = this.map.getPixelMap()[0].length;
-			this.graphics = new Graphics("Bomb Blitz", width, height, true, this);
+			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -68,19 +64,23 @@ public class OnlineGame implements GameInterface {
 			this.renderer.init(screen);
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 
-			Thread.sleep(500);
-			this.gameState = this.client.getGameState();
-			for(Player player : this.gameState.getPlayers()){
-				
+			while (this.gameState == null) {
+				this.gameState = this.client.getGameState();
+				Thread.sleep(100);
+			}
+
+			for (Player player : this.gameState.getPlayers()) {
+
 				player.addMesh(new Mesh(32, 32, colours));
 			}
-			this.keyState = this.gameState.getPlayers().get(0).getKeyState();
+
+			this.keyState = new KeyboardState();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		this.ui.hide();
 	}
 
@@ -88,12 +88,13 @@ public class OnlineGame implements GameInterface {
 	public void update(float interval) {
 
 		this.gameState = this.client.getGameState();
-		float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
-		for(Player player : this.gameState.getPlayers()){
-			
-			player.addMesh(new Mesh(32, 32, colours));
-		}
-		this.keyState = this.gameState.getPlayers().get(0).getKeyState();
+		/*
+		 * float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f,
+		 * 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f }; for(Player player :
+		 * this.gameState.getPlayers()){
+		 * 
+		 * player.addMesh(new Mesh(32, 32, colours)); }
+		 */
 
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
@@ -126,6 +127,6 @@ public class OnlineGame implements GameInterface {
 		renderer.dispose();
 		this.graphics.getScreen().close();
 		audio.stopAudio();
-		
+
 	}
 }

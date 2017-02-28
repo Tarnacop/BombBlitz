@@ -7,14 +7,18 @@ import java.net.DatagramSocket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.KeyboardState;
 
 public class ServerThread implements Runnable {
@@ -25,6 +29,10 @@ public class ServerThread implements Runnable {
 	private final ServerConfiguration config;
 
 	private final DatagramSocket socket;
+
+	// table for storing nonce
+	private final Hashtable<SocketAddress, Long> nonceTable;
+	private final SecureRandom random = new SecureRandom();
 
 	// table for storing client info
 	private final ServerClientTable clientTable;
@@ -61,6 +69,7 @@ public class ServerThread implements Runnable {
 		this.port = port;
 		this.printStream = printStream;
 		this.config = config;
+		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
 
@@ -81,6 +90,7 @@ public class ServerThread implements Runnable {
 		this.port = port;
 		this.printStream = System.out;
 		this.config = config;
+		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
 
@@ -99,6 +109,7 @@ public class ServerThread implements Runnable {
 		this.port = port;
 		this.printStream = System.out;
 		this.config = new ServerConfiguration();
+		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
 
@@ -142,10 +153,13 @@ public class ServerThread implements Runnable {
 				ArrayList<PacketHistoryEntry> packetList = e.getValue().getPacketHistoryList();
 				for (PacketHistoryEntry f : packetList) {
 					if (f != null && !f.isAcked() && f.getRetransmissionCount() < config.getMaxRetransmitCount()) {
-						pServerf(
-								"retransmitTask: Retransmitting packet %d created at %d with length %d and retransmission count %d to client %s\n",
-								f.getSequence(), f.getCreationTimeStamp(), f.getPacketLength(),
-								f.getRetransmissionCountAndIncrement(), e.getKey());
+						/*
+						 * pServerf(
+						 * "retransmitTask: Retransmitting packet %d created at %d with length %d and retransmission count %d to client %s\n"
+						 * , f.getSequence(), f.getCreationTimeStamp(),
+						 * f.getPacketLength(),
+						 * f.getRetransmissionCountAndIncrement(), e.getKey());
+						 */
 						try {
 							sendPacket(new DatagramPacket(f.getPacketData(), f.getPacketLength(), e.getKey()));
 						} catch (IOException e1) {
@@ -189,6 +203,15 @@ public class ServerThread implements Runnable {
 
 		SocketAddress sockAddr = packet.getSocketAddress();
 
+		// Steam-compatible A2S_INFO query response
+		if (packet.getLength() == 25 && recvByteBuffer.getInt(0) == 0xffffffff && recvByteBuffer.get(24) == 0) {
+			if (recvByteBuffer.getLong(4) == 0x54536F7572636520l && recvByteBuffer.getLong(12) == 0x456E67696E652051l
+					&& recvByteBuffer.getInt(20) == 0x75657279) {
+				sendSteamQueryResponse(sockAddr);
+				return;
+			}
+		}
+
 		byte messageType = (byte) (recvByteBuffer.get(0) & (~ProtocolConstant.MSG_B_HASSEQUENCE));
 		boolean messageHasSequence = (recvByteBuffer.get(0) & ProtocolConstant.MSG_B_HASSEQUENCE) != 0;
 		short messageSequence = 0;
@@ -204,36 +227,100 @@ public class ServerThread implements Runnable {
 		if (clientInfo != null) {
 			clientInfo.updateTimeStamp();
 			/*
-			 * TODO log the sequence number of last 100 received packets from
-			 * this client and drop duplicate packets based on the sequence
-			 * number
+			 * log the sequence number of last 100 received packets from this
+			 * client and drop duplicate packets based on the sequence number
 			 */
+			if (messageHasSequence && clientInfo.isSequenceDuplicate(messageSequence)) {
+				return;
+			}
 		} else {
 			/*
-			 * if the client does not exist on the server and the message type
-			 * is not MSG_C_NET_CONNECT, tell the client it has not connected to
-			 * the server yet
+			 * if the client does not exist in the client table and the message
+			 * type is not MSG_C_NET_GETNONCE or MSG_C_NET_CONNECT, tell the
+			 * client it has not connected to the server yet
 			 */
-			if (messageType != ProtocolConstant.MSG_C_NET_CONNECT) {
+			if (messageType == ProtocolConstant.MSG_C_NET_GETNONCE) {
+				// ignore short packets
+				if (packet.getLength() < 11) {
+					return;
+				}
+
+				// generate the nonce
+				long nonce;
+				Long n = nonceTable.get(sockAddr);
+				if (n == null) {
+					nonce = random.nextLong();
+				} else {
+					nonce = n.longValue();
+				}
+
+				// if the nonce table grows too large, empty it first
+				if (nonceTable.size() > 10 * config.getMaxPlayer()) {
+					nonceTable.clear();
+				}
+
+				// store the nonce
+				nonceTable.put(sockAddr, nonce);
+
+				// send the nonce
+				sendByteBuffer.putLong(3, nonce);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 8, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_NET_NONCE, false);
+
+				return;
+
+			} else if (messageType != ProtocolConstant.MSG_C_NET_CONNECT) {
 				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
-				sendPacket(p, ProtocolConstant.MSG_S_NET_NOTCONNECTED, true);
+				sendPacket(p, ProtocolConstant.MSG_S_NET_NOTCONNECTED, false);
 
 				return;
 			}
 		}
 
+		/*
+		 * only new clients with message type MSG_C_NET_CONNECT or connected
+		 * clients can reach here
+		 */
+
 		switch (messageType) {
+		case ProtocolConstant.MSG_C_NET_GETNONCE: {
+			if (clientInfo != null) {
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_NET_ALREADYCONNECTED, true);
+			} else {
+				System.out.println("Server bug: this line should be unreachable");
+			}
+
+			break;
+		}
+
 		case ProtocolConstant.MSG_C_NET_CONNECT: {
 			// TODO should reject with a reason in this type of message
 
 			// packet length check
-			if (packet.getLength() < 5) {
+			if (packet.getLength() < 13) {
 				return;
 			}
 
+			// nonce check
+			long nonce = recvByteBuffer.getLong(3);
+			Long n = nonceTable.get(sockAddr);
+			if (n == null || n.longValue() != nonce) {
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
+				return;
+			} else {
+				// nonceTable.remove(sockAddr);
+				/*
+				 * TODO currently nonceTable is cleared after exceeding a
+				 * particular size, later we need to delete a few oldest items
+				 * instead based on the time when a nonce was created
+				 */
+			}
+
 			// name length check
-			byte nameLength = recvByteBuffer.get(3);
-			if (1 + 2 + 1 + nameLength != packet.getLength()) {
+			byte nameLength = recvByteBuffer.get(11);
+			if (1 + 2 + 8 + 1 + nameLength != packet.getLength()) {
 				return;
 			}
 			if (nameLength < 1) {
@@ -252,7 +339,8 @@ public class ServerThread implements Runnable {
 			// only valid packets can reach here
 
 			// existence check
-			if (clientInfo != null) {
+			ServerClientInfo client = clientInfo;
+			if (client != null) {
 				/*
 				 * when the client exists, tell the client that it has already
 				 * connected to the server
@@ -278,7 +366,7 @@ public class ServerThread implements Runnable {
 			}
 
 			// get name from packet
-			String name = new String(recvBuffer, 4, nameLength, "UTF-8");
+			String name = new String(recvBuffer, 1 + 2 + 8 + 1, nameLength, "UTF-8");
 
 			// duplicate name check
 			if (clientTable.contains(name)) {
@@ -288,7 +376,7 @@ public class ServerThread implements Runnable {
 			}
 
 			// create and add client
-			ServerClientInfo client = new ServerClientInfo(sockAddr, name);
+			client = new ServerClientInfo(sockAddr, name);
 			clientTable.put(client);
 
 			// tell the client that the connection has been accepted
@@ -305,7 +393,7 @@ public class ServerThread implements Runnable {
 		case ProtocolConstant.MSG_C_NET_DISCONNECT: {
 			pServer("Deleting client " + sockAddr + " due to disconnection request");
 
-			removeClient(clientTable.get(sockAddr));
+			removeClient(clientInfo);
 
 			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_NET_DISCONNECTED, false);
@@ -425,7 +513,7 @@ public class ServerThread implements Runnable {
 			}
 
 			// check whether the player is already in a room
-			ServerClientInfo client = clientTable.get(sockAddr);
+			ServerClientInfo client = clientInfo;
 			if (client == null) {
 				pServer("Bug: client should not be null in this situation");
 				return;
@@ -492,7 +580,7 @@ public class ServerThread implements Runnable {
 			pServerf("Room join request from %s, room ID: %d\n", sockAddr, roomID);
 
 			// check whether the client is already in a room
-			ServerClientInfo client = clientTable.get(sockAddr);
+			ServerClientInfo client = clientInfo;
 			if (client == null) {
 				pServer("Bug: client should not be null in this situation");
 				return;
@@ -574,7 +662,7 @@ public class ServerThread implements Runnable {
 			pServerf("Room leave request from %s, room ID: %d\n", sockAddr, roomID);
 
 			// check whether the client is already in a room
-			ServerClientInfo client = clientTable.get(sockAddr);
+			ServerClientInfo client = clientInfo;
 			if (client == null) {
 				pServer("Bug: client should not be null in this situation");
 				return;
@@ -649,7 +737,7 @@ public class ServerThread implements Runnable {
 			pServer("readyToPlay request from " + sockAddr + ", roomID: " + roomID + ", ready: " + readyToPlay);
 
 			// check whether the client is already in a room
-			ServerClientInfo client = clientTable.get(sockAddr);
+			ServerClientInfo client = clientInfo;
 			if (client == null) {
 				pServer("Bug: client should not be null in this situation");
 				return;
@@ -744,7 +832,7 @@ public class ServerThread implements Runnable {
 			int roomID = recvByteBuffer.getInt(3);
 
 			// check whether the client is already in a room
-			ServerClientInfo client = clientTable.get(sockAddr);
+			ServerClientInfo client = clientInfo;
 			if (client == null) {
 				pServer("Bug: client should not be null in this situation");
 				return;
@@ -805,6 +893,28 @@ public class ServerThread implements Runnable {
 					room.addAI();
 				} else if (op == ProtocolConstant.MSG_C_ROOM_SETINFO_AI_REMOVE) {
 					room.removeAI();
+				} else if (op == ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY && packet.getLength() >= 11) {
+					byte aiID = recvByteBuffer.get();
+					byte difficulty = recvByteBuffer.get();
+					AIDifficulty aiDifficulty;
+					switch (difficulty) {
+					case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY:
+						aiDifficulty = AIDifficulty.EASY;
+						break;
+					case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM:
+						aiDifficulty = AIDifficulty.MEDIUM;
+						break;
+					case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD:
+						aiDifficulty = AIDifficulty.HARD;
+						break;
+					case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME:
+						aiDifficulty = AIDifficulty.EXTREME;
+						break;
+					default:
+						aiDifficulty = AIDifficulty.MEDIUM;
+						break;
+					}
+					room.setAIDifficulty(aiID, aiDifficulty);
 				} else {
 					return;
 				}
@@ -851,7 +961,7 @@ public class ServerThread implements Runnable {
 			 */
 
 			// check whether the client is already in a room
-			ServerClientInfo client = clientTable.get(sockAddr);
+			ServerClientInfo client = clientInfo;
 			if (client == null) {
 				pServer("Bug: client should not be null in this situation");
 				return;
@@ -894,44 +1004,55 @@ public class ServerThread implements Runnable {
 
 		}
 
-		// TODO testing cases
-		case 's': {
-			pServer("Message type 's', table size: " + clientTable.size());
-
-			String reply = "table size: " + clientTable.size() + "\n";
-			byte[] replyData = reply.getBytes("UTF-8");
-
-			sendByteBuffer.position(3);
-			sendByteBuffer.put(replyData);
-
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + replyData.length, sockAddr);
-			sendPacket(p, (byte) 'm', true);
-
-			break;
-		}
-
-		case 't': {
-			long time = System.currentTimeMillis();
-
-			pServerf("Message type 't', time: %d\n", time);
-
-			String reply = "time: " + time + "\n";
-			byte[] replyData = reply.getBytes("UTF-8");
-
-			sendByteBuffer.position(3);
-			sendByteBuffer.put(replyData);
-
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + replyData.length, sockAddr);
-			sendPacket(p, (byte) 'm', true);
-
-			break;
-		}
-
 		default: {
 			pServer("Default case: message type " + String.format("0x%02x", messageType));
 		}
 
 		}
+	}
+
+	private void sendSteamQueryResponse(SocketAddress sockAddr) throws IOException {
+		try {
+			sendByteBuffer.position(0);
+			// header
+			sendByteBuffer.putInt(0xffffffff);
+			sendByteBuffer.put((byte) 0x49);
+			// protocol version
+			sendByteBuffer.put((byte) 0x11);
+			// name of the server
+			sendByteBuffer.put(config.getServerName().getBytes("UTF-8"));
+			sendByteBuffer.put((byte) 0);
+			// map of the server
+			sendByteBuffer.putShort((short) 0x2000);
+			// name of the folder
+			sendByteBuffer.putShort((short) 0x2000);
+			// full name of the game
+			sendByteBuffer.put((config.getGameName() + " " + config.getVersion()).getBytes("UTF-8"));
+			sendByteBuffer.put((byte) 0);
+			// id of game
+			sendByteBuffer.putShort((byte) 0);
+			// number of players
+			sendByteBuffer.put((byte) clientTable.size());
+			// maximum number of players
+			sendByteBuffer.put((byte) config.getMaxPlayer());
+			// number of bots
+			sendByteBuffer.put((byte) 0);
+			// type of server
+			sendByteBuffer.put((byte) 'd');
+			// environment of server
+			sendByteBuffer.put((byte) 'l');
+			// whether the server requires a password
+			sendByteBuffer.put((byte) 0);
+			// whether the server uses VAC
+			sendByteBuffer.put((byte) 0);
+			// version of the game
+			sendByteBuffer.put(config.getVersion().getBytes("UTF-8"));
+			sendByteBuffer.put((byte) 0);
+		} catch (BufferOverflowException e) {
+			throw new IOException("send buffer is too small for query response");
+		}
+		DatagramPacket packet = new DatagramPacket(sendBuffer, sendByteBuffer.position(), sockAddr);
+		sendPacket(packet);
 	}
 
 	public synchronized void sendPacket(DatagramPacket packet) throws IOException {

@@ -1,6 +1,12 @@
 package bomber.networking;
 
 public class ServerConfiguration {
+	private String serverName = "Bomb Blitz Dedicated Server";
+
+	private final String gameName = "Bomb Blitz";
+
+	private final String version = "1.1";
+
 	private long clientTimeOut;
 
 	private final long keepAliveInterval;
@@ -205,5 +211,51 @@ public class ServerConfiguration {
 	 */
 	public int getMaxNameLength() {
 		return maxNameLength;
+	}
+
+	/**
+	 * Get the name of the server
+	 * 
+	 * @return the name of the server
+	 */
+	public String getServerName() {
+		return serverName;
+	}
+
+	/**
+	 * Set the name of the server (maximum length 50)
+	 * 
+	 * @param serverName
+	 *            the name of the server
+	 */
+	public void setServerName(String serverName) {
+		if (serverName == null) {
+			return;
+		}
+
+		if (serverName.length() <= 50) {
+			this.serverName = serverName;
+		} else {
+			this.serverName = serverName.substring(0, 50);
+		}
+
+	}
+
+	/**
+	 * Get the name of the game ("Bomb Blitz")
+	 * 
+	 * @return the name of the game ("Bomb Blitz")
+	 */
+	public String getGameName() {
+		return gameName;
+	}
+
+	/**
+	 * Get the version string of the game
+	 * 
+	 * @return the version string of the game
+	 */
+	public String getVersion() {
+		return version;
 	}
 }

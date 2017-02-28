@@ -101,8 +101,8 @@ public class Screen {
 		// If vsync is set to enabled, enable it
 		if(isVsyncOn()) {
 			
-			// 30 FPS
-			glfwSwapInterval(2);
+			// 60 FPS
+			glfwSwapInterval(1);
 		}
 
 		// Make the screen visible

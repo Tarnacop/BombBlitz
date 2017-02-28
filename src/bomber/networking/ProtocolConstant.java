@@ -35,10 +35,15 @@ public class ProtocolConstant {
 	// Range from 0x00 to 0x3f (up to 64 types of message)
 
 	// Network connection
+	public static final byte MSG_C_NET_GETNONCE = 0x10; // Bit set
+	/*
+	 * 1 byte message type + 2 byte sequence + 8 byte constant 0
+	 */
+
 	public static final byte MSG_C_NET_CONNECT = 0x00; // Bit set
 	/*
-	 * 1 byte message type + 2 byte sequence + 1 byte name string length + name
-	 * string bytes
+	 * 1 byte message type + 2 byte sequence + 8 byte nonce + 1 byte name string
+	 * length + name string bytes
 	 */
 
 	public static final byte MSG_C_NET_DISCONNECT = 0x01; // Bit set
@@ -87,6 +92,12 @@ public class ProtocolConstant {
 	public static final byte MSG_C_ROOM_SETINFO_AI = 0x03;
 	public static final byte MSG_C_ROOM_SETINFO_AI_ADD = 0x00;
 	public static final byte MSG_C_ROOM_SETINFO_AI_REMOVE = 0x01;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY = 0x02;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY = 0x00;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM = 0x01;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD = 0x02;
+	public static final byte MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME = 0x03;
+
 	/* Header: 1 byte message type + 2 byte sequence + 4 byte room ID */
 	/* Valid format: Header + any one of the below */
 	/*
@@ -101,6 +112,10 @@ public class ProtocolConstant {
 	 */
 	/* add AI: 1 byte constant 0x3 + 1 byte constant 0x0 */
 	/* remove AI: 1 byte constant 0x3 + 1 byte constant 0x1 */
+	/*
+	 * set AI difficulty: 1 byte constant 0x3 + 1 byte constant 0x2 + 1 byte AI
+	 * id + 1 byte AI difficulty
+	 */
 
 	// public static final byte MSG_C_ROOM_GETINFO = 0x0d;
 
@@ -118,14 +133,17 @@ public class ProtocolConstant {
 	// Range from 0x40 to 0x7f (up to 64 types of message)
 
 	// Network connection
+	public static final byte MSG_S_NET_NONCE = 0x52; // Bit not set
+	// 1 byte message type + 2 byte sequence + 8 byte nonce
+
 	public static final byte MSG_S_NET_ACCEPT = 0x40; // Bit set
 	// 1 byte message type + 2 byte sequence + 4 byte client id
 
 	public static final byte MSG_S_NET_REJECT = 0x41; // Bit not set
 	// 1 byte message type + 2 byte sequence
 	/*
-	 * TODO rejection message should contain a reason: server full, duplicate
-	 * name, invalid name length
+	 * TODO rejection message may contain a reason: server full, duplicate name,
+	 * invalid name length, invalid nonce
 	 */
 
 	public static final byte MSG_S_NET_ALREADYCONNECTED = 0x42; // Bit set
@@ -201,7 +219,8 @@ public class ProtocolConstant {
 	 * player number + 1 byte max player limit + 1 byte inGame flag + 4 byte
 	 * game map id + array of up to 4 human player info(4 byte player id + 1
 	 * byte player name length + bytes of player string + 1 byte isReadyToPlay
-	 * flag) + array of up to 4 AI player info(1 byte AI id)
+	 * flag) + array of up to 4 AI player info(1 byte AI id + 1 byte AI
+	 * difficulty)
 	 */
 
 	public static final byte MSG_S_ROOM_GAMESTART = 0x4f; // Bit set

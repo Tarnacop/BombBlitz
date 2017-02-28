@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.AudioEvent;
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -269,14 +270,17 @@ public class ClientPacketEncoder {
 		// get AI player info
 		List<ClientServerAI> aiPlayerList = new ArrayList<ClientServerAI>(4);
 		for (int i = 0; i < aiPlayerNumber; i++) {
-			if (length < buffer.position() + 1) {
+			if (length < buffer.position() + 1 + 1) {
 				throw new IOException("packet format is invalid");
 			}
 
-			// get player ID
+			// get AI ID
 			byte playerID = buffer.get();
+			// get AI difficulty
+			byte difficulty = buffer.get();
+			AIDifficulty aiDifficulty = byteToAIDifficulty(difficulty);
 
-			aiPlayerList.add(new ClientServerAI(playerID));
+			aiPlayerList.add(new ClientServerAI(playerID, aiDifficulty));
 		}
 
 		if (length != buffer.position()) {
@@ -297,9 +301,6 @@ public class ClientPacketEncoder {
 	 * and sequence number and will be ignored. The caller should ensure the
 	 * first three bytes are correct before calling this method.
 	 * 
-	 * @param clientID
-	 *            the id of the client, so that the keyboard state of the client
-	 *            itself will not be overwritten by this method
 	 * @param gameState
 	 *            the game state to modify, or null to create a new game state
 	 * @param src
@@ -310,8 +311,7 @@ public class ClientPacketEncoder {
 	 *         GameState object if it is null
 	 * @throws IOException
 	 */
-	public static GameState decodeGameState(int clientID, GameState gameState, byte[] src, int length)
-			throws IOException {
+	public static GameState decodeGameState(GameState gameState, byte[] src, int length) throws IOException {
 		if (gameState == null) {
 			// gameState = new GameState(new Map("map", new
 			// Block[gridMapWidth][gridMapHeight], null), null);
@@ -386,25 +386,16 @@ public class ClientPacketEncoder {
 
 		for (int x = 0; x < gridMapWidth; x++) {
 			for (int y = 0; y < gridMapHeight; y++) {
-				Block b = Block.BLANK;
+				Block b;
 
-				boolean bits[] = new boolean[4];
+				byte bits = 0;
 				int bitIndex = x + y * gridMapWidth;
-
 				for (int i = 3; i >= 0; i--) {
-					bits[i] = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					boolean bit = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					bits = BitArray.setBit(bits, i, bit);
 				}
 
-				if (!bits[3] && !bits[2] && !bits[1] && !bits[0]) {
-					b = Block.BLANK;
-				} else if (!bits[3] && !bits[2] && !bits[1] && bits[0]) {
-					b = Block.BLAST;
-				} else if (!bits[3] && !bits[2] && bits[1] && !bits[0]) {
-					b = Block.SOFT;
-				} else if (!bits[3] && !bits[2] && bits[1] && bits[0]) {
-					b = Block.SOLID;
-				}
-
+				b = byteToBlock(bits);
 				if (gridMap[x][y] != b) {
 					gridMap[x][y] = b;
 				}
@@ -417,18 +408,22 @@ public class ClientPacketEncoder {
 			gameState.setPlayers(new ArrayList<>(4));
 		}
 		List<Player> playerList = gameState.getPlayers();
-		while (playerList.size() > numPlayer) {
-			playerList.remove(playerList.size() - 1);
+		synchronized (playerList) {
+			while (playerList.size() > numPlayer) {
+				playerList.remove(playerList.size() - 1);
+			}
+			while (playerList.size() < numPlayer) {
+				playerList.add(null);
+			}
 		}
-		while (playerList.size() < numPlayer) {
-			playerList.add(null);
-		}
-
 		for (int i = 0; i < numPlayer; i++) {
-			Player player = playerList.get(i);
-			if (player == null) {
-				player = new Player(null, new Point(0, 0), 3, 321, null);
-				playerList.set(i, player);
+			Player player;
+			synchronized (playerList) {
+				player = playerList.get(i);
+				if (player == null) {
+					player = new Player(null, new Point(0, 0), 3, 321, null);
+					playerList.set(i, player);
+				}
 			}
 
 			int id = buffer.getInt();
@@ -448,22 +443,21 @@ public class ClientPacketEncoder {
 				player.setKeyState(k);
 			}
 
-			if (id != clientID) {
+			k.setMovement(Movement.NONE);
+			k.setBomb(false);
+			if (BitArray.getBit(keyState, 0)) {
 				k.setMovement(Movement.NONE);
-				k.setBomb(false);
-				if (BitArray.getBit(keyState, 0)) {
-					k.setMovement(Movement.NONE);
-				} else if (BitArray.getBit(keyState, 1)) {
-					k.setMovement(Movement.UP);
-				} else if (BitArray.getBit(keyState, 2)) {
-					k.setMovement(Movement.DOWN);
-				} else if (BitArray.getBit(keyState, 3)) {
-					k.setMovement(Movement.LEFT);
-				} else if (BitArray.getBit(keyState, 4)) {
-					k.setMovement(Movement.RIGHT);
-				}
-				k.setBomb(BitArray.getBit(keyState, 5));
+			} else if (BitArray.getBit(keyState, 1)) {
+				k.setMovement(Movement.UP);
+			} else if (BitArray.getBit(keyState, 2)) {
+				k.setMovement(Movement.DOWN);
+			} else if (BitArray.getBit(keyState, 3)) {
+				k.setMovement(Movement.LEFT);
+			} else if (BitArray.getBit(keyState, 4)) {
+				k.setMovement(Movement.RIGHT);
 			}
+			k.setBomb(BitArray.getBit(keyState, 5));
+
 			player.setName("player " + id);
 			player.getPos().x = posX;
 			player.getPos().y = posY;
@@ -472,7 +466,6 @@ public class ClientPacketEncoder {
 			player.setPlayerID(id);
 			player.setBombRange(bombRange);
 			player.setMaxNrOfBombs(maxBomb);
-			// player.setKeyState(k);
 			player.setAlive(isAlive);
 		}
 
@@ -482,18 +475,22 @@ public class ClientPacketEncoder {
 			gameState.setBombs(new ArrayList<>());
 		}
 		List<Bomb> bombList = gameState.getBombs();
-		while (bombList.size() > numBomb) {
-			bombList.remove(bombList.size() - 1);
+		synchronized (bombList) {
+			while (bombList.size() > numBomb) {
+				bombList.remove(bombList.size() - 1);
+			}
+			while (bombList.size() < numBomb) {
+				bombList.add(null);
+			}
 		}
-		while (bombList.size() < numBomb) {
-			bombList.add(null);
-		}
-
 		for (int i = 0; i < numBomb; i++) {
-			Bomb bomb = bombList.get(i);
-			if (bomb == null) {
-				bomb = new Bomb(null, new Point(0, 0), 0, 0);
-				bombList.set(i, bomb);
+			Bomb bomb;
+			synchronized (bombList) {
+				bomb = bombList.get(i);
+				if (bomb == null) {
+					bomb = new Bomb(null, new Point(0, 0), 0, 0);
+					bombList.set(i, bomb);
+				}
 			}
 
 			int playerID = buffer.getInt();
@@ -512,57 +509,29 @@ public class ClientPacketEncoder {
 
 		// Audio Events
 		buffer.position(7 + 130 + 1 + 35 * numPlayer + 1 + 20 * numBomb);
-		if (gameState.getAudioEvents() == null) {
-			gameState.setAudioEvents(new ArrayList<>(16));
-		}
-		List<AudioEvent> audioEventList = gameState.getAudioEvents();
-
 		short audioState = buffer.getShort();
 
 		/*
-		 * TODO AudioManager should also lock audioEventList to avoid
-		 * ConcurrentModificationException
-		 */
-		/*
 		 * TODO Audio can cause OutOfMemoryError during game
 		 */
-		synchronized (audioEventList) {
-			if (BitArray.getBit(audioState, 0)) {
-				if (!audioEventList.contains(AudioEvent.PLACE_BOMB)) {
-					audioEventList.add(AudioEvent.PLACE_BOMB);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.PLACE_BOMB);
-			}
-			if (BitArray.getBit(audioState, 1)) {
-				if (!audioEventList.contains(AudioEvent.EXPLOSION)) {
-					audioEventList.add(AudioEvent.EXPLOSION);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.EXPLOSION);
-			}
-			if (BitArray.getBit(audioState, 2)) {
-				if (!audioEventList.contains(AudioEvent.PLAYER_DEATH)) {
-					audioEventList.add(AudioEvent.PLAYER_DEATH);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.PLAYER_DEATH);
-			}
-			if (BitArray.getBit(audioState, 3)) {
-				if (!audioEventList.contains(AudioEvent.MOVEMENT)) {
-					audioEventList.add(AudioEvent.MOVEMENT);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.MOVEMENT);
-			}
-			if (BitArray.getBit(audioState, 4)) {
-				if (!audioEventList.contains(AudioEvent.POWERUP)) {
-					audioEventList.add(AudioEvent.POWERUP);
-				}
-			} else {
-				audioEventList.removeIf(e -> e == AudioEvent.POWERUP);
-			}
+		List<AudioEvent> audioEventList = new ArrayList<>(16);
+		if (BitArray.getBit(audioState, 0)) {
+			audioEventList.add(AudioEvent.PLACE_BOMB);
 		}
+		if (BitArray.getBit(audioState, 1)) {
+			audioEventList.add(AudioEvent.EXPLOSION);
+		}
+		if (BitArray.getBit(audioState, 2)) {
+			audioEventList.add(AudioEvent.PLAYER_DEATH);
+		}
+		if (BitArray.getBit(audioState, 3)) {
+			// TODO movement sound disabled due to client audio bug
+			// audioEventList.add(AudioEvent.MOVEMENT);
+		}
+		if (BitArray.getBit(audioState, 4)) {
+			audioEventList.add(AudioEvent.POWERUP);
+		}
+		gameState.setAudioEvents(audioEventList);
 
 		return gameState;
 	}
@@ -580,7 +549,7 @@ public class ClientPacketEncoder {
 	 * @return a list of ClientServerRoom
 	 * @throws IOException
 	 */
-	public static GameState decodeGameState(byte[] src, int length) throws IOException {
+	private static GameState decodeGameState(byte[] src, int length) throws IOException {
 		if (src == null) {
 			throw new IOException("src is null");
 		}
@@ -627,21 +596,16 @@ public class ClientPacketEncoder {
 		}
 		for (int x = 0; x < gridMapWidth; x++) {
 			for (int y = 0; y < gridMapHeight; y++) {
-				Block b = Block.BLANK;
-				boolean bits[] = new boolean[4];
+				Block b;
+
+				byte bits = 0;
 				int bitIndex = x + y * gridMapWidth;
 				for (int i = 3; i >= 0; i--) {
-					bits[i] = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					boolean bit = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					bits = BitArray.setBit(bits, i, bit);
 				}
-				if (!bits[3] && !bits[2] && !bits[1] && !bits[0]) {
-					b = Block.BLANK;
-				} else if (!bits[3] && !bits[2] && !bits[1] && bits[0]) {
-					b = Block.BLAST;
-				} else if (!bits[3] && !bits[2] && bits[1] && !bits[0]) {
-					b = Block.SOFT;
-				} else if (!bits[3] && !bits[2] && bits[1] && bits[0]) {
-					b = Block.SOLID;
-				}
+
+				b = byteToBlock(bits);
 				gridMap[x][y] = b;
 			}
 		}
@@ -709,7 +673,8 @@ public class ClientPacketEncoder {
 			audioEventList.add(AudioEvent.PLAYER_DEATH);
 		}
 		if (BitArray.getBit(audioState, 3)) {
-			audioEventList.add(AudioEvent.MOVEMENT);
+			// TODO movement sound disabled due to client audio bug
+			// audioEventList.add(AudioEvent.MOVEMENT);
 		}
 		if (BitArray.getBit(audioState, 4)) {
 			audioEventList.add(AudioEvent.POWERUP);
@@ -755,6 +720,96 @@ public class ClientPacketEncoder {
 		}
 
 		return keyState;
+	}
+
+	/**
+	 * Convert byte into Block (only bit 3 to bit 0 in the byte are used)
+	 * 
+	 * @param b
+	 *            the byte
+	 * @return the Block
+	 */
+	public static Block byteToBlock(byte b) {
+		Block block = null;
+
+		switch (b) {
+		case 0:
+			block = Block.BLANK;
+			break;
+
+		case 1:
+			block = Block.SOLID;
+			break;
+
+		case 2:
+			block = Block.SOFT;
+			break;
+
+		case 3:
+			block = Block.BLAST;
+			break;
+
+		case 4:
+			block = Block.PLUS_BOMB;
+			break;
+
+		case 5:
+			block = Block.MINUS_BOMB;
+			break;
+
+		case 6:
+			block = Block.PLUS_RANGE;
+			break;
+
+		case 7:
+			block = Block.MINUS_RANGE;
+			break;
+
+		case 8:
+			block = Block.PLUS_SPEED;
+			break;
+
+		case 9:
+			block = Block.MINUS_SPEED;
+			break;
+
+		default:
+			block = Block.BLANK;
+			break;
+		}
+
+		return block;
+	}
+
+	/**
+	 * Convert byte into AIDifficulty
+	 * 
+	 * @param b
+	 *            the byte
+	 * @return the AIDifficulty
+	 */
+	public static AIDifficulty byteToAIDifficulty(byte b) {
+		AIDifficulty aiDifficulty;
+
+		switch (b) {
+		case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY:
+			aiDifficulty = AIDifficulty.EASY;
+			break;
+		case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM:
+			aiDifficulty = AIDifficulty.MEDIUM;
+			break;
+		case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD:
+			aiDifficulty = AIDifficulty.HARD;
+			break;
+		case ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME:
+			aiDifficulty = AIDifficulty.EXTREME;
+			break;
+		default:
+			aiDifficulty = AIDifficulty.MEDIUM;
+			break;
+		}
+
+		return aiDifficulty;
 	}
 
 }

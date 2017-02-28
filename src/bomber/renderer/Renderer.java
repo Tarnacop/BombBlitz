@@ -4,6 +4,8 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
+import java.util.List;
+
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
@@ -104,27 +106,31 @@ public class Renderer {
 			}
 		}
 
-		for (Player player : state.getPlayers()) {
-			if (!player.isAlive())
-				continue;
-			modelMatrix = transformation
-					.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y), 0f, 1f);
+		List<Player> playerList = state.getPlayers();
+		synchronized (playerList) {
+			for (Player player : playerList) {
+				if (!player.isAlive())
+					continue;
+				modelMatrix = transformation
+						.getModelMatrix(new Vector2f((float) player.getPos().x, (float) player.getPos().y), 0f, 1f);
 
-			shaderConstructor.setUniform("model", modelMatrix);
+				shaderConstructor.setUniform("model", modelMatrix);
 
-			player.getMesh().render();
+				player.getMesh().render();
+			}
 		}
+		List<Bomb> boombList = state.getBombs();
+		synchronized (boombList) {
+			for (Bomb bomb : boombList) {
 
-		for (Bomb bomb : state.getBombs()) {
+				modelMatrix = transformation
+						.getModelMatrix(new Vector2f((float) bomb.getPos().x, (float) bomb.getPos().y), 0f, 1f);
 
-			modelMatrix = transformation.getModelMatrix(new Vector2f((float) bomb.getPos().x, (float) bomb.getPos().y),
-					0f, 1f);
+				shaderConstructor.setUniform("model", modelMatrix);
 
-			shaderConstructor.setUniform("model", modelMatrix);
-
-			bombMesh.render();
+				bombMesh.render();
+			}
 		}
-
 		// Unbind the shader
 		shaderConstructor.unbind();
 
