@@ -2,7 +2,7 @@ package bomber.game;
 
 public enum Block {
 
-	BLANK, SOLID, SOFT, BLAST, PLUS_BOMB, MINUS_BOMB, PLUS_RANGE, MINUS_RANGE, PLUS_SPEED, MINUS_SPEED	//possible block types for each grid square of the map: 
+	BLANK, SOLID, SOFT, BLAST, PLUS_BOMB, MINUS_BOMB, PLUS_RANGE, MINUS_RANGE, PLUS_SPEED, MINUS_SPEED		//possible block types for each grid square of the map: 
 	//BLANK - nothing
 	//SOLID - indestructible block
 	//SOFT - destructible block

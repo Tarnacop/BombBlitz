@@ -11,7 +11,7 @@ import bomber.game.Player;
 /**
  * The Class HardAI for making moves.
  *
- * @author Jokubas Liutkus 
+ * @author Jokubas Liutkus
  */
 public class ExtremeAI extends AITemplate {
 
@@ -49,8 +49,7 @@ public class ExtremeAI extends AITemplate {
 	}
 
 	/**
-	 * Perform planned moves.
-	 * When none of the players are reachable
+	 * Perform planned moves. When none of the players are reachable
 	 *
 	 * @param moves
 	 *            the moves
@@ -78,7 +77,7 @@ public class ExtremeAI extends AITemplate {
 
 					}
 				}
-			} 
+			}
 			// otherwise make a standard move
 			else {
 				makeSingleMove(action);
@@ -86,23 +85,21 @@ public class ExtremeAI extends AITemplate {
 		}
 
 	}
-	
-	
-	
-	private boolean isPerformer()
-	{
-		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());
-		if(!players.isEmpty()) return players.get(0).equals(gameAI);
+
+	private boolean isPerformer() {
+		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive())
+				.collect(Collectors.toList());
+		if (!players.isEmpty())
+			return players.get(0).equals(gameAI);
 		return false;
 	}
-	
-	
-	private boolean checkIfAIsReachable()
-	{
-		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());
-		for(Player p : players)
-		{
-			if(!p.equals(gameAI) && finder.findRoute(gameAI.getGridPos(), p.getGridPos())!=null) return true;
+
+	private boolean checkIfAIsReachable() {
+		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive())
+				.collect(Collectors.toList());
+		for (Player p : players) {
+			if (!p.equals(gameAI) && finder.findRoute(gameAI.getGridPos(), p.getGridPos()) != null)
+				return true;
 		}
 		return false;
 	}
@@ -128,13 +125,20 @@ public class ExtremeAI extends AITemplate {
 				performMoves(moves, true);
 			}
 
+			// else if there is an upgrade find the moves to it
+			else if ((moves = finder.findRouteToUpgrade()) != null) {
+				if (!checkIfAIsReachable() || isPerformer())
+					performMoves(moves, false);
+			}
+
 			// // if enemy is in bomb range then place the bomb and go to the
-//			////// // safe location
-//			else if (safetyCh.isEnemyInBombRangeExludeAIs()) {
-//				gameAI.getKeyState().setBomb(true);
-//				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-//				performMoves(moves, true);
-//			}
+			// ////// // safe location
+			// else if (safetyCh.isEnemyInBombRangeExludeAIs()) {
+			// gameAI.getKeyState().setBomb(true);
+			// moves =
+			// finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+			// performMoves(moves, true);
+			// }
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemyExcludeAIs()) != null) {
@@ -143,7 +147,7 @@ public class ExtremeAI extends AITemplate {
 			// if enemy is not in the range get the plan how to reach enemy and
 			// fullfill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs())) != null) {
-				if(!checkIfAIsReachable() || isPerformer())
+				if (!checkIfAIsReachable() || isPerformer())
 					performPlannedMoves(moves);
 			}
 

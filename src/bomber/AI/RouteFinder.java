@@ -17,10 +17,9 @@ import bomber.game.Player;
 /**
  * The Class RouteFinder.
  *
- * @author Jokubas Liutkus 
+ * @author Jokubas Liutkus
  * 
- * The Class RouteFinder. For finding different routes
- *         and planning.
+ *         The Class RouteFinder. For finding different routes and planning.
  */
 public class RouteFinder {
 
@@ -139,13 +138,15 @@ public class RouteFinder {
 		// we check if the coordiantes are valid
 		// if not we return
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
-				|| map[x][y] == Block.SOLID)
+				|| map[x][y] == Block.SOLID || map[x][y] == Block.MINUS_BOMB || map[x][y] == Block.MINUS_RANGE
+				|| map[x][y] == Block.MINUS_SPEED)
 			return;
-//
-//		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
-//
-//		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(neigh)).findFirst().isPresent())
-//			return;
+		//
+		// List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
+		//
+		// if (bombs.stream().filter(bomb ->
+		// bomb.getGridPos().equals(neigh)).findFirst().isPresent())
+		// return;
 		// if the neighbour is in the visited list we return
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
@@ -197,10 +198,11 @@ public class RouteFinder {
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOLID)
 			return;
 
-//		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
-//
-//		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(neigh)).findFirst().isPresent())
-//			return;
+		// List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
+		//
+		// if (bombs.stream().filter(bomb ->
+		// bomb.getGridPos().equals(neigh)).findFirst().isPresent())
+		// return;
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
 				return;
@@ -291,7 +293,8 @@ public class RouteFinder {
 		// Block[][] map = getMap();
 
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
-				|| map[x][y] == Block.SOLID)
+				|| map[x][y] == Block.SOLID || map[x][y] == Block.MINUS_BOMB || map[x][y] == Block.MINUS_RANGE
+				|| map[x][y] == Block.MINUS_SPEED)
 			return;
 		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
 
@@ -311,12 +314,12 @@ public class RouteFinder {
 	}
 
 	/**
-	 * Escape from explotion. Finds and returns the fastest route from the
-	 * explotion when the AI is in danger. Using breadth-first search
+	 * Escape from explosion. Finds and returns the fastest route from the
+	 * explosion when the AI is in danger. Using breadth-first search
 	 *
 	 * @param dangerTiles
 	 *            the danger tiles which might damage the AI
-	 * @return the list of moves to be made to escape from explotion.
+	 * @return the list of moves to be made to escape from explosion.
 	 */
 	public LinkedList<AIActions> escapeFromExplotion(ArrayList<Point> dangerTiles) {
 		Point pos = gameAI.getGridPos();
@@ -505,7 +508,8 @@ public class RouteFinder {
 				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(safetyCh.getBombCoverage(
 						new Bomb(null, new Point(pos.x * scalar, pos.y * scalar), 0, gameAI.getBombRange()), map), pos,
 						map));
-				if(escapeMoves == null) return realMoves;
+				if (escapeMoves == null)
+					return realMoves;
 				realMoves.addAll(escapeMoves);
 				realMoves.add(AIActions.NONE);
 				realMoves.addAll(reverseMoves(escapeMoves));
@@ -563,7 +567,7 @@ public class RouteFinder {
 		return getPathWithBombs(getMovesFromPoints(finish), start);
 
 	}
-	
+
 	/**
 	 * Can put bomb and escape.
 	 * 
@@ -629,23 +633,23 @@ public class RouteFinder {
 
 	}
 
-//	private class Pair {
-//		private Point position;
-//		private LinkedList<AIActions> actions;
-//
-//		private Pair(Point position, LinkedList<AIActions> actions) {
-//			this.position = position;
-//			this.actions = actions;
-//		}
-//
-//		private Point getPos() {
-//			return position;
-//		}
-//
-//		private LinkedList<AIActions> getActions() {
-//			return actions;
-//		}
-//	}
+	// private class Pair {
+	// private Point position;
+	// private LinkedList<AIActions> actions;
+	//
+	// private Pair(Point position, LinkedList<AIActions> actions) {
+	// this.position = position;
+	// this.actions = actions;
+	// }
+	//
+	// private Point getPos() {
+	// return position;
+	// }
+	//
+	// private LinkedList<AIActions> getActions() {
+	// return actions;
+	// }
+	// }
 
 	// ------------------------
 
@@ -664,7 +668,7 @@ public class RouteFinder {
 		int distance = Integer.MAX_VALUE;
 		List<Player> players = state.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive())
 				.collect(Collectors.toList());
-		
+
 		for (Player p : players) {
 			if ((Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
 				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
@@ -688,9 +692,8 @@ public class RouteFinder {
 		LinkedList<AIActions> moves = null;
 		if (safetyCh.isEnemyInBombRangeExludeAIs()) {
 			ArrayList<Point> bombs = safetyCh.getTilesAffectedByBombs();
-			ArrayList<Point> coverage = safetyCh.getBombCoverage(
-					new Bomb(gameAI.getName(), gameAI.getPos(), 0, gameAI.getBombRange()),
-					getMap());
+			ArrayList<Point> coverage = safetyCh
+					.getBombCoverage(new Bomb(gameAI.getName(), gameAI.getPos(), 0, gameAI.getBombRange()), getMap());
 			bombs.addAll(coverage);
 			moves = escapeFromExplotion(bombs);
 
@@ -698,6 +701,44 @@ public class RouteFinder {
 		if ((moves != null) && (moves.size() < 4))
 			return moves;
 		return null;
+	}
+
+	public LinkedList<AIActions> findRouteToUpgrade() {
+		Point pos = gameAI.getGridPos();
+		LinkedList<Node> open = new LinkedList<>();
+		HashSet<Node> closed = new HashSet<>();
+		Block[][] map = getMap();
+
+		Node startNode = new Node(null, pos);
+		open.add(startNode);
+
+		// loop until the queue is not empty
+		Node finish = null;
+		while (!open.isEmpty()) {
+
+			// take the head of the queue
+			Node temp = open.poll();
+
+			// if the head is final position we finish
+			Block singleBlock = map[temp.getCoord().x][temp.getCoord().y];
+			if (singleBlock == Block.PLUS_BOMB || singleBlock == Block.PLUS_RANGE ||
+					singleBlock == Block.PLUS_SPEED) {
+				finish = temp;
+				break;
+			}
+
+			for (Point p : getNeighbours(temp)) {
+				checkNeighbour(temp, p, open, closed, getMap());
+			}
+
+			// else we loop through all the neighbours
+			closed.add(temp);
+		}
+
+		if (finish == null)
+			return null;
+		return getMovesFromPoints(finish);
+
 	}
 
 }
