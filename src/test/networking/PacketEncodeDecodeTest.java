@@ -57,7 +57,12 @@ public class PacketEncodeDecodeTest {
 		}
 		System.out.println("decodePlayerList:");
 		for (ClientServerPlayer p : playerList) {
-			System.out.printf("ID: %d, Name: %s\n", p.getID(), p.getName());
+			System.out.printf("ID: %d, Name: %s, inRoom: %b", p.getID(), p.getName(), p.isInRoom());
+			if (p.isInRoom()) {
+				System.out.printf(", Room ID: %d\n", p.getRoomID());
+			} else {
+				System.out.println();
+			}
 		}
 
 		System.out.println();
@@ -88,6 +93,9 @@ public class PacketEncodeDecodeTest {
 		for (ClientServerLobbyRoom r : roomList) {
 			System.out.printf("ID: %d, Name: %s, Number of players: %d, Max players: %d, inGame: %b, Map ID: %d\n",
 					r.getID(), r.getName(), r.getPlayerNumber(), r.getMaxPlayer(), r.isInGame(), r.getMapID());
+			for (int id : r.getPlayerID()) {
+				System.out.printf("Player ID: %d\n", id);
+			}
 		}
 
 		System.out.println();

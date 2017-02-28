@@ -68,20 +68,45 @@ public class ServerPacketEncoder {
 		buffer.putInt(11, 0);
 		buffer.putInt(15, list.size());
 
-		// put id and names into byte array
+		// put id, name, inRoom and (optionally)room id into byte array
 		buffer.position(1 + 2 + 4 + 4 + 4 + 4);
 		for (Entry<SocketAddress, ServerClientInfo> e : list) {
+			// id
 			if (dest.length < buffer.position() + 4) {
 				throw new IOException("dest is too short");
 			}
 			buffer.putInt(e.getValue().getID());
 
+			// name
 			byte[] nameData = e.getValue().getName().getBytes("UTF-8");
 			if (dest.length < buffer.position() + 1 + nameData.length) {
 				throw new IOException("dest is too short");
 			}
 			buffer.put((byte) nameData.length);
 			buffer.put(nameData);
+
+			// inRoom
+			boolean inRoom = e.getValue().isInRoom();
+			ServerRoom room = e.getValue().getRoom();
+			if (inRoom && room == null) {
+				inRoom = false;
+			}
+			if (dest.length < buffer.position() + 1) {
+				throw new IOException("dest is too short");
+			}
+			if (inRoom) {
+				buffer.put((byte) 1);
+			} else {
+				buffer.put((byte) 0);
+			}
+
+			// room id
+			if (inRoom) {
+				if (dest.length < buffer.position() + 4) {
+					throw new IOException("dest is too short");
+				}
+				buffer.putInt(room.getID());
+			}
 		}
 
 		len = buffer.position();
@@ -134,14 +159,16 @@ public class ServerPacketEncoder {
 		// put room info into byte array
 		buffer.position(1 + 2 + 4 + 4 + 4 + 4);
 		for (Entry<Integer, ServerRoom> e : list) {
+			ServerRoom room = e.getValue();
+
 			// put room ID
 			if (dest.length < buffer.position() + 4) {
 				throw new IOException("dest is too short");
 			}
-			buffer.putInt(e.getValue().getID());
+			buffer.putInt(room.getID());
 
 			// put room name
-			byte[] nameData = e.getValue().getName().getBytes("UTF-8");
+			byte[] nameData = room.getName().getBytes("UTF-8");
 			if (dest.length < buffer.position() + 1 + nameData.length) {
 				throw new IOException("dest is too short");
 			}
@@ -152,20 +179,20 @@ public class ServerPacketEncoder {
 			if (dest.length < buffer.position() + 1) {
 				throw new IOException("dest is too short");
 			}
-			buffer.put((byte) e.getValue().getPlayerNumber());
+			buffer.put((byte) room.getPlayerNumber());
 
 			// put max player limit
 			if (dest.length < buffer.position() + 1) {
 				throw new IOException("dest is too short");
 			}
-			buffer.put((byte) e.getValue().getMaxPlayer());
+			buffer.put((byte) room.getMaxPlayer());
 
 			// put inGame boolean flag
 			if (dest.length < buffer.position() + 1) {
 				throw new IOException("dest is too short");
 			}
 			byte inGame;
-			if (e.getValue().isInGame()) {
+			if (room.isInGame()) {
 				inGame = 1;
 			} else {
 				inGame = 0;
@@ -176,9 +203,24 @@ public class ServerPacketEncoder {
 			if (dest.length < buffer.position() + 4) {
 				throw new IOException("dest is too short");
 			}
-			int mapID = e.getValue().getMapID();
+			int mapID = room.getMapID();
 			buffer.putInt(mapID);
 
+			// put number of human players
+			if (dest.length < buffer.position() + 1) {
+				throw new IOException("dest is too short");
+			}
+			ServerClientInfo[] humanPlayers = room.getHumanPlayers();
+			int humanPlayerNumber = humanPlayers.length;
+			buffer.put((byte) humanPlayerNumber);
+
+			// put array of human player id
+			if (dest.length < buffer.position() + 4 * humanPlayerNumber) {
+				throw new IOException("dest is too short");
+			}
+			for (int i = 0; i < humanPlayerNumber; i++) {
+				buffer.putInt(humanPlayers[i].getID());
+			}
 		}
 
 		len = buffer.position();

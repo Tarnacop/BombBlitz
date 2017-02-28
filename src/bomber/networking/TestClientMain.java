@@ -71,7 +71,12 @@ public class TestClientMain {
 						List<ClientServerPlayer> playerList = client.getPlayerList();
 						System.out.printf("Size: %d\n", playerList.size());
 						for (ClientServerPlayer p : playerList) {
-							System.out.printf("ID: %d, Name: %s\n", p.getID(), p.getName());
+							System.out.printf("ID: %d, Name: %s, inRoom: %b", p.getID(), p.getName(), p.isInRoom());
+							if (p.isInRoom()) {
+								System.out.printf(", Room ID: %d\n", p.getRoomID());
+							} else {
+								System.out.println();
+							}
 						}
 
 					} else if (cmds[0].equals("url") || cmds[0].equals("updateroomlist")) {
@@ -87,6 +92,9 @@ public class TestClientMain {
 									"ID: %d, Name: %s, Number of players: %d, Max players: %d, inGame: %b, Map ID: %d\n",
 									r.getID(), r.getName(), r.getPlayerNumber(), r.getMaxPlayer(), r.isInGame(),
 									r.getMapID());
+							for (int id : r.getPlayerID()) {
+								System.out.printf("Player ID: %d\n", id);
+							}
 						}
 
 					} else if (cmds[0].equals("isinlobby")) {
