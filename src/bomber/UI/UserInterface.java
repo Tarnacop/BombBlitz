@@ -418,7 +418,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		roomsListPane = new VBox();
 		roomsListPane.setSpacing(10);
 		roomsListPane.setAlignment(Pos.TOP_LEFT);
-		roomsListPane.minHeightProperty().bind(roomsBox.minHeightProperty().add(100));
+		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(roomsBox.minHeightProperty().add(100)));
 		roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
 
 		playersTitle = createLabel("Online Players:", false, true);
@@ -426,12 +426,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersBox = new FlowPane(Orientation.VERTICAL);
 		playersBox.setVgap(20);
 		playersBox.setHgap(20);
-		playersBox.setMinHeight(200);
+		playersBox.setMinHeight(100);
 		playersListPane = new VBox();
 		playersListPane.setSpacing(10);
 		playersListPane.getChildren().addAll(playersTitle, playersBox);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
-		playersListPane.minHeightProperty().bind(playersBox.minHeightProperty());
+		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox.minHeightProperty().add(70)));
 		
 		roomsPlayersPane = new VBox();
 		roomsPlayersPane.setSpacing(40);
@@ -443,7 +443,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		serverBox.setSpacing(20);
 		serverBox.setAlignment(Pos.CENTER);
 		roomsPlayersPane.getStyleClass().add("wideclearbox");
-		roomsPlayersPane.minHeightProperty().bind(roomsListPane.minHeightProperty().add(playersListPane.minHeightProperty()));
+		roomsPlayersPane.minHeightProperty().bind(roomsListPane.minHeightProperty().add(playersListPane.minHeightProperty().add(50)));
 		serverBox.minHeightProperty().bind(roomsPlayersPane.minHeightProperty());
 		serverBox.getChildren().addAll(createRoomPane, roomsPlayersPane);
 		serverPane.setTop(backBox);
@@ -921,8 +921,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 			else{
 		try {
 			this.client.createRoom(text, (byte) this.roomNumber.get(), 1);
-			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Generating... )");
 			this.expectingRoomCreation = true;
+			this.createRoomBtn.setOnAction(null);
+			this.createRoomBtn.setText("Generating...");
+			this.createRoomBtn.getStyleClass().clear();
+			this.createRoomBtn.getStyleClass().add("textfield");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1085,8 +1088,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 			roomContainer.setMinWidth(100);
 			roomContainer.setAlignment(Pos.CENTER);
 			roomContainer.getStyleClass().add("namebox");
-			Label roomName = createLabel(room.getName(), false, false);
-			roomName.setPrefHeight(50);
+			Label roomID = createLabel("Room " + room.getID() +":", false, false);
+			Label roomName = createLabel("\"" + room.getName() + "\"", false, false);
 			roomName.setAlignment(Pos.CENTER);
 			HBox roomPane = new HBox();
 			roomPane.setSpacing(15);
@@ -1105,7 +1108,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 				fullLabel.getStyleClass().add("textfield");
 				roomPane.getChildren().addAll(fullLabel, numPlayers);
 			}
-			roomContainer.getChildren().addAll(roomName, roomPane);
+			roomContainer.getChildren().addAll(roomID, roomName, roomPane);
 			
 			this.roomsBox.getChildren().add(roomContainer);
 		}
@@ -1336,6 +1339,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 				if(expectingRoomCreation){
 					advance(currentScene, roomScene);
 					roomCreationLabel.setText("Create and join a room\nwith these settings");
+					createRoomBtn.setOnAction(e -> createRoom());
+					createRoomBtn.setText("Create New Room");
+					createRoomBtn.getStyleClass().clear();
+					createRoomBtn.getStyleClass().add("menubutton");
 					expectingRoomCreation = false;
 				}
 			}
