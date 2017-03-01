@@ -148,31 +148,31 @@ public class HardAITest {
 	}
 
 	
-	@Test
-	public void mediumTest() throws InterruptedException
-	{
-		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
-		players.add(player);
-		ai.setAlive(true);
-		ai.setDifficulty(AIDifficulty.MEDIUM);
-		ai.begin();
-		assertTrue(checker.inDanger());
-		while(checker.inDanger()){
-			Thread.sleep(10);
-			this.physics.update();
-		}
-		assertFalse(checker.inDanger());	
-		state.setBombs(new ArrayList<>());
-		
-		assertTrue(player.isAlive());
-		while(player.isAlive())
-		{
-			Thread.sleep(100);
-			this.physics.update();
-		}
-		assertFalse(player.isAlive());
-		ai.setAlive(false);
-	}
+//	@Test
+//	public void mediumTest() throws InterruptedException
+//	{
+//		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+//		players.add(player);
+//		ai.setAlive(true);
+//		ai.setDifficulty(AIDifficulty.MEDIUM);
+//		ai.begin();
+//		assertTrue(checker.inDanger());
+//		while(checker.inDanger()){
+//			Thread.sleep(10);
+//			this.physics.update();
+//		}
+//		assertFalse(checker.inDanger());	
+//		state.setBombs(new ArrayList<>());
+//		
+//		assertTrue(player.isAlive());
+//		while(player.isAlive())
+//		{
+//			Thread.sleep(100);
+//			this.physics.update();
+//		}
+//		assertFalse(player.isAlive());
+//		ai.setAlive(false);
+//	}
 
 
 }
