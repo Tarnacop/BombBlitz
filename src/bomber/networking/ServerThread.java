@@ -1159,7 +1159,7 @@ public class ServerThread implements Runnable {
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < length; i++) {
-			sb.append(String.format("%02x ", data[i]));
+			sb.append(String.format("0x%02x ", data[i]));
 		}
 
 		return sb.toString();

@@ -166,14 +166,14 @@ public class ProtocolConstant {
 	 * 1 byte message type + 2 byte sequence + 4 byte total number of players +
 	 * 4 byte packet index + 4 byte max index + 4 byte number of players in this
 	 * packet + array of (4 byte player id + 1 byte name length + bytes of name
-	 * string)
+	 * string + ((1 byte inRoom flag true + 4 byte room id) or (1 byte inRoom
+	 * flag false)))
 	 */
 	/*
 	 * TODO currently packet index and max index are hard-coded to 0 and number
 	 * of players in this packet to total number of players, since we don't
 	 * expect to have the number of players one packet does not fit(32 players)
 	 */
-	/* TODO only player IDs and names are encoded, may add inRoom flag later */
 
 	public static final byte MSG_S_LOBBY_ROOMLIST = 0x48; // Bit set
 	/*
@@ -181,7 +181,8 @@ public class ProtocolConstant {
 	 * byte packet index + 4 byte max index + 4 byte number of rooms in this
 	 * packet + array of (4 byte room id + 1 byte room name length + bytes of
 	 * room name string + 1 byte number of players(human + AI) + 1 byte max
-	 * player limit + 1 byte inGame boolean flag + 4 byte game map id)
+	 * player limit + 1 byte inGame boolean flag + 4 byte game map id + 1 byte
+	 * number of human players + array of up to 4 4 byte human player id)
 	 */
 	/*
 	 * TODO max number of rooms is limited to 32 for the same reason above.
@@ -195,8 +196,8 @@ public class ProtocolConstant {
 	public static final byte MSG_S_LOBBY_ROOMREJECT = 0x4a; // Bit set
 	// 1 byte message type + 2 byte sequence
 	/*
-	 * TODO rejection message should contain a reason: server full, duplicate
-	 * name, invalid name length
+	 * TODO rejection message should contain a reason: room full, invalid name
+	 * length, invalid room id, game in progress
 	 */
 
 	public static final byte MSG_S_LOBBY_NOTINROOM = 0x4b; // Bit set

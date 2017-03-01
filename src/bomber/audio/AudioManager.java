@@ -25,6 +25,16 @@ public class AudioManager
         effects.start();
     }
 
+    public void setMusicVolume(float percent)
+    {
+        music.setVolume(percent);
+    }
+
+    public void setEffectsVolume(float percent)
+    {
+        effects.setVolume(percent);
+    }
+
     public void setVolume(float percent)
     {
         music.setVolume(percent);

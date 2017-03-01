@@ -1,11 +1,10 @@
 package bomber.physics;
 
 import bomber.game.*;
+import bomber.game.Map;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by Alexandru Rosu on 15.01.2017.
@@ -17,6 +16,8 @@ public class PhysicsEngine
 
     private HashMap<String, Boolean> okToPlaceBomb;
 
+    private Stack<Point> powerUpPossibleLocations;
+
     /**
      * Creates an engine using a GameState
      * @param gameState The GameState object
@@ -25,6 +26,7 @@ public class PhysicsEngine
     {
         this.gameState = gameState;
         okToPlaceBomb = new HashMap<>();
+        powerUpPossibleLocations = new Stack<>();
     }
 
     /**
@@ -48,14 +50,24 @@ public class PhysicsEngine
 
     public synchronized void update(int milliseconds)
     {
-        // update map (blast)
+        // update map after blast
         Map map = gameState.getMap();
+        // generate power-ups
+        while(!powerUpPossibleLocations.isEmpty())
+        {
+            Point p = powerUpPossibleLocations.pop();
+            //System.out.println("Possible power-up at " + p.toString());
+            map.setGridBlockAt(p, getRandomBlock());
+        }
+        // clear the blast
         int width = gameState.getMap().getGridMap().length;
         int height = gameState.getMap().getGridMap()[0].length;
         for(int x=0; x<width; x++)
             for(int y=0; y<height; y++)
                 if (map.getGridBlockAt(x,y) == Block.BLAST)
-                    map.setGridBlockAt(new Point(x,y), Block.BLANK); // TODO: get the block from gameLogic
+                {
+                    map.setGridBlockAt(new Point(x,y), Block.BLANK);
+                }
 
         // update bombs
         ArrayList<Bomb> toBeDeleted = new ArrayList<>();
@@ -278,7 +290,9 @@ public class PhysicsEngine
             return;
         if(radius==0 || gameState.getMap().getGridBlockAt(x, y)==Block.SOLID)
             return;
-        if(gameState.getMap().getGridBlockAt(x, y) != Block.SOFT)
+        if(gameState.getMap().getGridBlockAt(x, y) == Block.SOFT)
+            powerUpPossibleLocations.push(pos);
+        else
             switch (direction)
             {
                 case 0:
@@ -307,6 +321,40 @@ public class PhysicsEngine
     private void decreaseBombTimer(Bomb bomb, int milliseconds)
     {
         bomb.setTime(bomb.getTime()-milliseconds);
+    }
+
+    // --------------------------
+    // Map update related methods
+    // --------------------------
+
+    private Block getRandomBlock()
+    {
+        Random generator = new Random();
+        boolean isPowerup = generator.nextInt(100) < Constants.powerupProbability;
+        if(!isPowerup)
+            return Block.BLANK;
+        int isPositive = generator.nextInt(100) < Constants.positivePowerupProbability ? 0 : 10; // 0 is positive, 10 is negative
+        int powerup = generator.nextInt(3); // first, second or third power-up
+
+        switch (isPositive+powerup)
+        {
+            case 0:
+                return Block.PLUS_BOMB;
+            case 1:
+                return Block.PLUS_RANGE;
+            case 2:
+                return Block.PLUS_SPEED;
+            case 10:
+                return Block.MINUS_BOMB;
+            case 11:
+                return Block.MINUS_RANGE;
+            case 12:
+                return Block.MINUS_SPEED;
+            default:
+                System.err.println("Unexpected result in Physics.getRandomBlock().");
+                return Block.BLANK;
+        }
+
     }
 
 }

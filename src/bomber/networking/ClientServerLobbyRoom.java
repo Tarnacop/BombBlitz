@@ -12,6 +12,7 @@ public class ClientServerLobbyRoom {
 	private int maxPlayer;
 	private boolean inGame;
 	private int mapID;
+	private int[] playerID;
 
 	/**
 	 * Construct a ClientServerLobbyRoom object
@@ -21,21 +22,25 @@ public class ClientServerLobbyRoom {
 	 * @param name
 	 *            the name of the room
 	 * @param playerNumber
-	 *            the number of players in the room
+	 *            the number of players(human + AI) in the room
 	 * @param maxPlayer
 	 *            the max number of players allowed in the room
 	 * @param inGame
 	 *            true if there is a game in progress in the room
 	 * @param mapID
 	 *            the map id of the room
+	 * @param playerID
+	 *            the array of id of human players in the room
 	 */
-	public ClientServerLobbyRoom(int id, String name, int playerNumber, int maxPlayer, boolean inGame, int mapID) {
+	public ClientServerLobbyRoom(int id, String name, int playerNumber, int maxPlayer, boolean inGame, int mapID,
+			int[] playerID) {
 		this.id = id;
 		this.name = name;
 		this.playerNumber = playerNumber;
-		this.setMaxPlayer(maxPlayer);
+		this.maxPlayer = maxPlayer;
 		this.inGame = inGame;
 		this.mapID = mapID;
+		this.playerID = playerID;
 	}
 
 	/**
@@ -48,16 +53,6 @@ public class ClientServerLobbyRoom {
 	}
 
 	/**
-	 * Set the id of the room
-	 * 
-	 * @param id
-	 *            the id of the room
-	 */
-	public void setID(int id) {
-		this.id = id;
-	}
-
-	/**
 	 * Get the name of the room
 	 * 
 	 * @return the name of the room
@@ -67,32 +62,12 @@ public class ClientServerLobbyRoom {
 	}
 
 	/**
-	 * Set the name of the room
-	 * 
-	 * @param name
-	 *            the name of the room
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * Get the number of players in the room
+	 * Get the number of players(human + AI) in the room
 	 * 
 	 * @return the number of players in the room
 	 */
 	public int getPlayerNumber() {
 		return playerNumber;
-	}
-
-	/**
-	 * Set the number of players in the room
-	 * 
-	 * @param playerNumber
-	 *            the number of players in the room
-	 */
-	public void setPlayerNumber(int playerNumber) {
-		this.playerNumber = playerNumber;
 	}
 
 	/**
@@ -105,32 +80,12 @@ public class ClientServerLobbyRoom {
 	}
 
 	/**
-	 * Set whether there is a game in progress in the room
-	 * 
-	 * @param inGame
-	 *            true if there is a game in progress in the room
-	 */
-	public void setInGame(boolean inGame) {
-		this.inGame = inGame;
-	}
-
-	/**
 	 * Get the map id of the room
 	 * 
 	 * @return the map id of the room
 	 */
 	public int getMapID() {
 		return mapID;
-	}
-
-	/**
-	 * Set the map id of the room
-	 * 
-	 * @param mapID
-	 *            the map id of the room
-	 */
-	public void setMapID(int mapID) {
-		this.mapID = mapID;
 	}
 
 	/**
@@ -143,13 +98,11 @@ public class ClientServerLobbyRoom {
 	}
 
 	/**
-	 * Set the max number of players allowed in the room
+	 * Get an array of id of human players in the room
 	 * 
-	 * @param maxPlayer
-	 *            the max number of players allowed in the room
+	 * @return an array of id of human players in the room
 	 */
-	public void setMaxPlayer(int maxPlayer) {
-		this.maxPlayer = maxPlayer;
+	public int[] getPlayerID() {
+		return playerID;
 	}
-
 }
