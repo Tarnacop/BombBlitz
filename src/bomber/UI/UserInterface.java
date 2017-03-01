@@ -162,6 +162,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private TextField roomNameField;
 	private SimpleIntegerProperty roomNumber;
 	private boolean expectingRoomCreation;
+	private boolean expectingRoomJoin;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -418,7 +419,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		roomsListPane = new VBox();
 		roomsListPane.setSpacing(10);
 		roomsListPane.setAlignment(Pos.TOP_LEFT);
-		roomsListPane.minHeightProperty().bind(roomsBox.minHeightProperty().add(100));
+		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(roomsBox.minHeightProperty().add(100)));
 		roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
 
 		playersTitle = createLabel("Online Players:", false, true);
@@ -426,12 +427,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersBox = new FlowPane(Orientation.VERTICAL);
 		playersBox.setVgap(20);
 		playersBox.setHgap(20);
-		playersBox.setMinHeight(200);
+		playersBox.setMinHeight(100);
 		playersListPane = new VBox();
 		playersListPane.setSpacing(10);
 		playersListPane.getChildren().addAll(playersTitle, playersBox);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
-		playersListPane.minHeightProperty().bind(playersBox.minHeightProperty());
+		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox.minHeightProperty().add(70)));
 		
 		roomsPlayersPane = new VBox();
 		roomsPlayersPane.setSpacing(40);
@@ -443,7 +444,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		serverBox.setSpacing(20);
 		serverBox.setAlignment(Pos.CENTER);
 		roomsPlayersPane.getStyleClass().add("wideclearbox");
-		roomsPlayersPane.minHeightProperty().bind(roomsListPane.minHeightProperty().add(playersListPane.minHeightProperty()));
+		roomsPlayersPane.minHeightProperty().bind(roomsListPane.minHeightProperty().add(playersListPane.minHeightProperty().add(50)));
 		serverBox.minHeightProperty().bind(roomsPlayersPane.minHeightProperty());
 		serverBox.getChildren().addAll(createRoomPane, roomsPlayersPane);
 		serverPane.setTop(backBox);
@@ -921,8 +922,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 			else{
 		try {
 			this.client.createRoom(text, (byte) this.roomNumber.get(), 1);
-			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Generating... )");
 			this.expectingRoomCreation = true;
+			this.createRoomBtn.setOnAction(null);
+			this.createRoomBtn.setText("Generating...");
+			this.createRoomBtn.getStyleClass().clear();
+			this.createRoomBtn.getStyleClass().add("textfield");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1085,8 +1089,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 			roomContainer.setMinWidth(100);
 			roomContainer.setAlignment(Pos.CENTER);
 			roomContainer.getStyleClass().add("namebox");
-			Label roomName = createLabel(room.getName(), false, false);
-			roomName.setPrefHeight(50);
+			Label roomID = createLabel("Room " + room.getID() +":", false, false);
+			Label roomName = createLabel("\"" + room.getName() + "\"", false, false);
 			roomName.setAlignment(Pos.CENTER);
 			HBox roomPane = new HBox();
 			roomPane.setSpacing(15);
@@ -1095,7 +1099,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			Label numPlayers = createLabel(room.getPlayerNumber() + "/" + room.getMaxPlayer(), true, true);
 			if(room.getPlayerNumber() < room.getMaxPlayer()){
 				Button joinButton = createButton("Join", 100, 50);
-				joinButton.setOnAction(e -> joinRoom(room.getID()));
+				joinButton.setOnAction(e -> joinRoom(room.getID(), joinButton));
 				roomPane.getChildren().addAll(joinButton, numPlayers);
 			}
 			else{
@@ -1105,21 +1109,30 @@ public class UserInterface extends Application implements ClientNetInterface{
 				fullLabel.getStyleClass().add("textfield");
 				roomPane.getChildren().addAll(fullLabel, numPlayers);
 			}
-			roomContainer.getChildren().addAll(roomName, roomPane);
+			roomContainer.getChildren().addAll(roomID, roomName, roomPane);
 			
 			this.roomsBox.getChildren().add(roomContainer);
 		}
 	}
 
-	private void joinRoom(int id) {
+	private void joinRoom(int id, Button button) {
 		
 		try {
 			this.client.joinRoom(id);
+			button.setOnAction(null);
+			button.getStyleClass().clear();
+			button.getStyleClass().add("textfield");
+			button.setText(". . .");
+			this.expectingRoomJoin = true;
+			
+			this.expectingRoomCreation = true;
+			this.createRoomBtn.setOnAction(null);
+			this.createRoomBtn.setText("Please wait...");
+			this.createRoomBtn.getStyleClass().clear();
+			this.createRoomBtn.getStyleClass().add("textfield");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}finally{
-			advance(currentScene, roomScene);
 		}
 	}
 
@@ -1336,7 +1349,20 @@ public class UserInterface extends Application implements ClientNetInterface{
 				if(expectingRoomCreation){
 					advance(currentScene, roomScene);
 					roomCreationLabel.setText("Create and join a room\nwith these settings");
+					createRoomBtn.setOnAction(e -> createRoom());
+					createRoomBtn.setText("Create New Room");
+					createRoomBtn.getStyleClass().clear();
+					createRoomBtn.getStyleClass().add("menubutton");
 					expectingRoomCreation = false;
+				}
+				else if(expectingRoomJoin){
+					advance(currentScene, roomScene);
+					createRoomBtn.setOnAction(e -> createRoom());
+					createRoomBtn.setText("Create New Room");
+					createRoomBtn.getStyleClass().clear();
+					createRoomBtn.getStyleClass().add("menubutton");
+					displayRooms();
+					expectingRoomJoin = false;
 				}
 			}
 			   
@@ -1349,8 +1375,19 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				System.out.println("Room creation rejected");
-				expectingRoomCreation = false;
+				System.out.println("Room creation/join rejected");
+				if(expectingRoomCreation){
+					roomCreationLabel.setText("Create and join a room\nwith these settings\n( Room creation failed! )");
+					createRoomBtn.setOnAction(e -> createRoom());
+					createRoomBtn.setText("Create New Room");
+					createRoomBtn.getStyleClass().clear();
+					createRoomBtn.getStyleClass().add("menubutton");
+					expectingRoomCreation = false;
+				}
+				if(expectingRoomJoin){
+					displayRooms();
+					expectingRoomJoin = false;
+				}
 			}
 			   
 		});
@@ -1427,12 +1464,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	@Override
-	public void roomReceived() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void connectionAttemptTimeout() {
 		System.out.println("CALLED CONNECTION TIMEOUT");
 		Platform.runLater(new Runnable(){
@@ -1448,5 +1479,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 			}
 			   
 		});
+	}
+
+	@Override
+	public void roomReceived() {
+		// TODO Auto-generated method stub
+		
 	}
 }

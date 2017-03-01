@@ -20,6 +20,8 @@ public class Constants
     public static final int bombRangeChange = 1;
     public static final int lowPlayerSpeed = 200;
     public static final int highPlayerSpeed = 400;
+    public static final int powerupProbability = 25;
+    public static final int positivePowerupProbability = 75;
 
     // Audio files
     public static final String audioFilesPath = "/resources/sounds/";
@@ -28,8 +30,9 @@ public class Constants
     public static final String bombPlaceFilename = "sfx_sound_neutral6.wav";
     public static final String movementFilename = "sfx_movement_footsteps1a.wav";
     public static final String playerDeathFilename = "sfx_sounds_error1.wav";
-    public static final String powerupFilename = "sfx_sounds_neutral6.wav"; // TODO: find a sound
+    public static final String powerupFilename = "sfx_sounds_interaction24.wav";
     public static final String menuSoundFilename = "271139_strange-dragoon_menu-select_converted.wav";
 
+    // Settings
     public static final float defaultVolume = 75;
 }

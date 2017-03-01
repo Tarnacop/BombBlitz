@@ -79,7 +79,20 @@ public class ClientPacketEncoder {
 			buffer.get(nameData);
 			String name = new String(nameData, 0, nameLength, "UTF-8");
 
-			playerList.add(new ClientServerPlayer(id, name));
+			if (length < buffer.position() + 1) {
+				throw new IOException("packet format is invalid");
+			}
+			boolean inRoom = buffer.get() != 0;
+
+			int roomID = -1;
+			if (inRoom) {
+				if (length < buffer.position() + 4) {
+					throw new IOException("packet format is invalid");
+				}
+				roomID = buffer.getInt();
+			}
+
+			playerList.add(new ClientServerPlayer(id, name, inRoom, roomID));
 		}
 
 		if (length != buffer.position()) {
@@ -175,7 +188,22 @@ public class ClientPacketEncoder {
 			}
 			int mapID = buffer.getInt();
 
-			roomList.add(new ClientServerLobbyRoom(id, name, playerNumber, maxPlayer, inGame, mapID));
+			// get number of human players
+			if (length < buffer.position() + 1) {
+				throw new IOException("packet format is invalid");
+			}
+			byte humanPlayerNumber = buffer.get();
+
+			// get id of human players
+			if (humanPlayerNumber < 0 || length < buffer.position() + humanPlayerNumber * 4) {
+				throw new IOException("packet format is invalid");
+			}
+			int[] humanPlayerID = new int[humanPlayerNumber];
+			for (int j = 0; j < humanPlayerNumber; j++) {
+				humanPlayerID[j] = buffer.getInt();
+			}
+
+			roomList.add(new ClientServerLobbyRoom(id, name, playerNumber, maxPlayer, inGame, mapID, humanPlayerID));
 		}
 
 		if (length != buffer.position()) {
