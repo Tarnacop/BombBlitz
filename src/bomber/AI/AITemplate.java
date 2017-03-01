@@ -141,7 +141,8 @@ public abstract class AITemplate extends Thread {
 		check &= (updatedFinalPixelPos.y <= currentPixel.y);
 		return !check;
 	}
-
+	
+	
 	/**
 	 * Make single move.
 	 * 
@@ -152,9 +153,13 @@ public abstract class AITemplate extends Thread {
 	 */
 	protected void makeSingleMove(AIActions move) {
 		Point updatedPos = updatedPos(move);
+		Point updatedPos2 = new Point(updatedPos);
 		updatedPos.setLocation(updatedPos.x * scalar, updatedPos.y * scalar);
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
-		while (checkIfReachedDestination(gameAI.getPos(), updatedPos) && gameAI.isAlive()) {
+		int stuckChecker = 0;
+		while (checkIfReachedDestination(gameAI.getPos(), updatedPos) && gameAI.isAlive()
+				&& !safetyCh.isNextMoveBomb(updatedPos2) && stuckChecker<50) {
+			stuckChecker++;
 			try {
 				sleep(10);
 			} catch (InterruptedException e) {
