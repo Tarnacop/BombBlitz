@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.AudioEvent;
 import bomber.game.Block;
 import bomber.game.Bomb;
@@ -67,20 +68,45 @@ public class ServerPacketEncoder {
 		buffer.putInt(11, 0);
 		buffer.putInt(15, list.size());
 
-		// put id and names into byte array
+		// put id, name, inRoom and (optionally)room id into byte array
 		buffer.position(1 + 2 + 4 + 4 + 4 + 4);
 		for (Entry<SocketAddress, ServerClientInfo> e : list) {
+			// id
 			if (dest.length < buffer.position() + 4) {
 				throw new IOException("dest is too short");
 			}
 			buffer.putInt(e.getValue().getID());
 
+			// name
 			byte[] nameData = e.getValue().getName().getBytes("UTF-8");
 			if (dest.length < buffer.position() + 1 + nameData.length) {
 				throw new IOException("dest is too short");
 			}
 			buffer.put((byte) nameData.length);
 			buffer.put(nameData);
+
+			// inRoom
+			boolean inRoom = e.getValue().isInRoom();
+			ServerRoom room = e.getValue().getRoom();
+			if (inRoom && room == null) {
+				inRoom = false;
+			}
+			if (dest.length < buffer.position() + 1) {
+				throw new IOException("dest is too short");
+			}
+			if (inRoom) {
+				buffer.put((byte) 1);
+			} else {
+				buffer.put((byte) 0);
+			}
+
+			// room id
+			if (inRoom) {
+				if (dest.length < buffer.position() + 4) {
+					throw new IOException("dest is too short");
+				}
+				buffer.putInt(room.getID());
+			}
 		}
 
 		len = buffer.position();
@@ -133,14 +159,16 @@ public class ServerPacketEncoder {
 		// put room info into byte array
 		buffer.position(1 + 2 + 4 + 4 + 4 + 4);
 		for (Entry<Integer, ServerRoom> e : list) {
+			ServerRoom room = e.getValue();
+
 			// put room ID
 			if (dest.length < buffer.position() + 4) {
 				throw new IOException("dest is too short");
 			}
-			buffer.putInt(e.getValue().getID());
+			buffer.putInt(room.getID());
 
 			// put room name
-			byte[] nameData = e.getValue().getName().getBytes("UTF-8");
+			byte[] nameData = room.getName().getBytes("UTF-8");
 			if (dest.length < buffer.position() + 1 + nameData.length) {
 				throw new IOException("dest is too short");
 			}
@@ -151,20 +179,20 @@ public class ServerPacketEncoder {
 			if (dest.length < buffer.position() + 1) {
 				throw new IOException("dest is too short");
 			}
-			buffer.put((byte) e.getValue().getPlayerNumber());
+			buffer.put((byte) room.getPlayerNumber());
 
 			// put max player limit
 			if (dest.length < buffer.position() + 1) {
 				throw new IOException("dest is too short");
 			}
-			buffer.put((byte) e.getValue().getMaxPlayer());
+			buffer.put((byte) room.getMaxPlayer());
 
 			// put inGame boolean flag
 			if (dest.length < buffer.position() + 1) {
 				throw new IOException("dest is too short");
 			}
 			byte inGame;
-			if (e.getValue().isInGame()) {
+			if (room.isInGame()) {
 				inGame = 1;
 			} else {
 				inGame = 0;
@@ -175,9 +203,24 @@ public class ServerPacketEncoder {
 			if (dest.length < buffer.position() + 4) {
 				throw new IOException("dest is too short");
 			}
-			int mapID = e.getValue().getMapID();
+			int mapID = room.getMapID();
 			buffer.putInt(mapID);
 
+			// put number of human players
+			if (dest.length < buffer.position() + 1) {
+				throw new IOException("dest is too short");
+			}
+			ServerClientInfo[] humanPlayers = room.getHumanPlayers();
+			int humanPlayerNumber = humanPlayers.length;
+			buffer.put((byte) humanPlayerNumber);
+
+			// put array of human player id
+			if (dest.length < buffer.position() + 4 * humanPlayerNumber) {
+				throw new IOException("dest is too short");
+			}
+			for (int i = 0; i < humanPlayerNumber; i++) {
+				buffer.putInt(humanPlayers[i].getID());
+			}
 		}
 
 		len = buffer.position();
@@ -266,11 +309,15 @@ public class ServerPacketEncoder {
 		for (int i = 0; i < aiPlayers.length; i++) {
 			ServerAI ai = aiPlayers[i];
 			byte id = ai.getID();
-			if (dest.length < buffer.position() + 1) {
+			byte difficulty = aiDifficultyToByte(ai.getDifficulty());
+
+			if (dest.length < buffer.position() + 1 + 1) {
 				throw new IOException("dest is too short");
 			}
 			// put AI id
 			buffer.put(id);
+			// put AI difficulty
+			buffer.put(difficulty);
 		}
 
 		len = buffer.position();
@@ -453,34 +500,12 @@ public class ServerPacketEncoder {
 
 				Block b = gridMap[x][y];
 
-				boolean bits[] = new boolean[4];
-
-				if (b == Block.BLANK) {
-					bits[3] = false;
-					bits[2] = false;
-					bits[1] = false;
-					bits[0] = false;
-				} else if (b == Block.BLAST) {
-					bits[3] = false;
-					bits[2] = false;
-					bits[1] = false;
-					bits[0] = true;
-				} else if (b == Block.SOFT) {
-					bits[3] = false;
-					bits[2] = false;
-					bits[1] = true;
-					bits[0] = false;
-				} else if (b == Block.SOLID) {
-					bits[3] = false;
-					bits[2] = false;
-					bits[1] = true;
-					bits[0] = true;
-				}
+				byte bits = blockToByte(b);
 
 				int bitIndex = x + y * gridMapWidth;
 
 				for (int i = 3; i >= 0; i--) {
-					if (bits[i]) {
+					if (BitArray.getBit(bits, i)) {
 						bitArr[i][bitIndex / 64] = BitArray.setBit(bitArr[i][bitIndex / 64], bitIndex % 64, true);
 					}
 				}
@@ -605,5 +630,93 @@ public class ServerPacketEncoder {
 		keyboardState.setBomb(BitArray.getBit(k, 5));
 
 		return keyboardState;
+	}
+
+	/**
+	 * Convert Block into byte (only bit 3 to bit 0 in the byte are used)
+	 * 
+	 * @param block
+	 *            the Block
+	 * @return the byte
+	 */
+	public static byte blockToByte(Block block) {
+		byte b = 0;
+
+		switch (block) {
+		case BLANK:
+			b = 0;
+			break;
+
+		case SOLID:
+			b = 1;
+			break;
+
+		case SOFT:
+			b = 2;
+			break;
+
+		case BLAST:
+			b = 3;
+			break;
+
+		case PLUS_BOMB:
+			b = 4;
+			break;
+
+		case MINUS_BOMB:
+			b = 5;
+			break;
+
+		case PLUS_RANGE:
+			b = 6;
+			break;
+
+		case MINUS_RANGE:
+			b = 7;
+			break;
+
+		case PLUS_SPEED:
+			b = 8;
+			break;
+
+		case MINUS_SPEED:
+			b = 9;
+			break;
+
+		default:
+			b = 0;
+			break;
+		}
+
+		return b;
+	}
+
+	/**
+	 * Convert AIDifficulty into byte
+	 * 
+	 * @param difficulty
+	 *            the AIDifficulty
+	 * @return the byte
+	 */
+	public static byte aiDifficultyToByte(AIDifficulty difficulty) {
+		byte aiDifficulty;
+		switch (difficulty) {
+		case EASY:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EASY;
+			break;
+		case MEDIUM:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM;
+			break;
+		case HARD:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_HARD;
+			break;
+		case EXTREME:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_EXTREME;
+			break;
+		default:
+			aiDifficulty = ProtocolConstant.MSG_C_ROOM_SETINFO_AI_DIFFICULTY_MEDIUM;
+			break;
+		}
+		return aiDifficulty;
 	}
 }

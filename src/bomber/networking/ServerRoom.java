@@ -4,6 +4,8 @@ package bomber.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import bomber.AI.AIDifficulty;
+
 /**
  * 
  * Server side representation of a room
@@ -272,6 +274,23 @@ public class ServerRoom {
 		if (aiList.size() > 0) {
 			// remove the AI which is created most recently
 			aiList.remove(aiList.size() - 1);
+		}
+	}
+
+	/**
+	 * Set the difficulty of an AI player
+	 * 
+	 * @param id
+	 *            the id of the AI player, which should be in the range [0,2]
+	 * @param difficulty
+	 *            the difficulty of the AI player
+	 */
+	public void setAIDifficulty(int id, AIDifficulty difficulty) {
+		if (aiList.size() > 0 && id >= 0 && id <= aiList.size() - 1) {
+			ServerAI ai = aiList.get(id);
+			if (ai != null) {
+				ai.setDifficulty(difficulty);
+			}
 		}
 	}
 

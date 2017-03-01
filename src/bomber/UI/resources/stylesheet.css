@@ -1,3 +1,7 @@
+*{
+	-fx-border-color: white;
+	-fx-border-width: 2px;
+}
 
 .menubutton{
 	-fx-background-color: transparent;
@@ -26,6 +30,16 @@
 	-fx-padding: 5px;
 }
 
+.maplabel{
+	-fx-font-family: minecraft;
+	-fx-font-size: 20;
+	-fx-padding: 10px 20px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/maplabel.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
 .textfield{
 	-fx-font-family: minecraft;
 	-fx-font-size: 20;
@@ -44,6 +58,15 @@
         -fx-background-repeat:no-repeat;
 }
 
+.widebox{
+	-fx-padding: 20px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/widebox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+
 .nopadbox{
 	-fx-padding:5px;
 	-fx-background-color: transparent;
@@ -60,6 +83,14 @@
         -fx-background-repeat:no-repeat;
 }
 
+.connectbox{
+	-fx-padding: 20px;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/widefancybox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
 .creditsbox{
 	-fx-padding: 25px;
 	-fx-background-image: url("images/mapbox.png");
@@ -69,6 +100,13 @@
 
 .mapbox{
 	-fx-background-image: url("images/mapbox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.wideclearbox{
+	-fx-padding: 25px;
+	-fx-background-image: url("images/wideclearbox.png");
         -fx-background-size:100% 100%;
         -fx-background-repeat:no-repeat;
 }
