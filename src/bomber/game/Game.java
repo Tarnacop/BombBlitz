@@ -34,7 +34,7 @@ public class Game implements GameInterface {
 	private UserInterface ui;
 	private int aiNum;
 	private AIDifficulty aiDiff;
-
+	
 	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff) {
 
 		this.aiNum = aiNum;

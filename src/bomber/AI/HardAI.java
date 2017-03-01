@@ -123,7 +123,6 @@ public class HardAI extends AITemplate{
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
 				performPlannedMoves(moves);
 			}
-
 			gameAI.getKeyState().setBomb(false);
 		}
 	}
