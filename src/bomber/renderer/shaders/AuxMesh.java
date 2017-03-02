@@ -1,4 +1,3 @@
-
 package bomber.renderer.shaders;
 
 import static org.lwjgl.opengl.GL11.*;

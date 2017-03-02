@@ -1,9 +1,9 @@
 package bomber.renderer.shaders;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 // Class which holds a text
 public class TextItem {
@@ -15,76 +15,72 @@ public class TextItem {
 	private float scale;
 	
 	private String text;
-	
-    private final int numCols;
-    private final int numRows;
+	private FontTexture fontTexture;
     private AuxMesh mesh;
+    private Vector3f colour;
     
-    public TextItem(String text, String fontFileName, int numCols, int numRows) {
+    public TextItem(String text, FontTexture fontTexture) throws Exception {
     	
     	pos = new Vector2f(0f, 0f);
 		angle = 0f;
 		scale = 1f;
+		colour = new Vector3f(1f, 1f, 1f);
     	this.text = text;
-    	this.numCols = numCols;
-    	Texture texture = new Texture(fontFileName);
-    	this.numRows = numRows;
-    	this.mesh = buildMesh(texture, numCols, numRows);
+    	this.fontTexture = fontTexture;
+    	this.mesh = buildMesh();
     } // END OF CONSTRUCTOR
     
-    private AuxMesh buildMesh(Texture texture, int numCols, int numRows) {
-    	
-    	byte[] chars = text.getBytes(Charset.forName("ISO-8859-1"));
-    	int numChars = chars.length;
-    	
+    private AuxMesh buildMesh() {
+    	    	
         ArrayList<Float> positions = new ArrayList<Float>();
         ArrayList<Float> textCoords = new ArrayList<Float>();
         
         ArrayList<Integer> indices = new ArrayList<Integer>();
         
-        float tileWidth = (float) texture.getWidth()/(float) numCols;
-        float tileHeight = (float) texture.getHeight()/(float) numRows;
+        char[] characters = text.toCharArray();
+        int numChars = characters.length;
+
         
+        float startX = 0.0f;
         // Create the positions, textureCoords and indices
         for(int i = 0; i < numChars; i++) {
         	
-        	byte currChar = chars[i];
-        	int col = currChar % numCols;
-        	int row = currChar / numRows;
-        	
+        	FontTexture.CharInfo charInfo = fontTexture.getCharInfo(characters[i]);
         	// Build a character tile composed of 2 triangles ( => a quad)
         	
         	// Left top vertex
-        	positions.add((float)i*tileWidth); // x coord
+        	positions.add(startX); // x coord
         	positions.add(0.0f); // y coord
-        	textCoords.add((float) col / (float) numCols);
-        	textCoords.add((float) row / (float) numRows);
+        	textCoords.add((float)charInfo.getStartX() / (float)fontTexture.getWidth());
+        	textCoords.add(0.0f);
         	indices.add(i*VERTICES_PER_QUAD);
         	
         	// Left bottom vertex
-        	positions.add((float)i * tileWidth); // x coord
-        	positions.add(tileHeight); // y coord
-        	textCoords.add((float) col / (float) numCols);
-        	textCoords.add((float) (row+1) / (float) numRows);
+        	positions.add(startX); // x coord
+        	positions.add((float)fontTexture.getHeight()); // y coord
+        	textCoords.add((float)charInfo.getStartX() / (float)fontTexture.getWidth());
+        	textCoords.add(1.0f);
         	indices.add(i*VERTICES_PER_QUAD +  1);
         	
         	// Right bottom vertex
-        	positions.add((float)(i + 1)*tileWidth);
-        	positions.add(tileHeight);
-        	textCoords.add((float) (col + 1) / (float) numCols);
-        	textCoords.add((float) (row + 1) / (float) numRows);
+        	positions.add(startX + charInfo.getWidth());
+        	positions.add((float)fontTexture.getHeight());
+        	textCoords.add((float)(charInfo.getStartX() + charInfo.getWidth() )/ (float)fontTexture.getWidth());
+        	textCoords.add(1.0f);
         	indices.add(i*VERTICES_PER_QUAD + 2);
         	
         	// Right top vertex
-        	positions.add((float)i*tileWidth + tileWidth);
+        	positions.add(startX + charInfo.getWidth());
         	positions.add(0.0f);
-        	textCoords.add((float) (col + 1) / (float) numCols);
-        	textCoords.add((float) row / (float) numRows);
+        	textCoords.add((float)(charInfo.getStartX() + charInfo.getWidth() )/ (float)fontTexture.getWidth());
+        	textCoords.add(0.0f);
         	indices.add(i*VERTICES_PER_QUAD + 3);
         	
             // Add indices por left top and bottom right vertices
             indices.add(i*VERTICES_PER_QUAD);
             indices.add(i*VERTICES_PER_QUAD + 2);
+            
+            startX += charInfo.getWidth();
         }
         
     	float[] positionsArray = new float[positions.size()];
@@ -105,7 +101,7 @@ public class TextItem {
     		indicesArray[i] = indices.get(i);
     	}
     	
-    	return new AuxMesh(positionsArray, textCoordsArray, indicesArray, texture);
+    	return new AuxMesh(positionsArray, textCoordsArray, indicesArray, fontTexture.getTexture());
     } // END OF buildMesh METHOD 
     
     public void setMesh(AuxMesh mesh) {
@@ -157,9 +153,17 @@ public class TextItem {
 	public void setText(String text) {
 		
 		this.text = text;
-		Texture texture = this.getMesh().getTexture();
 		this.getMesh().deleteBuffers();
-		this.setMesh(buildMesh(texture, numCols, numRows));
+		this.setMesh(buildMesh());
 	} // END OF setText METHOD
 
+	public void setColour(Vector3f colour) {
+		
+		this.colour = colour;
+	} // END OF setColour METHOD
+	
+	public Vector3f getColour() {
+		
+		return colour;
+	} // END OF getColour METHOD
 } // END OF TextItem CLASS
