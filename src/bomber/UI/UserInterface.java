@@ -8,7 +8,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
 import java.awt.Point;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -16,13 +15,12 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.HPos;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -46,7 +44,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -923,10 +920,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		try {
 			this.client.createRoom(text, (byte) this.roomNumber.get(), 1);
 			this.expectingRoomCreation = true;
-			this.createRoomBtn.setOnAction(null);
-			this.createRoomBtn.setText("Generating...");
-			this.createRoomBtn.getStyleClass().clear();
-			this.createRoomBtn.getStyleClass().add("textfield");
+			blankButton(createRoomBtn, "Generating...");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1039,25 +1033,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			client.connect(this.playerName.get());
 			
-			connectBtn.setOnAction(null);
-			connectBtn.getStyleClass().clear();
-			connectBtn.getStyleClass().add("textfield");
-			connectBtn.setText("Connecting...");
+			blankButton(connectBtn, "Connecting...");
 			this.expectingConnection = true;
 		} 
 		catch (NumberFormatException e1) {
 			enterLabel.setText("Enter Server Details:\n( Invalid Port Number! )");
-			connectBtn.setOnAction(e -> connect());
-			connectBtn.getStyleClass().clear();
-			connectBtn.getStyleClass().add("menubutton");
-			connectBtn.setText("Connect");
+			resetButton(connectBtn, "Connect", e -> connect());
 		}
 		catch(IOException e2){
 			enterLabel.setText("Enter Server Details:\n( Couldn't open a connection! )");
-			connectBtn.setOnAction(e -> connect());
-			connectBtn.getStyleClass().clear();
-			connectBtn.getStyleClass().add("menubutton");
-			connectBtn.setText("Connect");
+			resetButton(connectBtn, "Connect", e -> connect());
 		}
 		
 		
@@ -1119,17 +1104,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		try {
 			this.client.joinRoom(id);
-			button.setOnAction(null);
-			button.getStyleClass().clear();
-			button.getStyleClass().add("textfield");
-			button.setText(". . .");
+			blankButton(button, ". . .");
 			this.expectingRoomJoin = true;
 			
 			this.expectingRoomCreation = true;
-			this.createRoomBtn.setOnAction(null);
-			this.createRoomBtn.setText("Please wait...");
-			this.createRoomBtn.getStyleClass().clear();
-			this.createRoomBtn.getStyleClass().add("textfield");
+			blankButton(createRoomBtn, "Please wait...");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1173,10 +1152,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		enterLabel.setText("Enter Server Details:");
 		this.currentNameText.set("Current Name:");
 		
-		connectBtn.setOnAction(e -> connect());
-		connectBtn.getStyleClass().clear();
-		connectBtn.getStyleClass().add("menubutton");
-		connectBtn.setText("Connect");
+		resetButton(connectBtn, "Connect", e -> connect());
+		resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 		}
 	}
 	
@@ -1279,10 +1256,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				enterLabel.setText("Enter Server Details:\n( A player with your name is already\nconncted to the server!\nChange and try again! )");
-				connectBtn.getStyleClass().clear();
-				connectBtn.setOnAction(e -> connect());
-				connectBtn.getStyleClass().add("menubutton");
-				connectBtn.setText("Connect");
+				resetButton(connectBtn, "Connect", e -> connect());
 				expectingConnection = false;
 			}
 			   
@@ -1303,10 +1277,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				enterLabel.setText("Enter Server Details:\n( Couldn't connect to server!\nMake sure server is running. )");
-				connectBtn.getStyleClass().clear();
-				connectBtn.setOnAction(e -> connect());
-				connectBtn.getStyleClass().add("menubutton");
-				connectBtn.setText("Connect");
+				resetButton(connectBtn, "Connect", e -> connect());
 				expectingConnection = false;
 			}
 			   
@@ -1349,18 +1320,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 				if(expectingRoomCreation){
 					advance(currentScene, roomScene);
 					roomCreationLabel.setText("Create and join a room\nwith these settings");
-					createRoomBtn.setOnAction(e -> createRoom());
-					createRoomBtn.setText("Create New Room");
-					createRoomBtn.getStyleClass().clear();
-					createRoomBtn.getStyleClass().add("menubutton");
+					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 					expectingRoomCreation = false;
 				}
 				else if(expectingRoomJoin){
 					advance(currentScene, roomScene);
-					createRoomBtn.setOnAction(e -> createRoom());
-					createRoomBtn.setText("Create New Room");
-					createRoomBtn.getStyleClass().clear();
-					createRoomBtn.getStyleClass().add("menubutton");
+					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 					displayRooms();
 					expectingRoomJoin = false;
 				}
@@ -1369,6 +1334,20 @@ public class UserInterface extends Application implements ClientNetInterface{
 		});
 	}
 
+	private void blankButton(Button button, String blankText){
+		button.setOnAction(null);
+		button.setText(blankText);
+		button.getStyleClass().clear();
+		button.getStyleClass().add("textfield");
+	}
+	
+	private void resetButton(Button button, String resetText, EventHandler<ActionEvent> handler){
+		button.setOnAction(handler);
+		button.setText(resetText);
+		button.getStyleClass().clear();
+		button.getStyleClass().add("menubutton");
+	}
+	
 	@Override
 	public void roomRejected() {
 		Platform.runLater(new Runnable(){
@@ -1378,10 +1357,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 				System.out.println("Room creation/join rejected");
 				if(expectingRoomCreation){
 					roomCreationLabel.setText("Create and join a room\nwith these settings\n( Room creation failed! )");
-					createRoomBtn.setOnAction(e -> createRoom());
-					createRoomBtn.setText("Create New Room");
-					createRoomBtn.getStyleClass().clear();
-					createRoomBtn.getStyleClass().add("menubutton");
+					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 					expectingRoomCreation = false;
 				}
 				if(expectingRoomJoin){
@@ -1471,10 +1447,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				enterLabel.setText("Enter Server Details:\n( Timed out trying to connect!\nMake sure server is running. )");
-				connectBtn.getStyleClass().clear();
-				connectBtn.setOnAction(e -> connect());
-				connectBtn.getStyleClass().add("menubutton");
-				connectBtn.setText("Connect");
+				resetButton(connectBtn, "Connect", e -> connect());
 				expectingConnection = false;
 			}
 			   

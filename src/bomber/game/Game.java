@@ -97,19 +97,19 @@ public class Game implements GameInterface {
 	@Override
 	public void update(float interval) {
 
-		if(!this.player.isAlive()){dispose();return;}
-		// System.out.println(this.gameState);
-		// System.out.println(this.player.getKeyState().toString() + ": " +
-		// this.player.getKeyState().getMovement());
-		// System.out.println(this.gameState.getPlayers().get(0).getKeyState().toString());
+		if(this.gameState.gameOver()){
+			//call game over screen
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			dispose();
+		}
 		this.physics.update((int) (interval * 1000));
-		//System.out.println(this.gameState);
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 		List<Player> players = this.gameState.getPlayers();
-		//for(Player player : players){
-		//	if(!player.isAlive())players.remove(player);
-		//}
 		audio.playEventList(gameState.getAudioEvents());
 	}
 
