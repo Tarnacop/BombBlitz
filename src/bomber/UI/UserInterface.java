@@ -49,6 +49,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import bomber.AI.AIDifficulty;
+import bomber.audio.AudioManager;
 import bomber.game.Block;
 import bomber.game.Game;
 import bomber.game.GameState;
@@ -895,8 +896,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 		return button;
 	}
 	
+	public void beep(){
+		AudioManager.playMenuItemSelected();
+	}
+	
 	private void beginOnlineGame() {
-		
+		beep();
 		try {
 			this.client.readyToPlay(true);
 			for(int x = 0; x < this.aiNumber.get(); x++){
@@ -909,6 +914,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void createRoom() {
+		beep();
 		String text = this.roomNameField.getText().trim();
 		if(text.length() < 1){
 			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Name too short! )");
@@ -960,6 +966,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void disconnect() {
+		beep();
 		if (this.client != null && !this.client.isInRoom()) {
 			try {
 
@@ -984,6 +991,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 	
 	private void decrementMap() {
+		beep();
 		int index = this.maps.indexOf(this.map);
 		if(index > 0){
 			this.map = this.maps.get(index-1);
@@ -996,6 +1004,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void incremenetMap() {
+		beep();
 		int index = this.maps.indexOf(this.map);
 		if(index < (this.maps.size()-1)){
 			this.map = this.maps.get(index+1);
@@ -1008,15 +1017,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void decrementAi() {
+		beep();
 		if(this.aiNumber.get() > 1)aiNumber.set(this.aiNumber.get()-1);
 	}
 
 	private void incrementAi() {
+		beep();
 		if(this.aiNumber.get() < 3)aiNumber.set(this.aiNumber.get()+1);
 	}
 	
 	private void connect() {
-		
+		beep();
 		enterLabel.setText("Enter Server Details:");
 		String host = ipText.getText();
 		try{
@@ -1102,6 +1113,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	private void joinRoom(int id, Button button) {
 		
+		beep();
 		try {
 			this.client.joinRoom(id);
 			blankButton(button, ". . .");
@@ -1128,6 +1140,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void previous() {
+		beep();
 		try {
 		if(this.client != null && this.client.isInRoom()){
 			
@@ -1159,6 +1172,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private void advance(Scene thisScene, Scene nextScene) {
 		
+		beep();
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
@@ -1175,6 +1189,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	public void setName(String string){
 		
+		beep();
 		string = string.trim();
 		if(string.length() > 0 && string.length() < 12){
 			this.playerName.set(string);
@@ -1190,6 +1205,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	public void beginGame(Map map, String playerName, HashMap<Response, Integer> controls, int aiNum) {
 		
+		beep();
 		Block[][] masterMap = this.map.getGridMap();
 		int columnLength = masterMap[0].length;
 		Block[][] arrayCopy = new Block[masterMap.length][columnLength];
@@ -1393,10 +1409,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				client.getMapID();
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
-				new OnlineGame(ui, client, gameState, maps.get(1), playerName.get(), controls);
+				new OnlineGame(ui, client, gameState, playerName.get(), controls);
 			}
 			   
 		});

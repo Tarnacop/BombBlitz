@@ -30,13 +30,12 @@ public class OnlineGame implements GameInterface {
 	// private int aiNum;
 	private ClientThread client;
 
-	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, Map map, String playerName,
+	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
 			HashMap<Response, Integer> controls) {
 
 		this.ui = ui;
 		this.gameState = gameState;
 		this.client = client;
-		this.map = map;
 		// this.playerName = playerName;
 		this.controlScheme = controls;
 		this.bombPressed = false;
