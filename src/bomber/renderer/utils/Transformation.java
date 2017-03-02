@@ -16,10 +16,9 @@ public class Transformation {
 
 	} // END OF CONSTRUCTOR
 
-	public Matrix4f getOrthographicProjection(float left, float right, float bottom, float top, float zNear,
-			float zFar) {
+	public Matrix4f getOrthographicProjection(float left, float right, float bottom, float top) {
 
-		return projection.identity().ortho(left, right, bottom, top, zNear, zFar);
+		return projection.identity().ortho2D(left, right, bottom, top);
 	} // END OF getOrthographic METHOD
 
 	public Matrix4f getModelMatrix(Vector3f offset, Vector3f rotation, float scale) {
@@ -41,4 +40,9 @@ public class Transformation {
 				.rotateZ((float) Math.toRadians(angle))
 				.scale(scale);
 	} // END OF getModelMatrix METHOD
+	
+	public Matrix4f getOrtoProjectionModelMatrix(Matrix4f modelMatrix, Matrix4f orthoMatrix) {
+		
+		return orthoMatrix.mul(modelMatrix);
+	}
 } // END OF Transformation CLASS

@@ -112,6 +112,10 @@ public class Screen {
 		
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		
+		// Support for transparencies
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
 		glfwSetInputMode(this.screenID, GLFW_STICKY_KEYS, GLFW_TRUE);
 
 		System.out.println("Initialized screen");
