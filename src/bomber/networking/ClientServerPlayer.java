@@ -51,6 +51,7 @@ public class ClientServerPlayer {
 		this.id = id;
 		this.name = name;
 		this.readyToPlay = readyToPlay;
+		this.inRoom = true;
 	}
 
 	/**

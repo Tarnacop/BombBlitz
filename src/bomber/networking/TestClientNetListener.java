@@ -26,7 +26,8 @@ public class TestClientNetListener implements ClientNetInterface {
 
 	@Override
 	public void connectionRejected() {
-		System.out.println("Client connection has been rejected by the server");
+		int reason = client.getConnectionRejectedReason();
+		System.out.println("Client connection has been rejected by the server, reason: " + reason);
 	}
 
 	@Override
@@ -58,7 +59,8 @@ public class TestClientNetListener implements ClientNetInterface {
 
 	@Override
 	public void roomRejected() {
-		System.out.println("Client has been rejected to create/join a room");
+		int reason = client.getRoomRejectedReason();
+		System.out.println("Client has been rejected to create/join a room, reason: " + reason);
 	}
 
 	@Override

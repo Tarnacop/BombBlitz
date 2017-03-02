@@ -23,7 +23,8 @@ public interface ClientNetInterface {
 
 	/**
 	 * This method will be called when the client has received connection
-	 * rejected message from the server
+	 * rejected message from the server. Call getConnectionRejectedReason() to
+	 * get the reason code
 	 */
 	public void connectionRejected();
 
@@ -71,7 +72,7 @@ public interface ClientNetInterface {
 	 * This method will be called when the client has received message from the
 	 * server indicating that it is not in a room yet (usually caused by
 	 * attempting to leave a room, send readyToPlay or send a move while it is
-	 * still in lobby)
+	 * still in lobby) Call getRoomRejectedReason() to get the reason code
 	 */
 	public void notInRoom();
 

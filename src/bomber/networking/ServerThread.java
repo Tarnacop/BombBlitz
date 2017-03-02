@@ -295,8 +295,6 @@ public class ServerThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_C_NET_CONNECT: {
-			// TODO should reject with a reason in this type of message
-
 			// packet length check
 			if (packet.getLength() < 13) {
 				return;
@@ -306,7 +304,8 @@ public class ServerThread implements Runnable {
 			long nonce = recvByteBuffer.getLong(3);
 			Long n = nonceTable.get(sockAddr);
 			if (n == null || n.longValue() != nonce) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_NET_REJECT_REASON_OTHER);
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
 			} else {
@@ -331,7 +330,8 @@ public class ServerThread implements Runnable {
 			if (nameLength > config.getMaxNameLength()) {
 				pServer("Warning: name length longer than " + config.getMaxNameLength() + " in conection request from "
 						+ sockAddr + ", request ignored");
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_NET_REJECT_REASON_INVALIDNAMELENGTH);
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
 			}
@@ -360,7 +360,8 @@ public class ServerThread implements Runnable {
 
 			// server full check
 			if (clientTable.size() >= config.getMaxPlayer()) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_NET_REJECT_REASON_SERVERFULL);
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
 			}
@@ -370,7 +371,8 @@ public class ServerThread implements Runnable {
 
 			// duplicate name check
 			if (clientTable.contains(name)) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_NET_REJECT_REASON_DUPLICATENAME);
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
 			}
@@ -462,8 +464,6 @@ public class ServerThread implements Runnable {
 		}
 
 		case ProtocolConstant.MSG_C_LOBBY_CREATEROOM: {
-			// TODO should reject with a reason in this type of message
-
 			recvByteBuffer.position(3);
 			if (packet.getLength() < recvByteBuffer.position() + 1) {
 				pServer("Failed to decode room creation request from " + sockAddr);
@@ -479,7 +479,8 @@ public class ServerThread implements Runnable {
 			if (nameLength > config.getMaxNameLength()) {
 				pServer("Warning: name length longer than " + config.getMaxNameLength()
 						+ " in room creation request from " + sockAddr + ", request ignored");
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_INVALIDNAMELENGTH);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, false);
 				return;
 			}
@@ -525,14 +526,15 @@ public class ServerThread implements Runnable {
 					return;
 				}
 				sendByteBuffer.putInt(3, room.getID());
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
 				return;
 			}
 
 			// check whether there are more rooms than clients
 			if (roomTable.size() >= clientTable.size()) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_OTHER);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 				return;
 			}
@@ -547,7 +549,7 @@ public class ServerThread implements Runnable {
 
 			// tell the client it has been accepted into the new room
 			sendByteBuffer.putInt(3, room.getID());
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT, true);
 
 			// send room info MSG_S_ROOM_ROOMINFO to this client
@@ -570,12 +572,6 @@ public class ServerThread implements Runnable {
 				return;
 			}
 			int roomID = recvByteBuffer.getInt(3);
-			/*
-			 * if (roomID < 0) { pServer(
-			 * "Client bug: roomID should not be negative"); DatagramPacket p =
-			 * new DatagramPacket(sendBuffer, 0, 3, sockAddr); sendPacket(p,
-			 * ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true); return; }
-			 */
 
 			pServerf("Room join request from %s, room ID: %d\n", sockAddr, roomID);
 
@@ -592,7 +588,7 @@ public class ServerThread implements Runnable {
 					return;
 				}
 				sendByteBuffer.putInt(3, room.getID());
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
 				return;
 			}
@@ -600,21 +596,24 @@ public class ServerThread implements Runnable {
 			// check whether the room exists
 			ServerRoom room = roomTable.get(roomID);
 			if (room == null) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_INVALIDROOMID);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 				return;
 			}
 
 			// check whether the room is full
 			if (room.getPlayerNumber() >= room.getMaxPlayer()) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_ROOMFULL);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 				return;
 			}
 
 			// check whether the room has a game in progress
 			if (room.isInGame()) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 1, sockAddr);
+				sendByteBuffer.put(3, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_GAMEINPROGRESS);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMREJECT, true);
 				return;
 			}
@@ -627,7 +626,7 @@ public class ServerThread implements Runnable {
 
 			// tell the client it has been accepted into the new room
 			sendByteBuffer.putInt(3, room.getID());
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_LOBBY_ROOMACCEPT, true);
 
 			// send room info MSG_S_ROOM_ROOMINFO to all clients in this room
@@ -670,7 +669,7 @@ public class ServerThread implements Runnable {
 
 			// when the client is not in room yet
 			if (!client.isInRoom()) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
 				return;
 			}
@@ -690,14 +689,14 @@ public class ServerThread implements Runnable {
 				pServerf("Warning: roomID mismatch: %d(request) != %d(server)\n", roomID, room.getID());
 
 				sendByteBuffer.putInt(3, room.getID());
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
 				return;
 			}
 
 			// remove the client from room
 			removeClientFromRoom(client);
-			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+			DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 			sendPacket(p, ProtocolConstant.MSG_S_ROOM_HAVELEFT, true);
 
 			/*
@@ -745,7 +744,7 @@ public class ServerThread implements Runnable {
 
 			// when the client is not in room yet
 			if (!client.isInRoom()) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
 				return;
 			}
@@ -765,7 +764,7 @@ public class ServerThread implements Runnable {
 				pServerf("roomID mismatch: %d(request) != %d(server)\n", roomID, room.getID());
 
 				sendByteBuffer.putInt(3, room.getID());
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
 				return;
 			}
@@ -840,7 +839,7 @@ public class ServerThread implements Runnable {
 
 			// when the client is not in room yet
 			if (!client.isInRoom()) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
 				return;
 			}
@@ -860,7 +859,7 @@ public class ServerThread implements Runnable {
 				pServerf("roomID mismatch: %d(request) != %d(server)\n", roomID, room.getID());
 
 				sendByteBuffer.putInt(3, room.getID());
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
 				return;
 			}
@@ -969,7 +968,7 @@ public class ServerThread implements Runnable {
 
 			// when the client is not in room yet
 			if (!client.isInRoom()) {
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_LOBBY_NOTINROOM, true);
 				return;
 			}
@@ -989,7 +988,7 @@ public class ServerThread implements Runnable {
 				pServerf("roomID mismatch: %d(request) != %d(server)\n", roomID, room.getID());
 
 				sendByteBuffer.putInt(3, room.getID());
-				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 3 + 4, sockAddr);
+				DatagramPacket p = new DatagramPacket(sendBuffer, 0, 1 + 2 + 4, sockAddr);
 				sendPacket(p, ProtocolConstant.MSG_S_ROOM_ALREADYINROOM, true);
 				return;
 			}

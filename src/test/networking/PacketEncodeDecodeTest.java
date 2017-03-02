@@ -33,8 +33,8 @@ import bomber.networking.ServerRoomTable;
 public class PacketEncodeDecodeTest {
 
 	private byte[] array;
-	ServerClientTable clientTable;
-	ServerRoomTable roomTable;
+	private ServerClientTable clientTable;
+	private ServerRoomTable roomTable;
 	private byte[] referencePlayerListArray;
 	private byte[] referenceRoomListArray;
 	private byte[] referenceRoomArray;
