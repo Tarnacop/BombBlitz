@@ -114,6 +114,12 @@ public class HardAI extends AITemplate{
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
+			
+			//else if there is an upgrade find the moves to it
+			else if((moves= finder.findRouteToUpgrade())!=null)
+			{
+				performMoves(moves, false);
+			}
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemy()) != null) {
@@ -123,7 +129,6 @@ public class HardAI extends AITemplate{
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
 				performPlannedMoves(moves);
 			}
-
 			gameAI.getKeyState().setBomb(false);
 		}
 	}

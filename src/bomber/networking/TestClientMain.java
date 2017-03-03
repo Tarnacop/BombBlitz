@@ -123,7 +123,7 @@ public class TestClientMain {
 
 					} else if (cmds[0].equals("sendmove")) {
 
-						// TODO currently just send a random move
+						// just send a random move
 						short random = (short) new Random().nextInt();
 						KeyboardState k = ServerPacketEncoder.shortToKeyboardState(random);
 						client.sendMove(k);

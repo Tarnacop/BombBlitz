@@ -140,11 +140,12 @@ public class ProtocolConstant {
 	// 1 byte message type + 2 byte sequence + 4 byte client id
 
 	public static final byte MSG_S_NET_REJECT = 0x41; // Bit not set
-	// 1 byte message type + 2 byte sequence
-	/*
-	 * TODO rejection message may contain a reason: server full, duplicate name,
-	 * invalid name length, invalid nonce
-	 */
+	public static final byte MSG_S_NET_REJECT_REASON_NOERROR = 0x00;
+	public static final byte MSG_S_NET_REJECT_REASON_OTHER = 0x01;
+	public static final byte MSG_S_NET_REJECT_REASON_SERVERFULL = 0x02;
+	public static final byte MSG_S_NET_REJECT_REASON_DUPLICATENAME = 0x03;
+	public static final byte MSG_S_NET_REJECT_REASON_INVALIDNAMELENGTH = 0x04;
+	// 1 byte message type + 2 byte sequence + 1 byte reason
 
 	public static final byte MSG_S_NET_ALREADYCONNECTED = 0x42; // Bit set
 	// 1 byte message type + 2 byte sequence
@@ -194,11 +195,13 @@ public class ProtocolConstant {
 	// 1 byte message type + 2 byte sequence + 4 byte room id
 
 	public static final byte MSG_S_LOBBY_ROOMREJECT = 0x4a; // Bit set
-	// 1 byte message type + 2 byte sequence
-	/*
-	 * TODO rejection message should contain a reason: room full, invalid name
-	 * length, invalid room id, game in progress
-	 */
+	public static final byte MSG_S_LOBBY_ROOMREJECT_REASON_NOERROR = 0x00;
+	public static final byte MSG_S_LOBBY_ROOMREJECT_REASON_OTHER = 0x01;
+	public static final byte MSG_S_LOBBY_ROOMREJECT_REASON_ROOMFULL = 0x02;
+	public static final byte MSG_S_LOBBY_ROOMREJECT_REASON_INVALIDROOMID = 0x03;
+	public static final byte MSG_S_LOBBY_ROOMREJECT_REASON_INVALIDNAMELENGTH = 0x04;
+	public static final byte MSG_S_LOBBY_ROOMREJECT_REASON_GAMEINPROGRESS = 0x05;
+	// 1 byte message type + 2 byte sequence + 1 byte reason
 
 	public static final byte MSG_S_LOBBY_NOTINROOM = 0x4b; // Bit set
 	// 1 byte message type + 2 byte sequence

@@ -48,10 +48,6 @@ public class ServerGame implements Runnable {
 
 	public ServerGame(int roomID, int mapID, List<ServerClientInfo> playerList, List<ServerAI> aiList, int tickRate,
 			ServerThread serverThread) {
-		/*
-		 * TODO currently if the map with this id cannot be found, we use test
-		 * map with id 0
-		 */
 		this.roomID = roomID;
 		this.mapID = mapID;
 		this.playerList = playerList;
@@ -92,14 +88,21 @@ public class ServerGame implements Runnable {
 	}
 
 	/*
-	 * TODO currently if the map with this id cannot be found, we use test map
-	 * with id 0
+	 * if the map with this id cannot be found, we will use map 0
 	 */
 	private boolean isMapIDValidreal() {
 		if (mapID < 0 || mapList == null || mapList.size() - 1 < mapID) {
 			return false;
 		}
 		return mapList.get(mapID) != null;
+	}
+
+	private boolean isIDHuman(int playerID) {
+		return playerID < 32;
+	}
+
+	private int aiIDtoPlayerID(int aiID) {
+		return aiID + 32;
 	}
 
 	/**
@@ -214,7 +217,7 @@ public class ServerGame implements Runnable {
 					}
 				}
 				GameAI a = new GameAI("AI " + ai.getID(), initPos, 3, 300, gameState, null, ai.getDifficulty());
-				a.setPlayerID(ai.getID() + 32);
+				a.setPlayerID(aiIDtoPlayerID(ai.getID()));
 				players.add(a);
 				ai.setGameAI(a);
 				posIndex += 1;
@@ -279,11 +282,6 @@ public class ServerGame implements Runnable {
 			}
 			ai.begin();
 		}
-		/*
-		 * TODO AI is memory consuming. When there are only human players, the
-		 * server memory usage is only around 100 MB while the addition of one
-		 * AI increases memory usage to 700MB
-		 */
 
 		long loopStartTime = System.currentTimeMillis();
 		int busyTime = 0;
@@ -309,7 +307,7 @@ public class ServerGame implements Runnable {
 			int humanPlayer = 0;
 			int deadHumanPlayer = 0;
 			for (Player p : players) {
-				if (p != null && p.getPlayerID() < 32) {
+				if (p != null && isIDHuman(p.getPlayerID())) {
 					humanPlayer += 1;
 					if (p.getLives() == 0 || !p.isAlive()) {
 						deadHumanPlayer += 1;
@@ -335,7 +333,7 @@ public class ServerGame implements Runnable {
 						}
 					}
 				}
-				if (shouldRemove && p != null && p.getPlayerID() < 32 && p.getLives() != 0 && p.isAlive()) {
+				if (shouldRemove && p != null && isIDHuman(p.getPlayerID()) && p.getLives() != 0 && p.isAlive()) {
 					// If no, kill this player
 					System.out.printf("ServerGame: killing player %d due to not in room\n", p.getPlayerID());
 					p.setLives(0);
@@ -345,9 +343,8 @@ public class ServerGame implements Runnable {
 
 			/*
 			 * TODO physics still does not check if there are duplicate audio
-			 * events in the audio event list. Since movement is very frequent,
-			 * the list is filled with movement sound, so we empty the audio
-			 * event list each time game state is updated
+			 * events in the audio event list, so we empty the audio event list
+			 * each time game state is updated
 			 */
 			// System.out.println(gameState.getAudioEvents().size());
 			gameState.getAudioEvents().clear();

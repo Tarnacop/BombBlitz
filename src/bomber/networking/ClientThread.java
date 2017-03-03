@@ -74,6 +74,12 @@ public class ClientThread implements Runnable {
 	private byte mapWidth = 16;
 	private byte mapHeight = 16;
 
+	// last reason of a rejected connection
+	private byte connectionRejectedReason = ProtocolConstant.MSG_S_NET_REJECT_REASON_NOERROR;
+
+	// last reason of a rejected room join/create request
+	private byte roomRejectedReason = ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_NOERROR;
+
 	// whether the client is in game(a client must be in room when it is in
 	// game)
 	private boolean inGame = false;
@@ -342,6 +348,8 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
+			connectionRejectedReason = ProtocolConstant.MSG_S_NET_REJECT_REASON_NOERROR;
+
 			name = tmpName;
 			setConnected(true);
 			setInRoom(false, -1);
@@ -358,6 +366,11 @@ public class ClientThread implements Runnable {
 
 		case ProtocolConstant.MSG_S_NET_REJECT: {
 			// pClient("Connection has been rejected by the server");
+			if (packet.getLength() >= 4) {
+				connectionRejectedReason = recvByteBuffer.get(3);
+			} else {
+				connectionRejectedReason = ProtocolConstant.MSG_S_NET_REJECT_REASON_OTHER;
+			}
 
 			setConnected(false);
 
@@ -485,6 +498,8 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
+			roomRejectedReason = ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_NOERROR;
+
 			// pClient("Room creation/join has been accepted, room ID: " +
 			// roomID);
 
@@ -499,6 +514,11 @@ public class ClientThread implements Runnable {
 
 		case ProtocolConstant.MSG_S_LOBBY_ROOMREJECT: {
 			// pClient("Room creation/join has been rejected by the server");
+			if (packet.getLength() >= 4) {
+				roomRejectedReason = recvByteBuffer.get(3);
+			} else {
+				roomRejectedReason = ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_OTHER;
+			}
 
 			for (ClientNetInterface e : netList) {
 				e.roomRejected();
@@ -865,6 +885,26 @@ public class ClientThread implements Runnable {
 	 */
 	public boolean isConnected() {
 		return connected;
+	}
+
+	/**
+	 * Get the reason code for last rejected connection to the server
+	 * 
+	 * @return a reason code, which can be found in
+	 *         ProtocolConstant.MSG_S_NET_REJECT_REASON_
+	 */
+	public int getConnectionRejectedReason() {
+		return connectionRejectedReason;
+	}
+
+	/**
+	 * Get the reason code for last rejected room join/create request
+	 * 
+	 * @return a reason code, which can be found in
+	 *         ProtocolConstant.MSG_S_LOBBY_ROOMREJECT_REASON_
+	 */
+	public int getRoomRejectedReason() {
+		return roomRejectedReason;
 	}
 
 	/**

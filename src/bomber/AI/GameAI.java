@@ -16,7 +16,7 @@ public class GameAI extends Player {
 	private GameState state;
 
 	/** The AI manager thread. */
-	private Thread ai;
+	private AITemplate ai;
 	
 
 	/**
@@ -50,7 +50,7 @@ public class GameAI extends Player {
 		
 	}
 
-	public void stopAI()
+	public void stop()
 	{
 		this.setAlive(false);
 	}

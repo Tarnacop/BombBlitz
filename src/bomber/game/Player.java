@@ -2,6 +2,7 @@ package bomber.game;
 
 import java.awt.Point;
 
+import bomber.AI.AIDifficulty;
 import bomber.renderer.shaders.Mesh;
 
 public class Player {
@@ -158,5 +159,15 @@ public class Player {
 	public void addMesh(Mesh mesh) {
 
 		this.mesh = mesh;
+	}
+	
+	public void setDifficulty(AIDifficulty diff)
+	{
+		
+	}
+	
+	public void stop()
+	{
+		
 	}
 }
