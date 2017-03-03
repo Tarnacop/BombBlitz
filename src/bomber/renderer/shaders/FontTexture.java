@@ -8,15 +8,15 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.IOUtils;
+import bomber.renderer.constants.RendererConstants;
 
 public class FontTexture {
 
@@ -29,10 +29,15 @@ public class FontTexture {
 	
 	private Texture texture;
 	
-	public FontTexture(Font font, String charSetName) throws Exception {
+	public FontTexture(String path, int size, int fontType) throws Exception {
+		
+		this(Font.createFont(Font.TRUETYPE_FONT, new File("res/minecraft.ttf")).deriveFont(fontType, size));
+	} // END OF CONSTRUCTOR
+	
+	public FontTexture(Font font) throws Exception {
 		
 		this.font = font;
-		this.charSetName = charSetName;
+		this.charSetName = RendererConstants.CHARSET_NAME;
 		
 		charMap = new HashMap<>();
 		
@@ -96,14 +101,12 @@ public class FontTexture {
 	    InputStream is;
 	    try (
 	        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-	        ImageIO.write(img, "png", out);
+	        ImageIO.write(img, RendererConstants.IMAGE_FORMAT, out);
 	        out.flush();
 	        is = new ByteArrayInputStream(out.toByteArray());
 	    }
 	    
-	    byte[] bytes = IOUtils.toByteArray(is);
-	    
-		texture = new Texture(width, height, ByteBuffer.wrap(bytes));
+		texture = new Texture(is);
 	} // END OF buildTexture METHOD
 	
 	public int getHeight() {
