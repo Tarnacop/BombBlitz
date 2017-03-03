@@ -41,7 +41,7 @@ public class TextItem {
         int numChars = characters.length;
 
         
-        float startX = 0.0f;
+        float startX = 0;
         // Create the positions, textureCoords and indices
         for(int i = 0; i < numChars; i++) {
         	

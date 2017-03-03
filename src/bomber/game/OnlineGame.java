@@ -15,7 +15,6 @@ import bomber.renderer.shaders.Mesh;
 public class OnlineGame implements GameInterface {
 
 	// private String playerName;
-	private Map map;
 	private HashMap<Response, Integer> controlScheme;
 	// private Screen screen;
 	private GameState gameState;
@@ -46,8 +45,8 @@ public class OnlineGame implements GameInterface {
 
 		try {
 
-			int width = this.map.getPixelMap().length;
-			int height = this.map.getPixelMap()[0].length;
+			int width = this.client.getMapWidth();
+			int height = this.client.getMapHeight();
 			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
 			this.graphics.start();
 		} catch (Exception e) {

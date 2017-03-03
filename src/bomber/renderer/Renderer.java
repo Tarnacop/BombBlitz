@@ -33,10 +33,13 @@ public class Renderer {
 	private Mesh softMesh;
 	private Mesh blastMesh;
 	private Mesh bombMesh;
+	
+	boolean gameOver;
 
 	public Renderer() {
 
 		transformation = new Transformation();
+		gameOver = false;
 	} // END OF CONSTRUCTOR
 
 	public void init(Screen screen) throws Exception {
@@ -51,7 +54,7 @@ public class Renderer {
 		blastMesh = new Mesh(64, 64, colours);
 		colours = new float[] { 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f };
 		bombMesh = new Mesh(50, 50, colours);
-		playerName = new TextItem("ALEX", new FontTexture(new Font("Arial", Font.PLAIN, 20), "ISO-8859-1"));
+		playerName = new TextItem("ALEX", new FontTexture("/res/minecraft.ttf", 20, Font.PLAIN));
 		playerName.setPosition(300f, 300f);
 		
 		screen.setClearColour(0f, 0f, 0f, 0f);
@@ -85,14 +88,21 @@ public class Renderer {
 	public void render(Screen screen, GameState state) {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		screen.setClearColour(0f, 0f, 0f, 0f);
+		
 		// Resize the screen if it needs to be resized
 		if (screen.isResized()) {
 			screen.setViewport(0, 0, screen.getWidth(), screen.getHeight());
 			screen.setResized(false);
 		}
 		
-		renderScene(screen, state);
-		renderHud(screen, state);
+		if(!gameOver) {
+			renderScene(screen, state);
+			renderHud(screen, state);
+		} else {
+			
+			System.err.println("GAME OVER!");
+		}
 	} // END OF render METHOD
 
 	public void renderScene(Screen screen, GameState state) {
@@ -166,6 +176,11 @@ public class Renderer {
 		
 	} // END OF renderHud METHOD
 
+	public void displayGameOver() {
+		
+		gameOver = true;
+	} // END OF displayGameOver METHOD
+	
 	public void dispose() {
 
 		solidMesh.dispose();
