@@ -158,7 +158,7 @@ public abstract class AITemplate extends Thread {
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
 		int stuckChecker = 0;
 		while (checkIfReachedDestination(gameAI.getPos(), updatedPos) && gameAI.isAlive()
-				&& !safetyCh.isNextMoveBomb(updatedPos2) && stuckChecker<50) {
+				&& !safetyCh.isNextMoveBomb(updatedPos2) && stuckChecker<75) {
 			stuckChecker++;
 			try {
 				sleep(10);
