@@ -183,7 +183,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.controls.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
 		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
-		this.windowHeight = 800;
+		this.windowHeight = 950;
 		this.windowWidth = 1100;
 	}
 	
@@ -407,7 +407,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		createRoomPane.maxWidthProperty().bind(roomNumPane.widthProperty().add(roomNameBox.widthProperty().add(roomDisplay.widthProperty())));
 		createRoomPane.getChildren().addAll(torch1, roomNumPane, roomNameBox, roomDisplay, torch2);
 		
-		roomsTitle = createLabel("Rooms:", false, true);
+		roomsTitle = createLabel("Rooms:				( Join or create a room to play a match! )", false, true);
 
 		roomsBox = new FlowPane();
 		roomsBox.setVgap(20);
@@ -417,7 +417,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		roomsListPane = new VBox();
 		roomsListPane.setSpacing(10);
 		roomsListPane.setAlignment(Pos.TOP_LEFT);
-		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(roomsBox.minHeightProperty().add(100)));
+		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(roomsBox.minHeightProperty().add(200)));
 		roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
 
 		playersTitle = createLabel("Online Players:", false, true);
@@ -1083,6 +1083,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			VBox roomContainer = new VBox();
 			roomContainer.setMinHeight(100);
 			roomContainer.setMinWidth(100);
+			roomContainer.setSpacing(5);
 			roomContainer.setAlignment(Pos.CENTER);
 			roomContainer.getStyleClass().add("namebox");
 			Label roomID = createLabel("Room " + room.getID() +":", false, false);
@@ -1093,6 +1094,21 @@ public class UserInterface extends Application implements ClientNetInterface{
 			roomPane.setPrefHeight(50);
 			roomPane.setAlignment(Pos.CENTER);
 			Label numPlayers = createLabel(room.getPlayerNumber() + "/" + room.getMaxPlayer(), true, true);
+			Label playersLabel = createLabel("", true, true);
+			playersLabel.setMinWidth(160);
+			int[] playerids = room.getPlayerID();
+			for(ClientServerPlayer player : this.client.getPlayerList()){
+				if(player.getID() == playerids[0]){
+					playersLabel.setText(playersLabel.getText() + " + " + player.getName());
+				}
+			}
+			for(int x = 1; x < playerids.length; x++){
+				for(ClientServerPlayer player : this.client.getPlayerList()){
+					if(player.getID() == playerids[x]){
+						playersLabel.setText(playersLabel.getText() + "\n + " + player.getName());
+					}
+				}
+			}
 			if(room.getPlayerNumber() < room.getMaxPlayer()){
 				Button joinButton = createButton("Join", 100, 50);
 				joinButton.setOnAction(e -> joinRoom(room.getID(), joinButton));
@@ -1105,7 +1121,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 				fullLabel.getStyleClass().add("textfield");
 				roomPane.getChildren().addAll(fullLabel, numPlayers);
 			}
-			roomContainer.getChildren().addAll(roomID, roomName, roomPane);
+			roomContainer.getChildren().addAll(roomID, roomName, playersLabel, roomPane);
 			
 			this.roomsBox.getChildren().add(roomContainer);
 		}
@@ -1134,7 +1150,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.playersBox.getChildren().clear();
 		
 		for(ClientServerPlayer player : connectedPlayers){
-			Label playerLabel = createLabel("- Player ID [ " + player.getID() + " ] : " + player.getName(), true, true);
+			Label playerLabel = createLabel("- P" + player.getID() + ":   " + player.getName(), true, true);
 			this.playersBox.getChildren().add(playerLabel);
 		}
 	}
