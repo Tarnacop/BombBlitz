@@ -89,7 +89,7 @@ public class AudioManager
 
     public void playEventList(List<AudioEvent> eventList)
     {
-        eventList.forEach(effects::play);
+//        eventList.forEach(effects::play);
         eventList.clear();
     }
 

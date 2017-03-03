@@ -126,9 +126,9 @@ public class ExtremeAI extends AITemplate {
 			}
 
 			// else if there is an upgrade find the moves to it
-			else if ((moves = finder.findRouteToUpgrade()) != null) {
-				if (!checkIfAIsReachable() || isPerformer())
-					performMoves(moves, false);
+			else if ((moves = finder.findRouteToUpgrade()) != null && (!checkIfAIsReachable() || isPerformer())) {
+
+				performMoves(moves, false);
 			}
 
 			// // if enemy is in bomb range then place the bomb and go to the
