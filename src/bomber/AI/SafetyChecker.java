@@ -3,6 +3,7 @@ package bomber.AI;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import bomber.game.Block;
@@ -207,6 +208,14 @@ public class SafetyChecker {
 		return false;
 	}
 	
+	
+//	true if is the bomb
+	public boolean isNextMoveBomb(Point updatedPos)
+	{
+			ArrayList<Bomb> bombs = new ArrayList<>(state.getBombs());
+			Optional<Bomb> b = bombs.stream().filter(bomb -> bomb.getGridPos().equals(updatedPos)).findAny();
+			return b.isPresent();
+	}
 	
 	//----------------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------

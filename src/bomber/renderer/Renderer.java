@@ -29,6 +29,14 @@ public class Renderer {
 	private Mesh blastMesh;
 	private Mesh bombMesh;
 	
+	private Mesh speedup;
+	private Mesh speeddown;
+	private Mesh blastUp;
+	private Mesh blastdown;
+
+	private Mesh rangeUp;
+	private Mesh rangeDown;
+	
 	public Renderer() {
 
 		transformation = new Transformation();
@@ -52,6 +60,22 @@ public class Renderer {
 		blastMesh = new Mesh(64, 64, colours);
 		colours = new float[] { 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f};
 		bombMesh = new Mesh(50, 50, colours);
+		
+		colours = new float[] { 0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f};
+		speedup = new Mesh(64,64, colours);
+		colours = new float[] { 0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f};
+		speeddown = new Mesh(64,64, colours);
+		
+		colours = new float[] { 0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f};
+		blastUp= new Mesh(64,64, colours);
+		colours = new float[] { 0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f};
+		blastdown = new Mesh(64,64, colours);
+		
+		colours = new float[] { 0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f};
+		rangeUp = new Mesh(64,64, colours);
+		colours = new float[] { 0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f};
+		rangeDown = new Mesh(64,64, colours);
+		
 		
 		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
@@ -101,6 +125,20 @@ public class Renderer {
 					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
 					shaderConstructor.setUniform("model", modelMatrix);
 					blastMesh.render();
+				}
+				else if (blocks[i][j] == Block.PLUS_BOMB || blocks[i][j] == Block.PLUS_RANGE || blocks[i][j] == Block.PLUS_SPEED)
+				{
+					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
+					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
+					shaderConstructor.setUniform("model", modelMatrix);
+					speedup.render();
+				}
+				else if(blocks[i][j] == Block.MINUS_BOMB || blocks[i][j] == Block.MINUS_RANGE || blocks[i][j] == Block.PLUS_SPEED)
+				{
+					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
+					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
+					shaderConstructor.setUniform("model", modelMatrix);
+					speeddown.render();
 				}
 
 			}
