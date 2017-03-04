@@ -63,6 +63,7 @@ public abstract class AITemplate extends Thread {
 			e.printStackTrace();
 		}
 		move();
+		System.out.println(gameAI.getLives());
 		System.out.println("AI Stopped.");
 	}
 
