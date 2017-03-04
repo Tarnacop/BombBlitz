@@ -320,7 +320,11 @@ public class UserInterface extends Application implements ClientNetInterface{
         HBox centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setSpacing(20);
-        centerBox.getChildren().addAll(createAiDifficultySelector(true), createMapSelector(true));
+
+		onlineMapCanvas = new Pane();
+		onlineMapCanvas.setMinHeight(300);
+		onlineMapCanvas.setMinWidth(300);
+        centerBox.getChildren().addAll(createAiDifficultySelector(true), createMapSelector(onlineMapCanvas, true));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn3);
@@ -543,7 +547,11 @@ public class UserInterface extends Application implements ClientNetInterface{
         centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setSpacing(20);
-        centerBox.getChildren().addAll(createAiDifficultySelector(false), createMapSelector(false));
+
+		mapCanvas = new Pane();
+		mapCanvas.setMinHeight(300);
+		mapCanvas.setMinWidth(300);
+        centerBox.getChildren().addAll(createAiDifficultySelector(false), createMapSelector(mapCanvas, false));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn3);
@@ -619,7 +627,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
 				}
 				
-				System.out.println("Set difficulty to " + newValue);
+				//System.out.println("Set difficulty to " + newValue);
 			}
         });
         
@@ -643,19 +651,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		return aiPad;
 	}
 	
-	private VBox createMapSelector(boolean online){
+	private VBox createMapSelector(Pane mapCanvas, boolean online){
 
-		mapCanvas = new Pane();
-		mapCanvas.setMinHeight(300);
-		mapCanvas.setMinWidth(300);
-		mapCanvas.widthProperty().addListener(e -> drawMaps());
-		mapCanvas.heightProperty().addListener(e -> drawMaps());
-		
-		onlineMapCanvas = new Pane();
-		onlineMapCanvas.setMinHeight(300);
-		onlineMapCanvas.setMinWidth(300);
-		onlineMapCanvas.widthProperty().addListener(e -> drawMaps());
-		onlineMapCanvas.heightProperty().addListener(e -> drawMaps());
+		System.out.println("Created Selector for: " + mapCanvas);
+//		mapCanvas.widthProperty().addListener(e -> drawMap(mapCanvas));
+//		mapCanvas.heightProperty().addListener(e -> drawMap(mapCanvas));
 		
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
@@ -689,14 +689,13 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         leftMapToggle.setPrefWidth(90);
         leftMapToggle.setOnAction(online?e -> decrementOnlineMap():e -> decrementMap());
-        
 		
         HBox mapPane = new HBox();
         mapPane.setAlignment(Pos.CENTER);
         mapPane.getChildren().addAll(leftMapToggle, mapContainer, rightMapToggle);
         
-        rightMapToggle.prefHeightProperty().bind(mapPane.heightProperty());
-        leftMapToggle.prefHeightProperty().bind(mapPane.heightProperty());
+        rightMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
+        leftMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
         
         //mapPane.maxHeightProperty().bind(aiBox.heightProperty());
         
@@ -707,13 +706,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 		return mapPad;
 	}
 	
-	private void drawMaps(){
-		drawMap(mapCanvas);
-		drawMap(onlineMapCanvas);
-	}
-	
 	private void drawMap(Pane mapCanvas) {
 
+		System.out.println("DRAWING CANVAS: " + mapCanvas);
+		System.out.println("MAP: " + this.map.getName());
 		int xpadding = 250;
 		int ypadding = 50;
 		
@@ -750,8 +746,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		double canvasWidth = mapCanvas.getWidth() - xpadding;
 		double canvasHeight = mapCanvas.getHeight() - ypadding;
-		
 		Block[][] gridMap = this.map.getGridMap();
+		System.out.println("SIZE: " + gridMap.length + ", " + gridMap[0].length);
 		double xscalar = canvasWidth/gridMap.length;
 		double yscalar = canvasHeight/gridMap[0].length;
 		
@@ -1045,7 +1041,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		beep();
 		try{
 		int index = this.client.getMapID();
-		System.out.println("INDEX: " + index);
+		//System.out.println("INDEX: " + index);
 		if(index > 0){
 			this.client.setRoomMapID(index-1);
 			this.map = this.maps.get(index-1);
@@ -1055,7 +1051,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(this.maps.size()-1);
 		}
 		this.mapName.set(this.map.getName());
-		drawMaps();
+		drawMap(onlineMapCanvas);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -1071,14 +1067,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(this.maps.size()-1);
 		}
 		this.mapName.set(this.map.getName());
-		drawMaps();
+		drawMap(mapCanvas);
 	}
 
 	private void incrementOnlineMap() {
 		beep();
 		try{
 		int index = this.client.getMapID();
-		System.out.println("INDEX: " + index);
+		//System.out.println("INDEX: " + index);
 		if(index < (this.maps.size()-1)){
 			this.client.setRoomMapID(index+1);
 			this.map = this.maps.get(index+1);
@@ -1088,7 +1084,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(0);
 		}
 		this.mapName.set(this.map.getName());
-		drawMaps();
+		drawMap(onlineMapCanvas);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -1104,7 +1100,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(0);
 		}
 		this.mapName.set(this.map.getName());
-		drawMaps();
+		drawMap(mapCanvas);
 	}
 
 	private void decrementOnlineAi(){
@@ -1112,7 +1108,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.humanPlayers = this.client.getRoom().getHumanPlayerNumber();
 			this.aiPlayers = this.client.getRoom().getAIPlayerNumber();
 		}
-		System.out.println("humans: "  + this.humanPlayers);
+		//System.out.println("humans: "  + this.humanPlayers);
 		if(this.humanPlayers > 1){
 			if(this.aiNumber.get() > 0){
 				
@@ -1146,7 +1142,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.humanPlayers = this.client.getRoom().getHumanPlayerNumber();
 			this.aiPlayers = this.client.getRoom().getAIPlayerNumber();
 		}
-		System.out.println("humans: "  + this.humanPlayers);
+		//System.out.println("humans: "  + this.humanPlayers);
 		
 			if(this.aiNumber.get() < (4 - this.humanPlayers)){
 			try {
@@ -1163,7 +1159,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		if(this.client != null){
 			this.humanPlayers = this.client.getRoom().getHumanPlayerNumber();
 		}
-		System.out.println("humans: "  + this.humanPlayers);
+		//System.out.println("humans: "  + this.humanPlayers);
 		if(this.aiNumber.get() < (4-this.humanPlayers))aiNumber.set(this.aiNumber.get()+1);
 	}
 	
@@ -1174,7 +1170,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		try{
 			int port = Integer.parseInt(portNum.getText());
 		
-		System.out.println("Attempting connection to: " + host + ", port = " + port);
+		//System.out.println("Attempting connection to: " + host + ", port = " + port);
 		this.client = null;
 			client = new ClientThread(host, port);
 
@@ -1300,7 +1296,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 			aiNumber.set(this.client.getRoom().getAIPlayerNumber());
 			this.map = this.maps.get(this.client.getRoom().getMapID());
 			this.mapName.set(this.map.getName());
-			drawMaps();
+		
+			drawMap(onlineMapCanvas);
 		}
 	}
 
@@ -1319,9 +1316,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
-		System.out.println("am at " + this.currentScene);
+		//System.out.println("am at " + this.currentScene);
 		this.currentStage.setScene(this.previousScenes.pop());
-		System.out.println("now at " + this.currentScene);
+		//System.out.println("now at " + this.currentScene);
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
@@ -1346,13 +1343,15 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		
 		this.previousScenes.push(thisScene);
-		System.out.println("Added " + thisScene);
-		System.out.println(this.previousScenes);
+		//System.out.println("Added " + thisScene);
+		//System.out.println(this.previousScenes);
 		this.currentStage.setScene(nextScene);
 		this.currentScene = nextScene;
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
+		
+        drawMap(mapCanvas);
 	}
 
 	public void setName(String string){
@@ -1482,12 +1481,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void roomListReceived() {
-		System.out.println("Adding display rooms event to queue");
+		//System.out.println("Adding display rooms event to queue");
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
-				System.out.println("Displaying Rooms");
+				//System.out.println("Displaying Rooms");
 				displayRooms();
 			}
 			   
@@ -1502,6 +1501,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			public void run() {
 				System.out.println("Room creation accepted");
 				if(expectingRoomCreation){
+			        drawMap(onlineMapCanvas);
 					advance(currentScene, roomScene);
 					roomCreationLabel.setText("Create and join a room\nwith these settings");
 					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
