@@ -15,7 +15,6 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -61,6 +60,7 @@ import bomber.game.Response;
 import bomber.networking.ClientNetInterface;
 import bomber.networking.ClientServerLobbyRoom;
 import bomber.networking.ClientServerPlayer;
+import bomber.networking.ClientServerRoom;
 import bomber.networking.ClientThread;
 
 public class UserInterface extends Application implements ClientNetInterface{
@@ -199,10 +199,10 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBtn5.setAlignment(Pos.CENTER);
         backBtn5.setOnAction(e -> previous());
         
-        settingsBtn = new Button("Settings");
-        settingsBtn.setPrefWidth(200);
-        settingsBtn.setOnAction(e -> advance(mainScene, keyScene));
-        
+//        settingsBtn = new Button("Settings");
+//        settingsBtn.setPrefWidth(200);
+//        settingsBtn.setOnAction(e -> advance(settingScene, keyScene));
+//        
         controlsBtn = new Button("Control Options");
         controlsBtn.setOnAction(e -> advance(mainScene, keyScene));
         
@@ -315,7 +315,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 //        startBtnPane.getChildren().add(startBtn);
 //        startBtn.setOnAction(e -> beginOnlineGame());
 //        
-        Button backBtn3 = createBackButton("Leave Room", true);
+        Button backBtn3 = createButton("Leave Room", 300, 50);
+        backBtn3.setOnAction(e -> leaveRoom());
         
         HBox centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
@@ -747,7 +748,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double canvasWidth = mapCanvas.getWidth() - xpadding;
 		double canvasHeight = mapCanvas.getHeight() - ypadding;
 		Block[][] gridMap = this.map.getGridMap();
-		System.out.println("SIZE: " + gridMap.length + ", " + gridMap[0].length);
+		System.out.println("SIZE: " + gridMap.length + ", " + gridMap[0].length + " on " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
 		double xscalar = canvasWidth/gridMap.length;
 		double yscalar = canvasHeight/gridMap[0].length;
 		
@@ -1012,29 +1013,32 @@ public class UserInterface extends Application implements ClientNetInterface{
 		System.out.println(e.getCode());
 	}
 
-	private void disconnect() {
-		beep();
-		if (this.client != null && !this.client.isInRoom()) {
-			try {
-
-				this.client.disconnect();
-			} catch (Exception e) {
-			} finally {
-				this.client.exit();
-				this.client = null;
-			}
-		}
-		else if(this.client != null && !this.client.isInRoom()){
+	private void leaveRoom(){
+		if(this.client != null && this.client.isInRoom()){
 			try {
 				this.client.leaveRoom();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-		this.expectingConnection = false;
-		if(previousScenes.size() != 0){
+			this.expectingRoomCreation = false;
+			this.expectingRoomJoin = false;
 			previous();
 		}
+	}
+	
+	private void disconnect() {
+		beep();
+		
+		if (this.client != null) {
+			try {
+				this.client.disconnect();
+				this.client.exit();
+				this.client = null;
+				
+			} catch (Exception e) {
+			}
+		}
+		this.expectingConnection = false;
 	}
 	
 	private void decrementOnlineMap() {
@@ -1109,8 +1113,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.aiPlayers = this.client.getRoom().getAIPlayerNumber();
 		}
 		//System.out.println("humans: "  + this.humanPlayers);
-		if(this.humanPlayers > 1){
-			if(this.aiNumber.get() > 0){
+		if(this.aiNumber.get() > 0){
 				
 				try {
 					this.client.removeAI();
@@ -1119,18 +1122,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 				}
 				aiNumber.set(this.aiPlayers-1);
 			}
-		} else{
-			if(this.aiNumber.get() > 1){
-		
-			try {
-				this.client.removeAI();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			aiNumber.set(this.aiPlayers-1);
 		}
-		}
-	}
+	
 	
 	private void decrementAi() {
 		beep();
@@ -1156,11 +1149,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private void incrementAi() {
 		beep();
-		if(this.client != null){
-			this.humanPlayers = this.client.getRoom().getHumanPlayerNumber();
-		}
-		//System.out.println("humans: "  + this.humanPlayers);
-		if(this.aiNumber.get() < (4-this.humanPlayers))aiNumber.set(this.aiNumber.get()+1);
+		if(this.aiNumber.get() < 3)aiNumber.set(this.aiNumber.get()+1);
 	}
 	
 	private void connect() {
@@ -1293,32 +1282,35 @@ public class UserInterface extends Application implements ClientNetInterface{
 		}
 		
 		if(this.client.isInRoom()){
-			aiNumber.set(this.client.getRoom().getAIPlayerNumber());
-			this.map = this.maps.get(this.client.getRoom().getMapID());
+			ClientServerRoom room = this.client.getRoom();
+			aiNumber.set(room.getAIPlayerNumber());
+			this.map = this.maps.get(room.getMapID());
 			this.mapName.set(this.map.getName());
 		
+				try {
+					if(room.getAIPlayerNumber() + room.getHumanPlayerNumber() > room.getMaxPlayer()){
+						this.client.removeAI();
+					}
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			
 			drawMap(onlineMapCanvas);
 		}
 	}
 
 	private void previous() {
 		beep();
-		try {
-		if(this.client != null && this.client.isInRoom()){
-			
-				this.client.leaveRoom();
-			
-		}} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally{
 		
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
-		//System.out.println("am at " + this.currentScene);
-		this.currentStage.setScene(this.previousScenes.pop());
-		//System.out.println("now at " + this.currentScene);
+		System.out.println("am at " + this.currentScene);
+		Scene lastScene = this.previousScenes.pop();
+		this.currentStage.setScene(lastScene);
+		this.currentScene = lastScene;
+		System.out.println("now at " + this.currentScene);
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
@@ -1333,7 +1325,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.aiNumber.set(1);
 		this.humanPlayers = 1;
 		}
-	}
+	
 	
 	private void advance(Scene thisScene, Scene nextScene) {
 		
@@ -1343,8 +1335,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		
 		this.previousScenes.push(thisScene);
-		//System.out.println("Added " + thisScene);
-		//System.out.println(this.previousScenes);
+		System.out.println("Added " + thisScene);
+		System.out.println(this.previousScenes);
 		this.currentStage.setScene(nextScene);
 		this.currentScene = nextScene;
 		
@@ -1395,7 +1387,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				disconnect();
+				previous();
 			}
 			   
 		});
@@ -1501,14 +1493,19 @@ public class UserInterface extends Application implements ClientNetInterface{
 			public void run() {
 				System.out.println("Room creation accepted");
 				if(expectingRoomCreation){
-			        drawMap(onlineMapCanvas);
-					advance(currentScene, roomScene);
+					mapName.set(". . .");
+					Label label = createLabel("Loading...", false, true);
+					label.setMinHeight(300);
+					label.setMinWidth(500);
+					onlineMapCanvas.getChildren().clear();
+					onlineMapCanvas.getChildren().add(label);
+					advance(serverScene, roomScene);
 					roomCreationLabel.setText("Create and join a room\nwith these settings");
 					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 					expectingRoomCreation = false;
 				}
 				else if(expectingRoomJoin){
-					advance(currentScene, roomScene);
+					advance(serverScene, roomScene);
 					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 					displayRooms();
 					expectingRoomJoin = false;
@@ -1540,7 +1537,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			public void run() {
 				System.out.println("Room creation/join rejected");
 				if(expectingRoomCreation){
-					roomCreationLabel.setText("Create and join a room\nwith these settings\n( Room creation failed! )");
+					roomCreationLabel.setText("Create and join a room\nwith these settings\n( Something went wrong! )");
 					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 					expectingRoomCreation = false;
 				}
