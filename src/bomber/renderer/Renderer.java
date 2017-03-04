@@ -72,8 +72,6 @@ public class Renderer {
 	} // END OF setupHudShader METHOD
 	public void render(Screen screen, GameState state) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		screen.setClearColour(0f, 0f, 0f, 0f);
-		
 		// Resize the screen if it needs to be resized
 		if (screen.isResized()) {
 			screen.setViewport(0, 0, screen.getWidth(), screen.getHeight());
@@ -83,9 +81,6 @@ public class Renderer {
 		if(!gameOver) {
 			renderScene(screen, state);
 			renderHud(screen, state);
-		} else {
-			
-			System.err.println("GAME OVER!");
 		}
 	} // END OF render METHOD
 	public void renderScene(Screen screen, GameState state) {
