@@ -15,6 +15,7 @@ import java.util.Stack;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -141,6 +142,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private boolean expectingRoomCreation;
 	private boolean expectingRoomJoin;
 	private FlowPane playersBox2;
+	private int humanPlayers;
+	private int aiPlayers;
+	private SimpleIntegerProperty onlineMap;
+	private Pane mapCanvas;
+	private Pane onlineMapCanvas;
+	private Label mapNameLabel;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -150,6 +157,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.css = this.getClass().getResource("resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty("Player 1");
 		this.aiNumber = new SimpleIntegerProperty(1);
+		this.onlineMap = new SimpleIntegerProperty(1);
 		this.roomNumber = new SimpleIntegerProperty(4);
 		this.roomCreationLabel = createLabel("Create and join a room\nwith these settings", false, true);
 		this.aiDiff = AIDifficulty.EASY;
@@ -312,7 +320,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         HBox centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setSpacing(20);
-        centerBox.getChildren().addAll(createAiDifficultySelector(), createMapSelector());
+        centerBox.getChildren().addAll(createAiDifficultySelector(true), createMapSelector(true));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn3);
@@ -323,7 +331,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersBox2 = new FlowPane(Orientation.VERTICAL);
 		playersBox2.setVgap(20);
 		playersBox2.setHgap(20);
-		playersBox2.setMinHeight(100);
 		
 		VBox playersListPane = new VBox();
 		playersListPane.getStyleClass().add("wideclearbox");
@@ -332,9 +339,27 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersListPane.setAlignment(Pos.TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox2.minHeightProperty().add(70)));
 		
-        roomBox.setCenter(centerBox);
+//		VBox playersPadding = new VBox();
+//		playersPadding.setSpacing(40);
+//		playersPadding.setAlignment(Pos.CENTER);
+//		playersPadding.getChildren().add(playersListPane);
+//		
+//		playersPadding.getStyleClass().add("wideclearbox");
+//		playersPadding.minHeightProperty().bind(playersListPane.minHeightProperty().add(50));
+//		
+		VBox readyPane = new VBox();
+		readyPane.getStyleClass().add("box");
+		
+		HBox playersReadyBox = new HBox();
+		playersReadyBox.setAlignment(Pos.CENTER);
+		playersReadyBox.getChildren().addAll(playersListPane, readyPane);
+		
+		VBox centerPane = new VBox();
+		centerPane.setSpacing(10);
+		centerPane.getChildren().addAll(centerBox, playersReadyBox);
+		
+        roomBox.setCenter(centerPane);
         roomBox.setTop(backBtnPane);
-        roomBox.setBottom(playersListPane);
         
         setBackgroundPane(roomMenu, roomBox);
 	}
@@ -518,7 +543,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setSpacing(20);
-        centerBox.getChildren().addAll(createAiDifficultySelector(), createMapSelector());
+        centerBox.getChildren().addAll(createAiDifficultySelector(false), createMapSelector(false));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn3);
@@ -531,11 +556,12 @@ public class UserInterface extends Application implements ClientNetInterface{
         setBackgroundPane(singleMenu, singleBox);
 	}
 
-	private VBox createAiDifficultySelector(){
+	private VBox createAiDifficultySelector(boolean online){
+		
 		Button upAiToggle = new Button();
         upAiToggle.setPrefWidth(30);
         upAiToggle.getStyleClass().add("aitoggleup");
-        upAiToggle.setOnAction(e -> incrementAi());
+        upAiToggle.setOnAction(online?e -> incrementOnlineAi():e -> incrementAi());
         
         Label displayAi = createBoundLabel(this.aiNumber, false, false);
         displayAi.getStyleClass().add("textfield");
@@ -544,7 +570,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         Button downAiToggle = new Button();
         downAiToggle.setPrefWidth(30);
         downAiToggle.getStyleClass().add("aitoggledown");
-        downAiToggle.setOnAction(e -> decrementAi());
+        downAiToggle.setOnAction(online?e -> decrementOnlineAi():e -> decrementAi());
         
         VBox aiBox = new VBox();
         aiBox.setAlignment(Pos.CENTER);
@@ -617,13 +643,19 @@ public class UserInterface extends Application implements ClientNetInterface{
 		return aiPad;
 	}
 	
-	private VBox createMapSelector(){
+	private VBox createMapSelector(boolean online){
 
-		Pane mapCanvas = new Pane();
+		mapCanvas = new Pane();
 		mapCanvas.setMinHeight(300);
 		mapCanvas.setMinWidth(300);
-		mapCanvas.widthProperty().addListener(e -> drawMap(mapCanvas));
-		mapCanvas.heightProperty().addListener(e -> drawMap(mapCanvas));
+		mapCanvas.widthProperty().addListener(e -> drawMaps());
+		mapCanvas.heightProperty().addListener(e -> drawMaps());
+		
+		onlineMapCanvas = new Pane();
+		onlineMapCanvas.setMinHeight(300);
+		onlineMapCanvas.setMinWidth(300);
+		onlineMapCanvas.widthProperty().addListener(e -> drawMaps());
+		onlineMapCanvas.heightProperty().addListener(e -> drawMaps());
 		
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
@@ -650,13 +682,13 @@ public class UserInterface extends Application implements ClientNetInterface{
         rightMapToggle.getStyleClass().add("maptoggleright");
         rightMapToggle.setPrefWidth(90);
         
-        rightMapToggle.setOnAction(e -> incremenetMap(mapCanvas));
+        rightMapToggle.setOnAction(online?e -> incrementOnlineMap():e -> incrementMap());
         
         Button leftMapToggle = new Button();
         leftMapToggle.getStyleClass().add("maptoggleleft");
         
         leftMapToggle.setPrefWidth(90);
-        leftMapToggle.setOnAction(e -> decrementMap(mapCanvas));
+        leftMapToggle.setOnAction(online?e -> decrementOnlineMap():e -> decrementMap());
         
 		
         HBox mapPane = new HBox();
@@ -673,6 +705,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		mapPad.getChildren().add(mapPane);
 		
 		return mapPad;
+	}
+	
+	private void drawMaps(){
+		drawMap(mapCanvas);
+		drawMap(onlineMapCanvas);
 	}
 	
 	private void drawMap(Pane mapCanvas) {
@@ -739,8 +776,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 			}
 		}
 		
-		for(int x = 0; x < this.map.getSpawnPoints().size(); x++){
-			Point pos = this.map.getSpawnPoints().get(x);
+		for(int x = 0; x < map.getSpawnPoints().size(); x++){
+			Point pos = map.getSpawnPoints().get(x);
 			Rectangle rect = new Rectangle(10, 10);
 			if(x == 0){
 				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/playerspawnpoint.png")));
@@ -1004,7 +1041,27 @@ public class UserInterface extends Application implements ClientNetInterface{
 		}
 	}
 	
-	private void decrementMap(Pane mapCanvas) {
+	private void decrementOnlineMap() {
+		beep();
+		try{
+		int index = this.client.getMapID();
+		System.out.println("INDEX: " + index);
+		if(index > 0){
+			this.client.setRoomMapID(index-1);
+			this.map = this.maps.get(index-1);
+		}
+		else{
+			this.client.setRoomMapID(this.maps.size()-1);
+			this.map = this.maps.get(this.maps.size()-1);
+		}
+		this.mapName.set(this.map.getName());
+		drawMaps();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	private void decrementMap() {
 		beep();
 		int index = this.maps.indexOf(this.map);
 		if(index > 0){
@@ -1014,10 +1071,30 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(this.maps.size()-1);
 		}
 		this.mapName.set(this.map.getName());
-		drawMap(mapCanvas);
+		drawMaps();
 	}
 
-	private void incremenetMap(Pane mapCanvas) {
+	private void incrementOnlineMap() {
+		beep();
+		try{
+		int index = this.client.getMapID();
+		System.out.println("INDEX: " + index);
+		if(index < (this.maps.size()-1)){
+			this.client.setRoomMapID(index+1);
+			this.map = this.maps.get(index+1);
+		}
+		else{
+			this.client.setRoomMapID(0);
+			this.map = this.maps.get(0);
+		}
+		this.mapName.set(this.map.getName());
+		drawMaps();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	private void incrementMap() {
 		beep();
 		int index = this.maps.indexOf(this.map);
 		if(index < (this.maps.size()-1)){
@@ -1027,23 +1104,73 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(0);
 		}
 		this.mapName.set(this.map.getName());
-		drawMap(mapCanvas);
+		drawMaps();
 	}
 
+	private void decrementOnlineAi(){
+		if(this.client != null){
+			this.humanPlayers = this.client.getRoom().getHumanPlayerNumber();
+			this.aiPlayers = this.client.getRoom().getAIPlayerNumber();
+		}
+		System.out.println("humans: "  + this.humanPlayers);
+		if(this.humanPlayers > 1){
+			if(this.aiNumber.get() > 0){
+				
+				try {
+					this.client.removeAI();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				aiNumber.set(this.aiPlayers-1);
+			}
+		} else{
+			if(this.aiNumber.get() > 1){
+		
+			try {
+				this.client.removeAI();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			aiNumber.set(this.aiPlayers-1);
+		}
+		}
+	}
+	
 	private void decrementAi() {
 		beep();
 		if(this.aiNumber.get() > 1)aiNumber.set(this.aiNumber.get()-1);
 	}
 
+	private void incrementOnlineAi(){
+		if(this.client != null){
+			this.humanPlayers = this.client.getRoom().getHumanPlayerNumber();
+			this.aiPlayers = this.client.getRoom().getAIPlayerNumber();
+		}
+		System.out.println("humans: "  + this.humanPlayers);
+		
+			if(this.aiNumber.get() < (4 - this.humanPlayers)){
+			try {
+				this.client.addAI();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			aiNumber.set(this.aiPlayers+1);}
+			
+	}
+	
 	private void incrementAi() {
 		beep();
-		if(this.aiNumber.get() < 3)aiNumber.set(this.aiNumber.get()+1);
+		if(this.client != null){
+			this.humanPlayers = this.client.getRoom().getHumanPlayerNumber();
+		}
+		System.out.println("humans: "  + this.humanPlayers);
+		if(this.aiNumber.get() < (4-this.humanPlayers))aiNumber.set(this.aiNumber.get()+1);
 	}
 	
 	private void connect() {
 		beep();
 		enterLabel.setText("Enter Server Details:");
-		String host = ipText.getText();
+		String host = ipText.getText().trim();
 		try{
 			int port = Integer.parseInt(portNum.getText());
 		
@@ -1168,6 +1295,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.playersBox.getChildren().add(createLabel("- P" + player.getID() + ":   " + player.getName(), true, true));
 			this.playersBox2.getChildren().add(createLabel("- P" + player.getID() + ":   " + player.getName(), true, true));
 		}
+		
+		if(this.client.isInRoom()){
+			aiNumber.set(this.client.getRoom().getAIPlayerNumber());
+			this.map = this.maps.get(this.client.getRoom().getMapID());
+			this.mapName.set(this.map.getName());
+			drawMaps();
+		}
 	}
 
 	private void previous() {
@@ -1198,6 +1332,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		resetButton(connectBtn, "Connect", e -> connect());
 		resetButton(createRoomBtn, "Create New Room", e -> createRoom());
+		
+		this.aiNumber.set(1);
+		this.humanPlayers = 1;
 		}
 	}
 	
