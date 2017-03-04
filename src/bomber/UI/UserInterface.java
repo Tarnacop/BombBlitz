@@ -148,6 +148,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Pane mapCanvas;
 	private Pane onlineMapCanvas;
 	private Label mapNameLabel;
+	private ChoiceBox<String> aiDifficultyChoice;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -598,7 +599,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiExplanation.setAlignment(Pos.CENTER);
         aiExplanation.setPrefWidth(200);
         
-        ChoiceBox<String> aiDifficultyChoice = new ChoiceBox<>();
+        aiDifficultyChoice = new ChoiceBox<>();
         aiDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
         aiDifficultyChoice.setPrefHeight(50);
         aiDifficultyChoice.setPrefWidth(200);
@@ -653,10 +654,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 	
 	private VBox createMapSelector(Pane mapCanvas, boolean online){
-
-		System.out.println("Created Selector for: " + mapCanvas);
-//		mapCanvas.widthProperty().addListener(e -> drawMap(mapCanvas));
-//		mapCanvas.heightProperty().addListener(e -> drawMap(mapCanvas));
 		
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
