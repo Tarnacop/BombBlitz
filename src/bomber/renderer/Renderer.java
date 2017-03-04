@@ -34,8 +34,15 @@ public class Renderer {
 	private Mesh blastMesh;
 	private Mesh bombMesh;
 	
-	boolean gameOver;
+	private Mesh speedup;
+	private Mesh speeddown;
+	private Mesh blastUp;
+	private Mesh blastdown;
 
+	private Mesh rangeUp;
+	private Mesh rangeDown;
+	private boolean gameOver;
+	
 	public Renderer() {
 
 		transformation = new Transformation();
@@ -56,6 +63,22 @@ public class Renderer {
 		bombMesh = new Mesh(50, 50, colours);
 		playerName = new TextItem("ALEX", new FontTexture("/res/minecraft.ttf", 20, Font.PLAIN));
 		playerName.setPosition(300f, 300f);
+		
+		colours = new float[] { 0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f};
+		speedup = new Mesh(64,64, colours);
+		colours = new float[] { 0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f};
+		speeddown = new Mesh(64,64, colours);
+		
+		colours = new float[] { 0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f};
+		blastUp= new Mesh(64,64, colours);
+		colours = new float[] { 0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f};
+		blastdown = new Mesh(64,64, colours);
+		
+		colours = new float[] { 0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f,  0.1f,  0.1f, 0.1f,  0.1f};
+		rangeUp = new Mesh(64,64, colours);
+		colours = new float[] { 0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f,  0.2f,  0.2f, 0.2f,  0.2f};
+		rangeDown = new Mesh(64,64, colours);
+		
 		
 		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
@@ -134,6 +157,24 @@ public class Renderer {
 					sceneShader.setUniform("model", modelMatrix);
 					blastMesh.render();
 				}
+<<<<<<< HEAD
+=======
+				else if (blocks[i][j] == Block.PLUS_BOMB || blocks[i][j] == Block.PLUS_RANGE || blocks[i][j] == Block.PLUS_SPEED)
+				{
+					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
+					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
+					shaderConstructor.setUniform("model", modelMatrix);
+					speedup.render();
+				}
+				else if(blocks[i][j] == Block.MINUS_BOMB || blocks[i][j] == Block.MINUS_RANGE || blocks[i][j] == Block.PLUS_SPEED)
+				{
+					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
+					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
+					shaderConstructor.setUniform("model", modelMatrix);
+					speeddown.render();
+				}
+
+>>>>>>> 0b1288cab1f5279ba0dfc1728dbec82e7d50be14
 			}
 		}
 		List<Player> playerList = state.getPlayers();

@@ -298,8 +298,18 @@ public class RouteFinder {
 			return;
 		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
 
-		if (bombs.stream().filter(bomb -> bomb.getGridPos().equals(tile)).findFirst().isPresent())
-			return;
+		/*
+		 * if (bombs .stream() .filter(bomb -> bomb .getGridPos() .equals(tile))
+		 * .findFirst() .isPresent()) return;
+		 */
+		for (Bomb b : bombs) {
+			// System.out.println(b);
+			if (b != null) {
+				if (b.getGridPos().equals(tile))
+					return;
+			}
+		}
+
 		for (Node nd : closed)
 			if (nd.getCoord().equals(tile))
 				return;
@@ -721,8 +731,7 @@ public class RouteFinder {
 
 			// if the head is final position we finish
 			Block singleBlock = map[temp.getCoord().x][temp.getCoord().y];
-			if (singleBlock == Block.PLUS_BOMB || singleBlock == Block.PLUS_RANGE ||
-					singleBlock == Block.PLUS_SPEED) {
+			if (singleBlock == Block.PLUS_BOMB || singleBlock == Block.PLUS_RANGE || singleBlock == Block.PLUS_SPEED) {
 				finish = temp;
 				break;
 			}
