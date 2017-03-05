@@ -33,6 +33,14 @@ public class Constants
     public static final String powerupFilename = "sfx_sounds_interaction24.wav";
     public static final String menuSoundFilename = "271139_strange-dragoon_menu-select_converted.wav";
 
-    // Settings
+    // Other files
+    public static final String settingsXMLPath = "src/resources/settings.xml";
+
+    // Default settings
     public static final float defaultVolume = 75;
+    public static final String defaultPlayerName = "Player";
+    public static final String defaultServerName = "Default server";
+    public static final String defaultServerIp = "localhost";
+    public static final int defaultServerPort = 1234;
+
 }
