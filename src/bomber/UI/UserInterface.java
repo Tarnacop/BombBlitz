@@ -1178,6 +1178,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 			if(this.aiNumber.get() < (4 - this.humanPlayers)){
 			try {
 				this.client.addAI();
+				for(ClientServerAI ai : client.getRoom().getAIPlayerList()){
+					try {
+						client.setAIDifficulty(ai.getID(), aiDiff);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
