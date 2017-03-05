@@ -139,6 +139,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Pane onlineMapCanvas;
 	private ChoiceBox<String> aiDifficultyChoice;
 	private ChoiceBox<String> aiOnlineDifficultyChoice;
+	private VBox readyPane;
+	private VBox readyBox;
+	private Button readyButton;
+	private Rectangle readyTorch;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -298,14 +302,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
         BorderPane roomBox = new BorderPane();
 		
-		//button to start the game
-//        Button startBtn = createButton("Start Game", 300, 75);
-//        HBox startBtnPane = new HBox();
-//        startBtnPane.setPadding(new Insets(20, 0, 20, 0));
-//        startBtnPane.setAlignment(Pos.CENTER);
-//        startBtnPane.getChildren().add(startBtn);
-//        startBtn.setOnAction(e -> beginOnlineGame());
-//        
         Button backBtn3 = createButton("Leave Room", 300, 50);
         backBtn3.setOnAction(e -> leaveRoom());
         
@@ -331,24 +327,37 @@ public class UserInterface extends Application implements ClientNetInterface{
 		VBox playersListPane = new VBox();
 		playersListPane.getStyleClass().add("wideclearbox");
 		playersListPane.setSpacing(10);
+		playersListPane.setMinWidth(400);
 		playersListPane.getChildren().addAll(playersTitle, playersBox2);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox2.minHeightProperty().add(70)));
+
+		readyTorch = new Rectangle();
+		readyTorch.setWidth(110);
+		readyTorch.setHeight(140);
+		readyTorch.getStyleClass().add("wideclearbox");
+		readyTorch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/darktorch.png")));
 		
-//		VBox playersPadding = new VBox();
-//		playersPadding.setSpacing(40);
-//		playersPadding.setAlignment(Pos.CENTER);
-//		playersPadding.getChildren().add(playersListPane);
-//		
-//		playersPadding.getStyleClass().add("wideclearbox");
-//		playersPadding.minHeightProperty().bind(playersListPane.minHeightProperty().add(50));
-//		
-		VBox readyPane = new VBox();
+		readyBox = new VBox();
+		readyBox.getStyleClass().add("namebox");
+		readyBox.setSpacing(10);
+		readyBox.setAlignment(Pos.CENTER);
+		readyBox.setMinWidth(300);
+		readyButton = createButton("Not Ready", 250, 50);
+		readyButton.setOnAction(e -> ready());
+		readyBox.getChildren().addAll(createLabel("Click to\ntoggle Ready:", false, false), readyTorch, readyButton);
+		
+		readyPane = new VBox();
 		readyPane.getStyleClass().add("box");
+		readyPane.setSpacing(20);
+		readyPane.setMinWidth(200);
+		readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 		
 		HBox playersReadyBox = new HBox();
 		playersReadyBox.setAlignment(Pos.CENTER);
-		playersReadyBox.getChildren().addAll(playersListPane, readyPane);
+		playersReadyBox.setSpacing(20);
+		playersReadyBox.setPadding(new Insets(10, 10, 10, 10));
+		playersReadyBox.getChildren().addAll(playersListPane, readyPane, readyBox);
 		
 		VBox centerPane = new VBox();
 		centerPane.setSpacing(10);
@@ -703,7 +712,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 		mapContainer.setAlignment(Pos.CENTER);
 		Label mapNameLabel = createBoundLabel(this.mapName, false, true);
 		mapNameLabel.getStyleClass().add("maplabel");
-		Image keyImage = new Image("bomber/UI/resources/images/key.png");
+		Image keyImage;
+		if(online){
+			keyImage = new Image("bomber/UI/resources/images/onlinekey.png");
+		}
+		else{
+			keyImage = new Image("bomber/UI/resources/images/key.png");
+		}
         ImageView mapKey = new ImageView(keyImage);
         
         VBox currentPane = new VBox();
@@ -743,13 +758,20 @@ public class UserInterface extends Application implements ClientNetInterface{
         VBox mapPad = new VBox();
 		mapPad.setAlignment(Pos.CENTER);
 		mapPad.getChildren().add(mapPane);
-		
+		drawMap(mapCanvas, online);
 		return mapPad;
 	}
 	
-	private void drawMap(Pane mapCanvas) {
+	private void drawMap(Pane mapCanvas, boolean online) {
 
-		System.out.println("size " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
+		int height = 300;
+		int width;
+		if(online){
+			width = 565;
+		}else{
+			width = 535;
+		}
+		System.out.println(mapCanvas + "size " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
 		int xpadding = 250;
 		int ypadding = 50;
 		
@@ -765,14 +787,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 		torch2.setWidth(60);
 		torch2.setHeight(80);
 		torch2.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
-		torch2.setX(mapCanvas.getWidth()-xpadding+150);
+		torch2.setX(width-xpadding+150);
 		torch2.setY(30);
 		
 		Rectangle torch3 = new Rectangle();
 		torch3.setWidth(60);
 		torch3.setHeight(80);
 		torch3.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
-		torch3.setX(mapCanvas.getWidth()-xpadding+150);
+		torch3.setX(width-xpadding+150);
 		torch3.setY(170);
 		
 		Rectangle torch4 = new Rectangle();
@@ -784,8 +806,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		mapCanvas.getChildren().addAll(torch1, torch2, torch3, torch4);
 		
-		double canvasWidth = mapCanvas.getWidth() - xpadding;
-		double canvasHeight = mapCanvas.getHeight() - ypadding;
+		double canvasWidth = width - xpadding;
+		double canvasHeight = height - ypadding;
 		Block[][] gridMap = this.map.getGridMap();
 		double xscalar = canvasWidth/gridMap.length;
 		double yscalar = canvasHeight/gridMap[0].length;
@@ -818,7 +840,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/playerspawnpoint.png")));
 			}
 			else{
-				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/spawnpoint.png")));
+				if(online){
+					rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/playerspawnpoint.png")));
+				}
+				else{
+					rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/spawnpoint.png")));
+				}
 			}
 			rect.setStroke(Color.BLACK);
 			rect.setX((xpadding/2) + 5 + xscalar*(pos.x/64));
@@ -986,15 +1013,28 @@ public class UserInterface extends Application implements ClientNetInterface{
 		AudioManager.playMenuItemSelected();
 	}
 	
-	private void beginOnlineGame() {
+	private void ready() {
 		beep();
+		readyButton.setText("Ready to Start");
+		readyButton.setOnAction(e -> notReady());
+		readyTorch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		
 		try {
 			this.client.readyToPlay(true);
-			for(int x = 0; x < this.aiNumber.get(); x++){
-				this.client.addAI();
-			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void notReady() {
+		beep();
+		readyButton.setText("Not Ready");
+		readyButton.setOnAction(e -> ready());
+		readyTorch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/darktorch.png")));
+		
+		try {
+			this.client.readyToPlay(false);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -1070,9 +1110,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		if (this.client != null) {
 			try {
 				this.client.disconnect();
-				this.client.exit();
-				this.client = null;
-				
 			} catch (Exception e) {
 			}
 		}
@@ -1093,7 +1130,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(this.maps.size()-1);
 		}
 		this.mapName.set(this.map.getName());
-		drawMap(onlineMapCanvas);
+		drawMap(onlineMapCanvas, true);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -1109,7 +1146,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(this.maps.size()-1);
 		}
 		this.mapName.set(this.map.getName());
-		drawMap(mapCanvas);
+		drawMap(mapCanvas, false);
 	}
 
 	private void incrementOnlineMap() {
@@ -1126,7 +1163,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(0);
 		}
 		this.mapName.set(this.map.getName());
-		drawMap(onlineMapCanvas);
+		drawMap(onlineMapCanvas, true);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -1142,7 +1179,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.map = this.maps.get(0);
 		}
 		this.mapName.set(this.map.getName());
-		drawMap(mapCanvas);
+		drawMap(mapCanvas, false);
 	}
 
 	private void decrementOnlineAi(){
@@ -1331,6 +1368,29 @@ public class UserInterface extends Application implements ClientNetInterface{
 			aiNumber.set(room.getAIPlayerNumber());
 			this.map = this.maps.get(room.getMapID());
 			this.mapName.set(this.map.getName());
+			readyPane.getChildren().clear();
+			readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
+			for(ClientServerPlayer player : room.getHumanPlayerList()){
+				System.out.println(player.getName());
+				Rectangle torch = new Rectangle();
+				torch.setWidth(40);
+				torch.setHeight(40);
+				if(player.isReadyToPlay()){
+					torch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+				}else{
+					torch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/darktorch.png")));
+				}
+				HBox playerBox = new HBox();
+				playerBox.setSpacing(20);
+				playerBox.setAlignment(Pos.CENTER);
+				Label playerName = createLabel(player.getName(), true, true);
+				playerName.setPrefHeight(20);
+				playerName.setPrefWidth(180);
+				playerBox.getChildren().addAll(playerName, torch);
+				if(!player.getName().equals(this.playerName.get())){
+					readyPane.getChildren().add(playerBox);
+				}
+			}
 			List<ClientServerAI> ais = room.getAIPlayerList();
 			if(ais.size() > 0){
 				AIDifficulty diff = room.getAIPlayerList().get(0).getDifficulty();
@@ -1353,7 +1413,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 					e.printStackTrace();
 				}
 			
-			drawMap(onlineMapCanvas);
+			drawMap(onlineMapCanvas, true);
 		}
 	}
 
@@ -1399,7 +1459,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
-		drawMap(mapCanvas);
 	}
 
 	public void setName(String string){
@@ -1443,6 +1502,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
+				client.exit();
+				client = null;
 				previous();
 			}
 			   
@@ -1553,7 +1614,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 					mapName.set(". . .");
 					Label label = createLabel("Loading...", false, true);
 					label.setMinHeight(300);
-					label.setMinWidth(500);
+					label.setMinWidth(565);
 					onlineMapCanvas.getChildren().clear();
 					onlineMapCanvas.getChildren().add(label);
 					advance(serverScene, roomScene);
