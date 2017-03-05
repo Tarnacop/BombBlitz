@@ -58,6 +58,7 @@ import bomber.game.Maps;
 import bomber.game.OnlineGame;
 import bomber.game.Response;
 import bomber.networking.ClientNetInterface;
+import bomber.networking.ClientServerAI;
 import bomber.networking.ClientServerLobbyRoom;
 import bomber.networking.ClientServerPlayer;
 import bomber.networking.ClientServerRoom;
@@ -72,7 +73,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private BorderPane singleMenu;
 	private Scene mainScene, keyScene, serverScene, singleScene;
 	private TextField nameText, ipText;
-	private Button nameBtn, settingsBtn, controlsBtn, startBtn;
+	private Button nameBtn, controlsBtn, startBtn;
 	private Button backBtn2, backBtn3, backBtn4;
 	private Button connectBtn;
 	private Stack<Scene> previousScenes;
@@ -90,12 +91,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private HBox backBox1;
 	private VBox connectPane;
 	private ClientThread client;
-	private Button disconnectBtn;
-	private Label roomsTitle;
-	private Label playersTitle;
-	private VBox roomsListPane;
-	private VBox roomsPlayersPane;
-	private VBox playersListPane;
 	private FlowPane roomsBox;
 	private FlowPane playersBox;
 	private Button backBtn5;
@@ -122,15 +117,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private UserInterface ui;
 	
 	private Scene roomScene;
-	private Button backButtonRooms;
 	private String css;
 	private Scene creditsScene;
 	private BorderPane creditsMenu;
 	private BorderPane roomMenu;
 	private Button createRoomBtn;
-	private Button addAi;
-	private ButtonBase removeAi;
-	private Button startGame;
 	private BorderPane mainMenu;
 	private SimpleStringProperty currentNameText;
 	private int windowHeight;
@@ -144,10 +135,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private FlowPane playersBox2;
 	private int humanPlayers;
 	private int aiPlayers;
-	private SimpleIntegerProperty onlineMap;
 	private Pane mapCanvas;
 	private Pane onlineMapCanvas;
-	private Label mapNameLabel;
+	private ChoiceBox<String> aiDifficultyChoice;
+	private ChoiceBox<String> aiOnlineDifficultyChoice;
 	
 	public UserInterface(){
 		//for JavaFX
@@ -157,7 +148,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.css = this.getClass().getResource("resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty("Player 1");
 		this.aiNumber = new SimpleIntegerProperty(1);
-		this.onlineMap = new SimpleIntegerProperty(1);
+		new SimpleIntegerProperty(1);
 		this.roomNumber = new SimpleIntegerProperty(4);
 		this.roomCreationLabel = createLabel("Create and join a room\nwith these settings", false, true);
 		this.aiDiff = AIDifficulty.EASY;
@@ -514,7 +505,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         connectBtn = createButton("Connect", 300, 75);
         connectBtn.setOnAction(e -> connect());
         
-        backBtn4 = createBackButton("Cancel", true);
+        backBtn4 = createBackButton("Cancel", false);
 
         VBox connectBox = new VBox();
         connectBox.setSpacing(20);
@@ -597,8 +588,62 @@ public class UserInterface extends Application implements ClientNetInterface{
         Label aiExplanation = createLabel("AI players will\nseek to\ndestroy you.", true, true);
         aiExplanation.setAlignment(Pos.CENTER);
         aiExplanation.setPrefWidth(200);
-        
-        ChoiceBox<String> aiDifficultyChoice = new ChoiceBox<>();
+        if(online){
+        	aiOnlineDifficultyChoice = new ChoiceBox<>();
+            aiOnlineDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
+            aiOnlineDifficultyChoice.setPrefHeight(50);
+            aiOnlineDifficultyChoice.setPrefWidth(200);
+            aiOnlineDifficultyChoice.getStyleClass().add("textfield");
+            aiOnlineDifficultyChoice.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
+            aiOnlineDifficultyChoice.getSelectionModel().select(1);
+            aiOnlineDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
+                    ChangeListener<String>() {
+    			@Override
+    			public void changed(ObservableValue<? extends String> ob,
+    					String oldValue, String newValue) {
+    				switch(newValue){
+    				case "Easy": 
+    					aiDiff = AIDifficulty.EASY; 
+    					aiExplanation.setText("AI players will\nmove randomly.");
+    					
+    					break;
+    				case "Medium": 
+    					aiDiff = AIDifficulty.MEDIUM;
+    					aiExplanation.setText("AI players will\nseek to\ndestroy you.");
+    					break;
+    				case "Hard": 
+    					aiDiff = AIDifficulty.HARD; 
+    					aiExplanation.setText("AI players will\nbe tough\nto beat!");
+    					break;
+    				case "Extreme": 
+    					aiDiff = AIDifficulty.EXTREME;
+    					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
+    				}
+    				System.out.println("Set difficulty to " + newValue);
+    			}
+            });	
+
+            VBox aiDiffBox = new VBox();
+            aiDiffBox.setAlignment(Pos.CENTER);
+            aiDiffBox.getStyleClass().add("namebox");
+            aiDiffBox.setSpacing(20);
+            aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), aiOnlineDifficultyChoice, aiExplanation);
+            aiDiffBox.setMinHeight(300);
+            
+            VBox aiContainer = new VBox();
+            aiContainer.setAlignment(Pos.CENTER);
+            aiContainer.getStyleClass().add("box");
+            aiContainer.setSpacing(20);
+            aiContainer.getChildren().addAll(aiPane, aiDiffBox);
+            
+    		VBox aiPad = new VBox();
+    		aiPad.setAlignment(Pos.CENTER);
+    		aiPad.getChildren().add(aiContainer);
+    		
+    		return aiPad;
+        }
+        else{
+        aiDifficultyChoice = new ChoiceBox<>();
         aiDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
         aiDifficultyChoice.setPrefHeight(50);
         aiDifficultyChoice.setPrefWidth(200);
@@ -627,12 +672,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 					aiDiff = AIDifficulty.EXTREME;
 					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
 				}
-				
-				//System.out.println("Set difficulty to " + newValue);
 			}
         });
-        
-        
+
         VBox aiDiffBox = new VBox();
         aiDiffBox.setAlignment(Pos.CENTER);
         aiDiffBox.getStyleClass().add("namebox");
@@ -650,13 +692,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		aiPad.getChildren().add(aiContainer);
 		
 		return aiPad;
+        
+        }
 	}
 	
 	private VBox createMapSelector(Pane mapCanvas, boolean online){
-
-		System.out.println("Created Selector for: " + mapCanvas);
-//		mapCanvas.widthProperty().addListener(e -> drawMap(mapCanvas));
-//		mapCanvas.heightProperty().addListener(e -> drawMap(mapCanvas));
 		
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
@@ -709,8 +749,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private void drawMap(Pane mapCanvas) {
 
-		System.out.println("DRAWING CANVAS: " + mapCanvas);
-		System.out.println("MAP: " + this.map.getName());
+		System.out.println("size " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
 		int xpadding = 250;
 		int ypadding = 50;
 		
@@ -748,7 +787,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double canvasWidth = mapCanvas.getWidth() - xpadding;
 		double canvasHeight = mapCanvas.getHeight() - ypadding;
 		Block[][] gridMap = this.map.getGridMap();
-		System.out.println("SIZE: " + gridMap.length + ", " + gridMap[0].length + " on " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
 		double xscalar = canvasWidth/gridMap.length;
 		double yscalar = canvasHeight/gridMap[0].length;
 		
@@ -1286,7 +1324,19 @@ public class UserInterface extends Application implements ClientNetInterface{
 			aiNumber.set(room.getAIPlayerNumber());
 			this.map = this.maps.get(room.getMapID());
 			this.mapName.set(this.map.getName());
-		
+			List<ClientServerAI> ais = room.getAIPlayerList();
+			if(ais.size() > 0){
+				AIDifficulty diff = room.getAIPlayerList().get(0).getDifficulty();
+				System.out.println("GOT DIFF: " + diff);
+				int index = 1;
+				switch(diff){
+				case EASY: index = 0;aiDiff = AIDifficulty.EASY;break;
+				case MEDIUM: index = 1;aiDiff = AIDifficulty.MEDIUM;break;
+				case HARD: index = 2;aiDiff = AIDifficulty.HARD;break;
+				case EXTREME: index = 3;aiDiff = AIDifficulty.EXTREME;break;
+				}
+				aiOnlineDifficultyChoice.getSelectionModel().select(index);
+			}
 				try {
 					if(room.getAIPlayerNumber() + room.getHumanPlayerNumber() > room.getMaxPlayer()){
 						this.client.removeAI();
@@ -1342,8 +1392,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
-		
-        drawMap(mapCanvas);
+		drawMap(mapCanvas);
 	}
 
 	public void setName(String string){
@@ -1415,6 +1464,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 					displayPlayers();
 					displayRooms();
 					expectingConnection = false;
+					
 					System.out.println("CONNECTION ACCEPTED");
 				}
 			}
@@ -1503,6 +1553,21 @@ public class UserInterface extends Application implements ClientNetInterface{
 					roomCreationLabel.setText("Create and join a room\nwith these settings");
 					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 					expectingRoomCreation = false;
+					aiOnlineDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
+			                ChangeListener<String>() {
+						@Override
+						public void changed(ObservableValue<? extends String> ob,
+								String oldValue, String newValue) {
+							for(ClientServerAI ai : client.getRoom().getAIPlayerList()){
+								try {
+									client.setAIDifficulty(ai.getID(), aiDiff);
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+							System.out.println("SET ALL AI TO: " + aiDiff);
+						}
+			        });
 				}
 				else if(expectingRoomJoin){
 					advance(serverScene, roomScene);
