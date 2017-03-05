@@ -21,7 +21,7 @@ public class ClientServerRoomTest {
 
 	@Before
 	public void setUp() throws Exception {
-		room = new ClientServerRoom(133, "Room 133", 2, 1, 4, false, 331);
+		room = new ClientServerRoom(133, "Room 133", 2, 1, 4, false, 31, 35);
 
 		humanPlayerList.add(new ClientServerPlayer(5, "P5", true));
 		humanPlayerList.add(new ClientServerPlayer(10, "P10", false));
@@ -43,7 +43,8 @@ public class ClientServerRoomTest {
 		assertEquals(1, room.getAIPlayerNumber());
 		assertEquals(4, room.getMaxPlayer());
 		assertFalse(room.isInGame());
-		assertEquals(331, room.getMapID());
+		assertEquals(31, room.getMapID());
+		assertEquals(35, room.getMaxMapID());
 
 		assertEquals(2, room.getHumanPlayerList().size());
 

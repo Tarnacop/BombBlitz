@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import bomber.AI.AIDifficulty;
 import bomber.game.KeyboardState;
+import bomber.game.Map;
 
 public class ServerThread implements Runnable {
 	private final int port;
@@ -309,11 +310,8 @@ public class ServerThread implements Runnable {
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
 			} else {
-				// nonceTable.remove(sockAddr);
 				/*
-				 * TODO currently nonceTable is cleared after exceeding a
-				 * particular size, later we need to delete a few oldest items
-				 * instead based on the time when a nonce was created
+				 * nonceTable is cleared after exceeding a particular size
 				 */
 			}
 
@@ -800,14 +798,7 @@ public class ServerThread implements Runnable {
 				return;
 			}
 
-			// create the game according to the map ID of the room
-			if (!room.createGame(config.getTickRate(), this)) {
-				pServerf("Failed to create game with map ID %d\n", room.getMapID());
-				// TODO tell clients this error
-				return;
-			}
-
-			// if all clients in this room are ready, start the game
+			// if all clients in this room are ready, create and start the game
 			if (room.allPlayersReady()) {
 				/*
 				 * ServerGame should be responsible for sending updated game
@@ -815,6 +806,9 @@ public class ServerThread implements Runnable {
 				 * game state and game end messages) while ServerThread will
 				 * update the KeyboardState of the players itself
 				 */
+				// create the game according to the map ID of the room
+				room.createGame(config.getTickRate(), this);
+
 				room.getGame().start();
 			}
 
@@ -916,6 +910,13 @@ public class ServerThread implements Runnable {
 					room.setAIDifficulty(aiID, aiDifficulty);
 				} else {
 					return;
+				}
+			} else if (changeType == ProtocolConstant.MSG_C_ROOM_SETINFO_ADDMAP) {
+				try {
+					Map customMap = ServerPacketEncoder.decodeCustomMap(recvBuffer, packet.getLength());
+					room.addCustomMap(customMap);
+				} catch (IOException e) {
+					pServer("Failed to decode custom map from " + sockAddr + ": " + e);
 				}
 			} else {
 				return;
