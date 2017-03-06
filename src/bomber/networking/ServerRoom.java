@@ -7,7 +7,6 @@ import java.util.List;
 import bomber.AI.AIDifficulty;
 import bomber.game.Block;
 import bomber.game.Map;
-import bomber.game.Maps;
 
 /**
  * 
@@ -44,10 +43,12 @@ public class ServerRoom {
 	 *            the name of the room
 	 * @param firstPlayer
 	 *            the player who created this room
+	 * @param mapList
+	 *            the list of maps to be used in the room
 	 * @param mapID
 	 *            the initial map ID of the room
 	 */
-	public ServerRoom(String name, ServerClientInfo firstPlayer, int mapID) {
+	public ServerRoom(String name, ServerClientInfo firstPlayer, List<Map> mapList, int mapID) {
 		if (name == null) {
 			this.name = "Room " + id;
 		} else {
@@ -57,97 +58,47 @@ public class ServerRoom {
 		if (firstPlayer != null) {
 			playerList.add(firstPlayer);
 		}
+
+		this.mapList = mapList;
 
 		this.mapID = mapID;
 
 		initMaps();
 	}
 
-	/**
-	 * Construct a room
-	 * 
-	 * @param name
-	 *            the name of the room
-	 * @param firstPlayer
-	 *            the player who created this room
-	 * @param maxPlayer
-	 *            the max number of players allowed in this room(in the range
-	 *            [2,4])
-	 * @param mapID
-	 *            the initial map ID of the room
-	 */
-	public ServerRoom(String name, ServerClientInfo firstPlayer, int maxPlayer, int mapID) {
-		if (name == null) {
-			this.name = "Room " + id;
-		} else {
-			this.name = name;
-		}
-
-		if (firstPlayer != null) {
-			playerList.add(firstPlayer);
-		}
-
-		setMaxPlayer(maxPlayer);
-
-		setMapID(mapID);
-
-		initMaps();
-	}
-
-	/**
-	 * Construct a room with a default name
-	 * 
-	 * @param firstPlayer
-	 *            the player who created this room
-	 */
-	public ServerRoom(ServerClientInfo firstPlayer) {
-		this.name = "Room " + id;
-
-		if (firstPlayer != null) {
-			playerList.add(firstPlayer);
-		}
-
-		initMaps();
-	}
-
 	private void initMaps() {
-		try {
-			mapList = new Maps().getMaps();
-		} catch (Exception e) {
-			mapList = null;
-		} finally {
-			if (mapList == null) {
-				mapList = new ArrayList<Map>(1);
-			}
-
-			if (mapList.size() < 1) {
-				Block[][] defaultGridMap = new Block[][] {
-						{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-						{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
-
-						{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-
-						{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
-						{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
-				Map defaultMap = new Map("default map", defaultGridMap, null);
-
-				mapList.add(defaultMap);
-			}
-
-			setMaxMapID(mapList.size() - 1);
-
-			setMapID(getMapID());
+		if (mapList == null) {
+			mapList = new ArrayList<Map>(1);
 		}
+
+		if (mapList.size() < 1) {
+			Block[][] defaultGridMap = new Block[][] {
+					{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
+					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+					{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+
+					{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+					{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+					{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+					{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+					{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+
+					{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+					{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
+					{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
+			Map defaultMap = new Map("default map", defaultGridMap, null);
+
+			mapList.add(defaultMap);
+		}
+
+		setMaxMapID(mapList.size() - 1);
+
+		setMapID(getMapID());
+
 	}
 
 	private Map getMap() {

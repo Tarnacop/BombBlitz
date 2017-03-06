@@ -24,7 +24,6 @@ import bomber.networking.ServerClientTable;
 import bomber.networking.ServerPacketEncoder;
 import bomber.networking.ServerRoom;
 import bomber.networking.ServerRoomTable;
-import bomber.networking.ServerThread;
 
 public class PacketEncodeDecodeTest2 {
 
@@ -47,7 +46,7 @@ public class PacketEncodeDecodeTest2 {
 			e.printStackTrace();
 		}
 		System.out.println("encodePlayerList returns " + ret);
-		System.out.println(ServerThread.toHex(arr, ret));
+		System.out.println(toHex(arr, ret));
 
 		List<ClientServerPlayer> playerList = null;
 		try {
@@ -71,7 +70,8 @@ public class PacketEncodeDecodeTest2 {
 		ServerRoomTable roomTable = new ServerRoomTable(32);
 
 		for (int i = 0; i < 32; i++) {
-			ServerRoom room = new ServerRoom("test_room " + i, clientTable.get(i), i);
+			System.out.println(i);
+			ServerRoom room = new ServerRoom("test_room " + i, clientTable.get(i), null, i);
 			roomTable.put(room);
 		}
 
@@ -81,7 +81,7 @@ public class PacketEncodeDecodeTest2 {
 			e.printStackTrace();
 		}
 		System.out.println("encodeRoomList returns " + ret);
-		System.out.println(ServerThread.toHex(arr, ret));
+		System.out.println(toHex(arr, ret));
 
 		List<ClientServerLobbyRoom> roomList = null;
 		try {
@@ -103,7 +103,7 @@ public class PacketEncodeDecodeTest2 {
 		// room test
 		SocketAddress sockAddr = new InetSocketAddress("12.12.12.12", 12);
 		ServerClientInfo client = new ServerClientInfo(sockAddr, "client " + 12);
-		ServerRoom room = new ServerRoom("Test Room", client, 3, 1);
+		ServerRoom room = new ServerRoom("Test Room", client, null, 3);
 		room.addAI();
 		room.addAI();
 
@@ -113,7 +113,7 @@ public class PacketEncodeDecodeTest2 {
 			e1.printStackTrace();
 		}
 		System.out.println("encodeRoom returns " + ret);
-		System.out.println(ServerThread.toHex(arr, ret));
+		System.out.println(toHex(arr, ret));
 
 		ClientServerRoom roomDecoded = null;
 		try {
@@ -161,7 +161,9 @@ public class PacketEncodeDecodeTest2 {
 				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
 				{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
 				{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
-		Map testMap = new Map("test map", testGridMap, new ArrayList<>());
+		List<Point> testSpawns = new ArrayList<>();
+		testSpawns.add(new Point(253, 128));
+		Map testMap = new Map("test map", testGridMap, testSpawns);
 
 		GameState testGameState = new GameState(testMap, testPlayerList);
 		List<Bomb> testBombList = testGameState.getBombs();
@@ -182,7 +184,7 @@ public class PacketEncodeDecodeTest2 {
 			e.printStackTrace();
 		}
 		System.out.println("encodeGameState returns " + ret);
-		System.out.println(ServerThread.toHex(arr, ret));
+		System.out.println(toHex(arr, ret));
 
 		try {
 			testGameState = ClientPacketEncoder.decodeGameState(testGameState, arr, ret);
@@ -196,6 +198,41 @@ public class PacketEncodeDecodeTest2 {
 			System.out.println("Audio: " + a);
 		}
 
+		// custom map upload test
+		try {
+			ret = ClientPacketEncoder.encodeCustomMap(3, testMap, arr);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("encodeCustomMap returns " + ret);
+		System.out.println(toHex(arr, ret));
+
+		Map decodedMap = null;
+		try {
+			decodedMap = ServerPacketEncoder.decodeCustomMap(arr, ret);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("decodeCustomMap:");
+		System.out.println(decodedMap.toStringWithPlayersBombs(new ArrayList<>(0), new ArrayList<>(0)));
+
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static String toHex(byte[] data, int length) {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < length; i++) {
+			sb.append(String.format("0x%02x, ", data[i]));
+		}
+
+		return sb.toString();
 	}
 
 }

@@ -13,14 +13,17 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import bomber.AI.AIDifficulty;
+import bomber.game.Block;
 import bomber.game.KeyboardState;
 import bomber.game.Map;
+import bomber.game.Maps;
 
 public class ServerThread implements Runnable {
 	private final int port;
@@ -40,6 +43,9 @@ public class ServerThread implements Runnable {
 
 	// table for storing room info
 	private final ServerRoomTable roomTable;
+
+	// list of maps
+	private List<Map> mapList;
 
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
@@ -73,6 +79,7 @@ public class ServerThread implements Runnable {
 		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
+		initMaps();
 
 		// open socket
 		socket = new DatagramSocket(port);
@@ -94,6 +101,7 @@ public class ServerThread implements Runnable {
 		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
+		initMaps();
 
 		// open socket
 		socket = new DatagramSocket(port);
@@ -113,6 +121,7 @@ public class ServerThread implements Runnable {
 		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
+		initMaps();
 
 		// open socket
 		socket = new DatagramSocket(port);
@@ -538,7 +547,7 @@ public class ServerThread implements Runnable {
 			}
 
 			// create the room and update the info of the client
-			ServerRoom room = new ServerRoom(roomName, client, mapID);
+			ServerRoom room = new ServerRoom(roomName, client, mapList, mapID);
 			room.setMaxPlayer(maxPlayer);
 			roomTable.put(room);
 			client.setInRoom(true);
@@ -1151,18 +1160,44 @@ public class ServerThread implements Runnable {
 
 	}
 
-	public void exit() {
-		socket.close();
+	private void initMaps() {
+		try {
+			mapList = new Maps().getMaps();
+		} catch (Exception e) {
+			mapList = null;
+		} finally {
+			if (mapList == null) {
+				mapList = new ArrayList<Map>(1);
+			}
+
+			if (mapList.size() < 1) {
+				Block[][] defaultGridMap = new Block[][] {
+						{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
+						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+						{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+
+						{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+						{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+
+						{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+						{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
+						{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
+				Map defaultMap = new Map("default map", defaultGridMap, null);
+
+				mapList.add(defaultMap);
+			}
+		}
 	}
 
-	public static String toHex(byte[] data, int length) {
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < length; i++) {
-			sb.append(String.format("0x%02x ", data[i]));
-		}
-
-		return sb.toString();
+	public void exit() {
+		socket.close();
 	}
 
 }
