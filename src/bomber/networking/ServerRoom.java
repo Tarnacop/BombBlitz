@@ -2,6 +2,7 @@
 package bomber.networking;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import bomber.AI.AIDifficulty;
@@ -31,7 +32,7 @@ public class ServerRoom {
 	// list of server maps
 	private List<Map> mapList;
 	// list of player uploaded custom maps
-	private List<Map> customMapList = new ArrayList<Map>(4);
+	private List<Map> customMapList = new LinkedList<Map>();
 	// game session
 	private ServerGame game;
 	// TODO consistency between constructor, getter, setter and game's mapID
@@ -72,33 +73,35 @@ public class ServerRoom {
 		}
 
 		if (mapList.size() < 1) {
-			Block[][] defaultGridMap = new Block[][] {
-					{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
-					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-					{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
-
-					{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
-					{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
-					{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-					{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-					{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-
-					{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
-					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
-					{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
-					{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
-					{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
-			Map defaultMap = new Map("default map", defaultGridMap, null);
-
-			mapList.add(defaultMap);
+			mapList.add(defaultMap());
 		}
 
 		setMaxMapID(mapList.size() - 1);
 
 		setMapID(getMapID());
+	}
 
+	private Map defaultMap() {
+		Block[][] defaultGridMap = new Block[][] { { Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+
+				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+
+				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
+		Map defaultMap = new Map("default map", defaultGridMap, null);
+
+		return defaultMap;
 	}
 
 	private Map getMap() {

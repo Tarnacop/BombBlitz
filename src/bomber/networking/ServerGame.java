@@ -45,11 +45,29 @@ public class ServerGame implements Runnable {
 
 	private boolean shouldRun;
 
+	/**
+	 * Construct a server game session
+	 * 
+	 * @param roomID
+	 *            the id of the room
+	 * @param mapID
+	 *            the id of the map
+	 * @param map
+	 *            the map of the game session
+	 * @param playerList
+	 *            the list of human players
+	 * @param aiList
+	 *            the list of AI players
+	 * @param tickRate
+	 *            the tick rate of the game session
+	 * @param serverThread
+	 *            the server thread
+	 */
 	public ServerGame(int roomID, int mapID, Map map, List<ServerClientInfo> playerList, List<ServerAI> aiList,
 			int tickRate, ServerThread serverThread) {
 		this.roomID = roomID;
 		this.mapID = mapID;
-		this.map = map;
+		this.map = copyMap(map);
 		this.playerList = playerList;
 		this.aiList = aiList;
 		this.tickRate = tickRate;
@@ -71,6 +89,38 @@ public class ServerGame implements Runnable {
 
 	private int aiIDtoPlayerID(int aiID) {
 		return aiID + 32;
+	}
+
+	private Map copyMap(Map map) {
+		Block[][] grid = map.getGridMap();
+		List<Point> spawn = map.getSpawnPoints();
+
+		int width = grid.length;
+		int height = grid[0].length;
+
+		Block[][] newGrid = new Block[width][height];
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				newGrid[x][y] = grid[x][y];
+			}
+		}
+
+		List<Point> newSpawn = new ArrayList<Point>(4);
+		if (spawn != null) {
+			for (int i = 0; i < 4; i++) {
+				if (i < spawn.size() && spawn.get(i) != null) {
+					newSpawn.add(new Point(spawn.get(i).x, spawn.get(i).y));
+				}
+			}
+		} else {
+			for (int i = 0; i < 4; i++) {
+				newSpawn.add(new Point(64, 64));
+			}
+		}
+
+		Map newMap = new Map(map.getName(), newGrid, newSpawn);
+
+		return newMap;
 	}
 
 	/**

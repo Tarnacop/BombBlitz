@@ -1064,44 +1064,6 @@ public class ServerThread implements Runnable {
 		sendPacket(packet);
 	}
 
-	public synchronized void sendPacket(DatagramPacket packet) throws IOException {
-		socket.send(packet);
-	}
-
-	public synchronized void sendPacket(DatagramPacket packet, byte type) throws IOException {
-		ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-		buffer.put(0, (byte) (type & (~ProtocolConstant.MSG_B_HASSEQUENCE)));
-		buffer.putShort(1, (short) 0);
-		socket.send(packet);
-	}
-
-	// Note: retransmission cannot work when recipient is not in client table
-	public synchronized void sendPacket(DatagramPacket packet, byte type, boolean tryRetransmit) throws IOException {
-		if (tryRetransmit) {
-			ServerClientInfo clientInfo = clientTable.get(packet.getSocketAddress());
-			if (clientInfo != null) {
-				short sequence = clientInfo.getNextPacketSequenceAndIncrement();
-
-				// set the sequence number in the packet before sending
-				ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-				buffer.put(0, (byte) (type | ProtocolConstant.MSG_B_HASSEQUENCE));
-				buffer.putShort(1, sequence);
-
-				// insert the packet to history
-				clientInfo.insertPacket(sequence, packet);
-
-				// send the packet
-				socket.send(packet);
-			} else {
-				// pServer("recipient does not exist in client table but
-				// tryRetransmit is set to true");
-				sendPacket(packet, type);
-			}
-		} else {
-			sendPacket(packet, type);
-		}
-	}
-
 	private void pServer(String string) {
 		printStream.println("Server: " + string);
 	}
@@ -1170,29 +1132,76 @@ public class ServerThread implements Runnable {
 				mapList = new ArrayList<Map>(1);
 			}
 
-			if (mapList.size() < 1) {
-				Block[][] defaultGridMap = new Block[][] {
-						{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-						{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
-
-						{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-
-						{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
-						{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
-						{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
-						{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
-				Map defaultMap = new Map("default map", defaultGridMap, null);
-
-				mapList.add(defaultMap);
+			for (int i = 0; i < mapList.size(); i++) {
+				if (mapList.get(i) == null) {
+					mapList.set(i, defaultMap());
+				}
 			}
+
+			if (mapList.size() < 1) {
+				mapList.add(defaultMap());
+			}
+		}
+	}
+
+	private Map defaultMap() {
+		Block[][] defaultGridMap = new Block[][] { { Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+
+				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+
+				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
+		Map defaultMap = new Map("default map", defaultGridMap, null);
+
+		return defaultMap;
+	}
+
+	public synchronized void sendPacket(DatagramPacket packet) throws IOException {
+		socket.send(packet);
+	}
+
+	public synchronized void sendPacket(DatagramPacket packet, byte type) throws IOException {
+		ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+		buffer.put(0, (byte) (type & (~ProtocolConstant.MSG_B_HASSEQUENCE)));
+		buffer.putShort(1, (short) 0);
+		socket.send(packet);
+	}
+
+	// Note: retransmission cannot work when recipient is not in client table
+	public synchronized void sendPacket(DatagramPacket packet, byte type, boolean tryRetransmit) throws IOException {
+		if (tryRetransmit) {
+			ServerClientInfo clientInfo = clientTable.get(packet.getSocketAddress());
+			if (clientInfo != null) {
+				short sequence = clientInfo.getNextPacketSequenceAndIncrement();
+
+				// set the sequence number in the packet before sending
+				ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+				buffer.put(0, (byte) (type | ProtocolConstant.MSG_B_HASSEQUENCE));
+				buffer.putShort(1, sequence);
+
+				// insert the packet to history
+				clientInfo.insertPacket(sequence, packet);
+
+				// send the packet
+				socket.send(packet);
+			} else {
+				// pServer("recipient does not exist in client table but
+				// tryRetransmit is set to true");
+				sendPacket(packet, type);
+			}
+		} else {
+			sendPacket(packet, type);
 		}
 	}
 
