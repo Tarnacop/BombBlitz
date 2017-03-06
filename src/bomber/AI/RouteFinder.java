@@ -347,7 +347,7 @@ public class RouteFinder {
 			Node temp = open.poll();
 
 			// if the head is final position we finish
-			if (!dangerTiles.contains(temp.getCoord())) {
+			if (!dangerTiles.contains(temp.getCoord()) /*&& isSafeLocationToMove(dangerTiles, temp.getCoord())*/) {
 				finish = temp;
 				break;
 			}
@@ -748,6 +748,14 @@ public class RouteFinder {
 			return null;
 		return getMovesFromPoints(finish);
 
+	}
+	
+	
+	
+	private boolean isSafeLocationToMove(ArrayList<Point> dangerTiles, Point position)
+	{
+		int numberOfPossibleMoves = 0;
+		return false;
 	}
 
 }
