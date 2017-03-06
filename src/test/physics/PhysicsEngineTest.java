@@ -9,11 +9,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import static bomber.game.Block.*;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 /**
  * Created by Alexandru Rosu on 26.01.2017.
@@ -31,9 +27,9 @@ public class PhysicsEngineTest
     public void setUp() throws Exception
     {
         Block[][] blocks = {{BLANK, BLANK, BLANK, SOLID, SOFT, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT},
-                            {BLANK, BLANK, SOFT, BLANK, SOLID, SOLID, SOLID, SOFT, BLANK, SOFT, SOLID},
-                            {BLANK, BLANK, BLANK, BLANK, SOFT, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT},
-                            {SOLID, SOFT, SOLID, SOFT, SOLID, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT}};
+                {BLANK, BLANK, SOFT, BLANK, SOLID, SOLID, SOLID, SOFT, BLANK, SOFT, SOLID},
+                {BLANK, BLANK, BLANK, BLANK, SOFT, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT},
+                {SOLID, SOFT, SOLID, SOFT, SOLID, SOLID, SOFT, SOFT, SOFT, SOFT, SOFT}};
         map = new Map("Test map", blocks, null);
 
         players = new ArrayList<>();
@@ -51,14 +47,14 @@ public class PhysicsEngineTest
         assertNotNull("Player was not added or does not have the given name.", testPlayer1);
         assertEquals("Added player does not have the given position", new Point(5,5), testPlayer1.getPos());
         assertEquals("Added player does not have the given number of lives", 1, testPlayer1.getLives());
-        assertEquals("Added player does not have the given speed", 10.0, testPlayer1.getSpeed());
+        assertEquals("Added player does not have the given speed", 10.0, testPlayer1.getSpeed(), 0);
 
         gameState.getPlayers().add(new Player("TestPlayer2", new Point(3,4), 3, 14, null));
         Player testPlayer2 = engine.getPlayerNamed("TestPlayer2");
         assertNotNull("Player was not added or does not have the given name.", testPlayer2);
         assertEquals("Added player does not have the given position", new Point(3, 4), testPlayer2.getPos());
         assertEquals("Added player does not have the given number of lives", 3, testPlayer2.getLives());
-        assertEquals("Added player does not have the given speed", 14.0, testPlayer2.getSpeed());
+        assertEquals("Added player does not have the given speed", 14.0, testPlayer2.getSpeed(), 0);
     }
 
     @Test

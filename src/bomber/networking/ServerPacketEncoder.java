@@ -1,5 +1,6 @@
 package bomber.networking;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -12,6 +13,7 @@ import bomber.AI.AIDifficulty;
 import bomber.game.AudioEvent;
 import bomber.game.Block;
 import bomber.game.Bomb;
+import bomber.game.Constants;
 import bomber.game.GameState;
 import bomber.game.KeyboardState;
 import bomber.game.Map;
@@ -267,10 +269,10 @@ public class ServerPacketEncoder {
 		buffer.put(roomNameData);
 
 		/*
-		 * put number of human players, AI players, max players, inGame flag and
-		 * map ID
+		 * put number of human players, AI players, max players, inGame flag map
+		 * ID and max map ID
 		 */
-		if (dest.length < buffer.position() + 1 + 1 + 1 + 1 + 4) {
+		if (dest.length < buffer.position() + 1 + 1 + 1 + 1 + 4 + 4) {
 			throw new IOException("dest is too short");
 		}
 		buffer.put((byte) room.getHumanPlayerNumber());
@@ -282,6 +284,7 @@ public class ServerPacketEncoder {
 			buffer.put((byte) 0);
 		}
 		buffer.putInt(room.getMapID());
+		buffer.putInt(room.getMaxMapID());
 
 		// put human player info
 		ServerClientInfo[] humanPlayers = room.getHumanPlayers();
@@ -339,16 +342,9 @@ public class ServerPacketEncoder {
 	 * @return the number of bytes of the encoded data in the byte array
 	 * @throws IOException
 	 */
-	/**
-	 * @param gameState
-	 * @param roomID
-	 * @param dest
-	 * @return
-	 * @throws IOException
-	 */
 	public static int encodeGameState(GameState gameState, int roomID, byte[] dest) throws IOException {
 		if (gameState == null || dest == null) {
-			throw new IOException("table or dest is null");
+			throw new IOException("game state or dest is null");
 		}
 
 		// null check
@@ -719,4 +715,148 @@ public class ServerPacketEncoder {
 		}
 		return aiDifficulty;
 	}
+
+	/**
+	 * Convert byte into Block (only bit 3 to bit 0 in the byte are used)
+	 * 
+	 * @param b
+	 *            the byte
+	 * @return the Block
+	 */
+	public static Block byteToBlock(byte b) {
+		Block block = null;
+
+		switch (b) {
+		case 0:
+			block = Block.BLANK;
+			break;
+
+		case 1:
+			block = Block.SOLID;
+			break;
+
+		case 2:
+			block = Block.SOFT;
+			break;
+
+		case 3:
+			block = Block.BLAST;
+			break;
+
+		case 4:
+			block = Block.PLUS_BOMB;
+			break;
+
+		case 5:
+			block = Block.MINUS_BOMB;
+			break;
+
+		case 6:
+			block = Block.PLUS_RANGE;
+			break;
+
+		case 7:
+			block = Block.MINUS_RANGE;
+			break;
+
+		case 8:
+			block = Block.PLUS_SPEED;
+			break;
+
+		case 9:
+			block = Block.MINUS_SPEED;
+			break;
+
+		default:
+			block = Block.BLANK;
+			break;
+		}
+
+		return block;
+	}
+
+	/**
+	 * Decode custom map from MSG_C_ROOM_SETINFO_ADDMAP message
+	 * 
+	 * @param src
+	 *            the source byte array
+	 * @param length
+	 *            the length of the data in the byte array
+	 * @return a custom map
+	 * @throws IOException
+	 */
+	public static Map decodeCustomMap(byte[] src, int length) throws IOException {
+		if (src == null) {
+			throw new IOException("src is null");
+		}
+
+		if (length > src.length) {
+			throw new IOException("length is invalid");
+		}
+
+		if (length < 1 + 2 + 4 + 1 + 130 + 32) {
+			throw new IOException("packet format is invalid");
+		}
+
+		ByteBuffer buffer = ByteBuffer.wrap(src, 0, length);
+		buffer.position(7);
+		if (buffer.get() != ProtocolConstant.MSG_C_ROOM_SETINFO_ADDMAP) {
+			throw new IOException("packet format is invalid");
+		}
+
+		byte gridMapWidth = buffer.get();
+		if (gridMapWidth < 1 || gridMapWidth > 16) {
+			throw new IOException("gridMap width is not in the range [1,16]");
+		}
+
+		byte gridMapHeight = buffer.get();
+		if (gridMapHeight < 1 || gridMapHeight > 16) {
+			throw new IOException("gridMap height is not in the range [1,16]");
+		}
+
+		Block[][] gridMap = new Block[gridMapWidth][gridMapHeight];
+
+		long bitArr[][] = new long[4][4];
+		for (int b = 3; b >= 0; b--) {
+			for (int i = 3; i >= 0; i--) {
+				bitArr[b][i] = buffer.getLong();
+			}
+		}
+		for (int x = 0; x < gridMapWidth; x++) {
+			for (int y = 0; y < gridMapHeight; y++) {
+				Block b;
+
+				byte bits = 0;
+				int bitIndex = x + y * gridMapWidth;
+				for (int i = 3; i >= 0; i--) {
+					boolean bit = BitArray.getBit(bitArr[i][bitIndex / 64], bitIndex % 64);
+					bits = BitArray.setBit(bits, i, bit);
+				}
+
+				b = byteToBlock(bits);
+				gridMap[x][y] = b;
+			}
+		}
+
+		List<Point> spawnPoints = new ArrayList<Point>(4);
+		for (int i = 0; i < 4; i++) {
+			int x = buffer.getInt();
+			if (x < 0 || x > gridMapWidth * Constants.mapBlockToGridMultiplier - 1) {
+				x = 64;
+			}
+
+			int y = buffer.getInt();
+			if (y < 0 || y > gridMapHeight * Constants.mapBlockToGridMultiplier - 1) {
+				y = 64;
+			}
+
+			Point p = new Point(x, y);
+			spawnPoints.add(p);
+		}
+
+		Map map = new Map(null, gridMap, spawnPoints);
+
+		return map;
+	}
+
 }

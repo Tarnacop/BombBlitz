@@ -1,15 +1,11 @@
 package bomber.renderer;
-
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-
 import java.awt.Font;
 import java.util.List;
-
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
@@ -20,9 +16,7 @@ import bomber.renderer.shaders.ShaderProgram;
 import bomber.renderer.shaders.TextItem;
 import bomber.renderer.utils.FileHandler;
 import bomber.renderer.utils.Transformation;
-
 public class Renderer {
-
 	private ShaderProgram sceneShader;
 	private ShaderProgram hudShader;
 	private final Transformation transformation;
@@ -35,15 +29,11 @@ public class Renderer {
 	private Mesh bombMesh;
 	
 	boolean gameOver;
-
 	public Renderer() {
-
 		transformation = new Transformation();
 		gameOver = false;
 	} // END OF CONSTRUCTOR
-
 	public void init(Screen screen) throws Exception {
-
 		setupSceneShader();
 		setupHudShader();
 		float[] colours = new float[] { 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f };
@@ -60,17 +50,13 @@ public class Renderer {
 		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
 		// Takes a state to render
-
 	public void setupSceneShader() throws Exception {
-
 		sceneShader = new ShaderProgram();
 		sceneShader.createVertexShader(FileHandler.loadResource("res/vertex.vs"));
 		sceneShader.createFragmentShader(FileHandler.loadResource("res/fragment.fs"));
 		sceneShader.link();
-
 		sceneShader.createUniform("projection");
 		sceneShader.createUniform("model");
-
 	} // END OF setupSceneShader METHOD
 	
 	public void setupHudShader() throws Exception {
@@ -84,9 +70,7 @@ public class Renderer {
 		hudShader.createUniform("colour");
 		
 	} // END OF setupHudShader METHOD
-
 	public void render(Screen screen, GameState state) {
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Resize the screen if it needs to be resized
 		if (screen.isResized()) {
@@ -99,9 +83,7 @@ public class Renderer {
 			renderHud(screen, state);
 		}
 	} // END OF render METHOD
-
 	public void renderScene(Screen screen, GameState state) {
-
 		// Bind the shader
 		sceneShader.bind();
 		// Set the uniform for the projection matrix
@@ -117,13 +99,11 @@ public class Renderer {
 					sceneShader.setUniform("model", modelMatrix);
 					solidMesh.render();
 				} else if (blocks[i][j] == Block.SOFT) {
-
 					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
 					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
 					sceneShader.setUniform("model", modelMatrix);
 					softMesh.render();
 				} else if (blocks[i][j] == Block.BLAST) {
-
 					Vector2f blockCoords = new Vector2f(i * 64f, j * 64f);
 					modelMatrix = transformation.getModelMatrix(blockCoords, 0f, 1f);
 					sceneShader.setUniform("model", modelMatrix);
@@ -153,7 +133,6 @@ public class Renderer {
 		}
 		// Unbind the shader
 		sceneShader.unbind();
-
 	} // END OF renderScene METHOD
 	
 	public void renderHud(Screen screen, GameState state) {
@@ -170,21 +149,18 @@ public class Renderer {
 		hudShader.unbind();
 		
 	} // END OF renderHud METHOD
-
 	public void displayGameOver() {
 		
 		gameOver = true;
 	} // END OF displayGameOver METHOD
 	
 	public void dispose() {
-
 		solidMesh.dispose();
 		softMesh.dispose();
 		blastMesh.dispose();
 		bombMesh.dispose();
 		playerName.getMesh().dispose();
 		if (sceneShader != null) {
-
 			sceneShader.dispose();
 		}
 		if(hudShader != null) {

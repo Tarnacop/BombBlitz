@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import bomber.AI.AIDifficulty;
 import bomber.game.GameState;
 import bomber.game.KeyboardState;
+import bomber.game.Map;
 
 public class ClientThread implements Runnable {
 	private final PrintStream printStream;
@@ -69,7 +70,7 @@ public class ClientThread implements Runnable {
 	private boolean inRoom = false;
 	private int roomID = -1;
 
-	// the ID, width and height of the map in which the client will play
+	// the ID, grid width and height of the map in which the client will play
 	private int mapID = 0;
 	private byte mapWidth = 16;
 	private byte mapHeight = 16;
@@ -1333,6 +1334,31 @@ public class ClientThread implements Runnable {
 		publicSendByteBuffer.put(aiDifficulty);
 
 		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, 1 + 2 + 4 + 1 + 1 + 1 + 1, serverSockAddr);
+		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
+	}
+
+	/**
+	 * Send a "add custom map" request to the server
+	 * 
+	 * @param map
+	 *            the custom map to send
+	 * @throws IOException
+	 */
+	public synchronized void addRoomMap(Map map) throws IOException {
+		if (!isConnected()) {
+			pClient("Warning: client has possibly not connected yet");
+		}
+
+		if (!isInRoom()) {
+			pClient("Warning: client is possibly not in a room");
+		}
+		if (isInGame()) {
+			pClient("Warning: client is possibly already in a game and this message will be ignored by the server");
+		}
+
+		int len = ClientPacketEncoder.encodeCustomMap(roomID, map, publicSendBuffer);
+
+		DatagramPacket p = new DatagramPacket(publicSendBuffer, 0, len, serverSockAddr);
 		sendPacket(p, ProtocolConstant.MSG_C_ROOM_SETINFO, true);
 	}
 

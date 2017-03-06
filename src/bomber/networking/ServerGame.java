@@ -12,7 +12,6 @@ import bomber.game.Block;
 import bomber.game.GameState;
 import bomber.game.KeyboardState;
 import bomber.game.Map;
-import bomber.game.Maps;
 import bomber.game.Player;
 import bomber.physics.PhysicsEngine;
 
@@ -40,16 +39,17 @@ public class ServerGame implements Runnable {
 
 	private ServerThread serverThread;
 
-	private List<Map> mapList = new Maps().getMaps();
+	private Map map;
 
 	private Thread thread = new Thread(this);
 
 	private boolean shouldRun;
 
-	public ServerGame(int roomID, int mapID, List<ServerClientInfo> playerList, List<ServerAI> aiList, int tickRate,
-			ServerThread serverThread) {
+	public ServerGame(int roomID, int mapID, Map map, List<ServerClientInfo> playerList, List<ServerAI> aiList,
+			int tickRate, ServerThread serverThread) {
 		this.roomID = roomID;
 		this.mapID = mapID;
+		this.map = map;
 		this.playerList = playerList;
 		this.aiList = aiList;
 		this.tickRate = tickRate;
@@ -63,38 +63,6 @@ public class ServerGame implements Runnable {
 			this.interval = 1;
 		}
 		this.serverThread = serverThread;
-	}
-
-	public void setMapID(int mapID) {
-		this.mapID = mapID;
-	}
-
-	public int getMapID() {
-		return mapID;
-	}
-
-	/**
-	 * Check whether the map ID is valid
-	 * 
-	 * @return true if the map ID is valid
-	 */
-	public boolean isMapIDValid() {
-		if (isMapIDValidreal()) {
-			return true;
-		} else {
-			this.mapID = 0;
-			return isMapIDValidreal();
-		}
-	}
-
-	/*
-	 * if the map with this id cannot be found, we will use map 0
-	 */
-	private boolean isMapIDValidreal() {
-		if (mapID < 0 || mapList == null || mapList.size() - 1 < mapID) {
-			return false;
-		}
-		return mapList.get(mapID) != null;
 	}
 
 	private boolean isIDHuman(int playerID) {
@@ -165,15 +133,8 @@ public class ServerGame implements Runnable {
 		System.out.printf("ServerGame: game thread for room %d started, tick rate: %d, interval: %d\n", roomID,
 				tickRate, interval);
 
-		if (!isMapIDValid()) {
-			System.out.println("ServerGame: attemping to start game thread with invalid map ID");
-			inGame = false;
-			return;
-		}
-
 		// initialise human & AI players and gameState
 		List<Player> players = new ArrayList<Player>();
-		Map map = mapList.get(mapID);
 
 		gameState = new GameState(map, players);
 

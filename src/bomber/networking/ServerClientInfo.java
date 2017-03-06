@@ -200,7 +200,7 @@ public class ServerClientInfo {
 
 	/**
 	 * Determine whether a packet received from the client is duplicate based on
-	 * its sequence number
+	 * its sequence number (up to 100 recent sequence numbers)
 	 * 
 	 * @param sequence
 	 *            the sequence number of the packet
