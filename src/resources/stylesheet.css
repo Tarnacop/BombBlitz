@@ -1,10 +1,10 @@
 /*AUTHOR: Owen Jenkins*/
 /*Stylesheet for Bomb Blitz Menu UI*/
 
-/**{
+*{
 	-fx-border-color: white;
 	-fx-border-width: 2px;
-}*/
+}
 
 .menubutton{
 	-fx-background-color: transparent;

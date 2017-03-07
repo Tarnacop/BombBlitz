@@ -29,7 +29,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -201,19 +200,19 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         upBtn = new Button("" + this.controls.get(Response.UP_MOVE));
         upBtn.setPrefWidth(200);
-        upBtn.setOnAction(e -> setUp());
+        //upBtn.setOnAction(e -> setUp());
         
         downBtn = new Button("" + this.controls.get(Response.DOWN_MOVE));
         downBtn.setPrefWidth(200);
-        downBtn.setOnAction(e -> setDown());
+        //downBtn.setOnAction(e -> setDown());
         
         leftBtn = new Button("" + this.controls.get(Response.LEFT_MOVE));
         leftBtn.setPrefWidth(200);
-        leftBtn.setOnAction(e -> setLeft());
+        //leftBtn.setOnAction(e -> setLeft());
         
         rightBtn = new Button("" + this.controls.get(Response.RIGHT_MOVE));
         rightBtn.setPrefWidth(200);
-        rightBtn.setOnAction(e -> setRight());
+        //rightBtn.setOnAction(e -> setRight());
         
         bombBtn = new Button("" + this.controls.get(Response.PLACE_BOMB));
         bombBtn.setPrefWidth(200);
@@ -537,7 +536,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		//button to start the game
         startBtn = createButton("Start Game", 300, 75);
         HBox startBtnPane = new HBox();
-        startBtnPane.setPadding(new Insets(20, 0, 20, 0));
+        startBtnPane.setPadding(new Insets(0, 0, 40, 0));
         startBtnPane.setAlignment(Pos.CENTER);
         startBtnPane.getChildren().add(startBtn);
         startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls, this.aiNumber.get()));
@@ -1061,26 +1060,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		}
 	}
 
-	private Object setRight() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private Object setLeft() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private Object setDown() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private Object setUp() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	private void setNextKey(Button btn, Response response) {
 
 		btn.setText("PRESS KEY");
@@ -1265,21 +1244,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			enterLabel.setText("Enter Server Details:\n( Couldn't open a connection! )");
 			resetButton(connectBtn, "Connect", e -> connect());
 		}
-		
-		
-//			// update my player list
-//			client.updatePlayerList();
-//			// get my player list
-//			List<ClientServerPlayer> playerList = client.getPlayerList();
-//			client.updateRoomList();
-//			// simple room to display in lobby
-//			List<ClientServerLobbyRoom> roomList = client.getRoomList();
-//			// TODO complex room desc
-//			client.createRoom("room name", (byte) 4, 0);
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
 	}
 
 	private void displayRooms() {
@@ -1348,7 +1312,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.expectingRoomCreation = true;
 			blankButton(createRoomBtn, "Please wait...");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1530,7 +1493,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 						client.updateRoomList();
 						client.updatePlayerList();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					displayPlayers();
@@ -1689,20 +1651,15 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void notInRoom() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void alreadyInRoom() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void haveLeftRoom() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -1721,13 +1678,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void gameStateReceived() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void gameEnded() {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -1773,7 +1727,5 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void roomReceived() {
-		// TODO Auto-generated method stub
-		
 	}
 }
