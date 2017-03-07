@@ -143,13 +143,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private VBox readyBox;
 	private Button readyButton;
 	private Rectangle readyTorch;
+	private String version;
 	
 	public UserInterface(){
 		//for JavaFX
-		
+		this.version = "1.2";
 		this.ui = this;
-		this.font = Font.loadFont(UserInterface.class.getResource("minecraft.ttf").toExternalForm(), 20);
-		this.css = this.getClass().getResource("resources/stylesheet.css").toExternalForm(); 
+		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 20);
+		this.css = UserInterface.class.getResource("../../resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty("Player 1");
 		this.aiNumber = new SimpleIntegerProperty(1);
 		new SimpleIntegerProperty(1);
@@ -336,7 +337,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyTorch.setWidth(110);
 		readyTorch.setHeight(140);
 		readyTorch.getStyleClass().add("wideclearbox");
-		readyTorch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/darktorch.png")));
+		readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 		
 		readyBox = new VBox();
 		readyBox.getStyleClass().add("namebox");
@@ -428,12 +429,12 @@ public class UserInterface extends Application implements ClientNetInterface{
         Rectangle torch1 = new Rectangle();
 		torch1.setWidth(60);
 		torch1.setHeight(80);
-		torch1.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch1.setFill(new ImagePattern(new Image("resources/images/torch.png")));
 		
 		Rectangle torch2 = new Rectangle();
 		torch2.setWidth(60);
 		torch2.setHeight(80);
-		torch2.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch2.setFill(new ImagePattern(new Image("resources/images/torch.png")));
         
 		HBox createRoomPane = new HBox();
 		createRoomPane.setAlignment(Pos.CENTER);
@@ -714,10 +715,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 		mapNameLabel.getStyleClass().add("maplabel");
 		Image keyImage;
 		if(online){
-			keyImage = new Image("bomber/UI/resources/images/onlinekey.png");
+			keyImage = new Image("/resources/images/onlinekey.png");
 		}
 		else{
-			keyImage = new Image("bomber/UI/resources/images/key.png");
+			keyImage = new Image("/resources/images/key.png");
 		}
         ImageView mapKey = new ImageView(keyImage);
         
@@ -779,28 +780,28 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Rectangle torch1 = new Rectangle();
 		torch1.setWidth(60);
 		torch1.setHeight(80);
-		torch1.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch1.setFill(new ImagePattern(new Image("resources/images/torch.png")));
 		torch1.setX(40);
 		torch1.setY(30);
 		
 		Rectangle torch2 = new Rectangle();
 		torch2.setWidth(60);
 		torch2.setHeight(80);
-		torch2.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch2.setFill(new ImagePattern(new Image("resources/images/torch.png")));
 		torch2.setX(width-xpadding+150);
 		torch2.setY(30);
 		
 		Rectangle torch3 = new Rectangle();
 		torch3.setWidth(60);
 		torch3.setHeight(80);
-		torch3.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch3.setFill(new ImagePattern(new Image("resources/images/torch.png")));
 		torch3.setX(width-xpadding+150);
 		torch3.setY(170);
 		
 		Rectangle torch4 = new Rectangle();
 		torch4.setWidth(60);
 		torch4.setHeight(80);
-		torch4.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		torch4.setFill(new ImagePattern(new Image("resources/images/torch.png")));
 		torch4.setX(40);
 		torch4.setY(170);
 		
@@ -824,7 +825,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 					break;
 				}
 				Rectangle rect = new Rectangle(xscalar, yscalar);
-				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/" + image + ".png")));
+				rect.setFill(new ImagePattern(new Image("resources/images/" + image + ".png")));
 					    	    
 				rect.setStroke(Color.BLACK);
 				rect.setX((xpadding/2) + xscalar*x);
@@ -837,14 +838,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 			Point pos = map.getSpawnPoints().get(x);
 			Rectangle rect = new Rectangle(10, 10);
 			if(x == 0){
-				rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/playerspawnpoint.png")));
+				rect.setFill(new ImagePattern(new Image("resources/images/playerspawnpoint.png")));
 			}
 			else{
 				if(online){
-					rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/playerspawnpoint.png")));
+					rect.setFill(new ImagePattern(new Image("resources/images/playerspawnpoint.png")));
 				}
 				else{
-					rect.setFill(new ImagePattern(new Image("bomber/UI/resources/images/spawnpoint.png")));
+					rect.setFill(new ImagePattern(new Image("resources/images/spawnpoint.png")));
 				}
 			}
 			rect.setStroke(Color.BLACK);
@@ -888,7 +889,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         Button multiPlayerBtn = createSceneButton("Multiplayer", 200, 50, mainScene, connectScene);
         Button creditsBtn = createSceneButton("Credits", 200, 50, mainScene, creditsScene);
         
-        Image logoImage = new Image("bomber/UI/resources/images/logo.png");
+        Image logoImage = new Image("resources/images/logo.png");
         ImageView logoImageView = new ImageView(logoImage);
         
         HBox logoPane = new HBox();
@@ -907,12 +908,15 @@ public class UserInterface extends Application implements ClientNetInterface{
         namePane.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
         		nameText, nameBtn);
         
-        menuBox.getChildren().addAll(namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn);
+        Button exitBtn = createButton("Exit", 200, 50);
+        exitBtn.setOnAction(e -> System.exit(0));
+        
+        menuBox.getChildren().addAll(createLabel("Version: " + this.version, false, true), namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn, exitBtn);
         setBackgroundPane(mainMenu, logoPane);
 	}
 
 	private void setBackgroundPane(BorderPane pane, Node content){
-		Image mainImage = new Image("bomber/UI/resources/images/background.png");
+		Image mainImage = new Image("resources/images/background.png");
         ImageView mainImageView = new ImageView(mainImage);
         Pane imagePane = new Pane();
         imagePane.getChildren().add(mainImageView); 
@@ -1017,7 +1021,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		beep();
 		readyButton.setText("Ready to Start");
 		readyButton.setOnAction(e -> notReady());
-		readyTorch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+		readyTorch.setFill(new ImagePattern(new Image("resources/images/torch.png")));
 		
 		try {
 			this.client.readyToPlay(true);
@@ -1030,7 +1034,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		beep();
 		readyButton.setText("Not Ready");
 		readyButton.setOnAction(e -> ready());
-		readyTorch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/darktorch.png")));
+		readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 		
 		try {
 			this.client.readyToPlay(false);
@@ -1376,9 +1380,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 				torch.setWidth(40);
 				torch.setHeight(40);
 				if(player.isReadyToPlay()){
-					torch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/torch.png")));
+					torch.setFill(new ImagePattern(new Image("resources/images/torch.png")));
 				}else{
-					torch.setFill(new ImagePattern(new Image("bomber/UI/resources/images/darktorch.png")));
+					torch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 				}
 				HBox playerBox = new HBox();
 				playerBox.setSpacing(20);
