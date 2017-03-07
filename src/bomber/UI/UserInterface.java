@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import bomber.game.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -50,13 +51,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import bomber.AI.AIDifficulty;
 import bomber.audio.AudioManager;
-import bomber.game.Block;
-import bomber.game.Game;
-import bomber.game.GameState;
-import bomber.game.Map;
-import bomber.game.Maps;
-import bomber.game.OnlineGame;
-import bomber.game.Response;
 import bomber.networking.ClientNetInterface;
 import bomber.networking.ClientServerAI;
 import bomber.networking.ClientServerLobbyRoom;
@@ -146,12 +140,15 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private String version;
 	
 	public UserInterface(){
+
+		SettingsParser.init();
+
 		//for JavaFX
 		this.version = "1.2";
 		this.ui = this;
 		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 20);
 		this.css = UserInterface.class.getResource("../../resources/stylesheet.css").toExternalForm(); 
-		this.playerName = new SimpleStringProperty("Player 1");
+		this.playerName = new SimpleStringProperty(SettingsParser.getPlayerName());
 		this.aiNumber = new SimpleIntegerProperty(1);
 		new SimpleIntegerProperty(1);
 		this.roomNumber = new SimpleIntegerProperty(4);
@@ -267,6 +264,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         backBox1 = new HBox();
         backBox1.setAlignment(Pos.CENTER_LEFT);
         backBox1.getChildren().addAll(backBtn3);
+
         
         primaryStage.setScene(mainScene);
         primaryStage.setOnCloseRequest(e -> disconnect());
@@ -1471,6 +1469,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		string = string.trim();
 		if(string.length() > 0 && string.length() < 12){
 			this.playerName.set(string);
+			SettingsParser.setPlayerName(string);
+			SettingsParser.storeSettings();
 			this.currentNameText.set("Current Name:");
 		}
 		else if(string.length() > 0){

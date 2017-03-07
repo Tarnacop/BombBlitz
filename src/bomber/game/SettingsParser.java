@@ -26,9 +26,12 @@ import java.io.IOException;
 public class SettingsParser
 {
 
-    private Document document;
+    private static Document document;
 
-    public SettingsParser()
+    // preventing instantiation, as the class should only be used statically
+    private SettingsParser() {}
+
+    public static void init()
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;
@@ -58,7 +61,7 @@ public class SettingsParser
 
     }
 
-    private void initialiseXML(DocumentBuilder builder)
+    private static void initialiseXML(DocumentBuilder builder)
     {
         document = builder.newDocument();
 
@@ -103,6 +106,11 @@ public class SettingsParser
 
 
         // write the content into xml file
+        storeSettings();
+    }
+
+    public static void storeSettings()
+    {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = null;
         try
@@ -123,17 +131,64 @@ public class SettingsParser
         }
     }
 
-    private String getTagText(String tag)
+    private static String getTagText(String tag)
     {
         return document.getElementsByTagName(tag).item(0).getTextContent();
     }
 
-    private String getTagText(Element element, String tag)
+    private static String getTagText(Element element, String tag)
     {
         return element.getElementsByTagName(tag).item(0).getTextContent();
     }
 
-    private void printSettings()
+    private static void setTagText(String tag, String text)
+    {
+        document.getElementsByTagName(tag).item(0).setTextContent(text);
+    }
+
+    public static void setPlayerName(String name)
+    {
+        setTagText("name", name);
+    }
+
+    public static void setMusicVolume(float volume)
+    {
+        setTagText("musicVolume", String.valueOf(volume));
+    }
+
+    public static void setEffectsVolume(float volume)
+    {
+        setTagText("effectsVolume", String.valueOf(volume));
+    }
+
+    public static void setShowTutorial(boolean show)
+    {
+        setTagText("showTutorial", String.valueOf(show));
+    }
+
+    // TODO: server add/remove/get
+
+    public static String getPlayerName()
+    {
+        return getTagText("name");
+    }
+
+    public static float getMusicVolume()
+    {
+        return Float.parseFloat(getTagText("musicVolume"));
+    }
+
+    public static float getEffectsVolume()
+    {
+        return Float.parseFloat(getTagText("effectsVolume"));
+    }
+
+    public static boolean getShowTutorial()
+    {
+        return Boolean.parseBoolean(getTagText("showTutorial"));
+    }
+
+    private static void printSettings()
     {
         System.out.println("\nSettings from XML:\n");
         System.out.println("Name: " + getTagText("name"));
@@ -193,9 +248,17 @@ public class SettingsParser
         file.delete();
         System.out.println("Deleted settings.xml");
 
-        SettingsParser parser = new SettingsParser();
+        SettingsParser.init();
 
-        parser.printSettings();
+        SettingsParser.printSettings();
+
+        SettingsParser.setPlayerName("Test");
+        System.out.println(SettingsParser.getPlayerName());
+
+        SettingsParser.storeSettings();
+        SettingsParser.init();
+
+        System.out.println(SettingsParser.getPlayerName());
     }
 
 }
