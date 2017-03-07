@@ -255,10 +255,10 @@ public class ClientPacketEncoder {
 		String name = new String(roomNameData, 0, roomNameLength, "UTF-8");
 
 		/*
-		 * get number of human players, AI players, max players, inGame flag and
-		 * map ID
+		 * get number of human players, AI players, max players, inGame flag,
+		 * map ID and max map ID
 		 */
-		if (length < buffer.position() + 1 + 1 + 1 + 1 + 4) {
+		if (length < buffer.position() + 1 + 1 + 1 + 1 + 4 + 4) {
 			throw new IOException("packet format is invalid");
 		}
 		byte humanPlayerNumber = buffer.get();
@@ -266,6 +266,11 @@ public class ClientPacketEncoder {
 		byte maxPlayer = buffer.get();
 		boolean inGame = buffer.get() != 0;
 		int mapID = buffer.getInt();
+		int maxMapID = buffer.getInt();
+		if (humanPlayerNumber < 0 || aiPlayerNumber < 0 || maxPlayer < 2 || mapID < 0 || maxMapID < 0
+				|| maxMapID < mapID) {
+			throw new IOException("packet format is invalid");
+		}
 
 		// get human player info
 		List<ClientServerPlayer> humanPlayerList = new ArrayList<ClientServerPlayer>(4);
@@ -316,7 +321,7 @@ public class ClientPacketEncoder {
 		}
 
 		ClientServerRoom room = new ClientServerRoom(roomID, name, humanPlayerNumber, aiPlayerNumber, maxPlayer, inGame,
-				mapID);
+				mapID, maxMapID);
 		room.setHumanPlayerList(humanPlayerList);
 		room.setAIPlayerList(aiPlayerList);
 
@@ -838,6 +843,194 @@ public class ClientPacketEncoder {
 		}
 
 		return aiDifficulty;
+	}
+
+	/**
+	 * Convert Block into byte (only bit 3 to bit 0 in the byte are used)
+	 * 
+	 * @param block
+	 *            the Block
+	 * @return the byte
+	 */
+	public static byte blockToByte(Block block) {
+		byte b = 0;
+
+		switch (block) {
+		case BLANK:
+			b = 0;
+			break;
+
+		case SOLID:
+			b = 1;
+			break;
+
+		case SOFT:
+			b = 2;
+			break;
+
+		case BLAST:
+			b = 3;
+			break;
+
+		case PLUS_BOMB:
+			b = 4;
+			break;
+
+		case MINUS_BOMB:
+			b = 5;
+			break;
+
+		case PLUS_RANGE:
+			b = 6;
+			break;
+
+		case MINUS_RANGE:
+			b = 7;
+			break;
+
+		case PLUS_SPEED:
+			b = 8;
+			break;
+
+		case MINUS_SPEED:
+			b = 9;
+			break;
+
+		default:
+			b = 0;
+			break;
+		}
+
+		return b;
+	}
+
+	/**
+	 * Encode custom map into MSG_C_ROOM_SETINFO_ADDMAP format. The first three
+	 * bytes in the destination byte array are reserved for message type and
+	 * sequence number and will not be overwritten by this method. The caller
+	 * should set the first three bytes properly before sending.
+	 * 
+	 * @param roomID
+	 *            the ID of the room which the player is in
+	 * @param map
+	 *            the custom map
+	 * @param dest
+	 *            the destination byte array that will be sent over the network
+	 * @return the number of bytes of the encoded data in the byte array
+	 * @throws IOException
+	 */
+	public static int encodeCustomMap(int roomID, Map map, byte[] dest) throws IOException {
+		if (map == null || dest == null) {
+			throw new IOException("map or dest is null");
+		}
+
+		int len = 1 + 2 + 4 + 1 + 130 + 32;
+		if (dest.length < len) {
+			throw new IOException("dest is too short");
+		}
+
+		// wrap byte array into a ByteBuffer
+		ByteBuffer buffer = ByteBuffer.wrap(dest);
+
+		// put room id
+		buffer.position(3);
+		buffer.putInt(roomID);
+
+		// put MSG_C_ROOM_SETINFO_ADDMAP
+		buffer.put(ProtocolConstant.MSG_C_ROOM_SETINFO_ADDMAP);
+
+		// put map
+		Block[][] gridMap = map.getGridMap();
+		if (gridMap == null) {
+			throw new IOException("gridMap is null");
+		}
+
+		if (gridMap.length < 1 || gridMap.length > 16) {
+			throw new IOException("gridMap width is not in the range [1,16]");
+		}
+		byte gridMapWidth = (byte) gridMap.length;
+
+		byte gridMapHeight = -1;
+		for (int i = 0; i < gridMap.length - 1; i++) {
+			Block[] column = gridMap[i];
+			Block[] columnNext = gridMap[i + 1];
+
+			if (column == null || columnNext == null) {
+				throw new IOException("gridMap has null column");
+			}
+
+			if (column.length != columnNext.length) {
+				throw new IOException("gridMap has inconsistent column length");
+			}
+
+			for (Block b : column) {
+				if (b == null) {
+					throw new IOException("gridMap has null block");
+				}
+			}
+
+			for (Block b : columnNext) {
+				if (b == null) {
+					throw new IOException("gridMap has null block");
+				}
+			}
+
+			gridMapHeight = (byte) column.length;
+		}
+
+		if (gridMapHeight < 1 || gridMapHeight > 16) {
+			throw new IOException("gridMap height is not in the range [1,16]");
+		}
+
+		buffer.put(gridMapWidth);
+		buffer.put(gridMapHeight);
+
+		long bitArr[][] = new long[4][4];
+		for (int y = 0; y < gridMapHeight; y++) {
+			for (int x = 0; x < gridMapWidth; x++) {
+
+				Block b = gridMap[x][y];
+
+				byte bits = blockToByte(b);
+
+				int bitIndex = x + y * gridMapWidth;
+
+				for (int i = 3; i >= 0; i--) {
+					if (BitArray.getBit(bits, i)) {
+						bitArr[i][bitIndex / 64] = BitArray.setBit(bitArr[i][bitIndex / 64], bitIndex % 64, true);
+					}
+				}
+
+			}
+		}
+
+		for (int b = 3; b >= 0; b--) {
+			for (int i = 3; i >= 0; i--) {
+				buffer.putLong(bitArr[b][i]);
+			}
+		}
+
+		List<Point> spawnPoints = map.getSpawnPoints();
+		if (spawnPoints == null) {
+			spawnPoints = new ArrayList<Point>(4);
+		}
+
+		while (spawnPoints.size() < 4) {
+			spawnPoints.add(new Point(64, 64));
+		}
+
+		for (int i = 0; i < 4; i++) {
+			Point p = spawnPoints.get(i);
+			if (p != null) {
+				buffer.putInt(p.x);
+				buffer.putInt(p.y);
+			} else {
+				buffer.putInt(64);
+				buffer.putInt(64);
+			}
+		}
+
+		return len;
 	}
 
 }

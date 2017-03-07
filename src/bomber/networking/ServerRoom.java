@@ -2,9 +2,12 @@
 package bomber.networking;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import bomber.AI.AIDifficulty;
+import bomber.game.Block;
+import bomber.game.Map;
 
 /**
  * 
@@ -22,11 +25,15 @@ public class ServerRoom {
 	private List<ServerAI> aiList = new ArrayList<ServerAI>();
 	// max number of players allowed in the room (in the range [2,4])
 	private int maxPlayer = 4;
-	// flag indicating whether the game is in progress
-	// private boolean inGame = false;
-	// the map ID
+	// map ID
 	private int mapID = 0;
-	// the game session
+	// max map ID
+	private int maxMapID = 0;
+	// list of server maps
+	private List<Map> mapList;
+	// list of player uploaded custom maps
+	private List<Map> customMapList = new LinkedList<Map>();
+	// game session
 	private ServerGame game;
 	// TODO consistency between constructor, getter, setter and game's mapID
 
@@ -37,10 +44,12 @@ public class ServerRoom {
 	 *            the name of the room
 	 * @param firstPlayer
 	 *            the player who created this room
+	 * @param mapList
+	 *            the list of maps to be used in the room
 	 * @param mapID
 	 *            the initial map ID of the room
 	 */
-	public ServerRoom(String name, ServerClientInfo firstPlayer, int mapID) {
+	public ServerRoom(String name, ServerClientInfo firstPlayer, List<Map> mapList, int mapID) {
 		if (name == null) {
 			this.name = "Room " + id;
 		} else {
@@ -51,49 +60,55 @@ public class ServerRoom {
 			playerList.add(firstPlayer);
 		}
 
-		setMapID(mapID);
+		this.mapList = mapList;
+
+		this.mapID = mapID;
+
+		initMaps();
 	}
 
-	/**
-	 * Construct a room
-	 * 
-	 * @param name
-	 *            the name of the room
-	 * @param firstPlayer
-	 *            the player who created this room
-	 * @param maxPlayer
-	 *            the max number of players allowed in this room(in the range
-	 *            [2,4])
-	 * @param mapID
-	 *            the initial map ID of the room
-	 */
-	public ServerRoom(String name, ServerClientInfo firstPlayer, int maxPlayer, int mapID) {
-		if (name == null) {
-			this.name = "Room " + id;
+	private void initMaps() {
+		if (mapList == null) {
+			mapList = new ArrayList<Map>(1);
+		}
+
+		if (mapList.size() < 1) {
+			mapList.add(defaultMap());
+		}
+
+		setMaxMapID(mapList.size() - 1);
+
+		setMapID(getMapID());
+	}
+
+	private Map defaultMap() {
+		Block[][] defaultGridMap = new Block[][] { { Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+
+				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+
+				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
+		Map defaultMap = new Map("default map", defaultGridMap, null);
+
+		return defaultMap;
+	}
+
+	private Map getMap() {
+		if (getMapID() <= mapList.size() - 1) {
+			return mapList.get(getMapID());
 		} else {
-			this.name = name;
-		}
-
-		if (firstPlayer != null) {
-			playerList.add(firstPlayer);
-		}
-
-		setMaxPlayer(maxPlayer);
-
-		setMapID(mapID);
-	}
-
-	/**
-	 * Construct a room with a default name
-	 * 
-	 * @param firstPlayer
-	 *            the player who created this room
-	 */
-	public ServerRoom(ServerClientInfo firstPlayer) {
-		this.name = "Room " + id;
-
-		if (firstPlayer != null) {
-			playerList.add(firstPlayer);
+			return customMapList.get(getMapID() - mapList.size());
 		}
 	}
 
@@ -175,9 +190,8 @@ public class ServerRoom {
 	 *            the server thread used for sending packets
 	 * @return
 	 */
-	public boolean createGame(int tickRate, ServerThread serverThread) {
-		game = new ServerGame(id, mapID, playerList, aiList, tickRate, serverThread);
-		return game.isMapIDValid();
+	public void createGame(int tickRate, ServerThread serverThread) {
+		game = new ServerGame(id, mapID, getMap(), playerList, aiList, tickRate, serverThread);
 	}
 
 	/**
@@ -370,9 +384,58 @@ public class ServerRoom {
 	 *            the map ID
 	 */
 	public void setMapID(int mapID) {
-		if (mapID >= 0) {
+		if (mapID < 0) {
+			this.mapID = 0;
+		} else if (mapID > getMaxMapID()) {
+			this.mapID = getMaxMapID();
+		} else {
 			this.mapID = mapID;
 		}
+	}
+
+	/**
+	 * Get the max map ID of the room. For example, if the max map ID is 5, then
+	 * maps with ID in the range [0,5] are available in the room
+	 * 
+	 * @return the max map ID
+	 */
+	public int getMaxMapID() {
+		return maxMapID;
+	}
+
+	/**
+	 * Set the max map ID of the room
+	 * 
+	 * @param maxMapID
+	 *            the max map ID
+	 */
+	public void setMaxMapID(int maxMapID) {
+		this.maxMapID = maxMapID;
+	}
+
+	/**
+	 * Add a player uploaded custom map to the room
+	 * 
+	 * @param map
+	 *            the custom map
+	 */
+	public void addCustomMap(Map map) {
+		if (map == null || map.getGridMap() == null || mapList.size() >= Integer.MAX_VALUE - 1 - 12
+				|| getMaxMapID() >= Integer.MAX_VALUE - 1) {
+			return;
+		}
+
+		/*
+		 * we only allow up to 12 custom maps per room, to prevent malicious
+		 * clients from exhausting server's memory
+		 */
+		if (customMapList.size() > 12) {
+			customMapList.remove(0);
+		}
+
+		customMapList.add(map);
+
+		setMaxMapID(mapList.size() + customMapList.size() - 1);
 	}
 
 }

@@ -83,9 +83,9 @@ public class TestClientNetListener implements ClientNetInterface {
 		System.out.println("Client has received updated room info from the server");
 		ClientServerRoom room = client.getRoom();
 		System.out.printf(
-				"room ID: %d, room name: %s, human player: %d, AI player: %d, max player: %d, inGame: %b, map ID: %d\n",
+				"room ID: %d, room name: %s, human player: %d, AI player: %d, max player: %d, inGame: %b, map ID: %d, max map ID: %d\n",
 				room.getID(), room.getName(), room.getHumanPlayerNumber(), room.getAIPlayerNumber(),
-				room.getMaxPlayer(), room.isInGame(), room.getMapID());
+				room.getMaxPlayer(), room.isInGame(), room.getMapID(), room.getMaxMapID());
 		System.out.println("Human players:");
 		for (ClientServerPlayer p : room.getHumanPlayerList()) {
 			System.out.printf("player ID: %d, name: %s, ready: %b\n", p.getID(), p.getName(), p.isReadyToPlay());

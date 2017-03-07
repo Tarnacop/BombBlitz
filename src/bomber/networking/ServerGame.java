@@ -12,7 +12,6 @@ import bomber.game.Block;
 import bomber.game.GameState;
 import bomber.game.KeyboardState;
 import bomber.game.Map;
-import bomber.game.Maps;
 import bomber.game.Player;
 import bomber.physics.PhysicsEngine;
 
@@ -40,16 +39,35 @@ public class ServerGame implements Runnable {
 
 	private ServerThread serverThread;
 
-	private List<Map> mapList = new Maps().getMaps();
+	private Map map;
 
 	private Thread thread = new Thread(this);
 
 	private boolean shouldRun;
 
-	public ServerGame(int roomID, int mapID, List<ServerClientInfo> playerList, List<ServerAI> aiList, int tickRate,
-			ServerThread serverThread) {
+	/**
+	 * Construct a server game session
+	 * 
+	 * @param roomID
+	 *            the id of the room
+	 * @param mapID
+	 *            the id of the map
+	 * @param map
+	 *            the map of the game session
+	 * @param playerList
+	 *            the list of human players
+	 * @param aiList
+	 *            the list of AI players
+	 * @param tickRate
+	 *            the tick rate of the game session
+	 * @param serverThread
+	 *            the server thread
+	 */
+	public ServerGame(int roomID, int mapID, Map map, List<ServerClientInfo> playerList, List<ServerAI> aiList,
+			int tickRate, ServerThread serverThread) {
 		this.roomID = roomID;
 		this.mapID = mapID;
+		this.map = copyMap(map);
 		this.playerList = playerList;
 		this.aiList = aiList;
 		this.tickRate = tickRate;
@@ -65,44 +83,44 @@ public class ServerGame implements Runnable {
 		this.serverThread = serverThread;
 	}
 
-	public void setMapID(int mapID) {
-		this.mapID = mapID;
-	}
-
-	public int getMapID() {
-		return mapID;
-	}
-
-	/**
-	 * Check whether the map ID is valid
-	 * 
-	 * @return true if the map ID is valid
-	 */
-	public boolean isMapIDValid() {
-		if (isMapIDValidreal()) {
-			return true;
-		} else {
-			this.mapID = 0;
-			return isMapIDValidreal();
-		}
-	}
-
-	/*
-	 * if the map with this id cannot be found, we will use map 0
-	 */
-	private boolean isMapIDValidreal() {
-		if (mapID < 0 || mapList == null || mapList.size() - 1 < mapID) {
-			return false;
-		}
-		return mapList.get(mapID) != null;
-	}
-
 	private boolean isIDHuman(int playerID) {
 		return playerID < 32;
 	}
 
 	private int aiIDtoPlayerID(int aiID) {
 		return aiID + 32;
+	}
+
+	private Map copyMap(Map map) {
+		Block[][] grid = map.getGridMap();
+		List<Point> spawn = map.getSpawnPoints();
+
+		int width = grid.length;
+		int height = grid[0].length;
+
+		Block[][] newGrid = new Block[width][height];
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				newGrid[x][y] = grid[x][y];
+			}
+		}
+
+		List<Point> newSpawn = new ArrayList<Point>(4);
+		if (spawn != null) {
+			for (int i = 0; i < 4; i++) {
+				if (i < spawn.size() && spawn.get(i) != null) {
+					newSpawn.add(new Point(spawn.get(i).x, spawn.get(i).y));
+				}
+			}
+		} else {
+			for (int i = 0; i < 4; i++) {
+				newSpawn.add(new Point(64, 64));
+			}
+		}
+
+		Map newMap = new Map(map.getName(), newGrid, newSpawn);
+
+		return newMap;
 	}
 
 	/**
@@ -165,15 +183,8 @@ public class ServerGame implements Runnable {
 		System.out.printf("ServerGame: game thread for room %d started, tick rate: %d, interval: %d\n", roomID,
 				tickRate, interval);
 
-		if (!isMapIDValid()) {
-			System.out.println("ServerGame: attemping to start game thread with invalid map ID");
-			inGame = false;
-			return;
-		}
-
 		// initialise human & AI players and gameState
 		List<Player> players = new ArrayList<Player>();
-		Map map = mapList.get(mapID);
 
 		gameState = new GameState(map, players);
 
