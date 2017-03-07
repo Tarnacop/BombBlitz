@@ -103,6 +103,11 @@ public class SettingsParser
 
 
         // write the content into xml file
+        storeSettings();
+    }
+
+    public void storeSettings()
+    {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = null;
         try
@@ -131,6 +136,53 @@ public class SettingsParser
     private String getTagText(Element element, String tag)
     {
         return element.getElementsByTagName(tag).item(0).getTextContent();
+    }
+
+    private void setTagText(String tag, String text)
+    {
+        document.getElementsByTagName(tag).item(0).setTextContent(text);
+    }
+
+    public void setPlayerName(String name)
+    {
+        setTagText("name", name);
+    }
+
+    public void setMusicVolume(float volume)
+    {
+        setTagText("musicVolume", String.valueOf(volume));
+    }
+
+    public void setEffectsVolume(float volume)
+    {
+        setTagText("effectsVolume", String.valueOf(volume));
+    }
+
+    public void setShowTutorial(boolean show)
+    {
+        setTagText("showTutorial", String.valueOf(show));
+    }
+
+    // TODO: server add/remove/get
+
+    public String getPlayerName()
+    {
+        return getTagText("name");
+    }
+
+    public float getMusicVolume()
+    {
+        return Float.parseFloat(getTagText("musicVolume"));
+    }
+
+    public float getEffectsVolume()
+    {
+        return Float.parseFloat(getTagText("effectsVolume"));
+    }
+
+    public boolean getShowTutorial()
+    {
+        return Boolean.parseBoolean(getTagText("showTutorial"));
     }
 
     private void printSettings()
