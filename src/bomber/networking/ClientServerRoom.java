@@ -16,6 +16,7 @@ public class ClientServerRoom {
 	private int maxPlayer;
 	private boolean inGame;
 	private int mapID;
+	private int maxMapID;
 	private List<ClientServerPlayer> humanPlayerList = new ArrayList<ClientServerPlayer>(4);
 	private List<ClientServerAI> aiPlayerList = new ArrayList<ClientServerAI>(4);
 
@@ -36,9 +37,11 @@ public class ClientServerRoom {
 	 *            true if there is a game in progress in the room
 	 * @param mapID
 	 *            the map id of the room
+	 * @param maxMapID
+	 *            the max map id of the room
 	 */
 	public ClientServerRoom(int id, String name, int humanPlayerNumber, int aiPlayerNumber, int maxPlayer,
-			boolean inGame, int mapID) {
+			boolean inGame, int mapID, int maxMapID) {
 		this.id = id;
 		this.name = name;
 		this.humanPlayerNumber = humanPlayerNumber;
@@ -46,6 +49,7 @@ public class ClientServerRoom {
 		this.setMaxPlayer(maxPlayer);
 		this.inGame = inGame;
 		this.mapID = mapID;
+		this.maxMapID = maxMapID;
 	}
 
 	/**
@@ -179,6 +183,26 @@ public class ClientServerRoom {
 	 */
 	public void setMapID(int mapID) {
 		this.mapID = mapID;
+	}
+
+	/**
+	 * Get the max map id of the room. For example, if the max map id is 5, then
+	 * maps with id in the range [0,5] are available in the room
+	 * 
+	 * @return the max map id of the room
+	 */
+	public int getMaxMapID() {
+		return maxMapID;
+	}
+
+	/**
+	 * Set the max map id of the room
+	 * 
+	 * @param maxMapID
+	 *            the max map id of the room
+	 */
+	public void setMaxMapID(int maxMapID) {
+		this.maxMapID = maxMapID;
 	}
 
 	/**

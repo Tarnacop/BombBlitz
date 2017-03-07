@@ -13,13 +13,17 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import bomber.AI.AIDifficulty;
+import bomber.game.Block;
 import bomber.game.KeyboardState;
+import bomber.game.Map;
+import bomber.game.Maps;
 
 public class ServerThread implements Runnable {
 	private final int port;
@@ -39,6 +43,9 @@ public class ServerThread implements Runnable {
 
 	// table for storing room info
 	private final ServerRoomTable roomTable;
+
+	// list of maps
+	private List<Map> mapList;
 
 	// 2000 bytes of receiving buffer
 	private final int recvBufferLen = 2000;
@@ -72,6 +79,7 @@ public class ServerThread implements Runnable {
 		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
+		initMaps();
 
 		// open socket
 		socket = new DatagramSocket(port);
@@ -93,6 +101,7 @@ public class ServerThread implements Runnable {
 		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
+		initMaps();
 
 		// open socket
 		socket = new DatagramSocket(port);
@@ -112,6 +121,7 @@ public class ServerThread implements Runnable {
 		this.nonceTable = new Hashtable<>(config.getMaxPlayer());
 		this.clientTable = new ServerClientTable(config.getMaxPlayer());
 		this.roomTable = new ServerRoomTable(config.getMaxPlayer());
+		initMaps();
 
 		// open socket
 		socket = new DatagramSocket(port);
@@ -309,11 +319,8 @@ public class ServerThread implements Runnable {
 				sendPacket(p, ProtocolConstant.MSG_S_NET_REJECT, false);
 				return;
 			} else {
-				// nonceTable.remove(sockAddr);
 				/*
-				 * TODO currently nonceTable is cleared after exceeding a
-				 * particular size, later we need to delete a few oldest items
-				 * instead based on the time when a nonce was created
+				 * nonceTable is cleared after exceeding a particular size
 				 */
 			}
 
@@ -540,7 +547,7 @@ public class ServerThread implements Runnable {
 			}
 
 			// create the room and update the info of the client
-			ServerRoom room = new ServerRoom(roomName, client, mapID);
+			ServerRoom room = new ServerRoom(roomName, client, mapList, mapID);
 			room.setMaxPlayer(maxPlayer);
 			roomTable.put(room);
 			client.setInRoom(true);
@@ -800,14 +807,7 @@ public class ServerThread implements Runnable {
 				return;
 			}
 
-			// create the game according to the map ID of the room
-			if (!room.createGame(config.getTickRate(), this)) {
-				pServerf("Failed to create game with map ID %d\n", room.getMapID());
-				// TODO tell clients this error
-				return;
-			}
-
-			// if all clients in this room are ready, start the game
+			// if all clients in this room are ready, create and start the game
 			if (room.allPlayersReady()) {
 				/*
 				 * ServerGame should be responsible for sending updated game
@@ -815,6 +815,9 @@ public class ServerThread implements Runnable {
 				 * game state and game end messages) while ServerThread will
 				 * update the KeyboardState of the players itself
 				 */
+				// create the game according to the map ID of the room
+				room.createGame(config.getTickRate(), this);
+
 				room.getGame().start();
 			}
 
@@ -916,6 +919,13 @@ public class ServerThread implements Runnable {
 					room.setAIDifficulty(aiID, aiDifficulty);
 				} else {
 					return;
+				}
+			} else if (changeType == ProtocolConstant.MSG_C_ROOM_SETINFO_ADDMAP) {
+				try {
+					Map customMap = ServerPacketEncoder.decodeCustomMap(recvBuffer, packet.getLength());
+					room.addCustomMap(customMap);
+				} catch (IOException e) {
+					pServer("Failed to decode custom map from " + sockAddr + ": " + e);
 				}
 			} else {
 				return;
@@ -1054,44 +1064,6 @@ public class ServerThread implements Runnable {
 		sendPacket(packet);
 	}
 
-	public synchronized void sendPacket(DatagramPacket packet) throws IOException {
-		socket.send(packet);
-	}
-
-	public synchronized void sendPacket(DatagramPacket packet, byte type) throws IOException {
-		ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-		buffer.put(0, (byte) (type & (~ProtocolConstant.MSG_B_HASSEQUENCE)));
-		buffer.putShort(1, (short) 0);
-		socket.send(packet);
-	}
-
-	// Note: retransmission cannot work when recipient is not in client table
-	public synchronized void sendPacket(DatagramPacket packet, byte type, boolean tryRetransmit) throws IOException {
-		if (tryRetransmit) {
-			ServerClientInfo clientInfo = clientTable.get(packet.getSocketAddress());
-			if (clientInfo != null) {
-				short sequence = clientInfo.getNextPacketSequenceAndIncrement();
-
-				// set the sequence number in the packet before sending
-				ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-				buffer.put(0, (byte) (type | ProtocolConstant.MSG_B_HASSEQUENCE));
-				buffer.putShort(1, sequence);
-
-				// insert the packet to history
-				clientInfo.insertPacket(sequence, packet);
-
-				// send the packet
-				socket.send(packet);
-			} else {
-				// pServer("recipient does not exist in client table but
-				// tryRetransmit is set to true");
-				sendPacket(packet, type);
-			}
-		} else {
-			sendPacket(packet, type);
-		}
-	}
-
 	private void pServer(String string) {
 		printStream.println("Server: " + string);
 	}
@@ -1150,18 +1122,91 @@ public class ServerThread implements Runnable {
 
 	}
 
-	public void exit() {
-		socket.close();
+	private void initMaps() {
+		try {
+			mapList = new Maps().getMaps();
+		} catch (Exception e) {
+			mapList = null;
+		} finally {
+			if (mapList == null) {
+				mapList = new ArrayList<Map>(1);
+			}
+
+			for (int i = 0; i < mapList.size(); i++) {
+				if (mapList.get(i) == null) {
+					mapList.set(i, defaultMap());
+				}
+			}
+
+			if (mapList.size() < 1) {
+				mapList.add(defaultMap());
+			}
+		}
 	}
 
-	public static String toHex(byte[] data, int length) {
-		StringBuilder sb = new StringBuilder();
+	private Map defaultMap() {
+		Block[][] defaultGridMap = new Block[][] { { Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
 
-		for (int i = 0; i < length; i++) {
-			sb.append(String.format("0x%02x ", data[i]));
+				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+
+				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
+				{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
+		Map defaultMap = new Map("default map", defaultGridMap, null);
+
+		return defaultMap;
+	}
+
+	public synchronized void sendPacket(DatagramPacket packet) throws IOException {
+		socket.send(packet);
+	}
+
+	public synchronized void sendPacket(DatagramPacket packet, byte type) throws IOException {
+		ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+		buffer.put(0, (byte) (type & (~ProtocolConstant.MSG_B_HASSEQUENCE)));
+		buffer.putShort(1, (short) 0);
+		socket.send(packet);
+	}
+
+	// Note: retransmission cannot work when recipient is not in client table
+	public synchronized void sendPacket(DatagramPacket packet, byte type, boolean tryRetransmit) throws IOException {
+		if (tryRetransmit) {
+			ServerClientInfo clientInfo = clientTable.get(packet.getSocketAddress());
+			if (clientInfo != null) {
+				short sequence = clientInfo.getNextPacketSequenceAndIncrement();
+
+				// set the sequence number in the packet before sending
+				ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
+				buffer.put(0, (byte) (type | ProtocolConstant.MSG_B_HASSEQUENCE));
+				buffer.putShort(1, sequence);
+
+				// insert the packet to history
+				clientInfo.insertPacket(sequence, packet);
+
+				// send the packet
+				socket.send(packet);
+			} else {
+				// pServer("recipient does not exist in client table but
+				// tryRetransmit is set to true");
+				sendPacket(packet, type);
+			}
+		} else {
+			sendPacket(packet, type);
 		}
+	}
 
-		return sb.toString();
+	public void exit() {
+		socket.close();
 	}
 
 }

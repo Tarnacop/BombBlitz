@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import bomber.game.Block;
 import bomber.game.KeyboardState;
+import bomber.game.Map;
 
 public class TestClientMain {
 
@@ -135,6 +137,30 @@ public class TestClientMain {
 					} else if (cmds[0].equals("removeai")) {
 
 						client.removeAI();
+
+					} else if (cmds[0].equals("sendmap") || cmds[0].equals("addmap")) {
+
+						Block[][] customGridMap = new Block[][] {
+								{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
+								{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+								{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+								{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
+								{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+
+								{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+								{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
+								{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+								{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+								{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
+
+								{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
+								{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+								{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
+								{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
+								{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
+						Map customMap = new Map("default map", customGridMap, null);
+
+						client.addRoomMap(customMap);
 
 					} else {
 

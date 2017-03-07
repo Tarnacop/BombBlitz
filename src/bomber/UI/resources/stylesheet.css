@@ -1,7 +1,7 @@
-{
+/**{
 	-fx-border-color: white;
 	-fx-border-width: 2px;
-}
+}*/
 
 .menubutton{
 	-fx-background-color: transparent;
@@ -24,7 +24,7 @@
         -fx-background-repeat:no-repeat;
 }
 
-.label.shaded{
+.shaded{
 	-fx-background-color: black;
 	-fx-opacity:50%;
 	-fx-padding: 5px;
