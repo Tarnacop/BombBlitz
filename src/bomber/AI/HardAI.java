@@ -91,14 +91,7 @@ public class HardAI extends AITemplate {
 
 			}
 
-			// //if enemy is in range and it is possible to place bomb and
-			// escape then do it
-			// else if((moves = finder.canPutBombAndEscape()) != null){
-			// System.out.println("Bomb");
-			// gameAI.getKeyState().setBomb(true);
-			// performMoves(moves, true);
-			// }
-			//
+			
 			// else if there is an upgrade find the moves to it
 			else if ((moves = finder.findRouteToUpgrade()) != null) {
 

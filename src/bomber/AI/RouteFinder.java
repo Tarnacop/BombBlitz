@@ -135,7 +135,7 @@ public class RouteFinder {
 		int y = neigh.y;
 		Block[][] map = getMap();
 
-		// we check if the coordiantes are valid
+		// we check if the coordinates are valid
 		// if not we return
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID || map[x][y] == Block.MINUS_BOMB || map[x][y] == Block.MINUS_RANGE
@@ -642,24 +642,6 @@ public class RouteFinder {
 		return getMovesFromPoints(finish);
 
 	}
-
-	// private class Pair {
-	// private Point position;
-	// private LinkedList<AIActions> actions;
-	//
-	// private Pair(Point position, LinkedList<AIActions> actions) {
-	// this.position = position;
-	// this.actions = actions;
-	// }
-	//
-	// private Point getPos() {
-	// return position;
-	// }
-	//
-	// private LinkedList<AIActions> getActions() {
-	// return actions;
-	// }
-	// }
 
 	// ------------------------
 
