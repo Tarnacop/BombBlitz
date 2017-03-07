@@ -89,7 +89,7 @@ public class HardAITest {
 		this.physics = new PhysicsEngine(state);	
 		state.setBombs(bombs);
 	}
-
+	
 	@Test
 	public void hardAITest() throws InterruptedException
 	{
@@ -108,7 +108,7 @@ public class HardAITest {
 		assertTrue(player.isAlive());
 		while(player.isAlive())
 		{
-			Thread.sleep(100);
+			Thread.sleep(10);
 			this.physics.update();
 		}
 		assertFalse(player.isAlive());
@@ -120,7 +120,7 @@ public class HardAITest {
 	@Test
 	public void extremeAITest() throws InterruptedException
 	{
-		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+		player = new Player("name2", new Point(12*scalar,12*scalar),1,30000, null );
 		players.add(player);
 		ai.setAlive(true);
 		Player ai2 = new GameAI("ai", new Point(4*scalar,4*scalar), 30000, 10, state, null, AIDifficulty.EXTREME);
@@ -138,7 +138,7 @@ public class HardAITest {
 		assertTrue(player.isAlive());
 		while(player.isAlive())
 		{
-			Thread.sleep(100);
+			Thread.sleep(20);
 			this.physics.update();
 		}
 		assertFalse(player.isAlive());
@@ -148,31 +148,23 @@ public class HardAITest {
 	}
 
 	
-//	@Test
-//	public void mediumTest() throws InterruptedException
-//	{
-//		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
-//		players.add(player);
-//		ai.setAlive(true);
-//		ai.setDifficulty(AIDifficulty.MEDIUM);
-//		ai.begin();
-//		assertTrue(checker.inDanger());
-//		while(checker.inDanger()){
-//			Thread.sleep(10);
-//			this.physics.update();
-//		}
-//		assertFalse(checker.inDanger());	
-//		state.setBombs(new ArrayList<>());
-//		
-//		assertTrue(player.isAlive());
-//		while(player.isAlive())
-//		{
-//			Thread.sleep(100);
-//			this.physics.update();
-//		}
-//		assertFalse(player.isAlive());
-//		ai.setAlive(false);
-//	}
+	@Test
+	public void mediumTest() throws InterruptedException
+	{
+		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+		players.add(player);
+		ai.setAlive(true);
+		ai.setDifficulty(AIDifficulty.MEDIUM);
+		ai.begin();
+		assertTrue(checker.inDanger());
+		while(checker.inDanger()){
+			Thread.sleep(10);
+			this.physics.update();
+		}
+		assertFalse(checker.inDanger());	
+		
+		ai.setAlive(false);
+	}
 
 
 }
