@@ -157,6 +157,10 @@ public class ServerRoomTable {
 	 * @return true if the table contains the room
 	 */
 	public boolean contains(ServerRoom room) {
+		if (room == null) {
+			return false;
+		}
+
 		return idTable.containsValue(room);
 	}
 
