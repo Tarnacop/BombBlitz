@@ -86,7 +86,7 @@ public class MediumAI extends AITemplate {
 
 		while (gameAI.isAlive()) {
 
-			// if AI is in dangger then escape only with 75% possibility
+			// if AI is in danger then escape only with 75% possibility
 			if (safetyCh.inDanger() && random.nextInt(100) > 25) {
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);

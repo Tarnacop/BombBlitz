@@ -5,14 +5,12 @@ import java.util.LinkedList;
 
 import bomber.game.GameState;
 
-
 /**
  * The Class AIManager.
  *
  * @author Jokubas Liutkus The Class AIManager for making moves.
  */
-public class HardAI extends AITemplate{
-
+public class HardAI extends AITemplate {
 
 	/**
 	 * Instantiates a new AI manager.
@@ -26,19 +24,14 @@ public class HardAI extends AITemplate{
 		super(ai, gameState);
 	}
 
-
-
-	
-
-
-
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see bomber.AI.AITemplate#performMoves(java.util.LinkedList, boolean)
 	 */
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
-			while (moves != null && !moves.isEmpty() && gameAI.isAlive() ) {
+			while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
@@ -48,8 +41,9 @@ public class HardAI extends AITemplate{
 			}
 	}
 
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see bomber.AI.AITemplate#performPlannedMoves(java.util.LinkedList)
 	 */
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
@@ -73,7 +67,7 @@ public class HardAI extends AITemplate{
 					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive()) {
 					}
 				}
-			} 
+			}
 			// otherwise make a standard move
 			else {
 				makeSingleMove(action);
@@ -81,10 +75,9 @@ public class HardAI extends AITemplate{
 		}
 	}
 
-	
-
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see bomber.AI.AITemplate#move()
 	 */
 	protected void move() {
@@ -95,29 +88,26 @@ public class HardAI extends AITemplate{
 			if (safetyCh.inDanger()) {
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
-				
+
 			}
+
 			
-//			//if enemy is in range and it is possible to place bomb and escape then do it
-//			else if((moves = finder.canPutBombAndEscape()) != null){
-//				System.out.println("Bomb");
-//				gameAI.getKeyState().setBomb(true);
-//				performMoves(moves, true);
-//			}
-//			
-			
-			
+			// else if there is an upgrade find the moves to it
+			else if ((moves = finder.findRouteToUpgrade()) != null) {
+
+				performMoves(moves, false);
+			}
+
 			// if enemy is in bomb range then place the bomb and go to the
-////			// safe location
+			//// // safe location
 			else if (safetyCh.isEnemyInBombRange()) {
 				gameAI.getKeyState().setBomb(true);
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
-			
-			//else if there is an upgrade find the moves to it
-			else if((moves= finder.findRouteToUpgrade())!=null)
-			{
+
+			// else if there is an upgrade find the moves to it
+			else if ((moves = finder.findRouteToUpgrade()) != null) {
 				performMoves(moves, false);
 			}
 			// if enemy is accessible(no boxes are blocking the path) then
@@ -125,7 +115,8 @@ public class HardAI extends AITemplate{
 			else if ((moves = getMovesToEnemy()) != null) {
 				performMoves(moves, false);
 			}
-			// if enemy is not in the range get the plan how to reach enemy and fullfill it
+			// if enemy is not in the range get the plan how to reach enemy and
+			// fullfill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
 				performPlannedMoves(moves);
 			}
