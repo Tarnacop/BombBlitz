@@ -92,7 +92,7 @@ public class MediumAI extends AITemplate {
 				performMoves(moves, true);
 
 			}
-
+			
 			// if enemy is in bomb range then place the bomb and go to the
 			//// // safe location only with 30% possibility
 			else if (safetyCh.isEnemyInBombRange() && random.nextInt(10) > 4) {

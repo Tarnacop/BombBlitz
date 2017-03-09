@@ -21,7 +21,7 @@ import bomber.game.Map;
 import bomber.game.Player;
 import bomber.physics.PhysicsEngine;
 
-public class HardAITest {
+public class AILevelTest{
 	
 	private Map map;
 	private List<Bomb> bombs;
@@ -89,12 +89,16 @@ public class HardAITest {
 		this.physics = new PhysicsEngine(state);	
 		state.setBombs(bombs);
 	}
-
+	
 	@Test
 	public void hardAITest() throws InterruptedException
 	{
+		players.clear();
+		players.add(ai);
 		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
 		players.add(player);
+		ai.setDifficulty(AIDifficulty.HARD);
+		ai.setPos( new Point(4*scalar,4*scalar));
 		ai.setAlive(true);
 		ai.begin();
 		assertTrue(checker.inDanger());
@@ -108,7 +112,7 @@ public class HardAITest {
 		assertTrue(player.isAlive());
 		while(player.isAlive())
 		{
-			Thread.sleep(100);
+			Thread.sleep(10);
 			this.physics.update();
 		}
 		assertFalse(player.isAlive());
@@ -120,11 +124,15 @@ public class HardAITest {
 	@Test
 	public void extremeAITest() throws InterruptedException
 	{
-		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+		players.clear();
+		players.add(ai);
+		player = new Player("name2", new Point(12*scalar,12*scalar),1,30000, null );
 		players.add(player);
+		ai.setPos(new Point(4*scalar,4*scalar));
 		ai.setAlive(true);
 		Player ai2 = new GameAI("ai", new Point(4*scalar,4*scalar), 30000, 10, state, null, AIDifficulty.EXTREME);
 		ai.setDifficulty(AIDifficulty.EXTREME);
+		players.add(ai2);
 		ai.begin();
 		ai2.begin();
 		assertTrue(checker.inDanger());
@@ -138,7 +146,7 @@ public class HardAITest {
 		assertTrue(player.isAlive());
 		while(player.isAlive())
 		{
-			Thread.sleep(100);
+			Thread.sleep(20);
 			this.physics.update();
 		}
 		assertFalse(player.isAlive());
@@ -147,32 +155,68 @@ public class HardAITest {
 
 	}
 
+
+	@Test
+	public void mediumTest() throws InterruptedException
+	{
+		players.clear();
+		players.add(ai);
+		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+		players.add(player);
+		ai.setPos(new Point(4*scalar,4*scalar));
+		ai.setAlive(true);
+		ai.setDifficulty(AIDifficulty.MEDIUM);
+		ai.begin();
+		assertTrue(checker.inDanger());
+		while(checker.inDanger()){
+			Thread.sleep(10);
+			this.physics.update();
+		}
+		assertFalse(checker.inDanger());	
 	
-//	@Test
-//	public void mediumTest() throws InterruptedException
-//	{
-//		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
-//		players.add(player);
-//		ai.setAlive(true);
-//		ai.setDifficulty(AIDifficulty.MEDIUM);
-//		ai.begin();
-//		assertTrue(checker.inDanger());
-//		while(checker.inDanger()){
-//			Thread.sleep(10);
-//			this.physics.update();
-//		}
-//		assertFalse(checker.inDanger());	
-//		state.setBombs(new ArrayList<>());
-//		
-//		assertTrue(player.isAlive());
-//		while(player.isAlive())
-//		{
-//			Thread.sleep(100);
-//			this.physics.update();
-//		}
-//		assertFalse(player.isAlive());
-//		ai.setAlive(false);
-//	}
+		int counter = 500;
+		while(counter>0)
+		{
+			Thread.sleep(10);
+			this.physics.update();
+			counter--;
+		}
+		assertTrue(ai.isAlive());
+		ai.setAlive(false);
+		player.setAlive(false);
+		assertFalse(ai.isAlive());
+	}
+	
+	@Test
+	public void easyTest() throws InterruptedException
+	{
+		players.clear();
+		players.add(ai);
+		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+		players.add(player);
+		ai.setAlive(true);
+		ai.setDifficulty(AIDifficulty.EASY);
+		ai.setPos(new Point(4*scalar,4*scalar));
+		ai.begin();
+		assertTrue(checker.inDanger());
+		while(checker.inDanger()){
+			Thread.sleep(10);
+			this.physics.update();
+		}
+		assertFalse(checker.inDanger());	
+	
+		int counter = 500;
+		while(counter>0)
+		{
+			Thread.sleep(10);
+			this.physics.update();
+			counter--;
+		}
+		assertTrue(ai.isAlive());
+		ai.setAlive(false);
+		player.setAlive(false);
+		assertFalse(ai.isAlive());
+	}
 
 
 }

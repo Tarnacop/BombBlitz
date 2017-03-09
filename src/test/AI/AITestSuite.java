@@ -8,7 +8,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
 	AITests.class,
 	PlanningTest.class,
-	HardAITest.class
+	AILevelTest.class
 })
 
 
