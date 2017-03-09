@@ -38,13 +38,16 @@ public class Renderer {
 	private ColourMesh softMesh;
 	private ColourMesh blastMesh;
 	private ColourMesh bombMesh;
+	
 	private boolean gameOver;
+	private boolean frontScreen;
 	
 	private TextureMesh backgroundMesh;
 	private TextureMesh infoBoxMesh;
 	private TextureMesh fancyBoxMesh;
 	private TextureMesh heartMesh;
 	private TextureMesh gameBoxMesh;
+	private TextureMesh beginningBoxMesh;
 	
 	private float w_ratio;
 	private float h_ratio;
@@ -54,6 +57,7 @@ public class Renderer {
 
 		transformation = new Transformation();
 		gameOver = false;
+		frontScreen = true;
 	} // END OF CONSTRUCTOR
 
 	public void init(Screen screen) throws Exception {
@@ -71,7 +75,7 @@ public class Renderer {
 	} // END OF init METHOD
 		// Takes a state to render
 
-	public void setupSceneShader() throws Exception {
+	private void setupSceneShader() throws Exception {
 
 		sceneShader = new ShaderProgram();
 		sceneShader.createVertexShader(FileHandler.loadResource("res/vertex.vs"));
@@ -83,7 +87,7 @@ public class Renderer {
 
 	} // END OF setupSceneShader METHOD
 	
-	public void setupTextureShader() throws Exception {
+	private void setupTextureShader() throws Exception {
 		
 		textureShader = new ShaderProgram();
 		textureShader.createVertexShader(FileHandler.loadResource("res/texture_vertex.vs"));
@@ -96,7 +100,7 @@ public class Renderer {
 
 	} // END OF setupTextureShader METHOD
 	
-	public void setupHudShader() throws Exception {
+	private void setupHudShader() throws Exception {
 		
 		hudShader = new ShaderProgram();
 		hudShader.createVertexShader(FileHandler.loadResource("res/hud_vertex.vs"));
@@ -109,7 +113,7 @@ public class Renderer {
 		
 	} // END OF setupHudShader METHOD
 	
-	public void setupMeshes() {
+	private void setupMeshes() {
 		
 		float[] colours = new float[] { 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f };
 		solidMesh = new ColourMesh(64, 64, colours);
@@ -121,7 +125,7 @@ public class Renderer {
 		bombMesh = new ColourMesh(50, 50, colours);
 	} // END OF setupMeshes METHOD
 	
-	public void setupTextures() throws Exception {
+	private void setupTextures() throws Exception {
 		
 		Texture background = new Texture("res/gamebackground.png");
 		Texture box = new Texture("res/mapbox.png");
@@ -132,32 +136,42 @@ public class Renderer {
 		gameBoxMesh = new TextureMesh(RendererConstants.GAME_BOX_WIDTH, RendererConstants.GAME_BOX_HEIGHT, box);
 		fancyBoxMesh = new TextureMesh(RendererConstants.FANCY_BOX_WIDTH, RendererConstants.FANCY_BOX_HEIGHT, fancybox);
 		heartMesh = new TextureMesh(RendererConstants.HEART_WIDTH, RendererConstants.HEART_HEIGHT, heart);
+		
+		beginningBoxMesh = new TextureMesh(RendererConstants.FRONT_BOX_WIDTH, RendererConstants.FRONT_BOX_HEIGHT, box);
 	} // END OF setupTextures METHOD
 	
-	public void setupHuds() throws Exception {
+	private void setupHuds() throws Exception {
 		
 		FontTexture hudFontTexture = new FontTexture("res/minecraft.ttf", 20, Font.PLAIN);
 		hudTextItem = new TextItem("", hudFontTexture);
 	} // END OF setupHuds METHOD
 
 	public void render(Screen screen, GameState state) {
-
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Resize the screen if it needs to be resized
 		if (screen.isResized()) {
+		
 			screen.setViewport(0, 0, screen.getWidth(), screen.getHeight());
 			screen.setResized(false);
 			w_ratio = RendererConstants.V_WIDTH / screen.getWidth();
 			h_ratio = RendererConstants.V_HEIGHT / screen.getHeight();
 		};
 		if(!gameOver) {
+			
 			renderGameTexture(screen, state);
 			renderGameScene(screen, state);
 			renderGameHud(screen, state);
 		}
+		if(frontScreen) {
+			
+			renderBeginningTextures(screen, state);
+			renderBeginningHud(screen, state);
+		}
 	} // END OF render METHOD
 
-	public void renderGameScene(Screen screen, GameState state) {
+	// -------------------------------------Game Screen Render--------------------------------------------------------------------
+	private void renderGameScene(Screen screen, GameState state) {
 
 		// Bind the shader
 		sceneShader.bind();
@@ -211,7 +225,7 @@ public class Renderer {
 
 	} // END OF renderScene METHOD
 	
-	public void renderGameTexture(Screen screen, GameState state) {
+	private void renderGameTexture(Screen screen, GameState state) {
 		
 		textureShader.bind();
 		textureShader.setUniform("texture_sampler", 0);
@@ -236,6 +250,7 @@ public class Renderer {
 		
 		// Render player info box
 		if(state.getPlayers().size() > 0) {
+			
 			modelMatrix = transformation.getModelMatrix(RendererConstants.FANCY_BOX1_X, RendererConstants.FANCY_BOX1_Y, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			fancyBoxMesh.render();
@@ -247,6 +262,7 @@ public class Renderer {
 		}
 		
 		if(state.getPlayers().size() > 1) {
+			
 			modelMatrix = transformation.getModelMatrix(RendererConstants.FANCY_BOX2_X, RendererConstants.FANCY_BOX2_Y, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			fancyBoxMesh.render();
@@ -258,6 +274,7 @@ public class Renderer {
 		}
 		
 		if(state.getPlayers().size() > 2) {
+			
 			modelMatrix = transformation.getModelMatrix(RendererConstants.FANCY_BOX3_X, RendererConstants.FANCY_BOX3_Y, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			fancyBoxMesh.render();
@@ -269,6 +286,7 @@ public class Renderer {
 		}
 		
 		if(state.getPlayers().size() > 3) {
+			
 			modelMatrix = transformation.getModelMatrix(RendererConstants.FANCY_BOX4_X, RendererConstants.FANCY_BOX4_Y, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			fancyBoxMesh.render();
@@ -282,7 +300,7 @@ public class Renderer {
 		textureShader.unbind();
 	} // END OF renderGameTexture METHOD
 	
-	public void renderGameHud(Screen screen, GameState state) {
+	private void renderGameHud(Screen screen, GameState state) {
 		
 		hudShader.bind();
 		hudShader.setUniform("texture_sampler", 0);
@@ -362,6 +380,49 @@ public class Renderer {
 		
 	} // END OF renderHud METHOD
 
+	// -------------------------------------Front Screen Render------------------------------------------------------------------
+	
+	private void renderBeginningTextures(Screen screen, GameState state) {
+		
+		textureShader.bind();
+		textureShader.setUniform("texture_sampler", 0);
+		
+		projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth() * w_ratio, screen.getHeight() * h_ratio, 0f);
+		textureShader.setUniform("projection", projectionMatrix);
+		
+		// Render box
+		// TODO - Move to constants
+		modelMatrix = transformation.getModelMatrix(RendererConstants.FRONT_BOX_X, RendererConstants.FRONT_BOX_Y, 0f, 1f);
+		textureShader.setUniform("model", modelMatrix);
+		beginningBoxMesh.render();
+		
+		
+		textureShader.unbind();
+		
+	} // END OF renderBeginningTextures METHOD
+	
+	private void renderBeginningHud(Screen screen, GameState state) {
+		
+		hudShader.bind();
+		hudShader.setUniform("texture_sampler", 0);
+		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio, screen.getHeight() * h_ratio, 0f);
+		
+		hudTextItem.setText("5 SECONDS");
+		x = RendererConstants.FRONT_BOX_X + (RendererConstants.FRONT_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+		float y = RendererConstants.FRONT_BOX_Y + (RendererConstants.FRONT_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
+		hudShader.setUniform("projModelMatrix", transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
+		hudShader.setUniform("colour", hudTextItem.getColour());
+		hudTextItem.getMesh().render();
+		
+		hudShader.unbind();
+	} // END OF renderBeginningHud METHOD
+	
+	public void stopFrontScreen() {
+		
+		frontScreen = false;
+	} // END OF stopFrontScreen METHOD
+	
 	public void displayGameOver() {
 		
 		gameOver = true;

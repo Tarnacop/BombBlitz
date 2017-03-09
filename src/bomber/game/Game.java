@@ -94,7 +94,8 @@ public class Game implements GameInterface {
 		this.ui.hide();
 	}
 
-	float gameOverCounter = 0;
+	private float gameOverCounter = 0;
+	private	float frontScreenCounter = 0f;
 	@Override
 	public void update(float interval) {
 
@@ -108,12 +109,20 @@ public class Game implements GameInterface {
 				
 				dispose();
 			}
-		}else{
-			this.physics.update((int) (interval * 1000));
-			this.keyState.setBomb(false);
-			this.keyState.setMovement(Movement.NONE);
-			List<Player> players = this.gameState.getPlayers();
-			audio.playEventList(gameState.getAudioEvents());
+		} else {
+			
+			// Wait 5 seconds
+			if(frontScreenCounter <= 5) {
+				
+				frontScreenCounter += interval;
+			} else {
+				
+				renderer.stopFrontScreen();
+				this.physics.update((int) (interval * 1000));
+				this.keyState.setBomb(false);
+				this.keyState.setMovement(Movement.NONE);
+				audio.playEventList(gameState.getAudioEvents());
+			}
 		}
 	}
 

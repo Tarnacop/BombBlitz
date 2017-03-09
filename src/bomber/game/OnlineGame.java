@@ -60,6 +60,7 @@ public class OnlineGame implements GameInterface {
 		try {
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
+			renderer.stopFrontScreen();
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 
 			while (this.gameState == null) {

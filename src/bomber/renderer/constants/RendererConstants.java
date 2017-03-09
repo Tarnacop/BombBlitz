@@ -7,12 +7,12 @@ public abstract class RendererConstants {
 	public static final String IMAGE_FORMAT = "png";
 	public static final String CHARSET_NAME = "ISO-8859-1";
 	
-	public static final float V_WIDTH = 1262f; // + 15
+	public static final float V_WIDTH = 1262f;
 	public static final float V_HEIGHT = 869f;
 	
 	public static final int PADDING = 10;
 	
-	public static final float BACKGROUND_WIDTH = 1262f; // + 15
+	public static final float BACKGROUND_WIDTH = 1262f;
 	public static final float BACKGROUND_HEIGHT = 869f;
 	public static final float BACKGROUND_X = 0f;
 	public static final float BACKGROUND_Y = 0f;
@@ -26,6 +26,11 @@ public abstract class RendererConstants {
 	public static final float GAME_BOX_HEIGHT = 859f;
 	public static final float GAME_BOX_X = 5f;
 	public static final float GAME_BOX_Y = 5f;
+	
+	public static final float FRONT_BOX_WIDTH = 1257f;
+	public static final float FRONT_BOX_HEIGHT = 864f;
+	public static final float FRONT_BOX_X = 5f;
+	public static final float FRONT_BOX_Y = 5f;
 	
 	public static final float FANCY_BOX_WIDTH = 300f;
 	public static final float FANCY_BOX_HEIGHT = 173f;
