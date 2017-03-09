@@ -4,7 +4,7 @@ import java.awt.Point;
 
 import bomber.game.GameState;
 import bomber.game.Player;
-import bomber.renderer.shaders.Mesh;
+import bomber.renderer.shaders.ColourMesh;
 
 /**
  * @author Jokubas Liutkus 
@@ -35,7 +35,7 @@ public class GameAI extends Player {
 	 * @param mesh
 	 *            the mesh
 	 */
-	public GameAI(String name, Point pos, int lives, double speed, GameState gameState, Mesh mesh, AIDifficulty diff) {
+	public GameAI(String name, Point pos, int lives, double speed, GameState gameState, ColourMesh mesh, AIDifficulty diff) {
 		super(name, pos, lives, speed, mesh);
 		this.state = gameState;
 		setDifficulty(diff);

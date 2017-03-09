@@ -3,7 +3,7 @@ package bomber.game;
 import java.awt.Point;
 
 import bomber.AI.AIDifficulty;
-import bomber.renderer.shaders.Mesh;
+import bomber.renderer.shaders.ColourMesh;
 
 public class Player {
 
@@ -18,9 +18,9 @@ public class Player {
 	private final int scalar = 64;
 	private KeyboardState keyState;
 	private boolean isAlive;
-	private Mesh mesh;
+	private ColourMesh mesh;
 	
-	public Player(String name, Point pos, int lives, double speed, Mesh mesh) {
+	public Player(String name, Point pos, int lives, double speed, ColourMesh mesh) {
 
 		this.name = name;
 		this.pos = pos;
@@ -52,7 +52,7 @@ public class Player {
 		this.gridPos = gridPos;
 	}
 
-	public void setMesh(Mesh mesh) {
+	public void setMesh(ColourMesh mesh) {
 		this.mesh = mesh;
 	}
 
@@ -97,7 +97,7 @@ public class Player {
 
 	public void makeMesh(int width, int height, float[] colours) {
 
-		this.mesh = new Mesh(width, height, colours);
+		this.mesh = new ColourMesh(width, height, colours);
 	}
 
 	private void updatePos() {
@@ -141,7 +141,7 @@ public class Player {
 		updatePos();
 	}
 
-	public Mesh getMesh() {
+	public ColourMesh getMesh() {
 
 		return this.mesh;
 	}
@@ -156,7 +156,7 @@ public class Player {
 		this.maxNrOfBombs = maxNrOfBombs;
 	}
 
-	public void addMesh(Mesh mesh) {
+	public void addMesh(ColourMesh mesh) {
 
 		this.mesh = mesh;
 	}

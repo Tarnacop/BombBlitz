@@ -11,7 +11,7 @@ import java.nio.IntBuffer;
 import org.lwjgl.system.MemoryUtil;
 
 // Class for VAO and VBO usage
-public class Mesh {
+public class ColourMesh {
 
 	private final VertexArrayObject vao;
 	private final VertexBufferObject vbopos;
@@ -19,18 +19,18 @@ public class Mesh {
 	private final VertexBufferObject vboindices;
 	private final int vertexCount;
 
-	public Mesh(int width, int height, float[] colours) {
+	public ColourMesh(float width, float height, float[] colours) {
 
 		int[] indices = new int[] { 0, 1, 3, 3, 1, 2, };
 		float[] positions = {
 				// V0
-				0f, (float) height,
+				0f, height,
 				// V1
 				0f, 0f,
 				// V2
-				(float) width, 0f,
+				width, 0f,
 				// V3
-				(float) width, (float) height
+				width, height
 		};
 		vao = new VertexArrayObject();
 		vbopos = new VertexBufferObject();

@@ -16,8 +16,11 @@ public class TextItem {
 	
 	private String text;
 	private FontTexture fontTexture;
-    private AuxMesh mesh;
+    private TextureMesh mesh;
     private Vector3f colour;
+    
+    private float stringWidth;
+    private float stringHeight;
     
     public TextItem(String text, FontTexture fontTexture) throws Exception {
     	
@@ -30,7 +33,7 @@ public class TextItem {
     	this.mesh = buildMesh();
     } // END OF CONSTRUCTOR
     
-    private AuxMesh buildMesh() {
+    private TextureMesh buildMesh() {
     	    	
         ArrayList<Float> positions = new ArrayList<Float>();
         ArrayList<Float> textCoords = new ArrayList<Float>();
@@ -83,6 +86,9 @@ public class TextItem {
             startX += charInfo.getWidth();
         }
         
+        stringWidth = startX;
+        stringHeight = (float) fontTexture.getHeight();
+        
     	float[] positionsArray = new float[positions.size()];
     	for(int i = 0; i < positionsArray.length; i++) {
     		
@@ -101,15 +107,15 @@ public class TextItem {
     		indicesArray[i] = indices.get(i);
     	}
     	
-    	return new AuxMesh(positionsArray, textCoordsArray, indicesArray, fontTexture.getTexture());
+    	return new TextureMesh(positionsArray, textCoordsArray, indicesArray, fontTexture.getTexture());
     } // END OF buildMesh METHOD 
     
-    public void setMesh(AuxMesh mesh) {
+    public void setMesh(TextureMesh mesh) {
     	
     	this.mesh = mesh;
     } // END OF setMesh METHOD
     
-    public AuxMesh getMesh() {
+    public TextureMesh getMesh() {
     	
     	return this.mesh;
     } // END OF getMesh METHOD
@@ -166,4 +172,15 @@ public class TextItem {
 		
 		return colour;
 	} // END OF getColour METHOD
+	
+	public float getTextWidth() {
+		
+		return this.stringWidth;
+	} // END OF getTextWidth METHOD
+	
+	public float getTextHeight() {
+		
+		return this.stringHeight;
+	} // END OF getTextWidth METHOD
+	
 } // END OF TextItem CLASS

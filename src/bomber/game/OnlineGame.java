@@ -10,7 +10,7 @@ import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
 import bomber.renderer.Screen;
 import bomber.renderer.interfaces.GameInterface;
-import bomber.renderer.shaders.Mesh;
+import bomber.renderer.shaders.ColourMesh;
 
 public class OnlineGame implements GameInterface {
 
@@ -69,7 +69,7 @@ public class OnlineGame implements GameInterface {
 
 			for (Player player : this.gameState.getPlayers()) {
 
-				player.addMesh(new Mesh(32, 32, colours));
+				player.addMesh(new ColourMesh(32, 32, colours));
 			}
 
 			this.keyState = new KeyboardState();
