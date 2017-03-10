@@ -10,7 +10,7 @@ import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
 import bomber.renderer.Screen;
 import bomber.renderer.interfaces.GameInterface;
-import bomber.renderer.shaders.Mesh;
+import bomber.renderer.shaders.ColourMesh;
 
 public class OnlineGame implements GameInterface {
 
@@ -60,6 +60,7 @@ public class OnlineGame implements GameInterface {
 		try {
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
+			renderer.stopFrontScreen();
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 
 			while (this.gameState == null) {
@@ -69,7 +70,7 @@ public class OnlineGame implements GameInterface {
 
 			for (Player player : this.gameState.getPlayers()) {
 
-				player.addMesh(new Mesh(32, 32, colours));
+				player.addMesh(new ColourMesh(32, 32, colours));
 			}
 
 			this.keyState = new KeyboardState();

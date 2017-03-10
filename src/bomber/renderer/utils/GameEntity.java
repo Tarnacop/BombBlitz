@@ -2,16 +2,16 @@ package bomber.renderer.utils;
 
 import org.joml.Vector2f;
 
-import bomber.renderer.shaders.Mesh;
+import bomber.renderer.shaders.ColourMesh;
 
 public class GameEntity {
 	
-	private final Mesh mesh;
+	private final ColourMesh mesh;
 	private final Vector2f pos;
 	private float angle;
 	private float scale;
 	
-	public GameEntity(Mesh mesh) {
+	public GameEntity(ColourMesh mesh) {
 		
 		this.mesh = mesh;
 		pos = new Vector2f(0f, 0f);
@@ -50,7 +50,7 @@ public class GameEntity {
 		this.angle = angle;
 	} // END OF setRotation METHOD
 	
-	public Mesh getMesh() {
+	public ColourMesh getMesh() {
 		
 		return mesh;
 	} // END OF getMesh METHOD

@@ -8,11 +8,13 @@ public class Transformation {
 
 	private final Matrix4f model;
 	private final Matrix4f projection;
+	private final Matrix4f modelprojection;
 
 	public Transformation() {
 
 		model = new Matrix4f();
 		projection = new Matrix4f();
+		modelprojection = new Matrix4f();
 
 	} // END OF CONSTRUCTOR
 
@@ -32,17 +34,27 @@ public class Transformation {
 	
 	public Matrix4f getModelMatrix(Vector2f offset, float angle, float scale) {
 		
-		Vector3f aux_offset = new Vector3f(offset, 0);
-		
-		return model.identity().translate(aux_offset)
+		return model.identity().translate(offset.x, offset.y, 0)
 				.rotateX((float) Math.toRadians(0))
 				.rotateY((float) Math.toRadians(0))
 				.rotateZ((float) Math.toRadians(angle))
 				.scale(scale);
 	} // END OF getModelMatrix METHOD
 	
+	public Matrix4f getModelMatrix(float x, float y, float angle, float scale) {
+		
+		return model.identity().translate(x, y, 0)
+				.rotateX((float) Math.toRadians(0))
+				.rotateY((float) Math.toRadians(0))
+				.rotateZ((float) Math.toRadians(angle))
+				.scale(scale);
+		
+	} // END OF getModelMatrix METHOD
+	
 	public Matrix4f getOrtoProjectionModelMatrix(Matrix4f modelMatrix, Matrix4f orthoMatrix) {
 		
-		return orthoMatrix.mul(modelMatrix);
-	}
+		return modelprojection.identity().mul(orthoMatrix).mul(modelMatrix);
+		
+	} // END OF getortoProjectionModelMatrix METHOD
+
 } // END OF Transformation CLASS

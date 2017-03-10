@@ -14,7 +14,7 @@ import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
 import bomber.renderer.Screen;
 import bomber.renderer.interfaces.GameInterface;
-import bomber.renderer.shaders.Mesh;
+import bomber.renderer.shaders.ColourMesh;
 
 public class Game implements GameInterface {
 
@@ -53,7 +53,7 @@ public class Game implements GameInterface {
 			
 			int width = this.map.getPixelMap().length;
 			int height = this.map.getPixelMap()[0].length;
-			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
+			this.graphics = new Graphics("Bomb Blitz", width + 400, height, false, this);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -70,7 +70,7 @@ public class Game implements GameInterface {
 			List<Point> spawns = this.map.getSpawnPoints();
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 
-			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 1, 300, new Mesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 1, 300, new ColourMesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
@@ -81,7 +81,7 @@ public class Game implements GameInterface {
 			this.physics = new PhysicsEngine(gameState);
 
 			for(int x = 1; x <= this.aiNum; x++){
-				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, new Mesh(32, 32, colours), this.aiDiff);
+				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, new ColourMesh(32, 32, colours), this.aiDiff);
 				list.add(ai);
 				ai.begin();
 			}
@@ -94,7 +94,8 @@ public class Game implements GameInterface {
 		this.ui.hide();
 	}
 
-	float gameOverCounter = 0;
+	private float gameOverCounter = 0;
+	private	float frontScreenCounter = 0f;
 	@Override
 	public void update(float interval) {
 
@@ -108,12 +109,20 @@ public class Game implements GameInterface {
 				
 				dispose();
 			}
-		}else{
-			this.physics.update((int) (interval * 1000));
-			this.keyState.setBomb(false);
-			this.keyState.setMovement(Movement.NONE);
-			List<Player> players = this.gameState.getPlayers();
-			audio.playEventList(gameState.getAudioEvents());
+		} else {
+			
+			// Wait 5 seconds
+			if(frontScreenCounter <= 5) {
+				
+				frontScreenCounter += interval;
+			} else {
+				
+				renderer.stopFrontScreen();
+				this.physics.update((int) (interval * 1000));
+				this.keyState.setBomb(false);
+				this.keyState.setMovement(Movement.NONE);
+				audio.playEventList(gameState.getAudioEvents());
+			}
 		}
 	}
 

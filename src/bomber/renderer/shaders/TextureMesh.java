@@ -12,7 +12,7 @@ import java.nio.IntBuffer;
 import org.lwjgl.system.MemoryUtil;
 
 // Aux Mesh to work with textures - TODO to be merged with Mesh after we find textures
-public class AuxMesh {
+public class TextureMesh {
 
 	private final VertexArrayObject vao;
 	private final VertexBufferObject vbopos;
@@ -21,7 +21,97 @@ public class AuxMesh {
 	private final int vertexCount;
 	private final Texture texture;
 
-	public AuxMesh(float[] positions, float[] textureCoords, int[] indices, Texture texture) {
+	public TextureMesh(float width, float height, Texture texture) {
+		
+		int[] indices = new int[] { 0, 1, 3, 3, 1, 2, };
+		float[] positions = {
+				// V0
+				0f, height,
+				// V1
+				0f, 0f,
+				// V2
+				width, 0f,
+				// V3
+				width, height
+		};
+
+		float[] textureCoords = new float[] {
+				
+				// For V0
+				0f, 1f,
+				// For V1
+				0f, 0f,
+				// For V2
+				1f, 0f,
+				// FOR V3
+				1f, 1f
+		};
+		
+		vao = new VertexArrayObject();
+		vbopos = new VertexBufferObject();
+		vbotexture = new VertexBufferObject();
+		vboindices = new VertexBufferObject();
+		this.texture = texture;
+
+		// Allocate memory for a float buffer
+		FloatBuffer positionsBuffer = null;
+		FloatBuffer textureBuffer = null;
+		IntBuffer indicesBuffer = null;
+
+		try {
+			positionsBuffer = MemoryUtil.memAllocFloat(positions.length);
+			textureBuffer = MemoryUtil.memAllocFloat(textureCoords.length);
+			indicesBuffer = MemoryUtil.memAllocInt(indices.length);
+
+			vertexCount = indices.length;
+
+			// Store the data and flip the buffer to 0
+			positionsBuffer.put(positions).flip();
+			textureBuffer.put(textureCoords).flip();
+			indicesBuffer.put(indices).flip();
+
+			// Create a VAO and bind it
+			vao.bind();
+
+			// Create the positions VBO and bind it
+			vbopos.bind(GL_ARRAY_BUFFER);
+			vbopos.uploadData(GL_ARRAY_BUFFER, positionsBuffer, GL_STATIC_DRAW);
+			// Show where the VBO's array buffers locations are in the shader
+			glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+
+			// Create the colour VBO and bind it
+			vbotexture.bind(GL_ARRAY_BUFFER);
+			vbotexture.uploadData(GL_ARRAY_BUFFER, textureBuffer, GL_STATIC_DRAW);
+			glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+
+			// Create the indices VBO and bind it
+			vboindices.bind(GL_ELEMENT_ARRAY_BUFFER);
+			vboindices.uploadData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
+
+			// Unbind the VAO
+			vao.unbind();
+
+		} finally {
+
+			if (positionsBuffer != null) {
+
+				MemoryUtil.memFree(positionsBuffer);
+			}
+
+			if (textureBuffer != null) {
+
+				MemoryUtil.memFree(textureBuffer);
+			}
+
+			if (indicesBuffer != null) {
+
+				MemoryUtil.memFree(indicesBuffer);
+			}
+		}
+		
+	} // END OF CONSTRUCTOR
+	
+	public TextureMesh(float[] positions, float[] textureCoords, int[] indices, Texture texture) {
 
 		vao = new VertexArrayObject();
 		vbopos = new VertexBufferObject();
@@ -55,7 +145,6 @@ public class AuxMesh {
 			// Show where the VBO's array buffers locations are in the shader
 			glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
 
-			// TODO - CHANGE IN Mesh FROM DEV
 			// Create the colour VBO and bind it
 			vbotexture.bind(GL_ARRAY_BUFFER);
 			vbotexture.uploadData(GL_ARRAY_BUFFER, textureBuffer, GL_STATIC_DRAW);
@@ -99,8 +188,7 @@ public class AuxMesh {
 
 	// Render the mesh
 	public void render() {
-
-		// TODO - ADD IN DEV
+		
 		// Activate first texture unit
 		glActiveTexture(GL_TEXTURE0);
 		// Bind the texture
@@ -140,6 +228,7 @@ public class AuxMesh {
 		// Delete the VAO
 		vao.unbind();
 		vao.dispose();
+		texture.dispose();
 	} // END OF dispose METHOD
 
 	public Texture getTexture() {
