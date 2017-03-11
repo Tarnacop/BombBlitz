@@ -35,7 +35,7 @@ public class Game implements GameInterface {
 	private int aiNum;
 	private AIDifficulty aiDiff;
 	
-	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff) {
+	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff, float musicVolume, float soundVolume) {
 
 		this.aiNum = aiNum;
 		this.aiDiff = aiDiff;
@@ -47,8 +47,11 @@ public class Game implements GameInterface {
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
 		audio = new AudioManager();
+		System.out.println("Music " + musicVolume + " Sound " + soundVolume);
 		audio.playMusic();
-
+		audio.setMusicVolume(musicVolume);
+		audio.setEffectsVolume(soundVolume);
+		
 		try {
 			
 			int width = this.map.getPixelMap().length;

@@ -57,6 +57,7 @@ public class GameAI extends Player {
 	
 	public void setDifficulty(AIDifficulty diff)
 	{
+		System.out.println("DIFFICULTY: " + diff);
 		switch(diff)
 		{
 		case EASY:

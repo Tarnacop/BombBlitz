@@ -1,9 +1,37 @@
 /*AUTHOR: Owen Jenkins*/
 /*Stylesheet for Bomb Blitz Menu UI*/
 
-*{
+/*{
 	-fx-border-color: white;
 	-fx-border-width: 2px;
+}*/
+
+.box{
+	-fx-background-color: transparent;
+        -fx-background-image: url("images/checkbox.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.box:selected{
+	-fx-background-color: transparent;
+        -fx-background-image: url("images/checkboxclicked.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.slider{
+	-fx-background-color: transparent;
+        -fx-background-image: url("images/slider.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.slider .thumb{
+	-fx-background-color: transparent;
+        -fx-background-image: url("images/slidermarker.png");
+        -fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
 }
 
 .menubutton{
@@ -53,7 +81,7 @@
         -fx-background-repeat:no-repeat;
 }
 
-.box{
+.menubox{
 	-fx-padding: 20px;
 	-fx-background-color: transparent;
 	-fx-background-image: url("images/box.png");

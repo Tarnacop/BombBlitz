@@ -29,8 +29,10 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -137,6 +139,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button readyButton;
 	private Rectangle readyTorch;
 	private String version;
+	private Font largeFont;
+	private Font italicFont;
+	private float musicVolume;
+	private float soundVolume;
+	private Slider musicSlider;
+	private Slider soundSlider;
+	private CheckBox muteMusicBtn;
+	private CheckBox muteSoundBtn;
 	
 	public UserInterface(){
 
@@ -146,6 +156,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.version = "1.2";
 		this.ui = this;
 		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 20);
+		this.largeFont = Font.loadFont(UserInterface.class.getResource("../../resources/minecraftbig.ttf").toExternalForm(), 30);
 		this.css = UserInterface.class.getResource("../../resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty(SettingsParser.getPlayerName());
 		this.aiNumber = new SimpleIntegerProperty(1);
@@ -346,7 +357,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyBox.getChildren().addAll(createLabel("Click to\ntoggle Ready:", false, false), readyTorch, readyButton);
 		
 		readyPane = new VBox();
-		readyPane.getStyleClass().add("box");
+		readyPane.getStyleClass().add("menubox");
 		readyPane.setSpacing(20);
 		readyPane.setMinWidth(200);
 		readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
@@ -639,7 +650,7 @@ public class UserInterface extends Application implements ClientNetInterface{
             
             VBox aiContainer = new VBox();
             aiContainer.setAlignment(Pos.CENTER);
-            aiContainer.getStyleClass().add("box");
+            aiContainer.getStyleClass().add("menubox");
             aiContainer.setSpacing(20);
             aiContainer.getChildren().addAll(aiPane, aiDiffBox);
             
@@ -690,7 +701,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         VBox aiContainer = new VBox();
         aiContainer.setAlignment(Pos.CENTER);
-        aiContainer.getStyleClass().add("box");
+        aiContainer.getStyleClass().add("menubox");
         aiContainer.setSpacing(20);
         aiContainer.getChildren().addAll(aiPane, aiDiffBox);
         
@@ -898,17 +909,52 @@ public class UserInterface extends Application implements ClientNetInterface{
         menuBox.setAlignment(Pos.CENTER);
         logoPane.getChildren().addAll(logoImageView, menuBox);
         
+        musicSlider = new Slider();
+        musicSlider.setMin(0);
+        musicSlider.setMax(100);
+        musicSlider.setValue(50);
+        musicSlider.setShowTickLabels(false);
+        musicSlider.setShowTickMarks(false);
+        
+        soundSlider = new Slider();
+        soundSlider.setMin(0);
+        soundSlider.setMax(100);
+        soundSlider.setValue(50);
+        soundSlider.setShowTickLabels(false);
+        soundSlider.setShowTickMarks(false);
+        
+        muteMusicBtn = new CheckBox();
+        muteSoundBtn = new CheckBox();
+        
+        muteMusicBtn.setSelected(false);
+        muteSoundBtn.setSelected(false);
+        
         VBox namePane = new VBox();
         namePane.setAlignment(Pos.CENTER);
         namePane.setSpacing(5);
         namePane.getStyleClass().add("namebox");
+        
+        HBox musicLabelBox = new HBox();
+        musicLabelBox.setAlignment(Pos.CENTER);
+        musicLabelBox.getChildren().addAll(createLabel("Music (Mute ", false, false), muteMusicBtn, createLabel(")", false, false));
+        HBox soundLabelBox = new HBox();
+        soundLabelBox.setAlignment(Pos.CENTER);
+        soundLabelBox.getChildren().addAll(createLabel("Sounds (Mute ", false, false), muteSoundBtn, createLabel(")", false, false));
+        
+        VBox audioPane = new VBox();
+        audioPane.setAlignment(Pos.CENTER);
+        audioPane.setSpacing(5);
+        audioPane.setPadding(new Insets(10, 0, 0, 0));
+        audioPane.getChildren().addAll(musicLabelBox, musicSlider, soundLabelBox, soundSlider);
+        
         namePane.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
-        		nameText, nameBtn);
+        		nameText, nameBtn, audioPane);
+        
         
         Button exitBtn = createButton("Exit", 200, 50);
         exitBtn.setOnAction(e -> System.exit(0));
         
-        menuBox.getChildren().addAll(createLabel("Version: " + this.version, false, true), namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn, exitBtn);
+        menuBox.getChildren().addAll(namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn, exitBtn);
         setBackgroundPane(mainMenu, logoPane);
 	}
 
@@ -1263,6 +1309,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			Label roomID = createLabel("Room " + room.getID() +":", false, false);
 			Label roomName = createLabel("\"" + room.getName() + "\"", false, false);
 			roomName.setAlignment(Pos.CENTER);
+			roomName.setFont(this.largeFont);
 			HBox roomPane = new HBox();
 			roomPane.setSpacing(15);
 			roomPane.setPrefHeight(50);
@@ -1459,7 +1506,23 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Map mapCopy = new Map(map.getName(), arrayCopy, map.getSpawnPoints());
 
 		Platform.setImplicitExit(false);
-		new Game(this, mapCopy, playerName, controls, aiNum, aiDiff);
+		System.out.println("Ai difficulty: " + this.aiDiff);
+		
+		float musicVolume = 50;
+		if(muteMusicBtn.isSelected()){
+			musicVolume = 0;
+		}else{
+			musicVolume = (float) musicSlider.getValue();
+		}
+		
+		float soundVolume = 50;
+		if(muteSoundBtn.isSelected()){
+			soundVolume = 0;
+		}else{
+			soundVolume = (float) soundSlider.getValue();
+		}
+		
+		new Game(this, mapCopy, playerName, controls, aiNum, this.aiDiff, musicVolume, soundVolume);
 	}
 
 	@Override

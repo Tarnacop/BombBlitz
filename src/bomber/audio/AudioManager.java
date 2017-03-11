@@ -67,7 +67,6 @@ public class AudioManager
     {
         if (!music.isAlive())
             music.start();
-        setVolume(Constants.defaultVolume);
     }
 
     public void pauseMusic()
