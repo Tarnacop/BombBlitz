@@ -70,7 +70,7 @@ public class Game implements GameInterface {
 			List<Point> spawns = this.map.getSpawnPoints();
 			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 
-			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 1, 300, new ColourMesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 100, 300, new ColourMesh(32, 32, colours));
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());

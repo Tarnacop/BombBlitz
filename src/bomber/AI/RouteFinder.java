@@ -338,7 +338,7 @@ public class RouteFinder {
 
 		Node startNode = new Node(null, pos);
 		open.add(startNode);
-
+		List<Node> finishPositions = new ArrayList<>();
 		// loop until the queue is not empty
 		Node finish = null;
 		while (!open.isEmpty()) {
@@ -348,9 +348,11 @@ public class RouteFinder {
 
 			// if the head is final position we finish
 			if (!dangerTiles.contains(temp.getCoord()) /*&& isSafeLocationToMove(dangerTiles, temp.getCoord())*/) {
-				finish = temp;
-				break;
-			}
+				finishPositions.add(temp);
+				if(finishPositions.size()>3)
+					break;
+					finish = temp;
+				}
 
 			for (Point p : getNeighbours(temp)) {
 				checkNeighbour(temp, p, open, closed, getMap());
@@ -360,6 +362,7 @@ public class RouteFinder {
 			closed.add(temp);
 		}
 
+		finish = findFurthestPositionFromEnemies(finishPositions);
 		if (finish == null)
 			return null;
 		return getMovesFromPoints(finish);
@@ -732,9 +735,35 @@ public class RouteFinder {
 
 	}
 	
+	private Node findFurthestPositionFromEnemies(List<Node> finishPositions)
+	{
+		Node furthestPos = null;
+		int furthest = Integer.MIN_VALUE;
+		int temp;
+		for(Node n: finishPositions)
+		{
+			int smallestDist = Integer.MAX_VALUE;
+			for(Player p: state.getPlayers()){
+				if(!(p instanceof GameAI) && smallestDist > (temp = countDistance(n.getCoord(), p.getGridPos())))
+					smallestDist = temp;
+			}
+			
+			if(smallestDist > furthest)
+			{
+				furthest = smallestDist;
+				furthestPos = n;
+			}
+		}
+		return furthestPos;
+	}
 	
 	
-	private boolean isSafeLocationToMove(ArrayList<Point> dangerTiles, Point position)
+	private int countDistance(Point p1, Point p2)
+	{
+		return Math.abs(p1.x-p2.x) + Math.abs(p1.y - p2.y);
+	}
+	
+	private boolean isEnclosure(ArrayList<Point> dangerTiles, Point position)
 	{
 		int numberOfPossibleMoves = 0;
 		return false;

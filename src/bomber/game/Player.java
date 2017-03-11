@@ -166,6 +166,16 @@ public class Player {
 		
 	}
 	
+	public void pause()
+	{
+		
+	}
+	
+	public void resume()
+	{
+		
+	}
+	
 	public void stop()
 	{
 		
