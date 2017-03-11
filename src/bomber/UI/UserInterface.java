@@ -912,22 +912,33 @@ public class UserInterface extends Application implements ClientNetInterface{
         musicSlider = new Slider();
         musicSlider.setMin(0);
         musicSlider.setMax(100);
-        musicSlider.setValue(50);
+        musicSlider.setValue(SettingsParser.getMusicVolume());
         musicSlider.setShowTickLabels(false);
         musicSlider.setShowTickMarks(false);
+        musicSlider.setOnMouseReleased(e -> setMusic((float)musicSlider.getValue()));
         
         soundSlider = new Slider();
         soundSlider.setMin(0);
         soundSlider.setMax(100);
-        soundSlider.setValue(50);
+        soundSlider.setValue(SettingsParser.getEffectsVolume());
         soundSlider.setShowTickLabels(false);
         soundSlider.setShowTickMarks(false);
+        soundSlider.setOnDragDone(e -> setMusic((float)soundSlider.getValue()));
         
         muteMusicBtn = new CheckBox();
+        muteMusicBtn.setOnAction(e -> setMusic(0));
+        if(SettingsParser.getMusicVolume() == 0){
+        	muteMusicBtn.setSelected(true);
+        }else{
+        	muteMusicBtn.setSelected(false);
+        }
         muteSoundBtn = new CheckBox();
-        
-        muteMusicBtn.setSelected(false);
-        muteSoundBtn.setSelected(false);
+        muteSoundBtn.setOnAction(e -> setSound(0));
+        if(SettingsParser.getEffectsVolume() == 0){
+        	muteSoundBtn.setSelected(true);
+        }else{
+        	muteSoundBtn.setSelected(false);
+        }
         
         VBox namePane = new VBox();
         namePane.setAlignment(Pos.CENTER);
@@ -958,6 +969,29 @@ public class UserInterface extends Application implements ClientNetInterface{
         setBackgroundPane(mainMenu, logoPane);
 	}
 
+	private void setMusic(float volume) {
+		if(muteMusicBtn.isSelected()){
+			SettingsParser.setMusicVolume(volume);
+			System.out.println("SET AND STORED MUSIC " + volume);
+		}else{
+			SettingsParser.setMusicVolume((float)musicSlider.getValue());
+			System.out.println("SET AND STORED MUSIC " + (float)musicSlider.getValue());
+		}
+		SettingsParser.storeSettings();
+	}
+
+	private void setSound(float volume) {
+		
+		if(muteSoundBtn.isSelected()){
+			SettingsParser.setEffectsVolume(volume);
+			System.out.println("SET AND STORED SOUND " + volume);
+		}else{
+			SettingsParser.setEffectsVolume((float)soundSlider.getValue());
+			System.out.println("SET AND STORED SOUND " + (float)soundSlider.getValue());
+		}
+		SettingsParser.storeSettings();
+	}
+	
 	private void setBackgroundPane(BorderPane pane, Node content){
 		Image mainImage = new Image("resources/images/background.png");
         ImageView mainImageView = new ImageView(mainImage);
@@ -1307,9 +1341,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 			roomContainer.setAlignment(Pos.CENTER);
 			roomContainer.getStyleClass().add("namebox");
 			Label roomID = createLabel("Room " + room.getID() +":", false, false);
-			Label roomName = createLabel("\"" + room.getName() + "\"", false, false);
+			Label roomName = createLabel(room.getName(), false, true);
 			roomName.setAlignment(Pos.CENTER);
-			roomName.setFont(this.largeFont);
+			roomName.getStyleClass().add("maplabel");
 			HBox roomPane = new HBox();
 			roomPane.setSpacing(15);
 			roomPane.setPrefHeight(50);
