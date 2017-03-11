@@ -82,19 +82,16 @@ public class GameAI extends Player {
 	/**
 	 * Pause thread.
 	 */
-	public void pauseThread() {
-		try {
-			ai.wait();
-		} catch (InterruptedException e) {
-			
-		}
+	public void pause() {
+		stop();
 	}
 
 	/**
 	 * Resume thread.
 	 */
-	public void resumeThread() {
-		ai.notify();
+	public void resume() {
+		this.setAlive(true);
+		ai.start();
 	}
 
 }
