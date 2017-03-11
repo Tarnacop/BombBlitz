@@ -86,7 +86,7 @@ public class Game implements GameInterface {
 			for(int x = 1; x <= this.aiNum; x++){
 				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, new ColourMesh(32, 32, colours), this.aiDiff);
 				list.add(ai);
-				ai.begin();
+//				ai.begin();
 			}
 
 		} catch (Exception e) {
@@ -99,6 +99,7 @@ public class Game implements GameInterface {
 
 	private float gameOverCounter = 0;
 	private	float frontScreenCounter = 0f;
+	private boolean startAIs = true;
 	@Override
 	public void update(float interval) {
 
@@ -118,7 +119,16 @@ public class Game implements GameInterface {
 			if(frontScreenCounter <= 5) {
 				
 				frontScreenCounter += interval;
-			} else {
+			} 
+			else if (startAIs) {
+				for (Player p : this.gameState.getPlayers()) {
+					if (p instanceof GameAI)
+						p.begin();
+				}
+
+				startAIs = false;
+			} 
+			else {
 				
 				renderer.stopFrontScreen();
 				this.physics.update((int) (interval * 1000));
