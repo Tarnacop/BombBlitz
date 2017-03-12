@@ -32,6 +32,8 @@ public class Constants
     public static final String playerDeathFilename = "sfx_sounds_error1.wav";
     public static final String powerupFilename = "sfx_sounds_interaction24.wav";
     public static final String menuSoundFilename = "271139_strange-dragoon_menu-select_converted.wav";
+    public static final String gameOverWonFilename = "270333__littlerobotsoundfactory__jingle-win-00.wav";
+    public static final String gameOverLostFilename = "270329__littlerobotsoundfactory__jingle-lose-00.wav";
 
     // Other files
     public static final String settingsXMLPath = "src/resources/settings.xml";

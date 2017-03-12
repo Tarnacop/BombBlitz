@@ -2,11 +2,9 @@ package bomber.audio;
 
 import bomber.game.AudioEvent;
 import bomber.game.Constants;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import javax.sound.sampled.FloatControl;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -99,16 +97,36 @@ public class AudioManager
         effects.interrupt();
     }
 
+    public static void playGameOverWon()
+    {
+        SoundEffectPlayer effects = new SoundEffectPlayer();
+        effects.playSound(Constants.gameOverWonFilename);
+        effects.interrupt();
+    }
+
+    public static void playGameOverLost()
+    {
+        SoundEffectPlayer effects = new SoundEffectPlayer();
+        effects.playSound(Constants.gameOverLostFilename);
+        effects.interrupt();
+    }
+
     public static void main(String[] args) throws InterruptedException
     {
         AudioManager audioManager = new AudioManager();
         //audioManager.playMusic();
         audioManager.setVolume(100);
 
-        AudioManager.playMenuItemSelected();
+        //AudioManager.playMenuItemSelected();
 
-        TimeUnit.SECONDS.sleep(2);
 
+        AudioManager.playGameOverWon();
+
+        TimeUnit.SECONDS.sleep(3);
+
+        AudioManager.playGameOverLost();
+
+        TimeUnit.SECONDS.sleep(3);
         /*
 
 
