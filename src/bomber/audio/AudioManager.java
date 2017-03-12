@@ -13,30 +13,34 @@ import java.util.concurrent.TimeUnit;
 public class AudioManager
 {
 
+    private static float musicVolume;
+    private static float effectsVolume;
+
     private MusicPlayer music;
     private SoundEffectPlayer effects;
 
     public AudioManager()
     {
-        music = new MusicPlayer();
-        effects = new SoundEffectPlayer();
+        music = new MusicPlayer(musicVolume);
+        effects = new SoundEffectPlayer(effectsVolume);
         effects.start();
     }
 
-    public void setMusicVolume(float percent)
+    public static void setMusicVolume(float percent)
     {
-        music.setVolume(percent);
+        musicVolume = percent;
     }
 
-    public void setEffectsVolume(float percent)
+    public static void setEffectsVolume(float percent)
     {
-        effects.setVolume(percent);
+        System.err.println("Effects volume set to " + percent);
+        effectsVolume = percent;
     }
 
-    public void setVolume(float percent)
+    public static void setVolume(float percent)
     {
-        music.setVolume(percent);
-        effects.setVolume(percent);
+        musicVolume = percent;
+        effectsVolume = percent;
     }
 
     static void setControlVolume(FloatControl gainControl, float volume)
@@ -92,7 +96,7 @@ public class AudioManager
 
     public static void playMenuItemSelected()
     {
-        SoundEffectPlayer effects = new SoundEffectPlayer();
+        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
         effects.playSound(Constants.menuSoundFilename);
         effects.interrupt();
     }
