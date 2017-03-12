@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import bomber.game.Constants;
 import bomber.game.GameState;
 import bomber.game.Movement;
 import bomber.game.Player;
@@ -28,12 +29,6 @@ public abstract class AITemplate extends Thread {
 
 	/** The game state. */
 	protected GameState gameState;
-
-	/** The Constant scalar. */
-	protected static final int scalar = 64;
-
-	/** The Constant playerSize. */
-	protected static final int playerSize = 32;
 
 	/**
 	 * Instantiates a new AI manager.
@@ -136,9 +131,9 @@ public abstract class AITemplate extends Thread {
 	 * @return true, if it is needed to stop moving
 	 */
 	protected boolean checkIfReachedDestination(Point currentPixel, Point updatedFinalPixelPos) {
-		boolean check = (currentPixel.x - updatedFinalPixelPos.x) < (scalar - playerSize);
+		boolean check = (currentPixel.x - updatedFinalPixelPos.x) < (Constants.mapBlockToGridMultiplier - Constants.playerPixelWidth);
 		check &= (updatedFinalPixelPos.x <= currentPixel.x);
-		check &= (currentPixel.y - updatedFinalPixelPos.y) < (scalar - playerSize);
+		check &= (currentPixel.y - updatedFinalPixelPos.y) < (Constants.mapBlockToGridMultiplier - Constants.playerPixelHeight);
 		check &= (updatedFinalPixelPos.y <= currentPixel.y);
 		return !check;
 	}
@@ -155,7 +150,7 @@ public abstract class AITemplate extends Thread {
 	protected void makeSingleMove(AIActions move) {
 		Point updatedPos = updatedPos(move);
 		Point updatedPos2 = new Point(updatedPos);
-		updatedPos.setLocation(updatedPos.x * scalar, updatedPos.y * scalar);
+		updatedPos.setLocation(updatedPos.x * Constants.mapBlockToGridMultiplier, updatedPos.y * Constants.mapBlockToGridMultiplier);
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
 		int stuckChecker = 0;
 		while (checkIfReachedDestination(gameAI.getPos(), updatedPos) && gameAI.isAlive()

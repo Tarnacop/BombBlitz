@@ -32,9 +32,6 @@ public class RouteFinder {
 	/** The safety checker. */
 	private SafetyChecker safetyCh;
 
-	/** The Constant scalar for pixel based representation. */
-	private static final int scalar = 64;
-
 	/**
 	 * Instantiates a new route finder.
 	 *
@@ -131,22 +128,12 @@ public class RouteFinder {
 	 */
 	private void checkNeighbour(Node parent, Point goal, int cost, Point neigh, PriorityQueue<Node> open,
 			HashSet<Node> closed) {
-		int x = neigh.x;
-		int y = neigh.y;
-		Block[][] map = getMap();
-
 		// we check if the coordinates are valid
 		// if not we return
-		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
-				|| map[x][y] == Block.SOLID || map[x][y] == Block.MINUS_BOMB || map[x][y] == Block.MINUS_RANGE
-				|| map[x][y] == Block.MINUS_SPEED)
+		if (!checkMoveValidity(neigh))
 			return;
 		//
-		// List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
-		//
-		// if (bombs.stream().filter(bomb ->
-		// bomb.getGridPos().equals(neigh)).findFirst().isPresent())
-		// return;
+
 		// if the neighbour is in the visited list we return
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
@@ -158,7 +145,10 @@ public class RouteFinder {
 		for (Node nd : open) {
 			if (nd.getCoord().equals(neigh) && cost < nd.getgValue()) {
 				open.remove(nd);
-				int hValue = Math.abs(goal.x - neigh.x) + Math.abs(goal.y - neigh.y);
+				int hValue = countDistance(goal, neigh); // Math.abs(goal.x -
+															// neigh.x) +
+															// Math.abs(goal.y -
+															// neigh.y);
 				Node neighNode = new Node(cost, hValue, parent, neigh);
 				open.add(neighNode);
 				return;
@@ -166,7 +156,9 @@ public class RouteFinder {
 		}
 
 		// else we add it to the queue
-		int hValue = Math.abs(goal.x - neigh.x) + Math.abs(goal.y - neigh.y);
+		int hValue = countDistance(goal, neigh); // Math.abs(goal.x - neigh.x) +
+													// Math.abs(goal.y -
+													// neigh.y);
 		Node neighNode = new Node(cost, hValue, parent, neigh);
 		open.add(neighNode);
 
@@ -198,11 +190,6 @@ public class RouteFinder {
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOLID)
 			return;
 
-		// List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
-		//
-		// if (bombs.stream().filter(bomb ->
-		// bomb.getGridPos().equals(neigh)).findFirst().isPresent())
-		// return;
 		for (Node nd : closed)
 			if (nd.getCoord().equals(neigh))
 				return;
@@ -210,14 +197,19 @@ public class RouteFinder {
 		for (Node nd : open) {
 			if (nd.getCoord().equals(neigh) && cost < nd.getgValue()) {
 				open.remove(nd);
-				int hValue = Math.abs(goal.x - neigh.x) + Math.abs(goal.y - neigh.y);
+				int hValue = countDistance(goal, neigh); // Math.abs(goal.x -
+															// neigh.x) +
+															// Math.abs(goal.y -
+															// neigh.y);
 				Node neighNode = new Node(cost, hValue, parent, neigh);
 				open.add(neighNode);
 				return;
 			}
 		}
 
-		int hValue = Math.abs(goal.x - neigh.x) + Math.abs(goal.y - neigh.y);
+		int hValue = countDistance(goal, neigh); // Math.abs(goal.x - neigh.x) +
+													// Math.abs(goal.y -
+													// neigh.y);
 		Node neighNode = new Node(cost, hValue, parent, neigh);
 		open.add(neighNode);
 	}
@@ -347,12 +339,13 @@ public class RouteFinder {
 			Node temp = open.poll();
 
 			// if the head is final position we finish
-			if (!dangerTiles.contains(temp.getCoord()) /*&& isSafeLocationToMove(dangerTiles, temp.getCoord())*/) {
+			if (!dangerTiles
+					.contains(temp.getCoord()) ) {
 				finishPositions.add(temp);
-				if(finishPositions.size()>3)
+				if (finishPositions.size() > 3)
 					break;
-					finish = temp;
-				}
+				finish = temp;
+			}
 
 			for (Point p : getNeighbours(temp)) {
 				checkNeighbour(temp, p, open, closed, getMap());
@@ -378,10 +371,11 @@ public class RouteFinder {
 		Point aiPos = gameAI.getGridPos();
 		Point pos = null;
 		int distance = Integer.MAX_VALUE;
+		int temp = 0;
 		for (Player p : state.getPlayers()) {
-			if (!p.equals(gameAI) && p.isAlive()
-					&& (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
-				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
+			if (!p.equals(gameAI) && p.isAlive() && (temp = countDistance(aiPos, p.getGridPos())) < distance) {
+				distance = temp; // (Math.abs(aiPos.x - p.getGridPos().x) +
+									// Math.abs(aiPos.y - p.getGridPos().y));
 				pos = p.getGridPos();
 			}
 		}
@@ -518,9 +512,12 @@ public class RouteFinder {
 			if (isSoftBlockAfterMove(move, pos, map)) {
 				realMoves.add(AIActions.BOMB);
 
-				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(safetyCh.getBombCoverage(
-						new Bomb(null, new Point(pos.x * scalar, pos.y * scalar), 0, gameAI.getBombRange()), map), pos,
-						map));
+				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(
+						safetyCh.getBombCoverage(
+								new Bomb(null,
+										new Point(pos.x * Constants.mapBlockToGridMultiplier,
+												pos.y * Constants.mapBlockToGridMultiplier),
+										0, gameAI.getBombRange()),map),pos, map));
 				if (escapeMoves == null)
 					return realMoves;
 				realMoves.addAll(escapeMoves);
@@ -664,9 +661,11 @@ public class RouteFinder {
 		List<Player> players = state.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive())
 				.collect(Collectors.toList());
 
+		int temp = 0;
 		for (Player p : players) {
-			if ((Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y)) < distance) {
-				distance = (Math.abs(aiPos.x - p.getGridPos().x) + Math.abs(aiPos.y - p.getGridPos().y));
+			if ((temp = countDistance(aiPos, p.getGridPos())) < distance) {
+				distance = temp;// (Math.abs(aiPos.x - p.getGridPos().x) +
+								// Math.abs(aiPos.y - p.getGridPos().y));
 				pos = p.getGridPos();
 			}
 		}
@@ -734,39 +733,61 @@ public class RouteFinder {
 		return getMovesFromPoints(finish);
 
 	}
-	
-	private Node findFurthestPositionFromEnemies(List<Node> finishPositions)
-	{
+
+	private Node findFurthestPositionFromEnemies(List<Node> finishPositions) {
 		Node furthestPos = null;
 		int furthest = Integer.MIN_VALUE;
 		int temp;
-		for(Node n: finishPositions)
-		{
+		for (Node n : finishPositions) {
 			int smallestDist = Integer.MAX_VALUE;
-			for(Player p: state.getPlayers()){
-				if(!(p instanceof GameAI) && smallestDist > (temp = countDistance(n.getCoord(), p.getGridPos())))
+			for (Player p : state.getPlayers()) {
+				if (!(p instanceof GameAI) && smallestDist > (temp = countDistance(n.getCoord(), p.getGridPos())))
 					smallestDist = temp;
 			}
-			
-			if(smallestDist > furthest)
-			{
+
+			if (smallestDist > furthest) {
 				furthest = smallestDist;
 				furthestPos = n;
 			}
 		}
 		return furthestPos;
 	}
-	
-	
-	private int countDistance(Point p1, Point p2)
-	{
-		return Math.abs(p1.x-p2.x) + Math.abs(p1.y - p2.y);
+
+	private int countDistance(Point p1, Point p2) {
+		return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 	}
 	
-	private boolean isEnclosure(ArrayList<Point> dangerTiles, Point position)
+	//true if valid, false otherwise
+	private boolean checkMoveValidity(Point p)
 	{
-		int numberOfPossibleMoves = 0;
-		return false;
+		int x = p.x;
+		int y = p.y;
+		Block[][] map = getMap();
+		return !((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
+				|| map[x][y] == Block.SOLID || map[x][y] == Block.MINUS_BOMB || map[x][y] == Block.MINUS_RANGE
+				|| map[x][y] == Block.MINUS_SPEED);
 	}
 
+	
+	//true if it enclosure and false it is safe
+	public boolean isEnclosure(ArrayList<Point> dangerTiles, Point position) {
+		LinkedList<Point> positions = new LinkedList<Point>();
+		positions.add(position);
+		Block[][] map = getMap();
+		Point temp =null;
+		int numberOfPossibleMoves = 0;
+		while(!positions.isEmpty() && numberOfPossibleMoves < 5)
+		{
+			temp = positions.poll();
+			if(temp == null || dangerTiles.contains(temp)) continue;
+			else if(checkMoveValidity(temp)){
+				numberOfPossibleMoves++;
+				positions.addAll(getNeighbours(new Node(null, temp)));
+			}
+
+		}
+		return numberOfPossibleMoves < 5;
+		
+
+	}
 }
