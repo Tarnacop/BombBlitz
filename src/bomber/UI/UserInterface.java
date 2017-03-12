@@ -129,8 +129,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		SettingsParser.init();
 
 		this.ui = this;
-		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft_alt.ttf").toExternalForm(), 20);
-		Font.loadFont(UserInterface.class.getResource("../../resources/minecraftbig.ttf").toExternalForm(), 30);
+		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 20);
 		this.css = UserInterface.class.getResource("../../resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty(SettingsParser.getPlayerName());
 		this.aiNumber = new SimpleIntegerProperty(1);
