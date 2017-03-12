@@ -101,6 +101,8 @@ public class ExtremeAI extends AITemplate {
 		return false;
 	}
 
+	
+	
 	/**
 	 * Check if other AIs are reachable
 	 *

@@ -345,8 +345,11 @@ public class RouteFinder {
 			// else we loop through all the neighbours
 			closed.add(temp);
 		}
-
+//		finishPositions.stream().forEach(n -> System.out.println(n.getCoord()));
+//		System.out.println('\n');
 		finish = findFurthestPositionFromEnemies(finishPositions);
+//		System.out.println(finish.getCoord());
+//		System.out.println('\n');
 		if (finish == null)
 			return null;
 		return getMovesFromPoints(finish);
@@ -681,7 +684,7 @@ public class RouteFinder {
 			moves = escapeFromExplotion(bombs);
 
 		}
-		if ((moves != null) && (moves.size() < 4))
+		if ((moves != null) && (moves.size() < 5 ))
 			return moves;
 		return null;
 	}
