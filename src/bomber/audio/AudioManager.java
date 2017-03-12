@@ -103,14 +103,14 @@ public class AudioManager
 
     public static void playGameOverWon()
     {
-        SoundEffectPlayer effects = new SoundEffectPlayer();
+        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
         effects.playSound(Constants.gameOverWonFilename);
         effects.interrupt();
     }
 
     public static void playGameOverLost()
     {
-        SoundEffectPlayer effects = new SoundEffectPlayer();
+        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
         effects.playSound(Constants.gameOverLostFilename);
         effects.interrupt();
     }
