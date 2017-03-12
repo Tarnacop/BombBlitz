@@ -15,7 +15,7 @@ public class MusicPlayer extends Thread
 
     private Clip clip;
 
-    public MusicPlayer()
+    public MusicPlayer(float volume)
     {
         try {
             clip = AudioSystem.getClip();
@@ -24,7 +24,7 @@ public class MusicPlayer extends Thread
                 throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
             clip.open(inputStream);
-            setVolume(Constants.defaultVolume);
+            setVolume(volume);
 
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             System.err.println("Could not load sound: " + Constants.audioFilesPath + Constants.musicFilename);

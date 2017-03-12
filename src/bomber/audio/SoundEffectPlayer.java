@@ -16,9 +16,9 @@ public class SoundEffectPlayer extends Thread
 
     private float volume;
 
-    public SoundEffectPlayer()
+    public SoundEffectPlayer(float volume)
     {
-        volume = Constants.defaultVolume;
+        this.volume = volume;
     }
 
     public void playSound(String fileName)

@@ -2,11 +2,10 @@ package bomber.audio;
 
 import bomber.game.AudioEvent;
 import bomber.game.Constants;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import javax.sound.sampled.FloatControl;
+
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -15,30 +14,34 @@ import java.util.concurrent.TimeUnit;
 public class AudioManager
 {
 
+    private static float musicVolume;
+    private static float effectsVolume;
+
     private MusicPlayer music;
     private SoundEffectPlayer effects;
 
     public AudioManager()
     {
-        music = new MusicPlayer();
-        effects = new SoundEffectPlayer();
+        music = new MusicPlayer(musicVolume);
+        effects = new SoundEffectPlayer(effectsVolume);
         effects.start();
     }
 
-    public void setMusicVolume(float percent)
+    public static void setMusicVolume(float percent)
     {
-        music.setVolume(percent);
+        musicVolume = percent;
     }
 
-    public void setEffectsVolume(float percent)
+    public static void setEffectsVolume(float percent)
     {
-        effects.setVolume(percent);
+        System.err.println("Effects volume set to " + percent);
+        effectsVolume = percent;
     }
 
-    public void setVolume(float percent)
+    public static void setVolume(float percent)
     {
-        music.setVolume(percent);
-        effects.setVolume(percent);
+        musicVolume = percent;
+        effectsVolume = percent;
     }
 
     static void setControlVolume(FloatControl gainControl, float volume)
@@ -65,6 +68,7 @@ public class AudioManager
 
     public void playMusic()
     {
+    	System.out.println("AudioManager Music " + musicVolume + " Sound " + effectsVolume);
         if (!music.isAlive())
             music.start();
     }
@@ -94,8 +98,22 @@ public class AudioManager
 
     public static void playMenuItemSelected()
     {
-        SoundEffectPlayer effects = new SoundEffectPlayer();
+        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
         effects.playSound(Constants.menuSoundFilename);
+        effects.interrupt();
+    }
+
+    public static void playGameOverWon()
+    {
+        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
+        effects.playSound(Constants.gameOverWonFilename);
+        effects.interrupt();
+    }
+
+    public static void playGameOverLost()
+    {
+        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
+        effects.playSound(Constants.gameOverLostFilename);
         effects.interrupt();
     }
 
@@ -105,10 +123,16 @@ public class AudioManager
         //audioManager.playMusic();
         audioManager.setVolume(100);
 
-        AudioManager.playMenuItemSelected();
+        //AudioManager.playMenuItemSelected();
 
-        TimeUnit.SECONDS.sleep(2);
 
+        AudioManager.playGameOverWon();
+
+        TimeUnit.SECONDS.sleep(3);
+
+        AudioManager.playGameOverLost();
+
+        TimeUnit.SECONDS.sleep(3);
         /*
 
 

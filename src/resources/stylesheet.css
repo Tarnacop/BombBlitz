@@ -62,8 +62,6 @@
 }
 
 .maplabel{
-	-fx-font-family: minecraft;
-	-fx-font-size: 20;
 	-fx-padding: 10px 20px;
 	-fx-background-color: transparent;
 	-fx-background-image: url("images/maplabel.png");
