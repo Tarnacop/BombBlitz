@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package bomber.AI;
 
 import java.awt.Point;
@@ -145,10 +148,7 @@ public class RouteFinder {
 		for (Node nd : open) {
 			if (nd.getCoord().equals(neigh) && cost < nd.getgValue()) {
 				open.remove(nd);
-				int hValue = countDistance(goal, neigh); // Math.abs(goal.x -
-															// neigh.x) +
-															// Math.abs(goal.y -
-															// neigh.y);
+				int hValue = countDistance(goal, neigh); 
 				Node neighNode = new Node(cost, hValue, parent, neigh);
 				open.add(neighNode);
 				return;
@@ -156,9 +156,7 @@ public class RouteFinder {
 		}
 
 		// else we add it to the queue
-		int hValue = countDistance(goal, neigh); // Math.abs(goal.x - neigh.x) +
-													// Math.abs(goal.y -
-													// neigh.y);
+		int hValue = countDistance(goal, neigh); 
 		Node neighNode = new Node(cost, hValue, parent, neigh);
 		open.add(neighNode);
 
@@ -197,19 +195,14 @@ public class RouteFinder {
 		for (Node nd : open) {
 			if (nd.getCoord().equals(neigh) && cost < nd.getgValue()) {
 				open.remove(nd);
-				int hValue = countDistance(goal, neigh); // Math.abs(goal.x -
-															// neigh.x) +
-															// Math.abs(goal.y -
-															// neigh.y);
+				int hValue = countDistance(goal, neigh); 
 				Node neighNode = new Node(cost, hValue, parent, neigh);
 				open.add(neighNode);
 				return;
 			}
 		}
 
-		int hValue = countDistance(goal, neigh); // Math.abs(goal.x - neigh.x) +
-													// Math.abs(goal.y -
-													// neigh.y);
+		int hValue = countDistance(goal, neigh); 
 		Node neighNode = new Node(cost, hValue, parent, neigh);
 		open.add(neighNode);
 	}
@@ -290,10 +283,7 @@ public class RouteFinder {
 			return;
 		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
 
-		/*
-		 * if (bombs .stream() .filter(bomb -> bomb .getGridPos() .equals(tile))
-		 * .findFirst() .isPresent()) return;
-		 */
+		
 		for (Bomb b : bombs) {
 			// System.out.println(b);
 			if (b != null) {
@@ -331,6 +321,7 @@ public class RouteFinder {
 		Node startNode = new Node(null, pos);
 		open.add(startNode);
 		List<Node> finishPositions = new ArrayList<>();
+		
 		// loop until the queue is not empty
 		Node finish = null;
 		while (!open.isEmpty()) {
@@ -374,8 +365,7 @@ public class RouteFinder {
 		int temp = 0;
 		for (Player p : state.getPlayers()) {
 			if (!p.equals(gameAI) && p.isAlive() && (temp = countDistance(aiPos, p.getGridPos())) < distance) {
-				distance = temp; // (Math.abs(aiPos.x - p.getGridPos().x) +
-									// Math.abs(aiPos.y - p.getGridPos().y));
+				distance = temp; 
 				pos = p.getGridPos();
 			}
 		}
@@ -556,7 +546,8 @@ public class RouteFinder {
 		// loop until the queue is not empty
 		Node finish = null;
 		while (!open.isEmpty()) {
-			// take the head of the queu
+			
+			// take the head of the queue
 			Node temp = open.poll();
 			// if the head is final position we finish
 			if (temp.getCoord().equals(goal)) {
@@ -643,7 +634,6 @@ public class RouteFinder {
 
 	}
 
-	// ------------------------
 
 	/**
 	 * Gets the nearest enemy.
@@ -664,8 +654,7 @@ public class RouteFinder {
 		int temp = 0;
 		for (Player p : players) {
 			if ((temp = countDistance(aiPos, p.getGridPos())) < distance) {
-				distance = temp;// (Math.abs(aiPos.x - p.getGridPos().x) +
-								// Math.abs(aiPos.y - p.getGridPos().y));
+				distance = temp;
 				pos = p.getGridPos();
 			}
 		}
@@ -697,6 +686,12 @@ public class RouteFinder {
 		return null;
 	}
 
+	/**
+	 * Find route to the upgrade.
+	 * Finds the fastest route to the upgrade using breadth-first algorithm
+	 *
+	 * @return the linked list
+	 */
 	public LinkedList<AIActions> findRouteToUpgrade() {
 		Point pos = gameAI.getGridPos();
 		LinkedList<Node> open = new LinkedList<>();
@@ -734,6 +729,15 @@ public class RouteFinder {
 
 	}
 
+	/**
+	 * Finds the furthest position from enemies.
+	 * Given a list of possible positions it returns the one
+	 * which is furthest from the enemy, so that AI could
+	 * avoid going to the enemy direction after bomb was placed
+	 *
+	 * @param finishPositions the finish positions
+	 * @return the node
+	 */
 	private Node findFurthestPositionFromEnemies(List<Node> finishPositions) {
 		Node furthestPos = null;
 		int furthest = Integer.MIN_VALUE;
@@ -753,11 +757,24 @@ public class RouteFinder {
 		return furthestPos;
 	}
 
+	/**
+	 * Count the distance from one position to another
+	 *
+	 * @param p1 the position 1
+	 * @param p2 the position 2
+	 * @return the distance
+	 */
 	private int countDistance(Point p1, Point p2) {
 		return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 	}
 	
-	//true if valid, false otherwise
+	/**
+	 * Check move validity.
+	 * Helps AI to avoid going into the wall, soft block, or out of the map
+	 *
+	 * @param p the position
+	 * @return true, if the move is valid
+	 */
 	private boolean checkMoveValidity(Point p)
 	{
 		int x = p.x;
@@ -769,11 +786,16 @@ public class RouteFinder {
 	}
 
 	
-	//true if it enclosure and false it is safe
+	/**
+	 * Checks if the position is enclosure.
+	 *
+	 * @param dangerTiles the danger tiles affected by bombs
+	 * @param position the position
+	 * @return true, if the position is enclosure so avoid it
+	 */
 	public boolean isEnclosure(ArrayList<Point> dangerTiles, Point position) {
 		LinkedList<Point> positions = new LinkedList<Point>();
 		positions.add(position);
-		Block[][] map = getMap();
 		Point temp =null;
 		int numberOfPossibleMoves = 0;
 		while(!positions.isEmpty() && numberOfPossibleMoves < 5)

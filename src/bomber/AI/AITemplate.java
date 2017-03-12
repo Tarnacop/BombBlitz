@@ -52,13 +52,11 @@ public abstract class AITemplate extends Thread {
 	 */
 	public void run() {
 		try {
-			sleep(1000);
+			sleep(500);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		move();
-		System.out.println(gameAI.getLives());
 		System.out.println("AI Stopped.");
 	}
 
@@ -120,7 +118,7 @@ public abstract class AITemplate extends Thread {
 
 		return m;
 	}
-	
+
 	/**
 	 * Check if the AI reached destination when making a single move.
 	 *
@@ -131,14 +129,15 @@ public abstract class AITemplate extends Thread {
 	 * @return true, if it is needed to stop moving
 	 */
 	protected boolean checkIfReachedDestination(Point currentPixel, Point updatedFinalPixelPos) {
-		boolean check = (currentPixel.x - updatedFinalPixelPos.x) < (Constants.mapBlockToGridMultiplier - Constants.playerPixelWidth);
+		boolean check = (currentPixel.x - updatedFinalPixelPos.x) < (Constants.mapBlockToGridMultiplier
+				- Constants.playerPixelWidth);
 		check &= (updatedFinalPixelPos.x <= currentPixel.x);
-		check &= (currentPixel.y - updatedFinalPixelPos.y) < (Constants.mapBlockToGridMultiplier - Constants.playerPixelHeight);
+		check &= (currentPixel.y - updatedFinalPixelPos.y) < (Constants.mapBlockToGridMultiplier
+				- Constants.playerPixelHeight);
 		check &= (updatedFinalPixelPos.y <= currentPixel.y);
 		return !check;
 	}
-	
-	
+
 	/**
 	 * Make single move.
 	 * 
@@ -148,20 +147,32 @@ public abstract class AITemplate extends Thread {
 	 *            the move to be made
 	 */
 	protected void makeSingleMove(AIActions move) {
-		Point updatedPos = updatedPos(move);
-		Point updatedPos2 = new Point(updatedPos);
-		updatedPos.setLocation(updatedPos.x * Constants.mapBlockToGridMultiplier, updatedPos.y * Constants.mapBlockToGridMultiplier);
+		//updated positions
+		Point updatedPosPixel = updatedPos(move);
+		Point updatedPos = new Point(updatedPosPixel);
+		
+		//sets the position to the pixel representation
+		updatedPosPixel.setLocation(updatedPosPixel.x * Constants.mapBlockToGridMultiplier,
+				updatedPosPixel.y * Constants.mapBlockToGridMultiplier);
+		
+		// sets the move to be made
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
+		
+		// checking if the AI got stuck
 		int stuckChecker = 0;
-		while (checkIfReachedDestination(gameAI.getPos(), updatedPos) && gameAI.isAlive()
-				&& !safetyCh.isNextMoveBomb(updatedPos2) && stuckChecker<75) {
+		
+		// waiting for the move to be mande
+		while (checkIfReachedDestination(gameAI.getPos(), updatedPosPixel) && gameAI.isAlive()
+				&& !safetyCh.isNextMoveBomb(updatedPos) && stuckChecker < 75) {
 			stuckChecker++;
 			try {
 				sleep(10);
 			} catch (InterruptedException e) {
-
+				
 			}
 		}
+		
+		// setting keyboard back to normal
 		gameAI.getKeyState().setMovement(Movement.NONE);
 
 	}
@@ -172,16 +183,16 @@ public abstract class AITemplate extends Thread {
 	 * @return the moves to enemy
 	 */
 	protected LinkedList<AIActions> getMovesToEnemy() {
-		
-		//find the route to the nearest enemy
-		//moves == null if there are soft block to the enemy
+
+		// find the route to the nearest enemy
+		// moves == null if there are soft block to the enemy
 		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy());
 		if (moves != null)
 			return moves;
-		
+
 		// else we loop through each enemy looking for the possible access
 		for (Player p : gameState.getPlayers()) {
-			if (!p.equals(gameAI)) {
+			if (!p.equals(gameAI) &&p.isAlive()) {
 				moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
 				if (moves != null)
 					return moves;
@@ -191,15 +202,14 @@ public abstract class AITemplate extends Thread {
 	}
 
 	/**
-	 * Gets the moves to enemy excluding the AI.
-	 * Other AIs are ignored.
+	 * Gets the moves to enemy excluding the AI. Other AIs are ignored.
 	 *
 	 * @return the moves to enemy ignoring other AIs
 	 */
 	protected LinkedList<AIActions> getMovesToEnemyExcludeAIs() {
-		
-		//find the route to the nearest enemy
-		//moves == null if there are soft block to the enemy
+
+		// find the route to the nearest enemy
+		// moves == null if there are soft block to the enemy
 		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs());
 		if (moves != null)
 			return moves;
@@ -227,8 +237,7 @@ public abstract class AITemplate extends Thread {
 	protected abstract void performMoves(LinkedList<AIActions> moves, boolean inDanger);
 
 	/**
-	 * Perform planned moves.
-	 * When none of the players are reachable
+	 * Perform planned moves. When none of the players are reachable
 	 *
 	 * @param moves
 	 *            the moves

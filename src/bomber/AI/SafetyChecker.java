@@ -12,8 +12,9 @@ import bomber.game.GameState;
 import bomber.game.Player;
 
 /**
- * @author Jokubas Liutkus
  * The Class SafetyChecker for checking safety of the moves and AI.
+ * 
+ * @author Jokubas Liutkus
  */
 public class SafetyChecker {
 
@@ -132,8 +133,7 @@ public class SafetyChecker {
 			points.add(new Point(bombX, (bombY + i)));
 
 		}
-//		System.out.println(points);
-//		Block[][] map = getMap();
+
 		int x, y;
 		for (int i = 0; i < points.size(); i++) {
 			x = points.get(i).x;
@@ -145,7 +145,6 @@ public class SafetyChecker {
 			}
 
 		}
-//		System.out.println(points);
 		return points;
 	}
 
@@ -209,7 +208,13 @@ public class SafetyChecker {
 	}
 	
 	
-//	true if is the bomb
+	
+	/**
+	 * Checks if is next move is bomb.
+	 *
+	 * @param updatedPos the position after move
+	 * @return true, if there is a bomb in the moving position
+	 */
 	public boolean isNextMoveBomb(Point updatedPos)
 	{
 			ArrayList<Bomb> bombs = new ArrayList<>(state.getBombs());

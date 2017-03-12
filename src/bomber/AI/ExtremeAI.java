@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import bomber.game.GameState;
 import bomber.game.Player;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class HardAI for making moves.
  *
@@ -86,6 +87,12 @@ public class ExtremeAI extends AITemplate {
 
 	}
 
+	/**
+	 * Checks if the AI is performer to pick the upgrade.
+	 * Determines which AI will get the upgrade
+	 *
+	 * @return true, if is performer
+	 */
 	private boolean isPerformer() {
 		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive())
 				.collect(Collectors.toList());
@@ -94,6 +101,11 @@ public class ExtremeAI extends AITemplate {
 		return false;
 	}
 
+	/**
+	 * Check if other AIs are reachable
+	 *
+	 * @return true, if successful
+	 */
 	private boolean checkIfAIsReachable() {
 		List<Player> players = gameState.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive())
 				.collect(Collectors.toList());
@@ -119,7 +131,7 @@ public class ExtremeAI extends AITemplate {
 			}
 
 			// if enemy is in range and it is possible to place bomb and escape
-			// then do it
+			// then perform it
 			else if ((moves = finder.canPutBombAndEscapeExcludeAIs()) != null) {
 				gameAI.getKeyState().setBomb(true);
 				performMoves(moves, true);
@@ -131,14 +143,7 @@ public class ExtremeAI extends AITemplate {
 				performMoves(moves, false);
 			}
 
-			// // if enemy is in bomb range then place the bomb and go to the
-			// ////// // safe location
-			// else if (safetyCh.isEnemyInBombRangeExludeAIs()) {
-			// gameAI.getKeyState().setBomb(true);
-			// moves =
-			// finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-			// performMoves(moves, true);
-			// }
+		
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemyExcludeAIs()) != null) {
@@ -155,4 +160,4 @@ public class ExtremeAI extends AITemplate {
 		}
 	}
 
-}
+}	

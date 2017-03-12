@@ -80,14 +80,14 @@ public class GameAI extends Player {
 	}
 	
 	/**
-	 * Pause thread.
+	 * Pause the AI.
 	 */
 	public void pause() {
 		stop();
 	}
 
 	/**
-	 * Resume thread.
+	 * Resume the AI.
 	 */
 	public void resume() {
 		this.setAlive(true);

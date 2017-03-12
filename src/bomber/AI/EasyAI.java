@@ -6,6 +6,7 @@ import java.util.Random;
 
 import bomber.game.GameState;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class EasyAI.
  * 
