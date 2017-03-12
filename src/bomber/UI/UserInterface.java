@@ -37,7 +37,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -66,10 +65,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Stage currentStage;
 	private BorderPane serverMenu;
 	private BorderPane singleMenu;
-	private Scene mainScene, keyScene, serverScene, singleScene;
+	private Scene mainScene, serverScene, singleScene;
 	private TextField nameText, ipText;
-	private Button nameBtn, controlsBtn, startBtn;
-	private Button backBtn2, backBtn3, backBtn4;
+	private Button nameBtn;
 	private Button connectBtn;
 	private Stack<Scene> previousScenes;
 	private HashMap<Response, Integer> controls;
@@ -78,33 +76,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private SimpleIntegerProperty aiNumber;
 	private TextField portNum;
 	private AIDifficulty aiDiff;
-	private HBox centerBox;
 	private List<Map> maps;
-	private HBox ipBox;
 	private Label enterLabel;
-	private Label slashLabel;
-	private HBox backBox1;
 	private VBox connectPane;
 	private ClientThread client;
 	private FlowPane roomsBox;
 	private FlowPane playersBox;
-	private Button backBtn5;
-	private Button upBtn;
-	private Button downBtn;
-	private Button leftBtn;
-	private Button rightBtn;
-	private Label upLabel;
-	private Label downLabel;
-	private Label rightLabel;
-	private Label leftLabel;
-	private Label keyLabel;
-	private HBox upPane;
-	private Label bombLabel;
-	private Button bombBtn;
-	private HBox downPane;
-	private HBox rightPane;
-	private HBox leftPane;
-	private HBox bombPane;
 	private boolean expectingConnection;
 	private Scene currentScene;
 	private Font font;
@@ -135,28 +112,25 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private ChoiceBox<String> aiDifficultyChoice;
 	private ChoiceBox<String> aiOnlineDifficultyChoice;
 	private VBox readyPane;
-	private VBox readyBox;
 	private Button readyButton;
 	private Rectangle readyTorch;
-	private String version;
-	private Font largeFont;
-	private Font italicFont;
-	private float musicVolume;
-	private float soundVolume;
 	private Slider musicSlider;
 	private Slider soundSlider;
 	private CheckBox muteMusicBtn;
 	private CheckBox muteSoundBtn;
+	private double versionNumber;
+	private boolean musicMuted;
+	private boolean soundMuted;
 	
 	public UserInterface(){
 
+		this.versionNumber = 1.2;
+		
 		SettingsParser.init();
 
-		//for JavaFX
-		this.version = "1.2";
 		this.ui = this;
-		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 20);
-		this.largeFont = Font.loadFont(UserInterface.class.getResource("../../resources/minecraftbig.ttf").toExternalForm(), 30);
+		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft_alt.ttf").toExternalForm(), 20);
+		Font.loadFont(UserInterface.class.getResource("../../resources/minecraftbig.ttf").toExternalForm(), 30);
 		this.css = UserInterface.class.getResource("../../resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty(SettingsParser.getPlayerName());
 		this.aiNumber = new SimpleIntegerProperty(1);
@@ -192,90 +166,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		previousScenes = new Stack<Scene>();
 		initScenes();
 		
-        backBtn2 = new Button("Back");
-        backBtn2.setOnAction(e -> previous());
-        
-        backBtn3 = new Button("Back");
-        backBtn3.setOnAction(e -> previous());
-        
-        backBtn5 = new Button("Back");
-        backBtn5.setAlignment(Pos.CENTER);
-        backBtn5.setOnAction(e -> previous());
-        
-//        settingsBtn = new Button("Settings");
-//        settingsBtn.setPrefWidth(200);
-//        settingsBtn.setOnAction(e -> advance(settingScene, keyScene));
-//        
-        controlsBtn = new Button("Control Options");
-        controlsBtn.setOnAction(e -> advance(mainScene, keyScene));
-        
-        upBtn = new Button("" + this.controls.get(Response.UP_MOVE));
-        upBtn.setPrefWidth(200);
-        //upBtn.setOnAction(e -> setUp());
-        
-        downBtn = new Button("" + this.controls.get(Response.DOWN_MOVE));
-        downBtn.setPrefWidth(200);
-        //downBtn.setOnAction(e -> setDown());
-        
-        leftBtn = new Button("" + this.controls.get(Response.LEFT_MOVE));
-        leftBtn.setPrefWidth(200);
-        //leftBtn.setOnAction(e -> setLeft());
-        
-        rightBtn = new Button("" + this.controls.get(Response.RIGHT_MOVE));
-        rightBtn.setPrefWidth(200);
-        //rightBtn.setOnAction(e -> setRight());
-        
-        bombBtn = new Button("" + this.controls.get(Response.PLACE_BOMB));
-        bombBtn.setPrefWidth(200);
-        bombBtn.setOnAction(e -> setNextKey(this.bombBtn, Response.PLACE_BOMB));
-        
-        keyLabel = new Label("Key Bindings");
-        keyLabel.setFont(font);
-        
-        upLabel = new Label("UP");
-        upLabel.setPrefWidth(200);
-        upPane = new HBox();
-        upPane.setAlignment(Pos.CENTER);
-        upPane.getChildren().addAll(upLabel, upBtn);
-        upPane.setSpacing(20);
-        
-        downLabel = new Label("DOWN");
-        downLabel.setPrefWidth(200);
-        downPane = new HBox();
-        downPane.setAlignment(Pos.CENTER);
-        downPane.getChildren().addAll(downLabel, downBtn);
-        downPane.setSpacing(20);
-        
-        rightLabel = new Label("RIGHT");
-        rightLabel.setPrefWidth(200);
-        rightPane = new HBox();
-        rightPane.setAlignment(Pos.CENTER);
-        rightPane.getChildren().addAll(rightLabel, rightBtn);
-        rightPane.setSpacing(20);
-        
-        leftLabel = new Label("LEFT");
-        leftLabel.setPrefWidth(200);
-        leftPane = new HBox();
-        leftPane.setAlignment(Pos.CENTER);
-        leftPane.getChildren().addAll(leftLabel, leftBtn);
-        leftPane.setSpacing(20);
-        
-        bombLabel = new Label("BOMB");
-        bombLabel.setPrefWidth(200);
-        bombPane = new HBox();
-        bombPane.setAlignment(Pos.CENTER);
-        bombPane.getChildren().addAll(bombLabel, bombBtn);
-        bombPane.setSpacing(20);
-        
-//        keyMenu.setSpacing(20);
-//        keyMenu.setAlignment(Pos.CENTER);
-//        keyMenu.getChildren().addAll(upPane, downPane, rightPane, leftPane, bombPane, backBtn5);
-//        
-        backBox1 = new HBox();
-        backBox1.setAlignment(Pos.CENTER_LEFT);
-        backBox1.getChildren().addAll(backBtn3);
-
-        
         primaryStage.setScene(mainScene);
         primaryStage.setOnCloseRequest(e -> disconnect());
         primaryStage.show();
@@ -290,8 +180,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         serverMenu = new BorderPane();
         singleMenu = new BorderPane();
         
-        //settingsScene = createScene(settingsMenu);
-        //keyScene = createScene(keyMenu);
         connectScene = createScene(connectMenu);
         serverScene = createScene(serverMenu);
         singleScene = createScene(singleMenu);
@@ -311,8 +199,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
         BorderPane roomBox = new BorderPane();
 		
-        Button backBtn3 = createButton("Leave Room", 300, 50);
-        backBtn3.setOnAction(e -> leaveRoom());
+        Button backBtn = createButton("Leave Room", 300, 50);
+        backBtn.setOnAction(e -> leaveRoom());
         
         HBox centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
@@ -324,7 +212,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         centerBox.getChildren().addAll(createAiDifficultySelector(true), createMapSelector(onlineMapCanvas, true));
         
         HBox backBtnPane = new HBox();
-        backBtnPane.getChildren().add(backBtn3);
+        backBtnPane.getChildren().add(backBtn);
         backBtnPane.setPadding(new Insets(20, 10, 20, 10));
         
         Label playersTitle = createLabel("Online Players:", false, true);
@@ -347,7 +235,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyTorch.getStyleClass().add("wideclearbox");
 		readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 		
-		readyBox = new VBox();
+		VBox readyBox = new VBox();
 		readyBox.getStyleClass().add("namebox");
 		readyBox.setSpacing(10);
 		readyBox.setAlignment(Pos.CENTER);
@@ -470,6 +358,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersBox.setVgap(20);
 		playersBox.setHgap(20);
 		playersBox.setMinHeight(100);
+		
 		VBox playersListPane = new VBox();
 		playersListPane.setSpacing(10);
 		playersListPane.getChildren().addAll(playersTitle, playersBox);
@@ -496,34 +385,33 @@ public class UserInterface extends Application implements ClientNetInterface{
 	}
 
 	private void decrementRoomNum() {
-		if(this.roomNumber.get() > 2)roomNumber.set(this.roomNumber.get()-1);
+		if(roomNumber.get() > 2)roomNumber.set(roomNumber.get()-1);
 	}
 
 	private void incrementRoomNum() {
-		if(this.roomNumber.get() < 4)roomNumber.set(this.roomNumber.get()+1);
+		if(roomNumber.get() < 4)roomNumber.set(roomNumber.get()+1);
 	}
 
 	private void initConnectScene(){
 		
 		enterLabel = createLabel("Enter Server Details:", false, false);
         
-        ipBox = new HBox();
+        HBox ipBox = new HBox();
         
         ipText = createTextField("IP Address");
         ipText.setMinWidth(200);
-        slashLabel = createLabel("/", false, false);
         portNum = createTextField("Port Number");
         portNum.setMinWidth(200);
         
         ipBox.setSpacing(10);
         ipBox.setPrefSize(200, 50);
         ipBox.setAlignment(Pos.CENTER);
-        ipBox.getChildren().addAll(ipText, slashLabel, portNum);
+        ipBox.getChildren().addAll(ipText, createLabel("/", false, false), portNum);
         
         connectBtn = createButton("Connect", 300, 75);
         connectBtn.setOnAction(e -> connect());
         
-        backBtn4 = createBackButton("Cancel", false);
+        Button backBtn = createBackButton("Cancel", false);
 
         VBox connectBox = new VBox();
         connectBox.setSpacing(20);
@@ -535,7 +423,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         connectPane = new VBox();
         connectPane.setAlignment(Pos.CENTER);
         connectPane.setSpacing(40);
-        connectPane.getChildren().addAll(connectBox, backBtn4);
+        connectPane.getChildren().addAll(connectBox, backBtn);
         
         setBackgroundPane(connectMenu, connectPane);
 	}
@@ -544,17 +432,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		BorderPane singleBox = new BorderPane();
 		
-		//button to start the game
-        startBtn = createButton("Start Game", 300, 75);
+        Button startBtn = createButton("Start Game", 300, 75);
+        
         HBox startBtnPane = new HBox();
         startBtnPane.setPadding(new Insets(0, 0, 40, 0));
         startBtnPane.setAlignment(Pos.CENTER);
         startBtnPane.getChildren().add(startBtn);
         startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls, this.aiNumber.get()));
         
-        backBtn3 = createBackButton("Back", false);
+        Button backBtn = createBackButton("Back", false);
         
-        centerBox = new HBox();
+        HBox centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setSpacing(20);
 
@@ -564,7 +452,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         centerBox.getChildren().addAll(createAiDifficultySelector(false), createMapSelector(mapCanvas, false));
         
         HBox backBtnPane = new HBox();
-        backBtnPane.getChildren().add(backBtn3);
+        backBtnPane.getChildren().add(backBtn);
         backBtnPane.setPadding(new Insets(20, 10, 20, 10));
         
         singleBox.setCenter(centerBox);
@@ -780,7 +668,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		}else{
 			width = 535;
 		}
-		System.out.println(mapCanvas + "size " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
+		//System.out.println(mapCanvas + "size " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
 		int xpadding = 250;
 		int ypadding = 50;
 		
@@ -880,7 +768,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		VBox creditsBox = new VBox();
 		creditsBox.setAlignment(Pos.CENTER);
 		creditsBox.setSpacing(20);
-		creditsBox.getChildren().addAll(creditsLabel, createBackButton("Back", false));
+		creditsBox.getChildren().addAll(createLabel("Version: " + this.versionNumber, false, true), creditsLabel, createBackButton("Back", false));
 
 		setBackgroundPane(creditsMenu, creditsBox);
 	}
@@ -915,7 +803,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         musicSlider.setValue(SettingsParser.getMusicVolume());
         musicSlider.setShowTickLabels(false);
         musicSlider.setShowTickMarks(false);
-        musicSlider.setOnMouseReleased(e -> setMusic((float)musicSlider.getValue()));
+        musicSlider.setOnMouseReleased(e -> setMusic(musicMuted?0:(float)musicSlider.getValue()));
         
         soundSlider = new Slider();
         soundSlider.setMin(0);
@@ -923,20 +811,29 @@ public class UserInterface extends Application implements ClientNetInterface{
         soundSlider.setValue(SettingsParser.getEffectsVolume());
         soundSlider.setShowTickLabels(false);
         soundSlider.setShowTickMarks(false);
-        soundSlider.setOnDragDone(e -> setMusic((float)soundSlider.getValue()));
+        soundSlider.setOnDragDone(e -> setSound(soundMuted?0:(float)soundSlider.getValue()));
         
         muteMusicBtn = new CheckBox();
         muteMusicBtn.setOnAction(e -> setMusic(0));
+        
+        AudioManager.setMusicVolume(SettingsParser.getMusicVolume());
+        AudioManager.setEffectsVolume(SettingsParser.getEffectsVolume());
+        
         if(SettingsParser.getMusicVolume() == 0){
+        	musicMuted = true;
         	muteMusicBtn.setSelected(true);
         }else{
+        	musicMuted = false;
         	muteMusicBtn.setSelected(false);
         }
         muteSoundBtn = new CheckBox();
         muteSoundBtn.setOnAction(e -> setSound(0));
+        
         if(SettingsParser.getEffectsVolume() == 0){
+        	soundMuted = true;
         	muteSoundBtn.setSelected(true);
         }else{
+        	soundMuted = false;
         	muteSoundBtn.setSelected(false);
         }
         
@@ -971,10 +868,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	private void setMusic(float volume) {
 		if(muteMusicBtn.isSelected()){
+			musicMuted = true;
 			SettingsParser.setMusicVolume(volume);
+			AudioManager.setMusicVolume(volume);
 			System.out.println("SET AND STORED MUSIC " + volume);
 		}else{
+			musicMuted = false;
 			SettingsParser.setMusicVolume((float)musicSlider.getValue());
+			AudioManager.setMusicVolume((float)musicSlider.getValue());
 			System.out.println("SET AND STORED MUSIC " + (float)musicSlider.getValue());
 		}
 		SettingsParser.storeSettings();
@@ -983,10 +884,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private void setSound(float volume) {
 		
 		if(muteSoundBtn.isSelected()){
+			soundMuted = true;
 			SettingsParser.setEffectsVolume(volume);
+			AudioManager.setEffectsVolume(volume);
 			System.out.println("SET AND STORED SOUND " + volume);
 		}else{
+			soundMuted = false;
 			SettingsParser.setEffectsVolume((float)soundSlider.getValue());
+			AudioManager.setEffectsVolume((float)soundSlider.getValue());
 			System.out.println("SET AND STORED SOUND " + (float)soundSlider.getValue());
 		}
 		SettingsParser.storeSettings();
@@ -1138,18 +1043,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			e.printStackTrace();
 		}
 		}
-	}
-
-	private void setNextKey(Button btn, Response response) {
-
-		btn.setText("PRESS KEY");
-		this.keyScene.setOnKeyPressed(e -> addControl(btn, e, response));
-	}
-
-	private void addControl(Button btn, KeyEvent e, Response response) {
-		
-		btn.setText(e.getText());
-		System.out.println(e.getCode());
 	}
 
 	private void leaveRoom(){

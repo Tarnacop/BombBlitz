@@ -47,10 +47,8 @@ public class Game implements GameInterface {
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
 		audio = new AudioManager();
-		System.out.println("Music " + musicVolume + " Sound " + soundVolume);
+		System.out.println("Game Music " + musicVolume + " Sound " + soundVolume);
 		audio.playMusic();
-		audio.setMusicVolume(musicVolume);
-		audio.setEffectsVolume(soundVolume);
 		
 		try {
 			
