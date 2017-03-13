@@ -192,7 +192,7 @@ public class Renderer {
 		if (!gameOver) {
 
 			renderGameTexture(screen, state);
-			renderGameScene(screen, state);
+			// renderGameScene(screen, state);
 			renderGameHud(screen, state);
 		}
 		if (frontScreen) {
