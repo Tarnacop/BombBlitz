@@ -8,7 +8,11 @@ import java.util.HashMap;
 import bomber.game.GameState;
 import bomber.game.Player;
 import bomber.game.Response;
-
+/**
+ * 
+ * @author Alexandru Blinda
+ * Class that holds the Graphic Thread with all its features
+ */
 public class Graphics implements Runnable {
 
 	private final Thread gameLoopThread;
@@ -16,6 +20,15 @@ public class Graphics implements Runnable {
 	private final Timer timer;
 	private final GameInterface gameLogic;
 	
+	/**
+	 * Create a Graphics object with the given parameters.
+	 * @param screenTitle The title of the screen
+	 * @param screenWidth The width of the screen
+	 * @param screenHeight The height of the screen
+	 * @param vSync	Boolean to use vSync
+	 * @param gameLogic The game logic for the graphics
+	 * @throws Exception
+	 */
 	public Graphics(String screenTitle, int screenWidth, int screenHeight, boolean vSync, GameInterface gameLogic) throws Exception {
 		
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
@@ -25,12 +38,18 @@ public class Graphics implements Runnable {
 		timer = new Timer();
 	} // END OF CONSTRUCTOR
 	
+	/**
+	 * Start the graphics
+	 */
 	public void start() {
 	
 		// Start the thread for the game engine loop
 		gameLoopThread.start();
 	} // END OF start METHOD
 
+	/**
+	 * Run the graphics
+	 */
 	@Override
 	public void run() {
 	
@@ -52,6 +71,10 @@ public class Graphics implements Runnable {
 		
 	} // END OF run METHOD
 	
+	/**
+	 * Initialise the graphics
+	 * @throws Exception
+	 */
 	// Initialize the game engine
 	private void init() throws Exception {
 		
@@ -60,6 +83,10 @@ public class Graphics implements Runnable {
 		this.gameLogic.init(screen);
 	} // END OF init METHOD
 	
+	/**
+	 * Update the game logic at the given interval
+	 * @param interval The interval at everything is updated
+	 */
 	// Update method
 	private void update(float interval) {
 		
@@ -67,6 +94,9 @@ public class Graphics implements Runnable {
 		gameLogic.update(interval);
 	} // END OF update METHOD
 
+	/**
+	 * Render everything on the screen
+	 */
 	// Render method
 	private void render() {
 		
@@ -75,6 +105,9 @@ public class Graphics implements Runnable {
 		screen.update();
 	} // END OF render METHOD
 	
+	/**
+	 * The game loop responsible with calculating UPS and FPS
+	 */
 	private void gameLoop() {
 		
 		float deltaTime = 0f;
@@ -110,9 +143,11 @@ public class Graphics implements Runnable {
 				sync();
 			}
 		}
-		System.out.println("FINISHED GAMELOOP");
 	} // END OF gameLoop METHOD
 	
+	/**
+	 * Synchronise everything if vSync is not on
+	 */
 	private void sync() {
 		
 		float loopInterval = 1f / RendererConstants.TARGET_FPS;
@@ -133,18 +168,28 @@ public class Graphics implements Runnable {
 		
 	} // END OF sync METHOD
 	
-	
+	/**
+	 * Listen for inputs from the game logic
+	 */
 	public void input() {
 		
 		gameLogic.input(screen);;
-	}
+	} // END OF input METHOD
+	
+	/**
+	 * Dispose the graphics and game logic
+	 */
 	public void dispose() {
 		
 		gameLogic.dispose();
 	} // END OF dispose METHOD
 
+	/**
+	 * Get the screen of the graphics
+	 * @return The screen
+	 */
 	public Screen getScreen() {
 		// TODO Auto-generated method stub
 		return this.screen;
-	}
+	} // END OF getScreeb METHOD
 } // END OF Application

@@ -10,6 +10,11 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
+/**
+ * 
+ * @author Alexandru Blinda
+ * The class containing a Screen and all its information
+ */
 public class Screen {
 
 	private final String title;
@@ -21,6 +26,13 @@ public class Screen {
 	private GLFWVidMode vidmode;
 	private GLFWKeyCallback keyCallback;
 	
+	/**
+	 * Create a Screen with the given title, width, height and vsync
+	 * @param title The title of the screen
+	 * @param width The width of the screen
+	 * @param height The height of the screen
+	 * @param vSync Use vsync for rendering
+	 */
 	public Screen(String title, int width, int height, boolean vSync) {
 
 		this.width = width;
@@ -30,15 +42,21 @@ public class Screen {
 		System.out.println("Made new screen in Screen.java");
 	} // END OF CONSTRUCTOR
 
-	
+	/**
+	 * Get the state of the keyboard key with the given key code
+	 * @param keyCode The given key Code
+	 * @return The state
+	 */
 	public int getKeyState(int keyCode){
 		
 		return glfwGetKey(this.screenID, keyCode);
 	}
 	
+	/**
+	 * Initialise the screen
+	 */
 	public void init() {
 
-		System.out.println("Initializing screen");
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
@@ -121,68 +139,122 @@ public class Screen {
 		System.out.println("Initialized screen");
 	} // END OF init METHOD
 
-	
-	
+	/**
+	 * Set the clear colour using the red, green, blue and alpha values provided
+	 * @param red The given red value
+	 * @param green The given green value
+	 * @param blue The given blue value
+	 * @param alpha The given alpha value
+	 */
 	public void setClearColour(float red, float green, float blue, float alpha) {
 		
 		glClearColor(red, green, blue, alpha);
 	} // END OF setClearColour
 
+	/**
+	 * Check if the screen should close
+	 * @return A boolean saying whether the screen should close or not
+	 */
 	public boolean screenShouldClose() {
 		
 		return glfwWindowShouldClose(screenID);
 	} // END OF screenShouldClose METHOD
 
+	/**
+	 * Get the title of the screen
+	 * @return The title of the screen
+	 */
 	public String getTitle() {
 		
 		return title;
 	} // END OF getTitle METHOD
 
+	/**
+	 * Get the width of the screen
+	 * @return The width of the screen
+	 */
 	public int getWidth() {
 		
 		return width;
 	} // END OF getWidth METHOD
 
+	/**
+	 * Get the height of the screen
+	 * @return The height of the screen
+	 */
 	public int getHeight() {
 		
 		return height;
 	} // END OF getHeight METHOD
 
+	/**
+	 * Check whether the screen was resized or not
+	 * @return A boolean saying whether the screen was resized or not
+	 */
 	public boolean isResized() {
 		
 		return resized;
 	} // END OF isResized METHOD
 
+	/**
+	 * Check whether the screen uses vsync or not
+	 * @return A boolean saying whether the screen uses vsync or not
+	 */
 	public boolean isVsyncOn() {
 
 		return vSync;
 	} // END OF isVsyncOn METHOD
 
+	/**
+	 * Set whether the screen was resized or not
+	 * @param resized A boolean saying whether the screen was resized or not
+	 */
 	public void setResized(boolean resized) {
 		
 		this.resized = resized;
 	} // END OF setResized METHOD
 
+	/**
+	 * Set whether the screen uses vsync or not
+	 * @param vSync A boolean saying whether the screen uses vsync or not
+	 */
 	public void setVsyncOn(boolean vSync) {
 		
 		this.vSync = vSync;
 	} // END OF setVsyncOn METHOD
 	
+	/**
+	 * Set the viewport of the screen starting from originX, originY with the width and height
+	 * @param originX The given originX
+	 * @param originY The given originY
+	 * @param width The given width
+	 * @param height The given height
+	 */
 	public void setViewport(int originX, int originY, int width, int height) {
 		
 		glViewport(originX, originY, width, height);
 	} // END OF setViewport METHOD
 	
+	/**
+	 * Get the id of the screen
+	 * @return The id of the screen
+	 */
 	public long getScreenID() {
 		
 		return screenID;
 	} // END OF getScreenID METHOD
 	
+	/**
+	 * Close the screen
+	 */
 	public void close() {
 		
 		glfwSetWindowShouldClose(screenID, true);
 	} // END OF close METHOD
 	
+	/**
+	 * Update the screen
+	 */
 	public void update() {
 		
         glfwSwapBuffers(screenID);

@@ -24,7 +24,11 @@ import bomber.renderer.shaders.Texture;
 import bomber.renderer.shaders.TextureMesh;
 import bomber.renderer.utils.FileHandler;
 import bomber.renderer.utils.Transformation;
-
+/**
+ * 
+ * @author Alexandru Blinda
+ * The class responsible with rendering everything on the screen
+ */
 public class Renderer {
 
 	private ShaderProgram sceneShader;
@@ -46,6 +50,9 @@ public class Renderer {
 	private float h_ratio;
 	private float x; // General purpose x coord
 
+	/**
+	 * Create a Renderer object
+	 */
 	public Renderer() {
 
 		transformation = new Transformation();
@@ -55,6 +62,11 @@ public class Renderer {
 		gamePaused = false;
 	} // END OF CONSTRUCTOR
 
+	/**
+	 * Initialise the renderer with the given screen
+	 * @param screen The given screen
+	 * @throws Exception
+	 */
 	public void init(Screen screen) throws Exception {
 
 		// setupSceneShader();
@@ -69,18 +81,10 @@ public class Renderer {
 	} // END OF init METHOD
 		// Takes a state to render
 
-	private void setupSceneShader() throws Exception {
-
-		sceneShader = new ShaderProgram();
-		sceneShader.createVertexShader(FileHandler.loadResource("res/vertex.vs"));
-		sceneShader.createFragmentShader(FileHandler.loadResource("res/fragment.fs"));
-		sceneShader.link();
-
-		sceneShader.createUniform("projection");
-		sceneShader.createUniform("model");
-
-	} // END OF setupSceneShader METHOD
-
+	/**
+	 * Setup the shaders for rendering textures
+	 * @throws Exception
+	 */
 	private void setupTextureShader() throws Exception {
 
 		textureShader = new ShaderProgram();
@@ -94,6 +98,10 @@ public class Renderer {
 
 	} // END OF setupTextureShader METHOD
 
+	/**
+	 * Setup the shaders for rendering hud
+	 * @throws Exception
+	 */
 	private void setupHudShader() throws Exception {
 
 		hudShader = new ShaderProgram();
@@ -107,6 +115,10 @@ public class Renderer {
 
 	} // END OF setupHudShader METHOD
 
+	/**
+	 * Setup the textures used for rendering
+	 * @throws Exception
+	 */
 	private void setupTextures() throws Exception {
 
 		Texture background = new Texture("res/gamebackground.png");
@@ -171,12 +183,21 @@ public class Renderer {
 		textureMeshes.put("beginningBoxMesh", beginningBoxMesh);
 	} // END OF setupTextures METHOD
 
+	/**
+	 * Setup the huds used for rendering
+	 * @throws Exception
+	 */
 	private void setupHuds() throws Exception {
 
 		FontTexture hudFontTexture = new FontTexture("res/minecraftbig.ttf", 25, Font.PLAIN);
 		hudTextItem = new TextItem("", hudFontTexture);
 	} // END OF setupHuds METHOD
 
+	/**
+	 * Render the given game state on the given screen
+	 * @param screen The given screen
+	 * @param state The given state
+	 */
 	public void render(Screen screen, GameState state) {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -209,22 +230,12 @@ public class Renderer {
 
 	// -------------------------------------Game Screen
 	// Render--------------------------------------------------------------------
-	private void renderGameScene(Screen screen, GameState state) {
 
-		// Bind the shader
-		sceneShader.bind();
-		// Set the uniform for the projection matrix
-		projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth() * w_ratio,
-				screen.getHeight() * h_ratio, 0f);
-		sceneShader.setUniform("projection", projectionMatrix);
-		// Render each entity of the state
-		
-
-		// Unbind the shader
-		sceneShader.unbind();
-
-	} // END OF renderScene METHOD
-
+	/**
+	 * Render the textures of the given game state on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderGameTexture(Screen screen, GameState state) {
 
 		textureShader.bind();
@@ -366,6 +377,11 @@ public class Renderer {
 		textureShader.unbind();
 	} // END OF renderGameTexture METHOD
 
+	/**
+	 * Render the huds of the given game state on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderGameHud(Screen screen, GameState state) {
 
 		hudShader.bind();
@@ -469,6 +485,11 @@ public class Renderer {
 	// -------------------------------------Front Screen
 	// Render------------------------------------------------------------------
 
+	/**
+	 * Render the textures of the front screen on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderBeginningTextures(Screen screen, GameState state) {
 
 		textureShader.bind();
@@ -487,6 +508,11 @@ public class Renderer {
 
 	} // END OF renderBeginningTextures METHOD
 
+	/**
+	 * Render the huds of the front screen on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderBeginningHud(Screen screen, GameState state) {
 
 		hudShader.bind();
@@ -510,6 +536,11 @@ public class Renderer {
 	// -------------------------------------Front Screen
 	// Render------------------------------------------------------------------
 
+	/** 
+	 * Render the textures of the pause screen on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderPauseTextures(Screen screen, GameState state) {
 
 		textureShader.bind();
@@ -518,6 +549,11 @@ public class Renderer {
 		textureShader.unbind();
 	} // END OF renderPauseScreen METHOD
 
+	/**
+	 * Render the huds of the pause screen on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderPauseHud(Screen screen, GameState state) {
 
 		hudShader.bind();
@@ -526,26 +562,41 @@ public class Renderer {
 		hudShader.unbind();
 	} // END OF renderPauseHud METHOD
 
+	/**
+	 * Stop the display of the front screen
+	 */
 	public void stopFrontScreen() {
 
 		frontScreen = false;
 	} // END OF stopFrontScreen METHOD
 
+	/**
+	 * Display game over screen
+	 */
 	public void displayGameOver() {
 
 		gameOver = true;
 	} // END OF displayGameOver METHOD
 
+	/**
+	 * Display the pause screen
+	 */
 	public void displayPauseScreen() {
 
 		gamePaused = true;
 	} // END OF displayPauseScreen METHOD
 
+	/**
+	 * Stop displaying the pause screen
+	 */
 	public void stopPauseScreen() {
 
 		gamePaused = false;
 	} // END OF stopPauseScreen METHOD
 
+	/**
+	 * Dispose the renderer and all its resources
+	 */
 	public void dispose() {
 		
 		hudTextItem.getMesh().dispose();

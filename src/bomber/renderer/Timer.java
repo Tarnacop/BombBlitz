@@ -2,9 +2,12 @@ package bomber.renderer;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
-import bomber.renderer.interfaces.TimerInterface;
-
-public class Timer implements TimerInterface {
+/**
+ * 
+ * @author Alexandru Blinda
+ * Class to calculate FPS, UPS, deltaTime and other render utils
+ */
+public class Timer {
 
 	private double lastLoopTime;
 	
@@ -23,8 +26,9 @@ public class Timer implements TimerInterface {
 	// Counter used to calculate ups
 	private int upsCount;
 	
-	
-	@Override
+	/**
+	 * Initialise the Timer
+	 */
 	public void init() {
 		
 		lastLoopTime = getTime();
@@ -35,13 +39,19 @@ public class Timer implements TimerInterface {
 		upsCount = 0;
 	} // END OF init METHOD
 
-	@Override
+	/**
+	 * Get the time since the screen started
+	 * @return The time since the screen started
+	 */
 	public double getTime() {
 		
 		return glfwGetTime();
 	} // END OF getTime METHOD
 
-	@Override
+	/**
+	 * Get the delta time
+	 * @return The delta time
+	 */
 	public float getDeltaTime() {
 		
 		double time = getTime();
@@ -51,13 +61,18 @@ public class Timer implements TimerInterface {
 		return deltaTime;
 	} // END OF getDeltaTime METHOD
 
-	@Override
+	/**
+	 * Get the time since the last loop
+	 * @return The time since the last loop
+	 */
 	public double getLastLoopTime() {
 		
 		return lastLoopTime;
 	} // END OF getLastLoopTime METHOD
 
-	@Override
+	/**
+	 * Update the timer
+	 */
 	public void update() {
 		
 		if(timeCount > 1f) {
@@ -73,7 +88,10 @@ public class Timer implements TimerInterface {
 		
 	} // END OF update METHOD
 
-	@Override
+	/**
+	 * Get the FPS rate
+	 * @return The FPS rate
+	 */
 	public int getFPS() {
 		
 		if(fps > 0) {
@@ -83,7 +101,10 @@ public class Timer implements TimerInterface {
 		return fpsCount;
 	} // END OF getFPS METHOD
 
-	@Override
+	/**
+	 * Get the UPS rate
+	 * @return The UPS rate
+	 */
 	public int getUPS() {
 		
 		if(ups > 0) {
@@ -93,13 +114,17 @@ public class Timer implements TimerInterface {
 		return upsCount;
 	} // END OF getUPS METHOD
 
-	@Override
+	/**
+	 * Update the FPS rate
+	 */
 	public void updateFPS() {
 		
 		fps = fps + 1;
 	} // END OF fps METHOD
 
-	@Override
+	/**
+	 * Update the UPS rate
+	 */
 	public void updateUPS() {
 		
 		ups = ups + 1;
