@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 
+import bomber.AI.GameAI;
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
@@ -34,10 +35,6 @@ public class Renderer {
 	private Matrix4f projectionMatrix;
 	private Matrix4f modelMatrix;
 	private TextItem hudTextItem;
-	private ColourMesh solidMesh;
-	private ColourMesh softMesh;
-	private ColourMesh blastMesh;
-	private ColourMesh bombMesh;
 
 	private boolean gameOver;
 	private boolean frontScreen;
@@ -60,10 +57,9 @@ public class Renderer {
 
 	public void init(Screen screen) throws Exception {
 
-		setupSceneShader();
+		// setupSceneShader();
 		setupTextureShader();
 		setupHudShader();
-		setupMeshes();
 		setupTextures();
 		setupHuds();
 		w_ratio = RendererConstants.V_WIDTH / screen.getWidth();
@@ -111,18 +107,6 @@ public class Renderer {
 
 	} // END OF setupHudShader METHOD
 
-	private void setupMeshes() {
-
-		float[] colours = new float[] { 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f };
-		solidMesh = new ColourMesh(64, 64, colours);
-		colours = new float[] { 1f, 1f, 1f, 0f, 1f, 1f, 1f, 0f, 1f, 1f, 1f, 0f };
-		softMesh = new ColourMesh(64, 64, colours);
-		colours = new float[] { 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f };
-		blastMesh = new ColourMesh(64, 64, colours);
-		colours = new float[] { 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f };
-		bombMesh = new ColourMesh(50, 50, colours);
-	} // END OF setupMeshes METHOD
-
 	private void setupTextures() throws Exception {
 
 		Texture background = new Texture("res/gamebackground.png");
@@ -147,9 +131,13 @@ public class Renderer {
 				RendererConstants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("blastMesh", blastMesh);
 		
-		// TODO - Resolve this
-		TextureMesh playerMesh = new TextureMesh(50f, 50f, 0f, 0.5f, RendererConstants.SPRITESHEET_COLS,
+		TextureMesh playerMesh = new TextureMesh(32f, 32f, 0f, 0.5f, RendererConstants.SPRITESHEET_COLS,
 				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		textureMeshes.put("playerMesh", playerMesh);
+		
+		TextureMesh aiMesh = new TextureMesh(32f, 32f, 0.25f, 0.5f, RendererConstants.SPRITESHEET_COLS,
+				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		textureMeshes.put("aiMesh", aiMesh);
 		
 		TextureMesh bombMesh = new TextureMesh(50f, 50f, 0.5f, 0.5f, RendererConstants.SPRITESHEET_COLS,
 				RendererConstants.SPRITESHEET_ROWS, spritesheet);
@@ -230,28 +218,7 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 		sceneShader.setUniform("projection", projectionMatrix);
 		// Render each entity of the state
-
-		List<Bomb> boombList = state.getBombs();
-		synchronized (boombList) {
-			for (Bomb bomb : boombList) {
-				modelMatrix = transformation.getModelMatrix((float) bomb.getPos().x + 15, (float) bomb.getPos().y + 15,
-						0f, 1f);
-				sceneShader.setUniform("model", modelMatrix);
-				bombMesh.render();
-			}
-		}
 		
-		List<Player> playerList = state.getPlayers();
-		synchronized (playerList) {
-			for (Player player : playerList) {
-				if (!player.isAlive())
-					continue;
-				modelMatrix = transformation.getModelMatrix((float) player.getPos().x + 15,
-						(float) player.getPos().y + 15, 0f, 1f);
-				sceneShader.setUniform("model", modelMatrix);
-				player.getMesh().render();
-			}
-		}
 
 		// Unbind the shader
 		sceneShader.unbind();
@@ -335,7 +302,7 @@ public class Renderer {
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("heartMesh").render();
 		}
-
+		
 		Block[][] blocks = state.getMap().getGridMap();
 		for (int i = 0; i < blocks.length; i++) {
 			for (int j = 0; j < blocks[0].length; j++) {
@@ -367,7 +334,35 @@ public class Renderer {
 				}
 			}
 		}
-
+		
+		List<Bomb> boombList = state.getBombs();
+		synchronized (boombList) {
+			for (Bomb bomb : boombList) {
+				modelMatrix = transformation.getModelMatrix((float) bomb.getPos().x + 15, (float) bomb.getPos().y + 15,
+						0f, 1f);
+				textureShader.setUniform("model", modelMatrix);
+				textureMeshes.get("bombMesh").render();
+			}
+		}
+		
+		List<Player> playerList = state.getPlayers();
+		synchronized (playerList) {
+			for (Player player : playerList) {
+				if (!player.isAlive())
+					continue;
+				modelMatrix = transformation.getModelMatrix((float) player.getPos().x + 15,
+						(float) player.getPos().y + 15, 0f, 1f);
+				textureShader.setUniform("model", modelMatrix);
+				if(player instanceof GameAI) {
+					
+					textureMeshes.get("aiMesh").render();
+				} else {
+					
+					textureMeshes.get("playerMesh").render();
+				}
+			}
+		}
+		
 		textureShader.unbind();
 	} // END OF renderGameTexture METHOD
 
@@ -552,11 +547,7 @@ public class Renderer {
 	} // END OF stopPauseScreen METHOD
 
 	public void dispose() {
-
-		solidMesh.dispose();
-		softMesh.dispose();
-		blastMesh.dispose();
-		bombMesh.dispose();
+		
 		hudTextItem.getMesh().dispose();
 
 		for (String key : textureMeshes.keySet()) {
