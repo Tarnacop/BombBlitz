@@ -10,6 +10,9 @@ public abstract class RendererConstants {
 	public static final float V_WIDTH = 1262f;
 	public static final float V_HEIGHT = 869f;
 	
+	public static final float SPRITESHEET_ROWS = 2f;
+	public static final float SPRITESHEET_COLS = 4f;
+	
 	public static final int SPACE_PADDING = 5;
 	
 	public static final float BACKGROUND_WIDTH = 1262f;
