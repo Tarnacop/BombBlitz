@@ -10,10 +10,11 @@ import java.io.InputStream;
 
 /**
  * Plays sound effects
+ * Only to be used by <code>AudioManager</code>
  *
  * @author Alexandru Rosu
  */
-public class SoundEffectPlayer extends Thread
+class SoundEffectPlayer extends Thread
 {
 
     private float volume;
@@ -23,7 +24,7 @@ public class SoundEffectPlayer extends Thread
      *
      * @param volume The volume percent, ranging from 0 to 100
      */
-    public SoundEffectPlayer(float volume)
+    SoundEffectPlayer(float volume)
     {
         this.volume = volume;
     }
@@ -31,9 +32,9 @@ public class SoundEffectPlayer extends Thread
     /**
      * Plays a single sound
      *
-     * @param fileName The name of the file inside the audio resources folder (<code>Constants.audoFilesPath</code>)
+     * @param fileName The name of the file inside the audio resources folder (<code>Constants.audioFilesPath</code>)
      */
-    public void playSound(String fileName)
+    void playSound(String fileName)
     {
         try
         {
@@ -58,7 +59,7 @@ public class SoundEffectPlayer extends Thread
      *
      * @param event The audio event
      */
-    public void play(AudioEvent event)
+    void play(AudioEvent event)
     {
         switch (event)
         {
@@ -85,7 +86,7 @@ public class SoundEffectPlayer extends Thread
      *
      * @param percent The volume percent, ranging from 0 to 100
      */
-    public void setVolume(float percent)
+    void setVolume(float percent)
     {
         this.volume = percent;
     }

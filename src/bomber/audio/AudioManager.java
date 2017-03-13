@@ -18,8 +18,8 @@ public class AudioManager
     private static float musicVolume;
     private static float effectsVolume;
 
-    private MusicPlayer music;
-    private SoundEffectPlayer effects;
+    private final MusicPlayer music;
+    private final SoundEffectPlayer effects;
 
     /**
      * Constructs an audio manager
@@ -40,7 +40,6 @@ public class AudioManager
     public static void setMusicVolume(float percent)
     {
         musicVolume = percent;
-        System.out.println("Set music volume was called");
     }
 
     /**
@@ -51,7 +50,6 @@ public class AudioManager
      */
     public static void setEffectsVolume(float percent)
     {
-        System.err.println("Effects volume set to " + percent);
         effectsVolume = percent;
     }
 
@@ -65,34 +63,6 @@ public class AudioManager
     {
         musicVolume = percent;
         effectsVolume = percent;
-    }
-
-    /**
-     * Changes the gain of a <code>Clip</code> according to the volume percent
-     *
-     * @param gainControl The MASTER_GAIN control of the <code>Clip</code>
-     * @param volume      The volume percent, ranging from 0 to 100
-     */
-    static void setControlVolume(FloatControl gainControl, float volume)
-    {
-
-        if (volume > 100 || volume < 0)
-        {
-            System.err.println("Incorrect call: setVolume(" + volume + ")");
-            return;
-        }
-
-        float linearMin = (float) Math.pow(10, gainControl.getMinimum() / 20);
-        float linearMax = (float) Math.pow(10, gainControl.getMaximum() / 20);
-        float linearVolume = linearMin + (linearMax - linearMin) * volume / 100;
-
-        //System.out.println(linearMin + " -- " + linearVolume + " -- " + linearMax);
-        //System.out.println(gainControl.getMinimum() + " -- " + (float)(20*Math.log10(linearVolume)) + " -- " + gainControl.getMaximum());
-
-        float min = gainControl.getMinimum();
-        float max = gainControl.getMaximum();
-        //gainControl.setValue(min + (max-min)*volume/100); // db; decreases faster
-        gainControl.setValue((float) (20 * Math.log10(linearVolume))); // linear formula; not so precise with little volume
     }
 
     /**
@@ -169,6 +139,35 @@ public class AudioManager
         SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
         effects.playSound(Constants.gameOverLostFilename);
         effects.interrupt();
+    }
+
+    /**
+     * Changes the gain of a <code>Clip</code> according to the volume percent
+     *
+     * @param gainControl The MASTER_GAIN control of the <code>Clip</code>
+     * @param volume      The volume percent, ranging from 0 to 100
+     */
+    static void setControlVolume(FloatControl gainControl, float volume)
+    {
+
+        if (volume > 100 || volume < 0)
+        {
+            System.err.println("Incorrect call: setVolume(" + volume + ")");
+            return;
+        }
+
+        float linearMin = (float) Math.pow(10, gainControl.getMinimum() / 20);
+        float linearMax = (float) Math.pow(10, gainControl.getMaximum() / 20);
+        float linearVolume = linearMin + (linearMax - linearMin) * volume / 100;
+
+        //System.out.println(linearMin + " -- " + linearVolume + " -- " + linearMax);
+        //System.out.println(gainControl.getMinimum() + " -- " + (float)(20*Math.log10(linearVolume)) + " -- " + gainControl.getMaximum());
+
+        float min = gainControl.getMinimum();
+        float max = gainControl.getMaximum();
+
+        //gainControl.setValue(min + (max-min)*volume/100); // db; decreases faster
+        gainControl.setValue((float) (20 * Math.log10(linearVolume))); // linear formula; not so precise with little volume
     }
 
     public static void main(String[] args) throws InterruptedException

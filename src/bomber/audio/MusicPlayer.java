@@ -9,10 +9,11 @@ import java.io.InputStream;
 
 /**
  * Plays music
+ * Only to be used by <code>AudioManager</code>
  *
  * @author Alexandru Rosu
  */
-public class MusicPlayer extends Thread
+class MusicPlayer extends Thread
 {
 
     private Clip clip;
@@ -22,7 +23,7 @@ public class MusicPlayer extends Thread
      *
      * @param volume The volume percent, ranging from 0 to 100
      */
-    public MusicPlayer(float volume)
+    MusicPlayer(float volume)
     {
         try
         {
@@ -46,7 +47,7 @@ public class MusicPlayer extends Thread
      *
      * @param percent The volume percent, ranging from 0 to 100
      */
-    public void setVolume(float percent)
+    private void setVolume(float percent)
     {
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
         AudioManager.setControlVolume(gainControl, percent);
@@ -64,7 +65,7 @@ public class MusicPlayer extends Thread
     /**
      * Pauses the music
      */
-    public void pause()
+    void pause()
     {
         clip.stop();
     }
@@ -72,7 +73,7 @@ public class MusicPlayer extends Thread
     /**
      * Unpauses the music
      */
-    public void unpause()
+    void unpause()
     {
         clip.start();
         clip.loop(Integer.MAX_VALUE);
