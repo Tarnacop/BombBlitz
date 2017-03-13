@@ -31,7 +31,7 @@ public class FontTexture {
 	
 	public FontTexture(String path, int size, int fontType) throws Exception {
 		
-		this(Font.createFont(Font.TRUETYPE_FONT, new File("res/minecraft.ttf")).deriveFont(fontType, size));
+		this(Font.createFont(Font.TRUETYPE_FONT, new File(path)).deriveFont(fontType, size));
 	} // END OF CONSTRUCTOR
 	
 	public FontTexture(Font font) throws Exception {
@@ -75,7 +75,6 @@ public class FontTexture {
 	    
 	    this.width = 0;
 	    this.height = 0;
-	    
 	    for(char c : allChars.toCharArray()) {
 	    	
 	    	// Get the size for each character and update the global dimensions
