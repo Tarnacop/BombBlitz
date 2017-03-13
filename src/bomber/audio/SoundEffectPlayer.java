@@ -9,36 +9,55 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by Alexandru Rosu on 05.02.2017.
+ * Plays sound effects
+ *
+ * @author Alexandru Rosu
  */
 public class SoundEffectPlayer extends Thread
 {
 
     private float volume;
 
+    /**
+     * Constructs a sound effect player
+     *
+     * @param volume The volume percent, ranging from 0 to 100
+     */
     public SoundEffectPlayer(float volume)
     {
         this.volume = volume;
     }
 
+    /**
+     * Plays a single sound
+     *
+     * @param fileName The name of the file inside the audio resources folder (<code>Constants.audoFilesPath</code>)
+     */
     public void playSound(String fileName)
     {
-        try {
+        try
+        {
             Clip clip = AudioSystem.getClip();
             InputStream rawStream = Main.class.getResourceAsStream(Constants.audioFilesPath + fileName);
-            if(rawStream == null)
+            if (rawStream == null)
                 throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
             clip.open(inputStream);
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             AudioManager.setControlVolume(gainControl, volume);
             clip.start();
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e)
+        {
             System.err.println("Could not load sound: " + Constants.audioFilesPath + fileName);
             e.printStackTrace();
         }
     }
 
+    /**
+     * Plays the sound associated with an audio event
+     *
+     * @param event The audio event
+     */
     public void play(AudioEvent event)
     {
         switch (event)
@@ -61,6 +80,11 @@ public class SoundEffectPlayer extends Thread
         }
     }
 
+    /**
+     * Sets a new value for volume
+     *
+     * @param percent The volume percent, ranging from 0 to 100
+     */
     public void setVolume(float percent)
     {
         this.volume = percent;
