@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 
+import bomber.AI.GameAI;
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
@@ -23,7 +24,11 @@ import bomber.renderer.shaders.Texture;
 import bomber.renderer.shaders.TextureMesh;
 import bomber.renderer.utils.FileHandler;
 import bomber.renderer.utils.Transformation;
-
+/**
+ * 
+ * @author Alexandru Blinda
+ * The class responsible with rendering everything on the screen
+ */
 public class Renderer {
 
 	private ShaderProgram sceneShader;
@@ -34,10 +39,6 @@ public class Renderer {
 	private Matrix4f projectionMatrix;
 	private Matrix4f modelMatrix;
 	private TextItem hudTextItem;
-	private ColourMesh solidMesh;
-	private ColourMesh softMesh;
-	private ColourMesh blastMesh;
-	private ColourMesh bombMesh;
 
 	private boolean gameOver;
 	private boolean frontScreen;
@@ -49,6 +50,9 @@ public class Renderer {
 	private float h_ratio;
 	private float x; // General purpose x coord
 
+	/**
+	 * Create a Renderer object
+	 */
 	public Renderer() {
 
 		transformation = new Transformation();
@@ -58,12 +62,16 @@ public class Renderer {
 		gamePaused = false;
 	} // END OF CONSTRUCTOR
 
+	/**
+	 * Initialise the renderer with the given screen
+	 * @param screen The given screen
+	 * @throws Exception
+	 */
 	public void init(Screen screen) throws Exception {
 
-		setupSceneShader();
+		// setupSceneShader();
 		setupTextureShader();
 		setupHudShader();
-		setupMeshes();
 		setupTextures();
 		setupHuds();
 		w_ratio = RendererConstants.V_WIDTH / screen.getWidth();
@@ -73,18 +81,10 @@ public class Renderer {
 	} // END OF init METHOD
 		// Takes a state to render
 
-	private void setupSceneShader() throws Exception {
-
-		sceneShader = new ShaderProgram();
-		sceneShader.createVertexShader(FileHandler.loadResource("res/vertex.vs"));
-		sceneShader.createFragmentShader(FileHandler.loadResource("res/fragment.fs"));
-		sceneShader.link();
-
-		sceneShader.createUniform("projection");
-		sceneShader.createUniform("model");
-
-	} // END OF setupSceneShader METHOD
-
+	/**
+	 * Setup the shaders for rendering textures
+	 * @throws Exception
+	 */
 	private void setupTextureShader() throws Exception {
 
 		textureShader = new ShaderProgram();
@@ -98,6 +98,10 @@ public class Renderer {
 
 	} // END OF setupTextureShader METHOD
 
+	/**
+	 * Setup the shaders for rendering hud
+	 * @throws Exception
+	 */
 	private void setupHudShader() throws Exception {
 
 		hudShader = new ShaderProgram();
@@ -111,18 +115,10 @@ public class Renderer {
 
 	} // END OF setupHudShader METHOD
 
-	private void setupMeshes() {
-
-		float[] colours = new float[] { 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f, 0f, 0f, 0.5f, 0f };
-		solidMesh = new ColourMesh(64, 64, colours);
-		colours = new float[] { 1f, 1f, 1f, 0f, 1f, 1f, 1f, 0f, 1f, 1f, 1f, 0f };
-		softMesh = new ColourMesh(64, 64, colours);
-		colours = new float[] { 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f, 0f, 1f, 1f, 0f };
-		blastMesh = new ColourMesh(64, 64, colours);
-		colours = new float[] { 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f, 0.7f, 0.4f, 0.1f, 0f };
-		bombMesh = new ColourMesh(50, 50, colours);
-	} // END OF setupMeshes METHOD
-
+	/**
+	 * Setup the textures used for rendering
+	 * @throws Exception
+	 */
 	private void setupTextures() throws Exception {
 
 		Texture background = new Texture("res/gamebackground.png");
@@ -147,9 +143,13 @@ public class Renderer {
 				RendererConstants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("blastMesh", blastMesh);
 		
-		// TODO - Resolve this
-		TextureMesh playerMesh = new TextureMesh(50f, 50f, 0f, 0.5f, RendererConstants.SPRITESHEET_COLS,
+		TextureMesh playerMesh = new TextureMesh(32f, 32f, 0f, 0.5f, RendererConstants.SPRITESHEET_COLS,
 				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		textureMeshes.put("playerMesh", playerMesh);
+		
+		TextureMesh aiMesh = new TextureMesh(32f, 32f, 0.25f, 0.5f, RendererConstants.SPRITESHEET_COLS,
+				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		textureMeshes.put("aiMesh", aiMesh);
 		
 		TextureMesh bombMesh = new TextureMesh(50f, 50f, 0.5f, 0.5f, RendererConstants.SPRITESHEET_COLS,
 				RendererConstants.SPRITESHEET_ROWS, spritesheet);
@@ -183,12 +183,21 @@ public class Renderer {
 		textureMeshes.put("beginningBoxMesh", beginningBoxMesh);
 	} // END OF setupTextures METHOD
 
+	/**
+	 * Setup the huds used for rendering
+	 * @throws Exception
+	 */
 	private void setupHuds() throws Exception {
 
 		FontTexture hudFontTexture = new FontTexture("res/minecraftbig.ttf", 25, Font.PLAIN);
 		hudTextItem = new TextItem("", hudFontTexture);
 	} // END OF setupHuds METHOD
 
+	/**
+	 * Render the given game state on the given screen
+	 * @param screen The given screen
+	 * @param state The given state
+	 */
 	public void render(Screen screen, GameState state) {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -204,7 +213,7 @@ public class Renderer {
 		if (!gameOver) {
 
 			renderGameTexture(screen, state);
-			renderGameScene(screen, state);
+			// renderGameScene(screen, state);
 			renderGameHud(screen, state);
 		}
 		if (frontScreen) {
@@ -221,43 +230,12 @@ public class Renderer {
 
 	// -------------------------------------Game Screen
 	// Render--------------------------------------------------------------------
-	private void renderGameScene(Screen screen, GameState state) {
 
-		// Bind the shader
-		sceneShader.bind();
-		// Set the uniform for the projection matrix
-		projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth() * w_ratio,
-				screen.getHeight() * h_ratio, 0f);
-		sceneShader.setUniform("projection", projectionMatrix);
-		// Render each entity of the state
-
-		List<Bomb> boombList = state.getBombs();
-		synchronized (boombList) {
-			for (Bomb bomb : boombList) {
-				modelMatrix = transformation.getModelMatrix((float) bomb.getPos().x + 15, (float) bomb.getPos().y + 15,
-						0f, 1f);
-				sceneShader.setUniform("model", modelMatrix);
-				bombMesh.render();
-			}
-		}
-		
-		List<Player> playerList = state.getPlayers();
-		synchronized (playerList) {
-			for (Player player : playerList) {
-				if (!player.isAlive())
-					continue;
-				modelMatrix = transformation.getModelMatrix((float) player.getPos().x + 15,
-						(float) player.getPos().y + 15, 0f, 1f);
-				sceneShader.setUniform("model", modelMatrix);
-				player.getMesh().render();
-			}
-		}
-
-		// Unbind the shader
-		sceneShader.unbind();
-
-	} // END OF renderScene METHOD
-
+	/**
+	 * Render the textures of the given game state on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderGameTexture(Screen screen, GameState state) {
 
 		textureShader.bind();
@@ -335,7 +313,7 @@ public class Renderer {
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("heartMesh").render();
 		}
-
+		
 		Block[][] blocks = state.getMap().getGridMap();
 		for (int i = 0; i < blocks.length; i++) {
 			for (int j = 0; j < blocks[0].length; j++) {
@@ -367,10 +345,43 @@ public class Renderer {
 				}
 			}
 		}
-
+		
+		List<Bomb> boombList = state.getBombs();
+		synchronized (boombList) {
+			for (Bomb bomb : boombList) {
+				modelMatrix = transformation.getModelMatrix((float) bomb.getPos().x + 15, (float) bomb.getPos().y + 15,
+						0f, 1f);
+				textureShader.setUniform("model", modelMatrix);
+				textureMeshes.get("bombMesh").render();
+			}
+		}
+		
+		List<Player> playerList = state.getPlayers();
+		synchronized (playerList) {
+			for (Player player : playerList) {
+				if (!player.isAlive())
+					continue;
+				modelMatrix = transformation.getModelMatrix((float) player.getPos().x + 15,
+						(float) player.getPos().y + 15, 0f, 1f);
+				textureShader.setUniform("model", modelMatrix);
+				if(player instanceof GameAI) {
+					
+					textureMeshes.get("aiMesh").render();
+				} else {
+					
+					textureMeshes.get("playerMesh").render();
+				}
+			}
+		}
+		
 		textureShader.unbind();
 	} // END OF renderGameTexture METHOD
 
+	/**
+	 * Render the huds of the given game state on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderGameHud(Screen screen, GameState state) {
 
 		hudShader.bind();
@@ -474,6 +485,11 @@ public class Renderer {
 	// -------------------------------------Front Screen
 	// Render------------------------------------------------------------------
 
+	/**
+	 * Render the textures of the front screen on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderBeginningTextures(Screen screen, GameState state) {
 
 		textureShader.bind();
@@ -492,6 +508,11 @@ public class Renderer {
 
 	} // END OF renderBeginningTextures METHOD
 
+	/**
+	 * Render the huds of the front screen on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderBeginningHud(Screen screen, GameState state) {
 
 		hudShader.bind();
@@ -515,6 +536,11 @@ public class Renderer {
 	// -------------------------------------Front Screen
 	// Render------------------------------------------------------------------
 
+	/** 
+	 * Render the textures of the pause screen on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderPauseTextures(Screen screen, GameState state) {
 
 		textureShader.bind();
@@ -523,6 +549,11 @@ public class Renderer {
 		textureShader.unbind();
 	} // END OF renderPauseScreen METHOD
 
+	/**
+	 * Render the huds of the pause screen on the given screen
+	 * @param screen The given screen
+	 * @param state The given game state
+	 */
 	private void renderPauseHud(Screen screen, GameState state) {
 
 		hudShader.bind();
@@ -531,32 +562,43 @@ public class Renderer {
 		hudShader.unbind();
 	} // END OF renderPauseHud METHOD
 
+	/**
+	 * Stop the display of the front screen
+	 */
 	public void stopFrontScreen() {
 
 		frontScreen = false;
 	} // END OF stopFrontScreen METHOD
 
+	/**
+	 * Display game over screen
+	 */
 	public void displayGameOver() {
 
 		gameOver = true;
 	} // END OF displayGameOver METHOD
 
+	/**
+	 * Display the pause screen
+	 */
 	public void displayPauseScreen() {
 
 		gamePaused = true;
 	} // END OF displayPauseScreen METHOD
 
+	/**
+	 * Stop displaying the pause screen
+	 */
 	public void stopPauseScreen() {
 
 		gamePaused = false;
 	} // END OF stopPauseScreen METHOD
 
+	/**
+	 * Dispose the renderer and all its resources
+	 */
 	public void dispose() {
-
-		solidMesh.dispose();
-		softMesh.dispose();
-		blastMesh.dispose();
-		bombMesh.dispose();
+		
 		hudTextItem.getMesh().dispose();
 
 		for (String key : textureMeshes.keySet()) {
