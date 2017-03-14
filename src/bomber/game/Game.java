@@ -98,10 +98,21 @@ public class Game implements GameInterface {
 	private float gameOverCounter = 0;
 	private	float frontScreenCounter = 0f;
 	private boolean startAIs = true;
+	private boolean gamePaused = false;
+	
 	@Override
 	public void update(float interval) {
 
-		if(this.gameState.gameOver()){
+		if(this.player.getKeyState().isPaused()){
+			if(!this.gamePaused){
+				this.gamePaused = true;
+				for(Player player : this.gameState.getPlayers()){
+					player.pause();
+				}
+				renderer.displayPauseScreen();
+			}
+		}
+		else if(this.gameState.gameOver()){
 			
 			if(gameOverCounter < 3) {
 				
@@ -112,6 +123,14 @@ public class Game implements GameInterface {
 				dispose();
 			}
 		} else {
+			
+			if(this.gamePaused){
+				this.gamePaused = false;
+				for(Player player : this.gameState.getPlayers()){
+					player.resume();
+				}
+				renderer.stopPauseScreen();
+			}
 			
 			// Wait 5 seconds
 			if(frontScreenCounter <= 5) {

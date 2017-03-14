@@ -3,13 +3,14 @@ package bomber.game;
 public class KeyboardState {
 
 	private boolean bomb;			//true if the bomb key is pressed
-
+	private boolean pause;
 	private Movement movement;			//the current movement key pressed, default NONE
 	
 	public KeyboardState(){
 		
 		this.movement = Movement.NONE;
 		this.bomb = false;
+		this.pause = false;
 	}
 
 	public boolean placeBomb(){
@@ -26,13 +27,19 @@ public class KeyboardState {
 	}
 
 	public void setMovement(Movement movement) {
-		//System.out.println("SETTING MOVEMENT ON Object " + this.toString() + " TO " + movement);
 		this.movement = movement;
-		//System.out.println("SET to " + this.movement);
 	}
 
 	public Movement getMovement(){
 		
 		return this.movement;
+	}
+	
+	public boolean isPaused(){
+		return this.pause;
+	}
+	
+	public void setPaused(boolean paused){
+		this.pause = paused;
 	}
 }

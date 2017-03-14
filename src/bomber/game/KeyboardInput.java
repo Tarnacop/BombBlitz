@@ -23,6 +23,20 @@ public class KeyboardInput {
 			
 			//System.out.println("Checking again...");
 			
+		//check for pause
+		if(getKey(Response.PAUSE_GAME, controlScheme).isPresent()){
+			state = screen.getKeyState(getKey(Response.PAUSE_GAME, controlScheme).get());
+		}
+		if(state == GLFW_PRESS){
+		   if(keyState.isPaused()){
+			   keyState.setPaused(false);
+		   }
+		   else{
+			   keyState.setPaused(true);
+		   }
+		    state = GLFW_RELEASE;
+		}else{
+		
 			//check for bomb
 			if(getKey(Response.PLACE_BOMB, controlScheme).isPresent()){
 				state = screen.getKeyState(getKey(Response.PLACE_BOMB, controlScheme).get());
@@ -72,7 +86,7 @@ public class KeyboardInput {
 			    keyState.setMovement(Movement.RIGHT);
 			    state = GLFW_RELEASE;
 			}
-			
+		}
 			return bombPressed;
 	}
 	
