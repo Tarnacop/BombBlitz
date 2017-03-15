@@ -87,8 +87,9 @@ public class Renderer {
 	private void setupTextureShader() throws Exception {
 
 		textureShader = new ShaderProgram();
-		textureShader.createVertexShader(FileHandler.loadShaderResource("res/texture_vertex.vs"));
-		textureShader.createFragmentShader(FileHandler.loadShaderResource("res/texture_fragment.fs"));
+
+		textureShader.createVertexShader(FileHandler.loadShaderResource("src/resources/shaders/texture_vertex.vs"));
+		textureShader.createFragmentShader(FileHandler.loadShaderResource("src/resources/shaders/texture_fragment.fs"));
 		textureShader.link();
 
 		textureShader.createUniform("projection");
@@ -104,8 +105,8 @@ public class Renderer {
 	private void setupHudShader() throws Exception {
 
 		hudShader = new ShaderProgram();
-		hudShader.createVertexShader(FileHandler.loadShaderResource("res/hud_vertex.vs"));
-		hudShader.createFragmentShader(FileHandler.loadShaderResource("res/hud_fragment.fs"));
+		hudShader.createVertexShader(FileHandler.loadShaderResource("src/resources/shaders/hud_vertex.vs"));
+		hudShader.createFragmentShader(FileHandler.loadShaderResource("src/resources/shaders/hud_fragment.fs"));
 		hudShader.link();
 
 		hudShader.createUniform("projModelMatrix");
@@ -120,11 +121,11 @@ public class Renderer {
 	 */
 	private void setupTextures() throws Exception {
 
-		Texture background = new Texture("res/gamebackground.png");
-		Texture box = new Texture("res/mapbox.png");
-		Texture fancybox = new Texture("res/fancybox.png");
-		Texture heart = new Texture("res/heart.png");
-		Texture spritesheet = new Texture("res/spritesheet.png");
+		Texture background = new Texture("src/resources/images/gamebackground.png");
+		Texture box = new Texture("src/resources/images/mapbox.png");
+		Texture fancybox = new Texture("src/resources/images/fancybox.png");
+		Texture heart = new Texture("src/resources/images/heart.png");
+		Texture spritesheet = new Texture("src/resources/images/spritesheet.png");
 
 		TextureMesh blankMesh = new TextureMesh(64f, 64f, 0f, 0f, RendererConstants.SPRITESHEET_COLS,
 				RendererConstants.SPRITESHEET_ROWS, spritesheet);
@@ -188,7 +189,7 @@ public class Renderer {
 	 */
 	private void setupHuds() throws Exception {
 
-		FontTexture hudFontTexture = new FontTexture("res/minecraftbig.ttf", 25, Font.PLAIN);
+		FontTexture hudFontTexture = new FontTexture("src/resources/minecraftbig.ttf", 25, Font.PLAIN);
 		hudTextItem = new TextItem("", hudFontTexture);
 	} // END OF setupHuds METHOD
 

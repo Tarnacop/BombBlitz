@@ -2,12 +2,6 @@ package bomber.renderer;
 
 import bomber.renderer.constants.RendererConstants;
 import bomber.renderer.interfaces.GameInterface;
-
-import java.util.HashMap;
-
-import bomber.game.GameState;
-import bomber.game.Player;
-import bomber.game.Response;
 /**
  * Class that holds the Graphic Thread with all its features
  * @author Alexandru Blinda
@@ -189,7 +183,7 @@ public class Graphics implements Runnable {
 	 * @return The screen
 	 */
 	public Screen getScreen() {
-		// TODO Auto-generated method stub
+		
 		return this.screen;
 	} // END OF getScreeb METHOD
 } // END OF Application
