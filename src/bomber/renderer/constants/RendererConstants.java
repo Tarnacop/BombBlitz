@@ -30,10 +30,10 @@ public abstract class RendererConstants {
 	public static final float GAME_BOX_X = 5f;
 	public static final float GAME_BOX_Y = 5f;
 	
-	public static final float FRONT_BOX_WIDTH = 1257f;
-	public static final float FRONT_BOX_HEIGHT = 864f;
-	public static final float FRONT_BOX_X = 5f;
-	public static final float FRONT_BOX_Y = 5f;
+	public static final float GENERAL_BOX_WIDTH = 1257f;
+	public static final float GENERAL_BOX_HEIGHT = 864f;
+	public static final float GENERAL_BOX_X = 5f;
+	public static final float GENERAL_BOX_Y = 5f;
 	
 	public static final float FANCY_BOX_WIDTH = 300f;
 	public static final float FANCY_BOX_HEIGHT = 173f;

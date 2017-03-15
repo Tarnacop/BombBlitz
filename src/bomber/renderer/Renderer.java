@@ -178,9 +178,9 @@ public class Renderer {
 		TextureMesh heartMesh = new TextureMesh(RendererConstants.HEART_WIDTH, RendererConstants.HEART_HEIGHT, heart);
 		textureMeshes.put("heartMesh", heartMesh);
 
-		TextureMesh beginningBoxMesh = new TextureMesh(RendererConstants.FRONT_BOX_WIDTH,
-				RendererConstants.FRONT_BOX_HEIGHT, box);
-		textureMeshes.put("beginningBoxMesh", beginningBoxMesh);
+		TextureMesh beginningBoxMesh = new TextureMesh(RendererConstants.GENERAL_BOX_WIDTH,
+				RendererConstants.GENERAL_BOX_HEIGHT, box);
+		textureMeshes.put("generalBoxMesh", beginningBoxMesh);
 	} // END OF setupTextures METHOD
 
 	/**
@@ -209,12 +209,14 @@ public class Renderer {
 			w_ratio = RendererConstants.V_WIDTH / screen.getWidth();
 			h_ratio = RendererConstants.V_HEIGHT / screen.getHeight();
 		}
-		;
-		if (!gameOver) {
 
-			renderGameTexture(screen, state);
-			// renderGameScene(screen, state);
-			renderGameHud(screen, state);
+		renderGameTexture(screen, state);
+		renderGameHud(screen, state);
+		
+		if(gameOver) {
+			
+			renderGameOverTextures(screen, state);
+			renderGameOverHud(screen, state);
 		}
 		if (frontScreen) {
 
@@ -481,7 +483,57 @@ public class Renderer {
 		hudShader.unbind();
 
 	} // END OF renderHud METHOD
+	
+	// -------------------------------------- Game Over Render ----------------------------
 
+	/**
+	 * Render the textures of game over scree of the given game state on the given screen
+	 * @param screen The given screen.
+	 * @param state The given game state.
+	 */
+	private void renderGameOverTextures(Screen screen, GameState state) {
+		
+		textureShader.bind();
+		textureShader.setUniform("texture_sampler", 0);
+
+		projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth() * w_ratio,
+				screen.getHeight() * h_ratio, 0f);
+		textureShader.setUniform("projection", projectionMatrix);
+
+		modelMatrix = transformation.getModelMatrix(RendererConstants.GENERAL_BOX_X, RendererConstants.GENERAL_BOX_Y, 0f,
+				1f);
+		textureShader.setUniform("model", modelMatrix);
+		textureMeshes.get("generalBoxMesh").render();
+
+		textureShader.unbind();
+		
+	} // END OF renderGameOverTextures METHOD
+	
+	/**
+	 * Render the huds of the game over screen of the given game state on the given screen
+	 * @param screen The given screen
+	 * @param state The given state
+	 */
+	private void renderGameOverHud(Screen screen, GameState state) {
+		
+		hudShader.bind();
+		hudShader.setUniform("texture_sampler", 0);
+		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio,
+				screen.getHeight() * h_ratio, 0f);
+
+		hudTextItem.setText("GAME OVER");
+		x = RendererConstants.GENERAL_BOX_X + (RendererConstants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+		float y = RendererConstants.GENERAL_BOX_Y
+				+ (RendererConstants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
+		hudShader.setUniform("projModelMatrix",
+				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
+		hudShader.setUniform("colour", hudTextItem.getColour());
+		hudTextItem.getMesh().render();
+
+		hudShader.unbind();
+	} // END OF renderGameOverHud METHOD
+	
 	// -------------------------------------Front Screen
 	// Render------------------------------------------------------------------
 
@@ -499,10 +551,10 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 		textureShader.setUniform("projection", projectionMatrix);
 
-		modelMatrix = transformation.getModelMatrix(RendererConstants.FRONT_BOX_X, RendererConstants.FRONT_BOX_Y, 0f,
+		modelMatrix = transformation.getModelMatrix(RendererConstants.GENERAL_BOX_X, RendererConstants.GENERAL_BOX_Y, 0f,
 				1f);
 		textureShader.setUniform("model", modelMatrix);
-		textureMeshes.get("beginningBoxMesh").render();
+		textureMeshes.get("generalBoxMesh").render();
 
 		textureShader.unbind();
 
@@ -521,9 +573,9 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 
 		hudTextItem.setText("5 SECONDS");
-		x = RendererConstants.FRONT_BOX_X + (RendererConstants.FRONT_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-		float y = RendererConstants.FRONT_BOX_Y
-				+ (RendererConstants.FRONT_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		x = RendererConstants.GENERAL_BOX_X + (RendererConstants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+		float y = RendererConstants.GENERAL_BOX_Y
+				+ (RendererConstants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -546,6 +598,15 @@ public class Renderer {
 		textureShader.bind();
 		textureShader.setUniform("texture_sampler", 0);
 
+		projectionMatrix = transformation.getOrthographicProjection(0f, screen.getWidth() * w_ratio,
+				screen.getHeight() * h_ratio, 0f);
+		textureShader.setUniform("projection", projectionMatrix);
+
+		modelMatrix = transformation.getModelMatrix(RendererConstants.GENERAL_BOX_X, RendererConstants.GENERAL_BOX_Y, 0f,
+				1f);
+		textureShader.setUniform("model", modelMatrix);
+		textureMeshes.get("generalBoxMesh").render();
+			
 		textureShader.unbind();
 	} // END OF renderPauseScreen METHOD
 
@@ -558,10 +619,21 @@ public class Renderer {
 
 		hudShader.bind();
 		hudShader.setUniform("texture_sampler", 0);
+		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio,
+				screen.getHeight() * h_ratio, 0f);
 
+		hudTextItem.setText("PRESS P TO UNPAUSE THE GAME");
+		x = RendererConstants.GENERAL_BOX_X + (RendererConstants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+		float y = RendererConstants.GENERAL_BOX_Y
+				+ (RendererConstants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
+		hudShader.setUniform("projModelMatrix",
+				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
+		hudShader.setUniform("colour", hudTextItem.getColour());
+		hudTextItem.getMesh().render();
 		hudShader.unbind();
 	} // END OF renderPauseHud METHOD
-
+	
 	/**
 	 * Stop the display of the front screen
 	 */
