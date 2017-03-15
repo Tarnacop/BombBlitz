@@ -16,7 +16,6 @@ import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Player;
 import bomber.renderer.constants.RendererConstants;
-import bomber.renderer.shaders.ColourMesh;
 import bomber.renderer.shaders.FontTexture;
 import bomber.renderer.shaders.ShaderProgram;
 import bomber.renderer.shaders.TextItem;

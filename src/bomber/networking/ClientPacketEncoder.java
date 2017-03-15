@@ -454,7 +454,7 @@ public class ClientPacketEncoder {
 			synchronized (playerList) {
 				player = playerList.get(i);
 				if (player == null) {
-					player = new Player(null, new Point(0, 0), 3, 321, null);
+					player = new Player(null, new Point(0, 0), 3, 321);
 					playerList.set(i, player);
 				}
 			}
@@ -671,7 +671,7 @@ public class ClientPacketEncoder {
 				k.setMovement(Movement.RIGHT);
 			}
 			k.setBomb(BitArray.getBit(keyState, 5));
-			Player p = new Player("player " + id, new Point(posX, posY), lives, speed, null);
+			Player p = new Player("player " + id, new Point(posX, posY), lives, speed);
 			p.setPlayerID(id);
 			p.setBombRange(bombRange);
 			p.setMaxNrOfBombs(maxBomb);

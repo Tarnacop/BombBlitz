@@ -78,7 +78,7 @@ public class AILevelTest{
 		state = new GameState(map, players);
 		state.setBombs(bombs);
 
-		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 30000, 10, state, null, AIDifficulty.HARD);
+		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 30000, 10, state, AIDifficulty.HARD);
 		players.add(ai);
 
 //		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
@@ -95,7 +95,7 @@ public class AILevelTest{
 	{
 		players.clear();
 		players.add(ai);
-		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+		player = new Player("name", new Point(12*scalar,12*scalar),1,30000);
 		players.add(player);
 		ai.setDifficulty(AIDifficulty.HARD);
 		ai.setPos( new Point(4*scalar,4*scalar));
@@ -126,11 +126,11 @@ public class AILevelTest{
 	{
 		players.clear();
 		players.add(ai);
-		player = new Player("name2", new Point(12*scalar,12*scalar),1,30000, null );
+		player = new Player("name2", new Point(12*scalar,12*scalar),1,30000);
 		players.add(player);
 		ai.setPos(new Point(4*scalar,4*scalar));
 		ai.setAlive(true);
-		Player ai2 = new GameAI("ai", new Point(4*scalar,4*scalar), 30000, 10, state, null, AIDifficulty.EXTREME);
+		Player ai2 = new GameAI("ai", new Point(4*scalar,4*scalar), 30000, 10, state, AIDifficulty.EXTREME);
 		ai.setDifficulty(AIDifficulty.EXTREME);
 		players.add(ai2);
 		ai.begin();
@@ -161,7 +161,7 @@ public class AILevelTest{
 	{
 		players.clear();
 		players.add(ai);
-		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+		player = new Player("name", new Point(12*scalar,12*scalar),1,30000);
 		players.add(player);
 		ai.setPos(new Point(4*scalar,4*scalar));
 		ai.setAlive(true);
@@ -192,7 +192,7 @@ public class AILevelTest{
 	{
 		players.clear();
 		players.add(ai);
-		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
+		player = new Player("name", new Point(12*scalar,12*scalar),1,30000);
 		players.add(player);
 		ai.setAlive(true);
 		ai.setDifficulty(AIDifficulty.EASY);

@@ -1,5 +1,10 @@
 package bomber.renderer.constants;
 
+/**
+ * 
+ * @author Alexandru Blinda
+ * Class keeping the constants for rendering
+ */
 public abstract class RendererConstants {
 
 	public static final int TARGET_FPS = 60;
