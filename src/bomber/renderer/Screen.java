@@ -11,9 +11,9 @@ import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
 /**
- * 
- * @author Alexandru Blinda
  * The class containing a Screen and all its information
+ * @author Alexandru Blinda
+ * 
  */
 public class Screen {
 

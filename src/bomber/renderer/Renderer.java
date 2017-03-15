@@ -24,9 +24,9 @@ import bomber.renderer.shaders.TextureMesh;
 import bomber.renderer.utils.FileHandler;
 import bomber.renderer.utils.Transformation;
 /**
- * 
- * @author Alexandru Blinda
  * The class responsible with rendering everything on the screen
+ * @author Alexandru Blinda
+ * 
  */
 public class Renderer {
 
@@ -87,8 +87,8 @@ public class Renderer {
 	private void setupTextureShader() throws Exception {
 
 		textureShader = new ShaderProgram();
-		textureShader.createVertexShader(FileHandler.loadResource("res/texture_vertex.vs"));
-		textureShader.createFragmentShader(FileHandler.loadResource("res/texture_fragment.fs"));
+		textureShader.createVertexShader(FileHandler.loadShaderResource("res/texture_vertex.vs"));
+		textureShader.createFragmentShader(FileHandler.loadShaderResource("res/texture_fragment.fs"));
 		textureShader.link();
 
 		textureShader.createUniform("projection");
@@ -104,8 +104,8 @@ public class Renderer {
 	private void setupHudShader() throws Exception {
 
 		hudShader = new ShaderProgram();
-		hudShader.createVertexShader(FileHandler.loadResource("res/hud_vertex.vs"));
-		hudShader.createFragmentShader(FileHandler.loadResource("res/hud_fragment.fs"));
+		hudShader.createVertexShader(FileHandler.loadShaderResource("res/hud_vertex.vs"));
+		hudShader.createFragmentShader(FileHandler.loadShaderResource("res/hud_fragment.fs"));
 		hudShader.link();
 
 		hudShader.createUniform("projModelMatrix");

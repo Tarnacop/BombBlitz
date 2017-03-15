@@ -3,9 +3,9 @@ package bomber.renderer;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 /**
- * 
+ * Class to calculate FPS, UPS, deltaTime and other render utils.
  * @author Alexandru Blinda
- * Class to calculate FPS, UPS, deltaTime and other render utils
+ * 
  */
 public class Timer {
 

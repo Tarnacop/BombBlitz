@@ -4,12 +4,20 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+/**
+ * Class to handle graphics transformation
+ * @author Alexandru Blinda
+ *
+ */
 public class Transformation {
 
 	private final Matrix4f model;
 	private final Matrix4f projection;
 	private final Matrix4f modelprojection;
 
+	/**
+	 * Create a new Transformation object
+	 */
 	public Transformation() {
 
 		model = new Matrix4f();
@@ -18,20 +26,27 @@ public class Transformation {
 
 	} // END OF CONSTRUCTOR
 
+	/**
+	 * Get an Orthographic Projection Matrix with the given left, right, bottom and top
+	 * @param left The given left coordinate
+	 * @param right The given right coordinate
+	 * @param bottom The given bottom coordinate
+	 * @param top The given top coordinate
+	 * @return The Orthographic Projection Matrix
+	 */
 	public Matrix4f getOrthographicProjection(float left, float right, float bottom, float top) {
 
 		return projection.identity().ortho2D(left, right, bottom, top);
 	} // END OF getOrthographic METHOD
 
-	public Matrix4f getModelMatrix(Vector3f offset, Vector3f rotation, float scale) {
-
-		return model.identity().translate(offset)
-				.rotateX((float) Math.toRadians(rotation.x))
-				.rotateY((float) Math.toRadians(rotation.y))
-				.rotateZ((float) Math.toRadians(rotation.z))
-				.scale(scale);
-	} // END OF getModelMatrix METHOD
-	
+	/**
+	 * Get a Model Matrix with the given offset, rotation and scale
+	 * Used for 2D coordinate system
+	 * @param offset The given offset in (x, y) coordinates as a Vector2f
+	 * @param angle The given angle rotation
+	 * @param scale The given scale
+	 * @return The Model Matrix
+	 */
 	public Matrix4f getModelMatrix(Vector2f offset, float angle, float scale) {
 		
 		return model.identity().translate(offset.x, offset.y, 0)
@@ -41,6 +56,15 @@ public class Transformation {
 				.scale(scale);
 	} // END OF getModelMatrix METHOD
 	
+	/**
+	 * Get a Model Matrix with the given offset, rotation and scale
+	 * Used for 2D coordinate system
+	 * @param x The given offset oN the x
+	 * @param y The given offset on the y
+	 * @param angle The given angle rotation
+	 * @param scale The given scale
+	 * @return The Model Matrix
+	 */
 	public Matrix4f getModelMatrix(float x, float y, float angle, float scale) {
 		
 		return model.identity().translate(x, y, 0)
@@ -51,6 +75,12 @@ public class Transformation {
 		
 	} // END OF getModelMatrix METHOD
 	
+	/**
+	 * Get a Model Projection Matrix from the given Model Matrix and the given Orthographic Projection Matrix
+	 * @param modelMatrix The given Model Matrix
+	 * @param orthoMatrix The given Orthographic Projection Matrix
+	 * @return The Model Projection Matrix
+	 */
 	public Matrix4f getOrtoProjectionModelMatrix(Matrix4f modelMatrix, Matrix4f orthoMatrix) {
 		
 		return modelprojection.identity().mul(orthoMatrix).mul(modelMatrix);

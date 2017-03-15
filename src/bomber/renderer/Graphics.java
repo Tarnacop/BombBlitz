@@ -9,9 +9,9 @@ import bomber.game.GameState;
 import bomber.game.Player;
 import bomber.game.Response;
 /**
- * 
- * @author Alexandru Blinda
  * Class that holds the Graphic Thread with all its features
+ * @author Alexandru Blinda
+ * 
  */
 public class Graphics implements Runnable {
 

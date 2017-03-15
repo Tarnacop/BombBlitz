@@ -1,9 +1,9 @@
 package bomber.renderer.constants;
 
 /**
- * 
- * @author Alexandru Blinda
  * Class keeping the constants for rendering
+ * @author Alexandru Blinda
+ * 
  */
 public abstract class RendererConstants {
 
