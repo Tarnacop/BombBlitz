@@ -28,7 +28,7 @@ import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
 /**
  * Class that handles and holds a texture
- * @author Alexandru
+ * @author Alexandru Blinda
  *
  */
 public class Texture {

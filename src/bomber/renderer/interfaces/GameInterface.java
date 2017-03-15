@@ -4,13 +4,13 @@ import bomber.renderer.Screen;
 
 /**
  * Interface for the GameLogic
- * @author Alexandru
+ * @author Alexandru Blinda
  *
  */
 public interface GameInterface {
 
 	/**
-	 * Initialize the game logic with the given screen
+	 * Initialise the game logic with the given screen
 	 * @param screen The given screen
 	 */
 	public void init(Screen screen);

@@ -14,7 +14,7 @@ import org.lwjgl.system.MemoryUtil;
 // TextureMesh
 /**
  * Class that represents a TextureMesh handles the Texture rendering
- * @author Alexandru
+ * @author Alexandru Blinda
  *
  */
 public class TextureMesh {

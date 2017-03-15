@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-import bomber.renderer.constants.RendererConstants;
+import bomber.game.Constants;
 
 /**
  * Class to create the texture for a font
@@ -54,7 +54,7 @@ public class FontTexture {
 	public FontTexture(Font font) throws Exception {
 		
 		this.font = font;
-		this.charSetName = RendererConstants.CHARSET_NAME;
+		this.charSetName = Constants.CHARSET_NAME;
 		
 		charMap = new HashMap<>();
 		
@@ -126,7 +126,7 @@ public class FontTexture {
 	    InputStream is;
 	    try (
 	        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-	        ImageIO.write(img, RendererConstants.IMAGE_FORMAT, out);
+	        ImageIO.write(img, Constants.IMAGE_FORMAT, out);
 	        out.flush();
 	        is = new ByteArrayInputStream(out.toByteArray());
 	    }

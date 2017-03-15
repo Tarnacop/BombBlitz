@@ -44,8 +44,8 @@ public class OnlineGame implements GameInterface {
 
 		try {
 
-			int width = this.client.getMapWidth() * Constants.mapBlockToGridMultiplier;
-			int height = this.client.getMapHeight() * Constants.mapBlockToGridMultiplier;
+			int width = this.client.getMapWidth() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
+			int height = this.client.getMapHeight() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
 			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
 			this.graphics.start();
 		} catch (Exception e) {

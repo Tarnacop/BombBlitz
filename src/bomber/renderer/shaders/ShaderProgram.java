@@ -54,13 +54,7 @@ public class ShaderProgram {
 		glShaderSource(shaderID, shaderCode);
 		glCompileShader(shaderID);
 
-		// Only for debugging ---------------------------- TODO REMOVE LATER
-		// --------------
-		if (glGetShaderi(shaderID, GL_COMPILE_STATUS) == 0) {
-
-			throw new Exception("Error compiling shader code:" + glGetShaderInfoLog(shaderID, 1024));
-		}
-		// --------------------------------------------------------------------------------
+		
 		glAttachShader(programID, shaderID);
 
 		return shaderID;

@@ -129,11 +129,11 @@ public abstract class AITemplate extends Thread {
 	 * @return true, if it is needed to stop moving
 	 */
 	protected boolean checkIfReachedDestination(Point currentPixel, Point updatedFinalPixelPos) {
-		boolean check = (currentPixel.x - updatedFinalPixelPos.x) < (Constants.mapBlockToGridMultiplier
-				- Constants.playerPixelWidth);
+		boolean check = (currentPixel.x - updatedFinalPixelPos.x) < (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER
+				- Constants.PLAYER_WIDTH);
 		check &= (updatedFinalPixelPos.x <= currentPixel.x);
-		check &= (currentPixel.y - updatedFinalPixelPos.y) < (Constants.mapBlockToGridMultiplier
-				- Constants.playerPixelHeight);
+		check &= (currentPixel.y - updatedFinalPixelPos.y) < (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER
+				- Constants.PLAYER_HEIGHT);
 		check &= (updatedFinalPixelPos.y <= currentPixel.y);
 		return !check;
 	}
@@ -152,8 +152,8 @@ public abstract class AITemplate extends Thread {
 		Point updatedPos = new Point(updatedPosPixel);
 		
 		//sets the position to the pixel representation
-		updatedPosPixel.setLocation(updatedPosPixel.x * Constants.mapBlockToGridMultiplier,
-				updatedPosPixel.y * Constants.mapBlockToGridMultiplier);
+		updatedPosPixel.setLocation(updatedPosPixel.x * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,
+				updatedPosPixel.y * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER);
 		
 		// sets the move to be made
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));

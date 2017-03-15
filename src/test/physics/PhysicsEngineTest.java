@@ -67,7 +67,7 @@ public class PhysicsEngineTest
         {
             engine.update();
             //System.out.println(buddy.getPos());
-            assertTrue("Collision was not detected successfully (problem at a right corner)", buddy.getPos().x+ Constants.playerPixelWidth<192);
+            assertTrue("Collision was not detected successfully (problem at a right corner)", buddy.getPos().x+ Constants.PLAYER_WIDTH<192);
         }
 
         kState.setMovement(Movement.DOWN);
@@ -75,7 +75,7 @@ public class PhysicsEngineTest
         {
             engine.update();
             //System.out.println(buddy.getPos());
-            assertTrue("Collision was not detected successfully (problem at a down corner)", buddy.getPos().y+ Constants.playerPixelHeight<256);
+            assertTrue("Collision was not detected successfully (problem at a down corner)", buddy.getPos().y+ Constants.PLAYER_HEIGHT<256);
         }
 
         kState.setMovement(Movement.LEFT);

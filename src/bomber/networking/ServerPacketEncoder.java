@@ -841,12 +841,12 @@ public class ServerPacketEncoder {
 		List<Point> spawnPoints = new ArrayList<Point>(4);
 		for (int i = 0; i < 4; i++) {
 			int x = buffer.getInt();
-			if (x < 0 || x > gridMapWidth * Constants.mapBlockToGridMultiplier - 1) {
+			if (x < 0 || x > gridMapWidth * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - 1) {
 				x = 64;
 			}
 
 			int y = buffer.getInt();
-			if (y < 0 || y > gridMapHeight * Constants.mapBlockToGridMultiplier - 1) {
+			if (y < 0 || y > gridMapHeight * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - 1) {
 				y = 64;
 			}
 

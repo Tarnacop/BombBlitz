@@ -505,8 +505,8 @@ public class RouteFinder {
 				LinkedList<AIActions> escapeMoves = (escapeFromExplotion(
 						safetyCh.getBombCoverage(
 								new Bomb(null,
-										new Point(pos.x * Constants.mapBlockToGridMultiplier,
-												pos.y * Constants.mapBlockToGridMultiplier),
+										new Point(pos.x * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,
+												pos.y * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER),
 										0, gameAI.getBombRange()),map),pos, map));
 				if (escapeMoves == null)
 					return realMoves;
@@ -581,7 +581,7 @@ public class RouteFinder {
 		if (safetyCh.isEnemyInBombRange()) {
 			ArrayList<Point> bombs = safetyCh.getTilesAffectedByBombs();
 			ArrayList<Point> coverage = safetyCh.getBombCoverage(
-					new Bomb(gameAI.getName(), gameAI.getPos(), Constants.defaultBombTime, gameAI.getBombRange()),
+					new Bomb(gameAI.getName(), gameAI.getPos(), Constants.DEFAULT_BOMB_TIME, gameAI.getBombRange()),
 					getMap());
 			bombs.addAll(coverage);
 			moves = escapeFromExplotion(bombs);

@@ -99,21 +99,21 @@ public class AudioManager
     public static void playMenuItemSelected()
     {
         SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.menuSoundFilename);
+        effects.playSound(Constants.MENU_SOUND_FILENAME);
         effects.interrupt();
     }
 
     public static void playGameOverWon()
     {
         SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.gameOverWonFilename);
+        effects.playSound(Constants.GAME_OVER_WON_FILENAME);
         effects.interrupt();
     }
 
     public static void playGameOverLost()
     {
         SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.gameOverLostFilename);
+        effects.playSound(Constants.GAME_OVER_LOST_FILENAME);
         effects.interrupt();
     }
 

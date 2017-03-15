@@ -2,8 +2,6 @@ package bomber.renderer.utils;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
-
 /**
  * Class to handle graphics transformation
  * @author Alexandru Blinda

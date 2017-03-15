@@ -1,6 +1,6 @@
 package bomber.renderer;
 
-import bomber.renderer.constants.RendererConstants;
+import bomber.game.Constants;
 import bomber.renderer.interfaces.GameInterface;
 /**
  * Class that holds the Graphic Thread with all its features
@@ -106,7 +106,7 @@ public class Graphics implements Runnable {
 		
 		float deltaTime = 0f;
 		float accumulator = 0f;
-		float interval = 1f / RendererConstants.TARGET_UPS;
+		float interval = 1f / Constants.TARGET_UPS;
 		
 		boolean gameRunning = true;
 		
@@ -144,7 +144,7 @@ public class Graphics implements Runnable {
 	 */
 	private void sync() {
 		
-		float loopInterval = 1f / RendererConstants.TARGET_FPS;
+		float loopInterval = 1f / Constants.TARGET_FPS;
 		double endTime = timer.getLastLoopTime() + loopInterval;
 		
 		while(timer.getTime() < endTime) {

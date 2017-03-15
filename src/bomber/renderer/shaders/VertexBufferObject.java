@@ -7,7 +7,7 @@ import java.nio.IntBuffer;
 
 /**
  * Wrapper class for a Vertex Buffer Object
- * @author Alexandru
+ * @author Alexandru Blinda
  *
  */
 // Wrapper for VBO

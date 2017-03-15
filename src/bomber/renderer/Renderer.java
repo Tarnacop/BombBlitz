@@ -15,7 +15,7 @@ import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
 import bomber.game.Player;
-import bomber.renderer.constants.RendererConstants;
+import bomber.game.Constants;
 import bomber.renderer.shaders.FontTexture;
 import bomber.renderer.shaders.ShaderProgram;
 import bomber.renderer.shaders.TextItem;
@@ -73,8 +73,8 @@ public class Renderer {
 		setupHudShader();
 		setupTextures();
 		setupHuds();
-		w_ratio = RendererConstants.V_WIDTH / screen.getWidth();
-		h_ratio = RendererConstants.V_HEIGHT / screen.getHeight();
+		w_ratio = Constants.V_WIDTH / screen.getWidth();
+		h_ratio = Constants.V_HEIGHT / screen.getHeight();
 
 		screen.setClearColour(0f, 0f, 0f, 0f);
 	} // END OF init METHOD
@@ -127,59 +127,53 @@ public class Renderer {
 		Texture heart = new Texture("src/resources/images/heart.png");
 		Texture spritesheet = new Texture("src/resources/images/spritesheet.png");
 
-		TextureMesh blankMesh = new TextureMesh(64f, 64f, 0f, 0f, RendererConstants.SPRITESHEET_COLS,
-				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		TextureMesh blankMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0f, 0f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("blankMesh", blankMesh);
 
-		TextureMesh softMesh = new TextureMesh(64f, 64f, 0.5f, 0f, RendererConstants.SPRITESHEET_COLS,
-				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		TextureMesh softMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.5f, 0f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("softMesh", softMesh);
 		
-		TextureMesh solidMesh = new TextureMesh(64f, 64f, 0.25f, 0f, RendererConstants.SPRITESHEET_COLS,
-				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		TextureMesh solidMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.25f, 0f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("solidMesh", solidMesh);
 		
-		TextureMesh blastMesh = new TextureMesh(64f, 64f, 0.75f, 0f, RendererConstants.SPRITESHEET_COLS,
-				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		TextureMesh blastMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.75f, 0f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("blastMesh", blastMesh);
 		
-		TextureMesh playerMesh = new TextureMesh(32f, 32f, 0f, 0.5f, RendererConstants.SPRITESHEET_COLS,
-				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		TextureMesh playerMesh = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0f, 0.5f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("playerMesh", playerMesh);
 		
-		TextureMesh aiMesh = new TextureMesh(32f, 32f, 0.25f, 0.5f, RendererConstants.SPRITESHEET_COLS,
-				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		TextureMesh aiMesh = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.25f, 0.5f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("aiMesh", aiMesh);
 		
-		TextureMesh bombMesh = new TextureMesh(50f, 50f, 0.5f, 0.5f, RendererConstants.SPRITESHEET_COLS,
-				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		TextureMesh bombMesh = new TextureMesh(Constants.BOMB_WIDTH, Constants.BOMB_HEIGHT, 0.5f, 0.5f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("bombMesh", bombMesh);
 		
-		TextureMesh powerMesh = new TextureMesh(64f, 64f, 0.75f, 0.5f, RendererConstants.SPRITESHEET_COLS,
-				RendererConstants.SPRITESHEET_ROWS, spritesheet);
+		TextureMesh powerMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.75f, 0.5f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, spritesheet);
 		textureMeshes.put("powerMesh", powerMesh);
 		
-		TextureMesh backgroundMesh = new TextureMesh(RendererConstants.BACKGROUND_WIDTH,
-				RendererConstants.BACKGROUND_WIDTH, background);
+		TextureMesh backgroundMesh = new TextureMesh(Constants.BACKGROUND_WIDTH, Constants.BACKGROUND_WIDTH, background);
 		textureMeshes.put("backgroundMesh", backgroundMesh);
 
-		TextureMesh infoBoxMesh = new TextureMesh(RendererConstants.INFO_BOX_WIDTH, RendererConstants.INFO_BOX_HEIGHT,
-				box);
+		TextureMesh infoBoxMesh = new TextureMesh(Constants.INFO_BOX_WIDTH, Constants.INFO_BOX_HEIGHT, box);
 		textureMeshes.put("infoBoxMesh", infoBoxMesh);
 
-		TextureMesh gameBoxMesh = new TextureMesh(RendererConstants.GAME_BOX_WIDTH, RendererConstants.GAME_BOX_HEIGHT,
-				box);
+		TextureMesh gameBoxMesh = new TextureMesh(Constants.GAME_BOX_WIDTH, Constants.GAME_BOX_HEIGHT, box);
 		textureMeshes.put("gameBoxMesh", gameBoxMesh);
 
-		TextureMesh fancyBoxMesh = new TextureMesh(RendererConstants.FANCY_BOX_WIDTH,
-				RendererConstants.FANCY_BOX_HEIGHT, fancybox);
+		TextureMesh fancyBoxMesh = new TextureMesh(Constants.FANCY_BOX_WIDTH, Constants.FANCY_BOX_HEIGHT, fancybox);
 		textureMeshes.put("fancyBoxMesh", fancyBoxMesh);
 
-		TextureMesh heartMesh = new TextureMesh(RendererConstants.HEART_WIDTH, RendererConstants.HEART_HEIGHT, heart);
+		TextureMesh heartMesh = new TextureMesh(Constants.HEART_WIDTH, Constants.HEART_HEIGHT, heart);
 		textureMeshes.put("heartMesh", heartMesh);
 
-		TextureMesh beginningBoxMesh = new TextureMesh(RendererConstants.GENERAL_BOX_WIDTH,
-				RendererConstants.GENERAL_BOX_HEIGHT, box);
+		TextureMesh beginningBoxMesh = new TextureMesh(Constants.GENERAL_BOX_WIDTH, Constants.GENERAL_BOX_HEIGHT, box);
 		textureMeshes.put("generalBoxMesh", beginningBoxMesh);
 	} // END OF setupTextures METHOD
 
@@ -206,8 +200,8 @@ public class Renderer {
 
 			screen.setViewport(0, 0, screen.getWidth(), screen.getHeight());
 			screen.setResized(false);
-			w_ratio = RendererConstants.V_WIDTH / screen.getWidth();
-			h_ratio = RendererConstants.V_HEIGHT / screen.getHeight();
+			w_ratio = Constants.V_WIDTH / screen.getWidth();
+			h_ratio = Constants.V_HEIGHT / screen.getHeight();
 		}
 
 		renderGameTexture(screen, state);
@@ -248,70 +242,70 @@ public class Renderer {
 		textureShader.setUniform("projection", projectionMatrix);
 
 		// Render background
-		modelMatrix = transformation.getModelMatrix(RendererConstants.BACKGROUND_X, RendererConstants.BACKGROUND_Y, 0f,
+		modelMatrix = transformation.getModelMatrix(Constants.BACKGROUND_X, Constants.BACKGROUND_Y, 0f,
 				1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("backgroundMesh").render();
 
 		// Render info box
-		modelMatrix = transformation.getModelMatrix(RendererConstants.INFO_BOX_X, RendererConstants.INFO_BOX_Y, 0f, 1f);
+		modelMatrix = transformation.getModelMatrix(Constants.INFO_BOX_X, Constants.INFO_BOX_Y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("infoBoxMesh").render();
 
 		// Render game box
-		modelMatrix = transformation.getModelMatrix(RendererConstants.GAME_BOX_X, RendererConstants.GAME_BOX_Y, 0f, 1f);
+		modelMatrix = transformation.getModelMatrix(Constants.GAME_BOX_X, Constants.GAME_BOX_Y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("gameBoxMesh").render();
 
 		// Render player info box
 		if (state.getPlayers().size() > 0) {
 
-			modelMatrix = transformation.getModelMatrix(RendererConstants.FANCY_BOX1_X, RendererConstants.FANCY_BOX1_Y,
+			modelMatrix = transformation.getModelMatrix(Constants.FANCY_BOX1_X, Constants.FANCY_BOX1_Y,
 					0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("fancyBoxMesh").render();
 
-			x = RendererConstants.FANCY_BOX1_X + RendererConstants.FANCY_BOX_WIDTH / 4;
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX1_Y + 30, 0f, 1f);
+			x = Constants.FANCY_BOX1_X + Constants.FANCY_BOX_WIDTH / 4;
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX1_Y + 30, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("heartMesh").render();
 		}
 
 		if (state.getPlayers().size() > 1) {
 
-			modelMatrix = transformation.getModelMatrix(RendererConstants.FANCY_BOX2_X, RendererConstants.FANCY_BOX2_Y,
+			modelMatrix = transformation.getModelMatrix(Constants.FANCY_BOX2_X, Constants.FANCY_BOX2_Y,
 					0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("fancyBoxMesh").render();
 
-			x = RendererConstants.FANCY_BOX2_X + RendererConstants.FANCY_BOX_WIDTH / 4;
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX2_Y + 30, 0f, 1f);
+			x = Constants.FANCY_BOX2_X + Constants.FANCY_BOX_WIDTH / 4;
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX2_Y + 30, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("heartMesh").render();
 		}
 
 		if (state.getPlayers().size() > 2) {
 
-			modelMatrix = transformation.getModelMatrix(RendererConstants.FANCY_BOX3_X, RendererConstants.FANCY_BOX3_Y,
+			modelMatrix = transformation.getModelMatrix(Constants.FANCY_BOX3_X, Constants.FANCY_BOX3_Y,
 					0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("fancyBoxMesh").render();
 
-			x = RendererConstants.FANCY_BOX3_X + RendererConstants.FANCY_BOX_WIDTH / 4;
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX3_Y + 30, 0f, 1f);
+			x = Constants.FANCY_BOX3_X + Constants.FANCY_BOX_WIDTH / 4;
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX3_Y + 30, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("heartMesh").render();
 		}
 
 		if (state.getPlayers().size() > 3) {
 
-			modelMatrix = transformation.getModelMatrix(RendererConstants.FANCY_BOX4_X, RendererConstants.FANCY_BOX4_Y,
+			modelMatrix = transformation.getModelMatrix(Constants.FANCY_BOX4_X, Constants.FANCY_BOX4_Y,
 					0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("fancyBoxMesh").render();
 
-			x = RendererConstants.FANCY_BOX4_X + RendererConstants.FANCY_BOX_WIDTH / 4;
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX4_Y + 30, 0f, 1f);
+			x = Constants.FANCY_BOX4_X + Constants.FANCY_BOX_WIDTH / 4;
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX4_Y + 30, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("heartMesh").render();
 		}
@@ -320,19 +314,19 @@ public class Renderer {
 		for (int i = 0; i < blocks.length; i++) {
 			for (int j = 0; j < blocks[0].length; j++) {
 				if (blocks[i][j] == Block.BLANK) {
-					modelMatrix = transformation.getModelMatrix(i * 64f + 15, j * 64f + 15, 0f, 1f);
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 					textureMeshes.get("blankMesh").render();
 				} else if (blocks[i][j] == Block.SOFT) {
-					modelMatrix = transformation.getModelMatrix(i * 64f + 15, j * 64f + 15, 0f, 1f);
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 					textureMeshes.get("softMesh").render();
 				} else if (blocks[i][j] == Block.SOLID) {
-					modelMatrix = transformation.getModelMatrix(i * 64f + 15, j * 64f + 15, 0f, 1f);
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 					textureMeshes.get("solidMesh").render();
 				} else if (blocks[i][j] == Block.BLAST) {
-					modelMatrix = transformation.getModelMatrix(i * 64f + 15, j * 64f + 15, 0f, 1f);
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 					textureMeshes.get("blastMesh").render();
 				} else if (blocks[i][j] == Block.PLUS_SPEED 
@@ -341,7 +335,7 @@ public class Renderer {
 						|| blocks[i][j] == Block.MINUS_BOMB
 						|| blocks[i][j] == Block.PLUS_RANGE
 						|| blocks[i][j] == Block.MINUS_RANGE) {
-					modelMatrix = transformation.getModelMatrix(i * 64f + 15, j * 64f + 15, 0f, 1f);
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 					textureMeshes.get("powerMesh").render();
 				}
@@ -395,9 +389,9 @@ public class Renderer {
 		if (state.getPlayers().size() > 0) {
 
 			hudTextItem.setText(state.getPlayers().get(0).getName());
-			x = RendererConstants.FANCY_BOX1_X
-					+ (RendererConstants.FANCY_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX1_Y + 10,
+			x = Constants.FANCY_BOX1_X
+					+ (Constants.FANCY_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX1_Y + 10,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -405,8 +399,8 @@ public class Renderer {
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(0).getLives()));
-			x = RendererConstants.FANCY_BOX1_X + RendererConstants.FANCY_BOX_WIDTH / 4 + RendererConstants.HEART_WIDTH;
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX1_Y + 37,
+			x = Constants.FANCY_BOX1_X + Constants.FANCY_BOX_WIDTH / 4 + Constants.HEART_WIDTH;
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX1_Y + 37,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -417,9 +411,9 @@ public class Renderer {
 		if (state.getPlayers().size() > 1) {
 
 			hudTextItem.setText(state.getPlayers().get(1).getName());
-			x = RendererConstants.FANCY_BOX2_X
-					+ (RendererConstants.FANCY_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX2_Y + 10,
+			x = Constants.FANCY_BOX2_X
+					+ (Constants.FANCY_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX2_Y + 10,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -427,8 +421,8 @@ public class Renderer {
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(1).getLives()));
-			x = RendererConstants.FANCY_BOX2_X + RendererConstants.FANCY_BOX_WIDTH / 4 + RendererConstants.HEART_WIDTH;
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX2_Y + 37,
+			x = Constants.FANCY_BOX2_X + Constants.FANCY_BOX_WIDTH / 4 + Constants.HEART_WIDTH;
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX2_Y + 37,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -439,9 +433,9 @@ public class Renderer {
 		if (state.getPlayers().size() > 2) {
 
 			hudTextItem.setText(state.getPlayers().get(2).getName());
-			x = RendererConstants.FANCY_BOX3_X
-					+ (RendererConstants.FANCY_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX3_Y + 10,
+			x = Constants.FANCY_BOX3_X
+					+ (Constants.FANCY_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX3_Y + 10,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -449,8 +443,8 @@ public class Renderer {
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(2).getLives()));
-			x = RendererConstants.FANCY_BOX3_X + RendererConstants.FANCY_BOX_WIDTH / 4 + RendererConstants.HEART_WIDTH;
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX3_Y + 37,
+			x = Constants.FANCY_BOX3_X + Constants.FANCY_BOX_WIDTH / 4 + Constants.HEART_WIDTH;
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX3_Y + 37,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -461,9 +455,9 @@ public class Renderer {
 		if (state.getPlayers().size() > 3) {
 
 			hudTextItem.setText(state.getPlayers().get(3).getName());
-			x = RendererConstants.FANCY_BOX4_X
-					+ (RendererConstants.FANCY_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX4_Y + 10,
+			x = Constants.FANCY_BOX4_X
+					+ (Constants.FANCY_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX4_Y + 10,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -471,8 +465,8 @@ public class Renderer {
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(3).getLives()));
-			x = RendererConstants.FANCY_BOX4_X + RendererConstants.FANCY_BOX_WIDTH / 4 + RendererConstants.HEART_WIDTH;
-			modelMatrix = transformation.getModelMatrix(x, RendererConstants.FANCY_BOX4_Y + 37,
+			x = Constants.FANCY_BOX4_X + Constants.FANCY_BOX_WIDTH / 4 + Constants.HEART_WIDTH;
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX4_Y + 37,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -500,7 +494,7 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 		textureShader.setUniform("projection", projectionMatrix);
 
-		modelMatrix = transformation.getModelMatrix(RendererConstants.GENERAL_BOX_X, RendererConstants.GENERAL_BOX_Y, 0f,
+		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f,
 				1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
@@ -522,9 +516,9 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 
 		hudTextItem.setText("GAME OVER");
-		x = RendererConstants.GENERAL_BOX_X + (RendererConstants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-		float y = RendererConstants.GENERAL_BOX_Y
-				+ (RendererConstants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+		float y = Constants.GENERAL_BOX_Y
+				+ (Constants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -551,7 +545,7 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 		textureShader.setUniform("projection", projectionMatrix);
 
-		modelMatrix = transformation.getModelMatrix(RendererConstants.GENERAL_BOX_X, RendererConstants.GENERAL_BOX_Y, 0f,
+		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f,
 				1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
@@ -573,9 +567,9 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 
 		hudTextItem.setText("5 SECONDS");
-		x = RendererConstants.GENERAL_BOX_X + (RendererConstants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-		float y = RendererConstants.GENERAL_BOX_Y
-				+ (RendererConstants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+		float y = Constants.GENERAL_BOX_Y
+				+ (Constants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -602,7 +596,7 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 		textureShader.setUniform("projection", projectionMatrix);
 
-		modelMatrix = transformation.getModelMatrix(RendererConstants.GENERAL_BOX_X, RendererConstants.GENERAL_BOX_Y, 0f,
+		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f,
 				1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
@@ -623,9 +617,9 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 
 		hudTextItem.setText("PRESS P TO UNPAUSE THE GAME");
-		x = RendererConstants.GENERAL_BOX_X + (RendererConstants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-		float y = RendererConstants.GENERAL_BOX_Y
-				+ (RendererConstants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+		float y = Constants.GENERAL_BOX_Y
+				+ (Constants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
@@ -687,4 +681,5 @@ public class Renderer {
 			hudShader.dispose();
 		}
 	} // END OF dispose METHOD
+	
 } // END OF Renderer CLASS
