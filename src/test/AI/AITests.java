@@ -80,7 +80,7 @@ public class AITests {
 		state = new GameState(map, players);
 		state.setBombs(bombs);
 
-		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state, null, AIDifficulty.EXTREME);
+		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state, AIDifficulty.EXTREME);
 		players.add(ai);
 		checker = new SafetyChecker(state, ai);
 		finder = new RouteFinder(state, ai,checker);
@@ -125,11 +125,11 @@ public class AITests {
 	@Test
 	public void enemyCheckTest() {
 
-		Player player = new Player("name", new Point(2*scalar, 2*scalar), 5, 10, null);
+		Player player = new Player("name", new Point(2*scalar, 2*scalar), 5, 10);
 		players.add(player);
 		assertFalse(checker.isEnemyInBombRange());
 
-		Player player2 = new Player("name2", new Point(4*scalar, 2*scalar), 5, 10, null);
+		Player player2 = new Player("name2", new Point(4*scalar, 2*scalar), 5, 10);
 		players.add(player2);
 		assertTrue(checker.isEnemyInBombRange());
 
@@ -139,7 +139,7 @@ public class AITests {
 		ai.setPos(new Point(6*scalar, 2*scalar));
 		assertTrue(checker.isEnemyInBombRange());
 		
-		Player ai2 = new GameAI("ai", new Point(6*scalar,6*scalar), 3, 10, state, null, AIDifficulty.EXTREME);	
+		Player ai2 = new GameAI("ai", new Point(6*scalar,6*scalar), 3, 10, state, AIDifficulty.EXTREME);	
 		ai.setPos(new Point(6*scalar,8*scalar));
 		players.add(ai2);
 		players.add(ai);
@@ -260,11 +260,11 @@ public class AITests {
 	@Test
 	public void nereastEnemyTest() {
 		ai.setPos(new Point(0,0));
-		Player player1 = new Player("nr1",new Point(0,12*scalar),3,0, null);
+		Player player1 = new Player("nr1",new Point(0,12*scalar),3,0);
 		players.add(player1);
-		Player player2 = new Player("nr1",new Point(12*scalar,0),3,0, null);
+		Player player2 = new Player("nr1",new Point(12*scalar,0),3,0);
 		players.add(player2);
-		Player player3 = new Player("nr1",new Point(5*scalar,6*scalar),3,0, null);
+		Player player3 = new Player("nr1",new Point(5*scalar,6*scalar),3,0);
 		players.add(player3);
 		state.setPlayers(players);
 		
@@ -274,7 +274,7 @@ public class AITests {
 		assertNotEquals(new Point(6,7),finder.getNearestEnemy());
 		
 		player3.setPos(new Point(4*scalar,3*scalar));
-		Player ai2 = new GameAI("name", new Point(0*scalar, 4*scalar),1, 1, state, null, AIDifficulty.EXTREME);
+		Player ai2 = new GameAI("name", new Point(0*scalar, 4*scalar),1, 1, state, AIDifficulty.EXTREME);
 		players.add(ai2);
 		assertEquals(new Point(0,4),finder.getNearestEnemy());
 		assertNotEquals(new Point(0,4),finder.getNearestEnemyExcludeAIs());
@@ -292,7 +292,7 @@ public class AITests {
 		assertNull(finder.canPutBombAndEscapeExcludeAIs());
 		
 		ai.setGridPos(new Point(0,4*scalar));
-		Player ai3 = new GameAI("name", new Point(0*scalar, 4*scalar),1, 1, state, null, AIDifficulty.EXTREME);
+		Player ai3 = new GameAI("name", new Point(0*scalar, 4*scalar),1, 1, state, AIDifficulty.EXTREME);
 		players.add(ai3);
 		assertNull(finder.canPutBombAndEscape());
 		assertNull(finder.canPutBombAndEscapeExcludeAIs());
@@ -303,7 +303,7 @@ public class AITests {
 		assertNotNull(finder.canPutBombAndEscape());
 		assertNull(finder.canPutBombAndEscapeExcludeAIs());
 		
-		Player player = new Player("nr1",new Point(0*scalar,9*scalar),3,0, null);
+		Player player = new Player("nr1",new Point(0*scalar,9*scalar),3,0);
 		players.add(player);
 		
 		assertNotNull(finder.canPutBombAndEscapeExcludeAIs());

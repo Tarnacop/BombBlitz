@@ -19,7 +19,7 @@ public class MusicPlayer extends Thread
     {
         try {
             clip = AudioSystem.getClip();
-            InputStream rawStream = Main.class.getResourceAsStream(Constants.audioFilesPath + Constants.musicFilename);
+            InputStream rawStream = Main.class.getResourceAsStream(Constants.AUDIO_FILES_PATH + Constants.MUSIC_FILENAME);
             if(rawStream == null)
                 throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
@@ -27,7 +27,7 @@ public class MusicPlayer extends Thread
             setVolume(volume);
 
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.err.println("Could not load sound: " + Constants.audioFilesPath + Constants.musicFilename);
+            System.err.println("Could not load sound: " + Constants.AUDIO_FILES_PATH + Constants.MUSIC_FILENAME);
             e.printStackTrace();
         }
     }

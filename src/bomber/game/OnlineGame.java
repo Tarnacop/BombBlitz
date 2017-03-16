@@ -10,7 +10,6 @@ import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
 import bomber.renderer.Screen;
 import bomber.renderer.interfaces.GameInterface;
-import bomber.renderer.shaders.ColourMesh;
 
 public class OnlineGame implements GameInterface {
 
@@ -45,8 +44,8 @@ public class OnlineGame implements GameInterface {
 
 		try {
 
-			int width = this.client.getMapWidth() * Constants.mapBlockToGridMultiplier;
-			int height = this.client.getMapHeight() * Constants.mapBlockToGridMultiplier;
+			int width = this.client.getMapWidth() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
+			int height = this.client.getMapHeight() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
 			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
 			this.graphics.start();
 		} catch (Exception e) {
@@ -61,16 +60,10 @@ public class OnlineGame implements GameInterface {
 			System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 			renderer.stopFrontScreen();
-			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 
 			while (this.gameState == null) {
 				this.gameState = this.client.getGameState();
 				Thread.sleep(100);
-			}
-
-			for (Player player : this.gameState.getPlayers()) {
-
-				player.addMesh(new ColourMesh(32, 32, colours));
 			}
 
 			this.keyState = new KeyboardState();
