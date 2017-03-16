@@ -143,6 +143,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private double boxWidth;
 	private double canvasHeight;
 	private double canvasWidth;
+	private Font smallFont;
 	
 	public UserInterface(){
 
@@ -152,6 +153,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 		this.ui = this;
 		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 20);
+		this.smallFont = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 15);
 		this.css = UserInterface.class.getResource("../../resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty(SettingsParser.getPlayerName());
 		this.aiNumber = new SimpleIntegerProperty(1);
@@ -176,11 +178,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.windowHeight = screenHeight * 0.8;
 		this.windowWidth = screenWidth * 0.8;
 		
-		this.btnHeight = windowHeight/20;
-		this.btnWidth = windowWidth/8;
-		this.bigBtnHeight = windowHeight/15;
-		this.bigBtnWidth = windowWidth/6;
-		
+//		this.btnHeight = windowHeight/20;
+//		this.btnWidth = windowWidth/10;
+//		this.bigBtnHeight = windowHeight/15;
+//		this.bigBtnWidth = windowWidth/8;
+
 		this.boxHeight = windowHeight/4;
 		this.boxWidth = windowWidth/6;
 		
@@ -245,7 +247,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		onlineMapCanvas = new Pane();
 		onlineMapCanvas.setMinHeight(300);
 		onlineMapCanvas.setMinWidth(300);
-        centerBox.getChildren().addAll(createAiDifficultySelector(true), createMapSelector(onlineMapCanvas, true));
+		aiOnlineDifficultyChoice = new ChoiceBox<>();
+        centerBox.getChildren().addAll(createAiDifficultySelector(aiOnlineDifficultyChoice, true), createMapSelector(onlineMapCanvas, true));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn);
@@ -502,7 +505,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		mapCanvas = new Pane();
 		mapCanvas.setMinHeight(300);
 		mapCanvas.setMinWidth(300);
-        centerBox.getChildren().addAll(createAiDifficultySelector(false), createMapSelector(mapCanvas, false));
+		aiDifficultyChoice = new ChoiceBox<>();
+        centerBox.getChildren().addAll(createAiDifficultySelector(aiDifficultyChoice, false), createMapSelector(mapCanvas, false));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn);
@@ -515,7 +519,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         setBackgroundPane(singleMenu, singleBox);
 	}
 
-	private VBox createAiDifficultySelector(boolean online){
+	private VBox createAiDifficultySelector(ChoiceBox<String> selector, boolean online){
 		
 		Button upAiToggle = new Button();
         upAiToggle.setPrefWidth(30);
@@ -545,17 +549,17 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiPane.setSpacing(20);
         aiPane.getChildren().addAll(aiBox, aiLabel);
         Label aiExplanation = createLabel("AI players will\nseek to\ndestroy you.", true, true);
+        aiExplanation.setFont(smallFont);
         aiExplanation.setAlignment(Pos.CENTER);
         aiExplanation.setPrefWidth(200);
-        if(online){
-        	aiOnlineDifficultyChoice = new ChoiceBox<>();
-            aiOnlineDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
-            aiOnlineDifficultyChoice.setPrefHeight(50);
-            aiOnlineDifficultyChoice.setPrefWidth(200);
-            aiOnlineDifficultyChoice.getStyleClass().add("textfield");
-            aiOnlineDifficultyChoice.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
-            aiOnlineDifficultyChoice.getSelectionModel().select(1);
-            aiOnlineDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
+        	selector = new ChoiceBox<>();
+            selector.setTooltip(new Tooltip("Change AI Difficulty"));
+            selector.setPrefHeight(50);
+            selector.setPrefWidth(200);
+            selector.getStyleClass().add("textfield");
+            selector.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
+            selector.getSelectionModel().select(1);
+            selector.getSelectionModel().selectedItemProperty().addListener(new
                     ChangeListener<String>() {
     			@Override
     			public void changed(ObservableValue<? extends String> ob,
@@ -586,7 +590,7 @@ public class UserInterface extends Application implements ClientNetInterface{
             aiDiffBox.setAlignment(Pos.CENTER);
             aiDiffBox.getStyleClass().add("namebox");
             aiDiffBox.setSpacing(20);
-            aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), aiOnlineDifficultyChoice, aiExplanation);
+            aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), selector, aiExplanation);
             aiDiffBox.setMinHeight(300);
             
             VBox aiContainer = new VBox();
@@ -600,59 +604,7 @@ public class UserInterface extends Application implements ClientNetInterface{
     		aiPad.getChildren().add(aiContainer);
     		
     		return aiPad;
-        }
-        else{
-        aiDifficultyChoice = new ChoiceBox<>();
-        aiDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
-        aiDifficultyChoice.setPrefHeight(50);
-        aiDifficultyChoice.setPrefWidth(200);
-        aiDifficultyChoice.getStyleClass().add("textfield");
-        aiDifficultyChoice.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
-        aiDifficultyChoice.getSelectionModel().select(1);
-        aiDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
-                ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> ob,
-					String oldValue, String newValue) {
-				switch(newValue){
-				case "Easy": 
-					aiDiff = AIDifficulty.EASY; 
-					aiExplanation.setText("AI players will\nmove randomly.");
-					break;
-				case "Medium": 
-					aiDiff = AIDifficulty.MEDIUM;
-					aiExplanation.setText("AI players will\nseek to\ndestroy you.");
-					break;
-				case "Hard": 
-					aiDiff = AIDifficulty.HARD; 
-					aiExplanation.setText("AI players will\nbe tough\nto beat!");
-					break;
-				case "Extreme": 
-					aiDiff = AIDifficulty.EXTREME;
-					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
-				}
-			}
-        });
-
-        VBox aiDiffBox = new VBox();
-        aiDiffBox.setAlignment(Pos.CENTER);
-        aiDiffBox.getStyleClass().add("namebox");
-        aiDiffBox.setSpacing(20);
-        aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), aiDifficultyChoice, aiExplanation);
         
-        VBox aiContainer = new VBox();
-        aiContainer.setAlignment(Pos.CENTER);
-        aiContainer.getStyleClass().add("menubox");
-        aiContainer.setSpacing(20);
-        aiContainer.getChildren().addAll(aiPane, aiDiffBox);
-        
-		VBox aiPad = new VBox();
-		aiPad.setAlignment(Pos.CENTER);
-		aiPad.getChildren().add(aiContainer);
-		
-		return aiPad;
-        
-        }
 	}
 	
 	private VBox createMapSelector(Pane mapCanvas, boolean online){
@@ -831,7 +783,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.currentNameText = new SimpleStringProperty("Current Name:");
 		nameText = createTextField("Enter Name");
 		
-        nameBtn = createButton("Set Name", btnWidth, btnHeight);
+        nameBtn = createButton("Set Name", 200, 50);
         nameBtn.setOnAction(e -> setName(nameText.getText()));
         
         Button singlePlayerBtn = createSceneButton("Single Player", 200, 50, mainScene, singleScene);
