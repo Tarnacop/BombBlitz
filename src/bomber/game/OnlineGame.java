@@ -27,9 +27,10 @@ public class OnlineGame implements GameInterface {
 	private UserInterface ui;
 	// private int aiNum;
 	private ClientThread client;
+	private boolean fullScreen;
 
 	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
-			HashMap<Response, Integer> controls) {
+			HashMap<Response, Integer> controls, boolean fullScreen) {
 
 		this.ui = ui;
 		this.gameState = gameState;
@@ -37,6 +38,7 @@ public class OnlineGame implements GameInterface {
 		// this.playerName = playerName;
 		this.controlScheme = controls;
 		this.bombPressed = false;
+		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
 		audio = new AudioManager();
@@ -46,7 +48,7 @@ public class OnlineGame implements GameInterface {
 
 			int width = this.client.getMapWidth() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
 			int height = this.client.getMapHeight() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
-			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
+			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

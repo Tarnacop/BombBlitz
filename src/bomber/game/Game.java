@@ -33,8 +33,9 @@ public class Game implements GameInterface {
 	private UserInterface ui;
 	private int aiNum;
 	private AIDifficulty aiDiff;
+	private boolean fullScreen;
 	
-	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff, float musicVolume, float soundVolume) {
+	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen) {
 
 		this.aiNum = aiNum;
 		this.aiDiff = aiDiff;
@@ -43,6 +44,7 @@ public class Game implements GameInterface {
 		this.playerName = playerName;
 		this.controlScheme = controls;
 		this.bombPressed = false;
+		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
 		audio = new AudioManager();
@@ -53,7 +55,7 @@ public class Game implements GameInterface {
 			
 			int width = this.map.getPixelMap().length;
 			int height = this.map.getPixelMap()[0].length;
-			this.graphics = new Graphics("Bomb Blitz", width + 400, height, false, this);
+			this.graphics = new Graphics("Bomb Blitz", width + 400, height, false, this, fullScreen);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
