@@ -7,8 +7,8 @@ public abstract class Constants
 {
 
     // Game World Constants
-    public static final int PLAYER_WIDTH = 32;
-    public static final int PLAYER_HEIGHT = 32;
+    public static final int PLAYER_WIDTH = 36;
+    public static final int PLAYER_HEIGHT = 36;
     public static final int BOMB_WIDTH = 50;
     public static final int BOMB_HEIGHT = 50;
     public static final float GENERAL_BLOCK_WIDTH = 64f;
@@ -57,7 +57,7 @@ public abstract class Constants
 	public static final float V_HEIGHT = 869f;
 	
 	public static final float SPRITESHEET_ROWS = 2f;
-	public static final float SPRITESHEET_COLS = 4f;
+	public static final float SPRITESHEET_COLS = 10f;
 	
 	public static final float BACKGROUND_WIDTH = 1262f;
 	public static final float BACKGROUND_HEIGHT = 869f;
@@ -92,4 +92,6 @@ public abstract class Constants
 	
 	public static final float HEART_WIDTH = 32f;
 	public static final float HEART_HEIGHT = 32f;
+
+	public static final float BOX_PADDING = 60f;
 }

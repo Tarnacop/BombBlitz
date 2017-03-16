@@ -2,6 +2,7 @@ package bomber.UI;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
@@ -13,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import bomber.game.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -32,6 +32,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -51,6 +53,14 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import bomber.AI.AIDifficulty;
 import bomber.audio.AudioManager;
+import bomber.game.Block;
+import bomber.game.Game;
+import bomber.game.GameState;
+import bomber.game.Map;
+import bomber.game.Maps;
+import bomber.game.OnlineGame;
+import bomber.game.Response;
+import bomber.game.SettingsParser;
 import bomber.networking.ClientNetInterface;
 import bomber.networking.ClientServerAI;
 import bomber.networking.ClientServerLobbyRoom;
@@ -65,11 +75,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Stage currentStage;
 	private BorderPane serverMenu;
 	private BorderPane singleMenu;
-	private Scene mainScene, serverScene, singleScene;
+	private Parent mainScene, serverScene, singleScene;
 	private TextField nameText, ipText;
 	private Button nameBtn;
 	private Button connectBtn;
-	private Stack<Scene> previousScenes;
+	private Stack<Parent> previousScenes;
 	private HashMap<Response, Integer> controls;
 	private Map map;
 	private SimpleStringProperty mapName;
@@ -80,17 +90,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label enterLabel;
 	private VBox connectPane;
 	private ClientThread client;
-	private FlowPane roomsBox;
+	private HBox roomsBox;
 	private FlowPane playersBox;
 	private boolean expectingConnection;
-	private Scene currentScene;
 	private Font font;
 	private Label roomCreationLabel;
 	private UserInterface ui;
 	
-	private Scene roomScene;
+	private Parent roomScene;
 	private String css;
-	private Scene creditsScene;
+	private Parent creditsScene;
 	private BorderPane creditsMenu;
 	private BorderPane roomMenu;
 	private Button createRoomBtn;
@@ -99,7 +108,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private int windowHeight;
 	private int windowWidth;
 	private BorderPane connectMenu;
-	private Scene connectScene;
+	private Parent connectScene;
 	private TextField roomNameField;
 	private SimpleIntegerProperty roomNumber;
 	private boolean expectingRoomCreation;
@@ -121,6 +130,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private double versionNumber;
 	private boolean musicMuted;
 	private boolean soundMuted;
+	private CheckBox fullScreenBtn;
 	
 	public UserInterface(){
 
@@ -147,7 +157,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.controls.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
 		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
-		this.windowHeight = 950;
+		this.controls.put(Response.PAUSE_GAME, GLFW_KEY_P);
+		this.windowHeight = 1000;
 		this.windowWidth = 1100;
 	}
 	
@@ -162,10 +173,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 		currentStage.setMinHeight(windowHeight);
 		currentStage.setMinWidth(windowWidth);
 		primaryStage.setTitle(this.appName);
-		previousScenes = new Stack<Scene>();
+		previousScenes = new Stack<Parent>();
 		initScenes();
 		
-        primaryStage.setScene(mainScene);
+        primaryStage.setScene(new Scene(mainScene));
         primaryStage.setOnCloseRequest(e -> disconnect());
         primaryStage.show();
 	}
@@ -220,17 +231,22 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersBox2.setVgap(20);
 		playersBox2.setHgap(20);
 		
+		ScrollPane scrollPane = new ScrollPane();
+		scrollPane.setMinHeight(200);
+		scrollPane.setMinWidth(300);
+		scrollPane.setContent(playersBox2);
+		
 		VBox playersListPane = new VBox();
 		playersListPane.getStyleClass().add("wideclearbox");
 		playersListPane.setSpacing(10);
-		playersListPane.setMinWidth(400);
-		playersListPane.getChildren().addAll(playersTitle, playersBox2);
+		playersListPane.setPrefWidth(200);
+		playersListPane.getChildren().addAll(playersTitle, scrollPane);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox2.minHeightProperty().add(70)));
 
 		readyTorch = new Rectangle();
-		readyTorch.setWidth(110);
-		readyTorch.setHeight(140);
+		readyTorch.setWidth(90);
+		readyTorch.setHeight(120);
 		readyTorch.getStyleClass().add("wideclearbox");
 		readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 		
@@ -239,14 +255,18 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyBox.setSpacing(10);
 		readyBox.setAlignment(Pos.CENTER);
 		readyBox.setMinWidth(300);
+		readyBox.setMinHeight(300);
+		readyBox.setPrefHeight(300);
 		readyButton = createButton("Not Ready", 250, 50);
 		readyButton.setOnAction(e -> ready());
 		readyBox.getChildren().addAll(createLabel("Click to\ntoggle Ready:", false, false), readyTorch, readyButton);
 		
 		readyPane = new VBox();
 		readyPane.getStyleClass().add("menubox");
-		readyPane.setSpacing(20);
-		readyPane.setMinWidth(200);
+		readyPane.setSpacing(30);
+		readyPane.setMinWidth(320);
+		readyBox.setMinHeight(300);
+		readyBox.setPrefHeight(300);
 		readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 		
 		HBox playersReadyBox = new HBox();
@@ -340,27 +360,36 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		Label roomsTitle = createLabel("Rooms:				( Join or create a room to play a match! )", false, true);
 
-		roomsBox = new FlowPane();
-		roomsBox.setVgap(20);
-		roomsBox.setHgap(40);
-		roomsBox.setMinHeight(100);
+		roomsBox = new HBox();
+		roomsBox.setSpacing(40);
+		
+		ScrollPane scrollRooms = new ScrollPane();
+		scrollRooms.setMinHeight(250);
+		scrollRooms.setVbarPolicy(ScrollBarPolicy.NEVER);
+		scrollRooms.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		scrollRooms.setFitToHeight(true);
+		scrollRooms.setFitToWidth(true);
+		scrollRooms.setContent(roomsBox);
 		
 		VBox roomsListPane = new VBox();
 		roomsListPane.setSpacing(10);
 		roomsListPane.setAlignment(Pos.TOP_LEFT);
-		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(roomsBox.minHeightProperty().add(200)));
-		roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
+		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(scrollRooms.minHeightProperty()));
+		roomsListPane.getChildren().addAll(roomsTitle, scrollRooms);
 
 		Label playersTitle = createLabel("Online Players:", false, true);
 
-		playersBox = new FlowPane(Orientation.VERTICAL);
+		playersBox = new FlowPane();
 		playersBox.setVgap(20);
 		playersBox.setHgap(20);
 		playersBox.setMinHeight(100);
 		
+		ScrollPane scrollPlayers = new ScrollPane();
+		scrollPlayers.setContent(playersBox);
+		
 		VBox playersListPane = new VBox();
 		playersListPane.setSpacing(10);
-		playersListPane.getChildren().addAll(playersTitle, playersBox);
+		playersListPane.getChildren().addAll(playersTitle, scrollPlayers);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox.minHeightProperty().add(70)));
 		
@@ -368,7 +397,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		roomsPlayersPane.setSpacing(40);
 		roomsPlayersPane.setAlignment(Pos.CENTER);
 		roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
-		roomsBox.maxWidthProperty().bind(roomsPlayersPane.widthProperty());
 		BorderPane serverPane = new BorderPane();
 		VBox serverBox = new VBox();
 		serverBox.setSpacing(20);
@@ -854,8 +882,16 @@ public class UserInterface extends Application implements ClientNetInterface{
         audioPane.setPadding(new Insets(10, 0, 0, 0));
         audioPane.getChildren().addAll(musicLabelBox, musicSlider, soundLabelBox, soundSlider);
         
+        fullScreenBtn = new CheckBox();
+        fullScreenBtn.setOnAction(e -> fullScreen());
+        
+        HBox fullScreenBox = new HBox();
+        fullScreenBox.setAlignment(Pos.CENTER);
+        fullScreenBox.setSpacing(5);
+        fullScreenBox.getChildren().addAll(createLabel("Fullscreen ", false, false), fullScreenBtn);
+        
         namePane.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
-        		nameText, nameBtn, audioPane);
+        		nameText, nameBtn, audioPane, fullScreenBox);
         
         
         Button exitBtn = createButton("Exit", 200, 50);
@@ -863,6 +899,15 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         menuBox.getChildren().addAll(namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn, exitBtn);
         setBackgroundPane(mainMenu, logoPane);
+	}
+
+	private void fullScreen() {
+		if(fullScreenBtn.isSelected()){
+			this.currentStage.setFullScreen(true);
+		}
+		else{
+			this.currentStage.setFullScreen(false);
+		}
 	}
 
 	private void setMusic(float volume) {
@@ -911,8 +956,9 @@ public class UserInterface extends Application implements ClientNetInterface{
         pane.setCenter(background);
 	}
 	
-	private Scene createScene(Parent menu){
-		Scene scene = new Scene(menu, windowWidth, windowHeight);
+	private Parent createScene(Parent menu){
+		BorderPane scene = new BorderPane();
+		scene.setCenter(menu);
 		scene.getStylesheets().add(css);
 		return scene;
 	}
@@ -983,7 +1029,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		return button;
 	}
 	
-	private Button createSceneButton(String label, double width, double height, Scene currentScene, Scene nextScene){
+	private Button createSceneButton(String label, double width, double height, Parent currentScene, Parent nextScene){
 		Button button = new Button(label);
 		button.setFont(font);
 		button.setPrefWidth(width);
@@ -1191,11 +1237,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		beep();
 		enterLabel.setText("Enter Server Details:");
 		String host = ipText.getText().trim();
+		this.client = null;
 		try{
 			int port = Integer.parseInt(portNum.getText());
 		
-		//System.out.println("Attempting connection to: " + host + ", port = " + port);
-		this.client = null;
+			//System.out.println("Attempting connection to: " + host + ", port = " + port);
 			client = new ClientThread(host, port);
 
 			client.addNetListener(this);
@@ -1207,6 +1253,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			
 			blankButton(connectBtn, "Connecting...");
 			this.expectingConnection = true;
+			
 		} 
 		catch (NumberFormatException e1) {
 			enterLabel.setText("Enter Server Details:\n( Invalid Port Number! )");
@@ -1228,7 +1275,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			
 			VBox roomContainer = new VBox();
 			roomContainer.setMinHeight(100);
-			roomContainer.setMinWidth(100);
+			roomContainer.setMinWidth(210);
 			roomContainer.setSpacing(5);
 			roomContainer.setAlignment(Pos.CENTER);
 			roomContainer.getStyleClass().add("namebox");
@@ -1297,7 +1344,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.playersBox2.getChildren().clear();
 		
 		for(ClientServerPlayer player : connectedPlayers){
-			this.playersBox.getChildren().add(createLabel("- P" + player.getID() + ":   " + player.getName(), true, true));
+			this.playersBox.getChildren().add(createLabel("- Player ID [" + player.getID() + "] Name:   " + player.getName(), true, true));
 			this.playersBox2.getChildren().add(createLabel("- P" + player.getID() + ":   " + player.getName(), true, true));
 		}
 		
@@ -1361,12 +1408,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
-		System.out.println("am at " + this.currentScene);
-		Scene lastScene = this.previousScenes.pop();
-		this.currentStage.setScene(lastScene);
-		this.currentScene = lastScene;
-		System.out.println("now at " + this.currentScene);
-		
+		//System.out.println("am at " + this.currentScene);
+		Parent lastScene = this.previousScenes.pop();
+		this.currentStage.getScene().setRoot(lastScene);
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
 		
@@ -1379,10 +1423,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		this.aiNumber.set(1);
 		this.humanPlayers = 1;
+		if(this.currentStage.isFullScreen()){
+			fullScreenBtn.setSelected(true);
+		}
+		else{
+			fullScreenBtn.setSelected(false);
+		}
 		}
 	
 	
-	private void advance(Scene thisScene, Scene nextScene) {
+	private void advance(Parent thisScene, Parent nextScene) {
 		
 		beep();
 		double x = this.currentStage.getWidth();
@@ -1392,9 +1442,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.previousScenes.push(thisScene);
 		System.out.println("Added " + thisScene);
 		System.out.println(this.previousScenes);
-		this.currentStage.setScene(nextScene);
-		this.currentScene = nextScene;
-		
+		this.currentStage.getScene().setRoot(nextScene);
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
 	}
