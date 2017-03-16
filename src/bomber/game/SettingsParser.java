@@ -166,7 +166,11 @@ public class SettingsParser
         setTagText("showTutorial", String.valueOf(show));
     }
 
-    // TODO: server add/remove/get
+    public static void setServer(String ip, String port)
+    {
+        setTagText("ip", ip);
+        setTagText("port", port);
+    }
 
     public static String getPlayerName()
     {
@@ -186,6 +190,16 @@ public class SettingsParser
     public static boolean getShowTutorial()
     {
         return Boolean.parseBoolean(getTagText("showTutorial"));
+    }
+
+    public static String getServerIp()
+    {
+        return getTagText("ip");
+    }
+
+    public static String getServerPort()
+    {
+        return getTagText("port");
     }
 
     private static void printSettings()
@@ -245,8 +259,8 @@ public class SettingsParser
 
         // delete settings.xml to check automatic initialisation
         File file = new File(Constants.settingsXMLPath);
-        file.delete();
-        System.out.println("Deleted settings.xml");
+        //file.delete();
+        //System.out.println("Deleted settings.xml");
 
         SettingsParser.init();
 
@@ -259,6 +273,16 @@ public class SettingsParser
         SettingsParser.init();
 
         System.out.println(SettingsParser.getPlayerName());
+
+        System.out.println("....................");
+
+        System.out.println(SettingsParser.getServerIp());
+        System.out.println(SettingsParser.getServerPort());
+
+        SettingsParser.setServer("server.ip", "server.port");
+        SettingsParser.storeSettings();
+        System.out.println(SettingsParser.getServerIp());
+        System.out.println(SettingsParser.getServerPort());
     }
 
 }
