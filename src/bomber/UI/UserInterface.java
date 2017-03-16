@@ -7,7 +7,9 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -105,8 +107,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button createRoomBtn;
 	private BorderPane mainMenu;
 	private SimpleStringProperty currentNameText;
-	private int windowHeight;
-	private int windowWidth;
+	private double windowHeight;
+	private double windowWidth;
 	private BorderPane connectMenu;
 	private Parent connectScene;
 	private TextField roomNameField;
@@ -131,6 +133,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private boolean musicMuted;
 	private boolean soundMuted;
 	private CheckBox fullScreenBtn;
+	private double screenHeight;
+	private double screenWidth;
+	private double btnHeight;
+	private double btnWidth;
+	private double bigBtnHeight;
+	private double bigBtnWidth;
+	private double boxHeight;
+	private double boxWidth;
+	private double canvasHeight;
+	private double canvasWidth;
 	
 	public UserInterface(){
 
@@ -158,8 +170,22 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
 		this.controls.put(Response.PAUSE_GAME, GLFW_KEY_P);
-		this.windowHeight = 1000;
-		this.windowWidth = 1100;
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.screenHeight = screenSize.height;
+		this.screenWidth = screenSize.width;
+		this.windowHeight = screenHeight * 0.8;
+		this.windowWidth = screenWidth * 0.8;
+		
+		this.btnHeight = windowHeight/20;
+		this.btnWidth = windowWidth/8;
+		this.bigBtnHeight = windowHeight/15;
+		this.bigBtnWidth = windowWidth/6;
+		
+		this.boxHeight = windowHeight/4;
+		this.boxWidth = windowWidth/6;
+		
+		this.canvasHeight = windowHeight/3; 
+		this.canvasWidth = windowWidth/3;
 	}
 	
 	public static void begin(){
@@ -805,7 +831,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.currentNameText = new SimpleStringProperty("Current Name:");
 		nameText = createTextField("Enter Name");
 		
-        nameBtn = createButton("Set Name", 200, 50);
+        nameBtn = createButton("Set Name", btnWidth, btnHeight);
         nameBtn.setOnAction(e -> setName(nameText.getText()));
         
         Button singlePlayerBtn = createSceneButton("Single Player", 200, 50, mainScene, singleScene);
@@ -1496,7 +1522,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			soundVolume = (float) soundSlider.getValue();
 		}
 		
-		new Game(this, mapCopy, playerName, controls, aiNum, this.aiDiff, musicVolume, soundVolume);
+		new Game(this, mapCopy, playerName, controls, aiNum, this.aiDiff, musicVolume, soundVolume, this.currentStage.isFullScreen());
 	}
 
 	@Override
@@ -1707,7 +1733,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			public void run() {
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
-				new OnlineGame(ui, client, gameState, playerName.get(), controls);
+				new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen());
 			}
 			   
 		});
