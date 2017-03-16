@@ -9,23 +9,37 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by Alexandru Rosu on 05.02.2017.
+ * Plays sound effects
+ * Only to be used by <code>AudioManager</code>
+ *
+ * @author Alexandru Rosu
  */
-public class SoundEffectPlayer extends Thread
+class SoundEffectPlayer extends Thread
 {
 
     private float volume;
 
-    public SoundEffectPlayer(float volume)
+    /**
+     * Constructs a sound effect player
+     *
+     * @param volume The volume percent, ranging from 0 to 100
+     */
+    SoundEffectPlayer(float volume)
     {
         this.volume = volume;
     }
 
-    public void playSound(String fileName)
+    /**
+     * Plays a single sound
+     *
+     * @param fileName The name of the file inside the audio resources folder (<code>Constants.audioFilesPath</code>)
+     */
+    void playSound(String fileName)
     {
-        try {
+        try
+        {
             Clip clip = AudioSystem.getClip();
-            InputStream rawStream = Main.class.getResourceAsStream(Constants.audioFilesPath + fileName);
+            InputStream rawStream = Main.class.getResourceAsStream(Constants.AUDIO_FILES_PATH + fileName);
             if(rawStream == null)
                 throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
@@ -34,34 +48,44 @@ public class SoundEffectPlayer extends Thread
             AudioManager.setControlVolume(gainControl, volume);
             clip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.err.println("Could not load sound: " + Constants.audioFilesPath + fileName);
+            System.err.println("Could not load sound: " + Constants.AUDIO_FILES_PATH + fileName);
             e.printStackTrace();
         }
     }
 
-    public void play(AudioEvent event)
+    /**
+     * Plays the sound associated with an audio event
+     *
+     * @param event The audio event
+     */
+    void play(AudioEvent event)
     {
         switch (event)
         {
             case PLACE_BOMB:
-                playSound(Constants.bombPlaceFilename);
+                playSound(Constants.BOMB_PLACE_FILENAME);
                 break;
             case EXPLOSION:
-                playSound(Constants.explosionFilename);
+                playSound(Constants.EXPLOSION_FILENAME);
                 break;
             case PLAYER_DEATH:
-                playSound(Constants.playerDeathFilename);
+                playSound(Constants.PLAYER_DEATH_FILENAME);
                 break;
             case MOVEMENT:
                 //playSound(Constants.movementFilename);
                 break;
             case POWERUP:
-                playSound(Constants.powerupFilename);
+                playSound(Constants.POWERUP_FILENAME);
                 break;
         }
     }
 
-    public void setVolume(float percent)
+    /**
+     * Sets a new value for volume
+     *
+     * @param percent The volume percent, ranging from 0 to 100
+     */
+    void setVolume(float percent)
     {
         this.volume = percent;
     }

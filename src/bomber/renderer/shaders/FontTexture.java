@@ -16,8 +16,13 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-import bomber.renderer.constants.RendererConstants;
+import bomber.game.Constants;
 
+/**
+ * Class to create the texture for a font
+ * @author Alexandru Blinda
+ *
+ */
 public class FontTexture {
 
 	private final Font font;
@@ -29,21 +34,38 @@ public class FontTexture {
 	
 	private Texture texture;
 	
+	/**
+	 * Create a FontTexture object with the path to the font, size of the font and fontType
+	 * @param path The given path to the font
+	 * @param size The given size of the font
+	 * @param fontType The given font type
+	 * @throws Exception
+	 */
 	public FontTexture(String path, int size, int fontType) throws Exception {
 		
 		this(Font.createFont(Font.TRUETYPE_FONT, new File(path)).deriveFont(fontType, size));
 	} // END OF CONSTRUCTOR
 	
+	/**
+	 * Create a FontTexture object with the given font
+	 * @param font The given font
+	 * @throws Exception
+	 */
 	public FontTexture(Font font) throws Exception {
 		
 		this.font = font;
-		this.charSetName = RendererConstants.CHARSET_NAME;
+		this.charSetName = Constants.CHARSET_NAME;
 		
 		charMap = new HashMap<>();
 		
 		buildTexture();
 	} // END OF CONSTRUCTOR
 	
+	/**
+	 * Get all the available characters of the font for a char set
+	 * @param charSetName The given char set
+	 * @return
+	 */
 	// Given a character set, we return all the characters that can be rendered
 	private String getAllAvailableCharacters(String charSetName) {
 		
@@ -61,6 +83,10 @@ public class FontTexture {
 		return result.toString();
 	} // END OF getAllAvailableCharacters METHOD
 	
+	/**
+	 * Build the texture of the font
+	 * @throws Exception
+	 */
 	private void buildTexture() throws Exception {
 		
 	    // Get the font metrics for each character for the selected font by using image
@@ -100,7 +126,7 @@ public class FontTexture {
 	    InputStream is;
 	    try (
 	        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-	        ImageIO.write(img, RendererConstants.IMAGE_FORMAT, out);
+	        ImageIO.write(img, Constants.IMAGE_FORMAT, out);
 	        out.flush();
 	        is = new ByteArrayInputStream(out.toByteArray());
 	    }
@@ -108,42 +134,78 @@ public class FontTexture {
 		texture = new Texture(is);
 	} // END OF buildTexture METHOD
 	
+	/**
+	 * Return the height of the font
+	 * @return The height of the font
+	 */
 	public int getHeight() {
 		
 		return this.height;
 	} // END OF getHeight METHOD
 	
+	/**
+	 * Return the width of the font
+	 * @return The width of the font
+	 */
 	public int getWidth() {
 		
 		return this.width;
 	} // END OF getWidth METHOD
 	
+	/**
+	 * Return the texture of the font
+	 * @return The texture of the font
+	 */
 	public Texture getTexture() {
 		
 		return this.texture;
 	} // END OF getTexture METHOD
 	
+	/**
+	 * Return information about a given character
+	 * @param c The given character
+	 * @return A CharInfo object representing information about the character
+	 */
 	public CharInfo getCharInfo(char c) {
 		
 		return charMap.get(c);
 	} // END OF getCharInfo METHOD
+	
+	/**
+	 * Class that stores information about a character
+	 * @author Alexandru Blinda
+	 *
+	 */
 	public static class CharInfo {
 		
 		private final int startX;
 		
 		private final int width;
 		
+		/**
+		 * Create a CharInfo object with the given startX and width
+		 * @param startX The starting position of a character in the texture
+		 * @param width The width of the character
+		 */
 		public CharInfo(int startX, int width) {
 			
 			this.startX = startX;
 			this.width = width;
 		} // END OF CONSTRUCTOR
 		
+		/**
+		 * Get the starting position of the character in the texture
+		 * @return The starting position of the character
+		 */
 		public int getStartX() {
 			
 			return startX;
 		} // END OF getStartX METHOD
 		
+		/**
+		 * Get the width of the character
+		 * @return The width of the character
+		 */
 		public int getWidth() {
 			
 			return width;

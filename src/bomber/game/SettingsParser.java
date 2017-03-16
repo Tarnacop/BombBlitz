@@ -47,7 +47,7 @@ public class SettingsParser
 
         try
         {
-            document = builder.parse(new File(Constants.settingsXMLPath));
+            document = builder.parse(new File(Constants.SETTING_XML_PATH));
             document.getDocumentElement().normalize();
         } catch (SAXException e)
         {
@@ -71,16 +71,16 @@ public class SettingsParser
 
         // name
         Element name = document.createElement("name");
-        name.appendChild(document.createTextNode(Constants.defaultPlayerName));
+        name.appendChild(document.createTextNode(Constants.DEFAULT_PLAYER_NAME));
         root.appendChild(name);
 
         // audio settings
         Element audio = document.createElement("audio");
         Element musicVolume = document.createElement("musicVolume");
-        musicVolume.appendChild(document.createTextNode(String.valueOf(Constants.defaultVolume)));
+        musicVolume.appendChild(document.createTextNode(String.valueOf(Constants.DEFAULT_VOLUME)));
         audio.appendChild(musicVolume);
         Element effectsVolume = document.createElement("effectsVolume");
-        effectsVolume.appendChild(document.createTextNode(String.valueOf(Constants.defaultVolume)));
+        effectsVolume.appendChild(document.createTextNode(String.valueOf(Constants.DEFAULT_VOLUME)));
         audio.appendChild(effectsVolume);
         root.appendChild(audio);
 
@@ -93,13 +93,13 @@ public class SettingsParser
         Element servers = document.createElement("servers");
         Element server = document.createElement("server");
         Element serverName = document.createElement("name");
-        serverName.appendChild(document.createTextNode(Constants.defaultServerName));
+        serverName.appendChild(document.createTextNode(Constants.DEFAULT_SERVER_NAME));
         server.appendChild(serverName);
         Element serverIp = document.createElement("ip");
-        serverIp.appendChild(document.createTextNode(Constants.defaultServerIp));
+        serverIp.appendChild(document.createTextNode(Constants.DEFAULT_SERVER_IP));
         server.appendChild(serverIp);
         Element serverPort = document.createElement("port");
-        serverPort.appendChild(document.createTextNode(String.valueOf(Constants.defaultServerPort)));
+        serverPort.appendChild(document.createTextNode(String.valueOf(Constants.DEFAULST_SERVER_PORT)));
         server.appendChild(serverPort);
         servers.appendChild(server);
         root.appendChild(servers);
@@ -121,7 +121,7 @@ public class SettingsParser
             e1.printStackTrace();
         }
         DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(new File(Constants.settingsXMLPath));
+        StreamResult result = new StreamResult(new File(Constants.SETTING_XML_PATH));
         try
         {
             transformer.transform(source, result);
@@ -166,7 +166,11 @@ public class SettingsParser
         setTagText("showTutorial", String.valueOf(show));
     }
 
-    // TODO: server add/remove/get
+    public static void setServer(String ip, String port)
+    {
+        setTagText("ip", ip);
+        setTagText("port", port);
+    }
 
     public static String getPlayerName()
     {
@@ -186,6 +190,16 @@ public class SettingsParser
     public static boolean getShowTutorial()
     {
         return Boolean.parseBoolean(getTagText("showTutorial"));
+    }
+
+    public static String getServerIp()
+    {
+        return getTagText("ip");
+    }
+
+    public static String getServerPort()
+    {
+        return getTagText("port");
     }
 
     private static void printSettings()
@@ -244,7 +258,7 @@ public class SettingsParser
     {
 
         // delete settings.xml to check automatic initialisation
-        File file = new File(Constants.settingsXMLPath);
+        File file = new File(Constants.SETTING_XML_PATH);
         file.delete();
         System.out.println("Deleted settings.xml");
 
@@ -259,6 +273,16 @@ public class SettingsParser
         SettingsParser.init();
 
         System.out.println(SettingsParser.getPlayerName());
+
+        System.out.println("....................");
+
+        System.out.println(SettingsParser.getServerIp());
+        System.out.println(SettingsParser.getServerPort());
+
+        SettingsParser.setServer("server.ip", "server.port");
+        SettingsParser.storeSettings();
+        System.out.println(SettingsParser.getServerIp());
+        System.out.println(SettingsParser.getServerPort());
     }
 
 }

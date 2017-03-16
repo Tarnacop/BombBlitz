@@ -11,9 +11,9 @@ import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
 /**
- * 
- * @author Alexandru Blinda
  * The class containing a Screen and all its information
+ * @author Alexandru Blinda
+ * 
  */
 public class Screen {
 
@@ -23,8 +23,8 @@ public class Screen {
 	private long screenID;
 	private boolean resized;
 	private boolean vSync;
+	private boolean fullScreen;
 	private GLFWVidMode vidmode;
-	private GLFWKeyCallback keyCallback;
 	
 	/**
 	 * Create a Screen with the given title, width, height and vsync
@@ -32,16 +32,17 @@ public class Screen {
 	 * @param width The width of the screen
 	 * @param height The height of the screen
 	 * @param vSync Use vsync for rendering
+	 * @param fullScreen Is the Screen fullScreen or window
 	 */
-	public Screen(String title, int width, int height, boolean vSync) {
+	public Screen(String title, int width, int height, boolean vSync, boolean fullScreen) {
 
 		this.width = width;
 		this.height = height;
 		this.title = title;
 		this.vSync = vSync;
-		System.out.println("Made new screen in Screen.java");
+		this.fullScreen = fullScreen;
 	} // END OF CONSTRUCTOR
-
+	
 	/**
 	 * Get the state of the keyboard key with the given key code
 	 * @param keyCode The given key Code
@@ -78,7 +79,14 @@ public class Screen {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
 		// Create the screen
-		screenID = glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
+		
+		if(fullScreen) {
+        
+			screenID = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), MemoryUtil.NULL);
+		} else {
+			
+			screenID = glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
+		}
 		if (screenID == MemoryUtil.NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -94,7 +102,7 @@ public class Screen {
 		
 		 // Setup a key callback. It will be called every time a key is pressed, repeated or released.
 
-        glfwSetKeyCallback(screenID, keyCallback = new GLFWKeyCallback() {
+        glfwSetKeyCallback(screenID, new GLFWKeyCallback() {
 
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {

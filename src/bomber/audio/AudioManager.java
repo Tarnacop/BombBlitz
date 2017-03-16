@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Alexandru Rosu on 05.02.2017.
+ * Manages all the sounds played by the game
+ *
+ * @author Alexandru Rosu
  */
 public class AudioManager
 {
@@ -17,9 +19,12 @@ public class AudioManager
     private static float musicVolume;
     private static float effectsVolume;
 
-    private MusicPlayer music;
-    private SoundEffectPlayer effects;
+    private final MusicPlayer music;
+    private final SoundEffectPlayer effects;
 
+    /**
+     * Constructs an audio manager
+     */
     public AudioManager()
     {
         music = new MusicPlayer(musicVolume);
@@ -27,45 +32,43 @@ public class AudioManager
         effects.start();
     }
 
+    /**
+     * Sets a new value for the volume of the music
+     * Must be called before initialising the manager
+     *
+     * @param percent The volume percent, ranging from 0 to 100
+     */
     public static void setMusicVolume(float percent)
     {
         musicVolume = percent;
     }
 
+    /**
+     * Sets a new value for the volume of the sound effects (all sounds but the music)
+     * Must be called before initialising the manager
+     *
+     * @param percent The volume percent, ranging from 0 to 100
+     */
     public static void setEffectsVolume(float percent)
     {
-        System.err.println("Effects volume set to " + percent);
         effectsVolume = percent;
     }
 
+    /**
+     * Sets a new value for the overall volume (both for the sound effects and the music)
+     * Must be called before initialising the manager
+     *
+     * @param percent The volume percent, ranging from 0 to 100
+     */
     public static void setVolume(float percent)
     {
         musicVolume = percent;
         effectsVolume = percent;
     }
 
-    static void setControlVolume(FloatControl gainControl, float volume)
-    {
-
-        if (volume>100 || volume<0)
-        {
-            System.err.println("Incorrect call: setVolume(" + volume + ")");
-            return;
-        }
-
-        float linearMin = (float)Math.pow(10,gainControl.getMinimum()/20);
-        float linearMax = (float)Math.pow(10,gainControl.getMaximum()/20);
-        float linearVolume = linearMin + (linearMax - linearMin) * volume / 100;
-
-        //System.out.println(linearMin + " -- " + linearVolume + " -- " + linearMax);
-        //System.out.println(gainControl.getMinimum() + " -- " + (float)(20*Math.log10(linearVolume)) + " -- " + gainControl.getMaximum());
-
-        float min = gainControl.getMinimum();
-        float max = gainControl.getMaximum();
-        //gainControl.setValue(min + (max-min)*volume/100); // db; decreases faster
-        gainControl.setValue((float)(20*Math.log10(linearVolume))); // linear formula; not so precise with little volume
-    }
-
+    /**
+     * Starts playing music, if not playing already
+     */
     public void playMusic()
     {
     	System.out.println("AudioManager Music " + musicVolume + " Sound " + effectsVolume);
@@ -73,16 +76,25 @@ public class AudioManager
             music.start();
     }
 
+    /**
+     * Pauses the music
+     */
     public void pauseMusic()
     {
         music.pause();
     }
 
+    /**
+     * Unpauses the music
+     */
     public void unpauseMusic()
     {
         music.unpause();
     }
 
+    /**
+     * Stops all the sounds from playing. The sound effects cannot be restarted after this
+     */
     public void stopAudio()
     {
         music.pause();
@@ -90,38 +102,81 @@ public class AudioManager
         effects.interrupt();
     }
 
+    /**
+     * Plays a series of sound effects
+     *
+     * @param eventList The list of events to be played
+     */
     public void playEventList(List<AudioEvent> eventList)
     {
         eventList.forEach(effects::play);
         eventList.clear();
     }
 
+    /**
+     * Plays the menu sound
+     */
     public static void playMenuItemSelected()
     {
         SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.menuSoundFilename);
+        effects.playSound(Constants.MENU_SOUND_FILENAME);
         effects.interrupt();
     }
 
+    /**
+     * Plays the "you won" sound
+     */
     public static void playGameOverWon()
     {
         SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.gameOverWonFilename);
+        effects.playSound(Constants.GAME_OVER_WON_FILENAME);
         effects.interrupt();
     }
 
+    /**
+     * Plays the "you lost" sound
+     */
     public static void playGameOverLost()
     {
         SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.gameOverLostFilename);
+        effects.playSound(Constants.GAME_OVER_LOST_FILENAME);
         effects.interrupt();
+    }
+
+    /**
+     * Changes the gain of a <code>Clip</code> according to the volume percent
+     *
+     * @param gainControl The MASTER_GAIN control of the <code>Clip</code>
+     * @param volume      The volume percent, ranging from 0 to 100
+     */
+    static void setControlVolume(FloatControl gainControl, float volume)
+    {
+
+        if (volume > 100 || volume < 0)
+        {
+            System.err.println("Incorrect call: setVolume(" + volume + ")");
+            return;
+        }
+
+        float linearMin = (float) Math.pow(10, gainControl.getMinimum() / 20);
+        float linearMax = (float) Math.pow(10, gainControl.getMaximum() / 20);
+        float linearVolume = linearMin + (linearMax - linearMin) * volume / 100;
+
+        //System.out.println(linearMin + " -- " + linearVolume + " -- " + linearMax);
+        //System.out.println(gainControl.getMinimum() + " -- " + (float)(20*Math.log10(linearVolume)) + " -- " + gainControl.getMaximum());
+
+        float min = gainControl.getMinimum();
+        float max = gainControl.getMaximum();
+
+        //gainControl.setValue(min + (max-min)*volume/100); // db; decreases faster
+        gainControl.setValue((float) (20 * Math.log10(linearVolume))); // linear formula; not so precise with little volume
     }
 
     public static void main(String[] args) throws InterruptedException
     {
         AudioManager audioManager = new AudioManager();
         //audioManager.playMusic();
-        audioManager.setVolume(100);
+        //audioManager.setVolume(100);
 
         //AudioManager.playMenuItemSelected();
 

@@ -138,7 +138,7 @@ public class PacketEncodeDecodeTest2 {
 		System.out.println();
 
 		// game state test
-		Player testPlayer = new Player("testPlayer", new Point(64, 64), 100, 300, null);
+		Player testPlayer = new Player("testPlayer", new Point(64, 64), 100, 300);
 		testPlayer.getKeyState().setBomb(true);
 		testPlayer.getKeyState().setMovement(Movement.RIGHT);
 		ArrayList<Player> testPlayerList = new ArrayList<Player>();

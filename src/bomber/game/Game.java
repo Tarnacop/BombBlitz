@@ -14,7 +14,6 @@ import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
 import bomber.renderer.Screen;
 import bomber.renderer.interfaces.GameInterface;
-import bomber.renderer.shaders.ColourMesh;
 
 public class Game implements GameInterface {
 
@@ -69,9 +68,8 @@ public class Game implements GameInterface {
 			this.renderer.init(screen);
 			
 			List<Point> spawns = this.map.getSpawnPoints();
-			float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f };
 
-			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 100, 300, new ColourMesh(32, 32, colours));
+			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 5, 300);
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
@@ -82,7 +80,7 @@ public class Game implements GameInterface {
 			this.physics = new PhysicsEngine(gameState);
 
 			for(int x = 1; x <= this.aiNum; x++){
-				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, new ColourMesh(32, 32, colours), this.aiDiff);
+				Player ai = new GameAI("Ai " + x, new Point(spawns.get(x).x, spawns.get(x).y), 5, 300, gameState, this.aiDiff);
 				list.add(ai);
 //				ai.begin();
 			}
@@ -98,10 +96,21 @@ public class Game implements GameInterface {
 	private float gameOverCounter = 0;
 	private	float frontScreenCounter = 0f;
 	private boolean startAIs = true;
+	private boolean gamePaused = false;
+	
 	@Override
 	public void update(float interval) {
 
-		if(this.gameState.gameOver()){
+		if(this.player.getKeyState().isPaused()){
+			if(!this.gamePaused){
+				this.gamePaused = true;
+				for(Player player : this.gameState.getPlayers()){
+					player.pause();
+				}
+				renderer.displayPauseScreen();
+			}
+		}
+		else if(this.gameState.gameOver()){
 			
 			if(gameOverCounter < 3) {
 				
@@ -112,6 +121,14 @@ public class Game implements GameInterface {
 				dispose();
 			}
 		} else {
+			
+			if(this.gamePaused){
+				this.gamePaused = false;
+				for(Player player : this.gameState.getPlayers()){
+					player.resume();
+				}
+				renderer.stopPauseScreen();
+			}
 			
 			// Wait 5 seconds
 			if(frontScreenCounter <= 5) {

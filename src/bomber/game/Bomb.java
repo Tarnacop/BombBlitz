@@ -1,7 +1,6 @@
 package bomber.game;
 
 import java.awt.Point;
-import bomber.renderer.shaders.ColourMesh;
 
 
 public class Bomb {

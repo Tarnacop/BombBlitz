@@ -3,46 +3,95 @@ package bomber.game;
 /**
  * Created by Alexandru Rosu on 20.02.2017.
  */
-public class Constants
+public abstract class Constants
 {
 
     // Game World Constants
-    public static final int playerPixelWidth = 32;
-    public static final int playerPixelHeight = 32;
-    public static final int bombPixelWidth = 50;
-    public static final int bombPixelHeight = 50;
-    public static final int mapBlockToGridMultiplier = 64;
+    public static final int PLAYER_WIDTH = 36;
+    public static final int PLAYER_HEIGHT = 36;
+    public static final int BOMB_WIDTH = 50;
+    public static final int BOMB_HEIGHT = 50;
+    public static final float GENERAL_BLOCK_WIDTH = 64f;
+    public static final float GENERAL_BLOCK_HEIGHT = 64f;
+    public static final int MAP_BLOCK_TO_GRID_MULTIPLIER = 64;
 
     // Game Rules
-    public static final int defaultBombTime = 2000;
-    public static final int minimumBombRange = 2;
-    public static final int maximumBombRange = 6;
-    public static final int bombRangeChange = 1;
-    public static final int lowPlayerSpeed = 200;
-    public static final int highPlayerSpeed = 400;
-    public static final int powerupProbability = 25;
-    public static final int positivePowerupProbability = 75;
+    public static final int DEFAULT_BOMB_TIME = 2000;
+    public static final int MINIMUM_BOMB_RANGE = 2;
+    public static final int MAXIMUM_BOMB_RANGE = 6;
+    public static final int BOMB_RANGE_CHANGE = 1;
+    public static final int LOW_PLAYER_SPEED = 200;
+    public static final int HIGH_PLAYER_SPEED = 400;
+    public static final int POWERUP_PROBABILITY = 25;
+    public static final int POSITIVE_POWERUP_PROBABILITY = 75;
 
     // Audio files
-    public static final String audioFilesPath = "/resources/sounds/";
-    public static final String musicFilename = "01_A_Night_Of_Dizzy_Spells.wav";
-    public static final String explosionFilename = "sfx_exp_medium3.wav";
-    public static final String bombPlaceFilename = "sfx_sound_neutral6.wav";
-    public static final String movementFilename = "sfx_movement_footsteps1a.wav";
-    public static final String playerDeathFilename = "sfx_sounds_error1.wav";
-    public static final String powerupFilename = "sfx_sounds_interaction24.wav";
-    public static final String menuSoundFilename = "271139_strange-dragoon_menu-select_converted.wav";
-    public static final String gameOverWonFilename = "270333__littlerobotsoundfactory__jingle-win-00.wav";
-    public static final String gameOverLostFilename = "270329__littlerobotsoundfactory__jingle-lose-00.wav";
+    public static final String AUDIO_FILES_PATH = "/resources/sounds/";
+    public static final String MUSIC_FILENAME = "01_A_Night_Of_Dizzy_Spells.wav";
+    public static final String EXPLOSION_FILENAME = "sfx_exp_medium3.wav";
+    public static final String BOMB_PLACE_FILENAME = "sfx_sound_neutral6.wav";
+    public static final String MOVEMENT_FILENAME = "sfx_movement_footsteps1a.wav";
+    public static final String PLAYER_DEATH_FILENAME = "sfx_sounds_error1.wav";
+    public static final String POWERUP_FILENAME = "sfx_sounds_interaction24.wav";
+    public static final String MENU_SOUND_FILENAME = "271139_strange-dragoon_menu-select_converted.wav";
+    public static final String GAME_OVER_WON_FILENAME = "270333__littlerobotsoundfactory__jingle-win-00.wav";
+    public static final String GAME_OVER_LOST_FILENAME = "270329__littlerobotsoundfactory__jingle-lose-00.wav";
 
     // Other files
-    public static final String settingsXMLPath = "src/resources/settings.xml";
+    public static final String SETTING_XML_PATH = "src/resources/settings.xml";
 
     // Default settings
-    public static final float defaultVolume = 75;
-    public static final String defaultPlayerName = "Player";
-    public static final String defaultServerName = "Default server";
-    public static final String defaultServerIp = "localhost";
-    public static final int defaultServerPort = 1234;
+    public static final float DEFAULT_VOLUME = 75;
+    public static final String DEFAULT_PLAYER_NAME = "Player";
+    public static final String DEFAULT_SERVER_NAME = "Default server";
+    public static final String DEFAULT_SERVER_IP = "localhost";
+    public static final int DEFAULST_SERVER_PORT = 1234;
+    
+    // Renderer constants
+    public static final int TARGET_FPS = 60;
+	public static final int TARGET_UPS = 60;
+	public static final String IMAGE_FORMAT = "png";
+	public static final String CHARSET_NAME = "ISO-8859-1";
+	
+	public static final float V_WIDTH = 1262f;
+	public static final float V_HEIGHT = 869f;
+	
+	public static final float SPRITESHEET_ROWS = 2f;
+	public static final float SPRITESHEET_COLS = 10f;
+	
+	public static final float BACKGROUND_WIDTH = 1262f;
+	public static final float BACKGROUND_HEIGHT = 869f;
+	public static final float BACKGROUND_X = 0f;
+	public static final float BACKGROUND_Y = 0f;
+	
+	public static final float INFO_BOX_WIDTH = 390f;
+	public static final float INFO_BOX_HEIGHT = 859f;
+	public static final float INFO_BOX_X = 867f;
+	public static final float INFO_BOX_Y = 5f;
+	
+	public static final float GAME_BOX_WIDTH = 857f;
+	public static final float GAME_BOX_HEIGHT = 859f;
+	public static final float GAME_BOX_X = 5f;
+	public static final float GAME_BOX_Y = 5f;
+	
+	public static final float GENERAL_BOX_WIDTH = 1257f;
+	public static final float GENERAL_BOX_HEIGHT = 864f;
+	public static final float GENERAL_BOX_X = 5f;
+	public static final float GENERAL_BOX_Y = 5f;
+	
+	public static final float FANCY_BOX_WIDTH = 300f;
+	public static final float FANCY_BOX_HEIGHT = 173f;
+	public static final float FANCY_BOX1_X = 918f;
+	public static final float FANCY_BOX1_Y = 25f;
+	public static final float FANCY_BOX2_X = 918f;
+	public static final float FANCY_BOX2_Y = 228f;
+	public static final float FANCY_BOX3_X = 918f;
+	public static final float FANCY_BOX3_Y = 441f;
+	public static final float FANCY_BOX4_X = 918f;
+	public static final float FANCY_BOX4_Y = 649f;
+	
+	public static final float HEART_WIDTH = 32f;
+	public static final float HEART_HEIGHT = 32f;
 
+	public static final float BOX_PADDING = 60f;
 }
