@@ -79,4 +79,9 @@ class MusicPlayer extends Thread
         clip.loop(Integer.MAX_VALUE);
     }
 
+    boolean hasOpened()
+    {
+        return clip.isOpen();
+    }
+
 }

@@ -81,13 +81,15 @@ class SoundEffectPlayer extends Thread
         }
     }
 
-    /**
-     * Sets a new value for volume
-     *
-     * @param percent The volume percent, ranging from 0 to 100
-     */
-    void setVolume(float percent)
-    {
-        this.volume = percent;
-    }
+
+//    /**
+//     * Sets a new value for volume
+//     *
+//     * @param percent The volume percent, ranging from 0 to 100
+//     */
+//    void setVolume(float percent)
+//    {
+//        this.volume = percent;
+//    }
+
 }

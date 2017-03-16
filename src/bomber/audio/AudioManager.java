@@ -31,6 +31,16 @@ public class AudioManager
         effects.start();
     }
 
+    private static boolean isValidPercent(float percent)
+    {
+        if (percent > 100 || percent < 0)
+        {
+            System.err.println("Incorrect call: setVolume(" + percent + ")");
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Sets a new value for the volume of the music
      * Must be called before initialising the manager
@@ -39,7 +49,8 @@ public class AudioManager
      */
     public static void setMusicVolume(float percent)
     {
-        musicVolume = percent;
+        if(isValidPercent(percent))
+            musicVolume = percent;
     }
 
     /**
@@ -50,7 +61,8 @@ public class AudioManager
      */
     public static void setEffectsVolume(float percent)
     {
-        effectsVolume = percent;
+        if(isValidPercent(percent))
+            effectsVolume = percent;
     }
 
     /**
@@ -61,8 +73,31 @@ public class AudioManager
      */
     public static void setVolume(float percent)
     {
-        musicVolume = percent;
-        effectsVolume = percent;
+        if(isValidPercent(percent))
+        {
+            musicVolume = percent;
+            effectsVolume = percent;
+        }
+    }
+
+    /**
+     * Gets the volume of the music
+     *
+     * @return The volume percent, ranging from 0 to 100
+     */
+    public static float getMusicVolume()
+    {
+        return musicVolume;
+    }
+
+    /**
+     * Gets the volume of the sound effects
+     *
+     * @return The volume percent, ranging from 0 to 100
+     */
+    public static float getEffectsVolume()
+    {
+        return effectsVolume;
     }
 
     /**
@@ -150,12 +185,6 @@ public class AudioManager
     static void setControlVolume(FloatControl gainControl, float volume)
     {
 
-        if (volume > 100 || volume < 0)
-        {
-            System.err.println("Incorrect call: setVolume(" + volume + ")");
-            return;
-        }
-
         float linearMin = (float) Math.pow(10, gainControl.getMinimum() / 20);
         float linearMax = (float) Math.pow(10, gainControl.getMaximum() / 20);
         float linearVolume = linearMin + (linearMax - linearMin) * volume / 100;
@@ -170,10 +199,27 @@ public class AudioManager
         gainControl.setValue((float) (20 * Math.log10(linearVolume))); // linear formula; not so precise with little volume
     }
 
+    public boolean hasOpenedMusic()
+    {
+        return music!=null && music.hasOpened();
+    }
+
+    public boolean isPlayingMusic()
+    {
+        return music.isAlive();
+    }
+
+    /*
     public static void main(String[] args) throws InterruptedException
     {
         AudioManager audioManager = new AudioManager();
-        //audioManager.playMusic();
+
+        System.out.println(audioManager.hasOpenedMusic());
+
+        audioManager.playMusic();
+
+
+
         //audioManager.setVolume(100);
 
         //AudioManager.playMenuItemSelected();
@@ -186,7 +232,7 @@ public class AudioManager
         AudioManager.playGameOverLost();
 
         TimeUnit.SECONDS.sleep(3);
-        /*
+
 
 
         Scanner sc = new Scanner(System.in);
@@ -194,7 +240,7 @@ public class AudioManager
         while(true)
             audioManager.setVolume(sc.nextInt());
 
-        /*
+
         for (int i = 100000; i >= 0; i--)
         {
             try
@@ -208,7 +254,7 @@ public class AudioManager
                 e.printStackTrace();
             }
         }
-/*
+
 
         try
         {
@@ -238,10 +284,6 @@ public class AudioManager
             e.printStackTrace();
         }
 
-*/
-
-
-/*
         List<AudioEvent> eventList = new ArrayList<>();
         eventList.add(AudioEvent.EXPLOSION);
 
@@ -286,6 +328,7 @@ public class AudioManager
         {
             e.printStackTrace();
         }
-*/
+
     }
+    */
 }
