@@ -205,7 +205,7 @@ public class ServerGame implements Runnable {
 							initPos = new Point(64, 64);
 						}
 					}
-					Player p = new Player(c.getName(), initPos, 3, 300, null);
+					Player p = new Player(c.getName(), initPos, 3, 300);
 					p.setPlayerID(c.getID());
 					players.add(p);
 					posIndex += 1;
@@ -227,7 +227,7 @@ public class ServerGame implements Runnable {
 						initPos = new Point(64, 64);
 					}
 				}
-				GameAI a = new GameAI("AI " + ai.getID(), initPos, 3, 300, gameState, null, ai.getDifficulty());
+				GameAI a = new GameAI("AI " + ai.getID(), initPos, 3, 300, gameState, ai.getDifficulty());
 				a.setPlayerID(aiIDtoPlayerID(ai.getID()));
 				players.add(a);
 				ai.setGameAI(a);

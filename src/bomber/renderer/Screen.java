@@ -11,9 +11,9 @@ import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
 /**
- * 
- * @author Alexandru Blinda
  * The class containing a Screen and all its information
+ * @author Alexandru Blinda
+ * 
  */
 public class Screen {
 
@@ -24,7 +24,6 @@ public class Screen {
 	private boolean resized;
 	private boolean vSync;
 	private GLFWVidMode vidmode;
-	private GLFWKeyCallback keyCallback;
 	
 	/**
 	 * Create a Screen with the given title, width, height and vsync
@@ -94,7 +93,7 @@ public class Screen {
 		
 		 // Setup a key callback. It will be called every time a key is pressed, repeated or released.
 
-        glfwSetKeyCallback(screenID, keyCallback = new GLFWKeyCallback() {
+        glfwSetKeyCallback(screenID, new GLFWKeyCallback() {
 
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {

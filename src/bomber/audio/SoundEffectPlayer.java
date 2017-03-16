@@ -25,7 +25,7 @@ public class SoundEffectPlayer extends Thread
     {
         try {
             Clip clip = AudioSystem.getClip();
-            InputStream rawStream = Main.class.getResourceAsStream(Constants.audioFilesPath + fileName);
+            InputStream rawStream = Main.class.getResourceAsStream(Constants.AUDIO_FILES_PATH + fileName);
             if(rawStream == null)
                 throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
@@ -34,7 +34,7 @@ public class SoundEffectPlayer extends Thread
             AudioManager.setControlVolume(gainControl, volume);
             clip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.err.println("Could not load sound: " + Constants.audioFilesPath + fileName);
+            System.err.println("Could not load sound: " + Constants.AUDIO_FILES_PATH + fileName);
             e.printStackTrace();
         }
     }
@@ -44,19 +44,19 @@ public class SoundEffectPlayer extends Thread
         switch (event)
         {
             case PLACE_BOMB:
-                playSound(Constants.bombPlaceFilename);
+                playSound(Constants.BOMB_PLACE_FILENAME);
                 break;
             case EXPLOSION:
-                playSound(Constants.explosionFilename);
+                playSound(Constants.EXPLOSION_FILENAME);
                 break;
             case PLAYER_DEATH:
-                playSound(Constants.playerDeathFilename);
+                playSound(Constants.PLAYER_DEATH_FILENAME);
                 break;
             case MOVEMENT:
                 //playSound(Constants.movementFilename);
                 break;
             case POWERUP:
-                playSound(Constants.powerupFilename);
+                playSound(Constants.POWERUP_FILENAME);
                 break;
         }
     }

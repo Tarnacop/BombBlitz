@@ -1,17 +1,11 @@
 package bomber.renderer;
 
-import bomber.renderer.constants.RendererConstants;
+import bomber.game.Constants;
 import bomber.renderer.interfaces.GameInterface;
-
-import java.util.HashMap;
-
-import bomber.game.GameState;
-import bomber.game.Player;
-import bomber.game.Response;
 /**
- * 
- * @author Alexandru Blinda
  * Class that holds the Graphic Thread with all its features
+ * @author Alexandru Blinda
+ * 
  */
 public class Graphics implements Runnable {
 
@@ -112,7 +106,7 @@ public class Graphics implements Runnable {
 		
 		float deltaTime = 0f;
 		float accumulator = 0f;
-		float interval = 1f / RendererConstants.TARGET_UPS;
+		float interval = 1f / Constants.TARGET_UPS;
 		
 		boolean gameRunning = true;
 		
@@ -150,7 +144,7 @@ public class Graphics implements Runnable {
 	 */
 	private void sync() {
 		
-		float loopInterval = 1f / RendererConstants.TARGET_FPS;
+		float loopInterval = 1f / Constants.TARGET_FPS;
 		double endTime = timer.getLastLoopTime() + loopInterval;
 		
 		while(timer.getTime() < endTime) {
@@ -189,7 +183,7 @@ public class Graphics implements Runnable {
 	 * @return The screen
 	 */
 	public Screen getScreen() {
-		// TODO Auto-generated method stub
+		
 		return this.screen;
 	} // END OF getScreeb METHOD
 } // END OF Application

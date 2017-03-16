@@ -3,7 +3,6 @@ package bomber.game;
 import java.awt.Point;
 
 import bomber.AI.AIDifficulty;
-import bomber.renderer.shaders.ColourMesh;
 
 public class Player {
 
@@ -18,9 +17,8 @@ public class Player {
 	private final int scalar = 64;
 	private KeyboardState keyState;
 	private boolean isAlive;
-	private ColourMesh mesh;
 	
-	public Player(String name, Point pos, int lives, double speed, ColourMesh mesh) {
+	public Player(String name, Point pos, int lives, double speed) {
 
 		this.name = name;
 		this.pos = pos;
@@ -33,7 +31,6 @@ public class Player {
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
 		this.gridPos = new Point();
-		this.mesh = mesh;
 	}
 
 	public int getPlayerID() {
@@ -51,11 +48,7 @@ public class Player {
 	public void setGridPos(Point gridPos) {
 		this.gridPos = gridPos;
 	}
-
-	public void setMesh(ColourMesh mesh) {
-		this.mesh = mesh;
-	}
-
+	
 	public void begin() {
 
 	}
@@ -93,11 +86,6 @@ public class Player {
 			y++;
 		gridPos.setLocation(x, y);
 		return gridPos;
-	}
-
-	public void makeMesh(int width, int height, float[] colours) {
-
-		this.mesh = new ColourMesh(width, height, colours);
 	}
 
 	private void updatePos() {
@@ -141,11 +129,6 @@ public class Player {
 		updatePos();
 	}
 
-	public ColourMesh getMesh() {
-
-		return this.mesh;
-	}
-
 	public int getMaxNrOfBombs()
 	{
 		return maxNrOfBombs;
@@ -154,11 +137,6 @@ public class Player {
 	public void setMaxNrOfBombs(int maxNrOfBombs)
 	{
 		this.maxNrOfBombs = maxNrOfBombs;
-	}
-
-	public void addMesh(ColourMesh mesh) {
-
-		this.mesh = mesh;
 	}
 	
 	public void setDifficulty(AIDifficulty diff)
