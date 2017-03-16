@@ -1237,11 +1237,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		beep();
 		enterLabel.setText("Enter Server Details:");
 		String host = ipText.getText().trim();
+		this.client = null;
 		try{
 			int port = Integer.parseInt(portNum.getText());
 		
-		//System.out.println("Attempting connection to: " + host + ", port = " + port);
-		this.client = null;
+			//System.out.println("Attempting connection to: " + host + ", port = " + port);
 			client = new ClientThread(host, port);
 
 			client.addNetListener(this);
@@ -1253,6 +1253,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			
 			blankButton(connectBtn, "Connecting...");
 			this.expectingConnection = true;
+			
 		} 
 		catch (NumberFormatException e1) {
 			enterLabel.setText("Enter Server Details:\n( Invalid Port Number! )");
