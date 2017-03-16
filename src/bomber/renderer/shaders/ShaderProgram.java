@@ -128,9 +128,9 @@ public class ShaderProgram {
 	    glUniform1i(uniforms.get(uniformName), value);
 	} // END OF setUniform METHOD
 	
-    public void setUniform(String uniformName, Vector3f value) {
+    public void setUniform(String uniformName, float x, float y, float z) {
         
-    	glUniform3f(uniforms.get(uniformName), value.x, value.y, value.z);
+    	glUniform3f(uniforms.get(uniformName), x, y, z);
     }
 
 	// Method to dispose the resources

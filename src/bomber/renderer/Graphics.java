@@ -21,13 +21,13 @@ public class Graphics implements Runnable {
 	 * @param screenHeight The height of the screen
 	 * @param vSync	Boolean to use vSync
 	 * @param gameLogic The game logic for the graphics
+	 * @param fullScreen The game runs in full screen or window
 	 * @throws Exception
 	 */
-	public Graphics(String screenTitle, int screenWidth, int screenHeight, boolean vSync, GameInterface gameLogic) throws Exception {
+	public Graphics(String screenTitle, int screenWidth, int screenHeight, boolean vSync, GameInterface gameLogic, boolean fullScreen) throws Exception {
 		
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
-		this.screen = new Screen(screenTitle, screenWidth, screenHeight, vSync);
-		System.out.println("Made new screen in Graphics");
+		this.screen = new Screen(screenTitle, screenWidth, screenHeight, vSync, fullScreen);
 		this.gameLogic = gameLogic;
 		timer = new Timer();
 	} // END OF CONSTRUCTOR

@@ -69,7 +69,7 @@ public class Game implements GameInterface {
 			
 			List<Point> spawns = this.map.getSpawnPoints();
 
-			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 100, 300);
+			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 5, 300);
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
