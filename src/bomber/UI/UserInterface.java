@@ -753,7 +753,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private void initCreditsScene() {
 		
 		String credits = "Credits:\n"
-				+ "\nGraphics - Alexandru Blindu"
+				+ "\nGraphics - Alexandru Blinda"
 				+ "\nPhysics/Audio - Alexandru Rosu"
 				+ "\nAI - Jokubas Liutkus"
 				+ "\nUI/Game Logic - Owen Jenkins"
