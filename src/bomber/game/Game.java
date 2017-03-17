@@ -1,9 +1,14 @@
 package bomber.game;
 
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.lwjgl.glfw.GLFW;
 
 import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
@@ -163,6 +168,9 @@ public class Game implements GameInterface {
 	@Override
 	public void input(Screen screen) {
 
+		if(screen.getKeyState(GLFW.GLFW_KEY_ESCAPE) == GLFW_PRESS){
+		    dispose();
+		}
 		this.bombPressed = this.input.update(screen, this.keyState, this.controlScheme, this.bombPressed);
 	}
 

@@ -135,14 +135,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private CheckBox fullScreenBtn;
 	private double screenHeight;
 	private double screenWidth;
-	private double btnHeight;
-	private double btnWidth;
-	private double bigBtnHeight;
-	private double bigBtnWidth;
 	private double boxHeight;
 	private double boxWidth;
-	private double canvasHeight;
-	private double canvasWidth;
 	private Font smallFont;
 	
 	public UserInterface(){
@@ -175,19 +169,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.screenHeight = screenSize.height;
 		this.screenWidth = screenSize.width;
-		this.windowHeight = screenHeight * 0.8;
+		this.windowHeight = screenHeight * 0.9;
 		this.windowWidth = screenWidth * 0.8;
 		
-//		this.btnHeight = windowHeight/20;
-//		this.btnWidth = windowWidth/10;
-//		this.bigBtnHeight = windowHeight/15;
-//		this.bigBtnWidth = windowWidth/8;
-
-		this.boxHeight = windowHeight/4;
+		this.boxHeight = windowHeight/3;
 		this.boxWidth = windowWidth/6;
-		
-		this.canvasHeight = windowHeight/3; 
-		this.canvasWidth = windowWidth/3;
 	}
 	
 	public static void begin(){
@@ -261,14 +247,15 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersBox2.setHgap(20);
 		
 		ScrollPane scrollPane = new ScrollPane();
-		scrollPane.setMinHeight(200);
-		scrollPane.setMinWidth(300);
+		scrollPane.setMinHeight(boxHeight);
+		scrollPane.setMaxHeight(boxHeight);
+		scrollPane.setMinWidth(boxWidth);
 		scrollPane.setContent(playersBox2);
 		
 		VBox playersListPane = new VBox();
 		playersListPane.getStyleClass().add("wideclearbox");
 		playersListPane.setSpacing(10);
-		playersListPane.setPrefWidth(200);
+		playersListPane.setMinWidth(boxWidth);
 		playersListPane.getChildren().addAll(playersTitle, scrollPane);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox2.minHeightProperty().add(70)));
@@ -283,9 +270,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyBox.getStyleClass().add("namebox");
 		readyBox.setSpacing(10);
 		readyBox.setAlignment(Pos.CENTER);
-		readyBox.setMinWidth(300);
-		readyBox.setMinHeight(300);
-		readyBox.setPrefHeight(300);
+		readyBox.setMinWidth(boxHeight);
+		readyBox.setMinHeight(boxHeight);
+		readyBox.setMaxHeight(boxHeight);
 		readyButton = createButton("Not Ready", 250, 50);
 		readyButton.setOnAction(e -> ready());
 		readyBox.getChildren().addAll(createLabel("Click to\ntoggle Ready:", false, false), readyTorch, readyButton);
@@ -293,9 +280,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyPane = new VBox();
 		readyPane.getStyleClass().add("menubox");
 		readyPane.setSpacing(30);
-		readyPane.setMinWidth(320);
-		readyBox.setMinHeight(300);
-		readyBox.setPrefHeight(300);
+		readyPane.setMinWidth(boxWidth+20);
+		readyPane.setMinHeight(boxHeight);
+		readyPane.setMaxHeight(boxHeight);
+		System.out.println(boxHeight);
 		readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 		
 		HBox playersReadyBox = new HBox();
@@ -491,7 +479,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         Button startBtn = createButton("Start Game", 300, 75);
         
         HBox startBtnPane = new HBox();
-        startBtnPane.setPadding(new Insets(0, 0, 40, 0));
+        startBtnPane.setPadding(new Insets(0, 0, 10, 0));
         startBtnPane.setAlignment(Pos.CENTER);
         startBtnPane.getChildren().add(startBtn);
         startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls, this.aiNumber.get()));
@@ -510,7 +498,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn);
-        backBtnPane.setPadding(new Insets(20, 10, 20, 10));
+        backBtnPane.setPadding(new Insets(10, 10, 10, 10));
         
         singleBox.setCenter(centerBox);
         singleBox.setTop(backBtnPane);
@@ -548,14 +536,14 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiPane.getStyleClass().add("namebox");
         aiPane.setSpacing(20);
         aiPane.getChildren().addAll(aiBox, aiLabel);
-        Label aiExplanation = createLabel("AI players will\nseek to\ndestroy you.", true, true);
+        Label aiExplanation = createLabel("AI players will seek\nto destroy you.", true, true);
         aiExplanation.setFont(smallFont);
         aiExplanation.setAlignment(Pos.CENTER);
-        aiExplanation.setPrefWidth(200);
+        aiExplanation.setPrefWidth(boxWidth);
         	selector = new ChoiceBox<>();
             selector.setTooltip(new Tooltip("Change AI Difficulty"));
             selector.setPrefHeight(50);
-            selector.setPrefWidth(200);
+            selector.setPrefWidth(boxWidth);
             selector.getStyleClass().add("textfield");
             selector.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
             selector.getSelectionModel().select(1);
@@ -567,20 +555,20 @@ public class UserInterface extends Application implements ClientNetInterface{
     				switch(newValue){
     				case "Easy": 
     					aiDiff = AIDifficulty.EASY; 
-    					aiExplanation.setText("AI players will\nmove randomly.");
+    					aiExplanation.setText("AI players will move\nrandomly.");
     					
     					break;
     				case "Medium": 
     					aiDiff = AIDifficulty.MEDIUM;
-    					aiExplanation.setText("AI players will\nseek to\ndestroy you.");
+    					aiExplanation.setText("AI players will seek\nto destroy you.");
     					break;
     				case "Hard": 
     					aiDiff = AIDifficulty.HARD; 
-    					aiExplanation.setText("AI players will\nbe tough\nto beat!");
+    					aiExplanation.setText("AI players will be tough\nto beat!");
     					break;
     				case "Extreme": 
     					aiDiff = AIDifficulty.EXTREME;
-    					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
+    					aiExplanation.setText("AI players will collaborate\nto bring you down!");
     				}
     				System.out.println("Set difficulty to " + newValue);
     			}
@@ -591,7 +579,7 @@ public class UserInterface extends Application implements ClientNetInterface{
             aiDiffBox.getStyleClass().add("namebox");
             aiDiffBox.setSpacing(20);
             aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), selector, aiExplanation);
-            aiDiffBox.setMinHeight(300);
+            aiDiffBox.setMinHeight(boxHeight/2);
             
             VBox aiContainer = new VBox();
             aiContainer.setAlignment(Pos.CENTER);
@@ -655,8 +643,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         rightMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
         leftMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
         
-        //mapPane.maxHeightProperty().bind(aiBox.heightProperty());
-        
         VBox mapPad = new VBox();
 		mapPad.setAlignment(Pos.CENTER);
 		mapPad.getChildren().add(mapPane);
@@ -666,14 +652,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private void drawMap(Pane mapCanvas, boolean online) {
 
-		int height = 300;
-		int width;
-		if(online){
-			width = 565;
-		}else{
-			width = 535;
-		}
-		//System.out.println(mapCanvas + "size " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
+		double height = 300;
+		double width = online?565:535;
 		int xpadding = 250;
 		int ypadding = 50;
 		
@@ -1474,7 +1454,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			soundVolume = (float) soundSlider.getValue();
 		}
 		
-		new Game(this, mapCopy, playerName, controls, aiNum, this.aiDiff, musicVolume, soundVolume, this.currentStage.isFullScreen());
+		new Game(this, mapCopy, playerName, controls, aiNum, this.aiDiff, musicVolume, soundVolume, this.currentStage.isFullScreen(), (int)this.currentStage.getWidth(), (int)this.currentStage.getHeight());
 	}
 
 	@Override
@@ -1685,7 +1665,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			public void run() {
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
-				new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen());
+				new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
 			}
 			   
 		});
