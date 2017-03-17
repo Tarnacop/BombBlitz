@@ -1099,7 +1099,7 @@ public class Renderer {
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
-		hudTextItem.getMesh().render();
+		//hudTextItem.getMesh().render();
 
 		hudShader.unbind();
 	} // END OF renderBeginningHud METHOD
