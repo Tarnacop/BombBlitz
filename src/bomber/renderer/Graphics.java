@@ -1,5 +1,6 @@
 package bomber.renderer;
 
+import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import bomber.game.Constants;
 import bomber.renderer.interfaces.GameInterface;
 /**
@@ -174,8 +175,9 @@ public class Graphics implements Runnable {
 	 * Dispose the graphics and game logic
 	 */
 	public void dispose() {
-		
+	
 		gameLogic.dispose();
+		glfwDestroyWindow(this.screen.getScreenID());
 	} // END OF dispose METHOD
 
 	/**

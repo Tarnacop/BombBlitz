@@ -56,7 +56,7 @@ public abstract class Constants
 	public static final float V_WIDTH = 1262f;
 	public static final float V_HEIGHT = 869f;
 	
-	public static final float SPRITESHEET_ROWS = 2f;
+	public static final float SPRITESHEET_ROWS = 3f;
 	public static final float SPRITESHEET_COLS = 10f;
 	
 	public static final float BACKGROUND_WIDTH = 1262f;

@@ -117,7 +117,6 @@ public class OnlineGame implements GameInterface {
 		this.ui.show();
 		System.out.println("RETURNED TO MENU");
 		renderer.dispose();
-		this.graphics.getScreen().close();
 		audio.stopAudio();
 
 	}

@@ -121,7 +121,7 @@ public class Screen {
         	
 			vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 	
-			// Center the Screen
+			// Centre the Screen
 			glfwSetWindowPos(screenID, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
         }
 		// Bind the screen with the openGL context current
