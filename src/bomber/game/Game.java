@@ -36,7 +36,6 @@ public class Game implements GameInterface {
 	private boolean fullScreen;
 	
 	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen, int width, int height) {
-
 		this.aiNum = aiNum;
 		this.aiDiff = aiDiff;
 		this.ui = ui;

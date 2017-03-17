@@ -29,6 +29,8 @@ public abstract class AITemplate extends Thread {
 
 	/** The game state. */
 	protected GameState gameState;
+	
+	protected boolean pause = false;
 
 	/**
 	 * Instantiates a new AI manager.
@@ -45,6 +47,16 @@ public abstract class AITemplate extends Thread {
 		this.finder = new RouteFinder(gameState, ai, safetyCh);
 	}
 
+	public void pause()
+	{
+		pause = true;
+	}
+	
+	public void update()
+	{
+		pause = false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -163,7 +175,7 @@ public abstract class AITemplate extends Thread {
 		
 		// waiting for the move to be mande
 		while (checkIfReachedDestination(gameAI.getPos(), updatedPosPixel) && gameAI.isAlive()
-				&& !safetyCh.isNextMoveBomb(updatedPos) && stuckChecker < 75) {
+				&& !safetyCh.isNextMoveBomb(updatedPos) && stuckChecker < 75 && !pause) {
 			stuckChecker++;
 			try {
 				sleep(10);
