@@ -30,7 +30,7 @@ public class OnlineGame implements GameInterface {
 	private boolean fullScreen;
 
 	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
-			HashMap<Response, Integer> controls, boolean fullScreen) {
+			HashMap<Response, Integer> controls, boolean fullScreen, int width, int height) {
 
 		this.ui = ui;
 		this.gameState = gameState;
@@ -46,8 +46,6 @@ public class OnlineGame implements GameInterface {
 
 		try {
 
-			int width = this.client.getMapWidth() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
-			int height = this.client.getMapHeight() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
 			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
 			this.graphics.start();
 		} catch (Exception e) {

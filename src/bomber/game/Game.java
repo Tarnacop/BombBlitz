@@ -35,7 +35,7 @@ public class Game implements GameInterface {
 	private AIDifficulty aiDiff;
 	private boolean fullScreen;
 	
-	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen) {
+	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen, int width, int height) {
 
 		this.aiNum = aiNum;
 		this.aiDiff = aiDiff;
@@ -53,9 +53,7 @@ public class Game implements GameInterface {
 		
 		try {
 			
-			int width = this.map.getPixelMap().length;
-			int height = this.map.getPixelMap()[0].length;
-			this.graphics = new Graphics("Bomb Blitz", width + 400, height, false, this, fullScreen);
+			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
