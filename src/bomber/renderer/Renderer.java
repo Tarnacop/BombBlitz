@@ -404,7 +404,7 @@ public class Renderer {
 			float y = Constants.FANCY_BOX1_Y + (Constants.FANCY_BOX_HEIGHT / 2 - Constants.PLAYER_HEIGHT / 2);
 			modelMatrix = transformation.getModelMatrix(Constants.FANCY_BOX1_X + 15, y, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
-			if (state.getPlayers().get(0) instanceof GameAI) {
+			if (state.getPlayers().get(0).getPlayerID() > 31) {
 
 				if (playerAnimationCounter < 5) {
 					textureMeshes.get("ingameAiMesh1").render();
@@ -460,7 +460,7 @@ public class Renderer {
 			float y = Constants.FANCY_BOX2_Y + (Constants.FANCY_BOX_HEIGHT / 2 - Constants.PLAYER_HEIGHT / 2);
 			modelMatrix = transformation.getModelMatrix(Constants.FANCY_BOX2_X + 15, y, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
-			if (state.getPlayers().get(1) instanceof GameAI) {
+			if (state.getPlayers().get(1).getPlayerID() > 31) {
 
 				if (playerAnimationCounter < 5) {
 
@@ -516,7 +516,7 @@ public class Renderer {
 			float y = Constants.FANCY_BOX3_Y + (Constants.FANCY_BOX_HEIGHT / 2 - Constants.PLAYER_HEIGHT / 2);
 			modelMatrix = transformation.getModelMatrix(Constants.FANCY_BOX3_X + 15, y, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
-			if (state.getPlayers().get(2) instanceof GameAI) {
+			if (state.getPlayers().get(2).getPlayerID() > 31) {
 
 				if (playerAnimationCounter < 5) {
 
@@ -573,7 +573,7 @@ public class Renderer {
 			float y = Constants.FANCY_BOX4_Y + (Constants.FANCY_BOX_HEIGHT / 2 - Constants.PLAYER_HEIGHT / 2);
 			modelMatrix = transformation.getModelMatrix(Constants.FANCY_BOX4_X + 15, y, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
-			if (state.getPlayers().get(3) instanceof GameAI) {
+			if (state.getPlayers().get(3).getPlayerID() > 31) {
 
 				if (playerAnimationCounter < 5) {
 
@@ -716,8 +716,7 @@ public class Renderer {
 				modelMatrix = transformation.getModelMatrix((float) player.getPos().x + 15,
 						(float) player.getPos().y + 15, 0f, 1f);
 				textureShader.setUniform("model", modelMatrix);
-				if (player instanceof GameAI) {
-
+				if (player.getPlayerID() > 31) {
 					if (player.isAlive()) {
 
 						if (playerAnimationCounter < 5) {
@@ -744,6 +743,7 @@ public class Renderer {
 						}
 					}
 				} else {
+					
 					if (player.isAlive()) {
 
 						if (playerAnimationCounter < 5) {
@@ -1068,8 +1068,8 @@ public class Renderer {
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
 				
-		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - 400 / 2);
-		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - 300 / 2);
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2);
+		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("controlsMesh").render();
@@ -1085,6 +1085,8 @@ public class Renderer {
 	 * @param state
 	 *            The given game state
 	 */
+	private float seconds = 5;
+	private float interval = 1f/Constants.TARGET_FPS;
 	private void renderBeginningHud(Screen screen, GameState state) {
 
 		hudShader.bind();
@@ -1092,14 +1094,16 @@ public class Renderer {
 		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio,
 				screen.getHeight() * h_ratio, 0f);
 
-		hudTextItem.setText("5 SECONDS");
-		x = Constants.GENERAL_BOX_X + 400 + hudTextItem.getTextWidth();
-		float y = Constants.GENERAL_BOX_Y + 300 + hudTextItem.getTextHeight();
+		hudTextItem.setText(Integer.toString((int) seconds));
+		x =  Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2) + Constants.CONTROLS_WIDTH / 2;
+		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2) + Constants.CONTROLS_HEIGHT + 10;
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 		hudTextItem.getMesh().render();
+		
+		seconds -= interval;
 
 		hudShader.unbind();
 	} // END OF renderBeginningHud METHOD
@@ -1127,6 +1131,12 @@ public class Renderer {
 		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
+		
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2);
+		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2);
+		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
+		textureShader.setUniform("model", modelMatrix);
+		textureMeshes.get("controlsMesh").render();
 
 		textureShader.unbind();
 	} // END OF renderPauseScreen METHOD
@@ -1145,15 +1155,16 @@ public class Renderer {
 		hudShader.setUniform("texture_sampler", 0);
 		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio,
 				screen.getHeight() * h_ratio, 0f);
-
+		
 		hudTextItem.setText("PRESS P TO UNPAUSE THE GAME");
-		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		x =  Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2) + (Constants.CONTROLS_WIDTH / 2 - hudTextItem.getTextWidth() / 2); 
+		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2) + Constants.CONTROLS_HEIGHT + 10;
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 		hudTextItem.getMesh().render();
+		
 		hudShader.unbind();
 	} // END OF renderPauseHud METHOD
 

@@ -76,13 +76,27 @@ public class OnlineGame implements GameInterface {
 		this.ui.hide();
 	}
 
+	private float gameOverCounter = 0;
 	@Override
 	public void update(float interval) {
 
-		this.gameState = this.client.getGameState();
-		this.keyState.setBomb(false);
-		this.keyState.setMovement(Movement.NONE);
-		audio.playEventList(gameState.getAudioEvents());
+		if (this.gameState.gameOver()) {
+
+			if (gameOverCounter < 3) {
+
+				gameOverCounter += interval;
+				renderer.displayGameOver();
+			} else {
+
+				this.graphics.getScreen().close();
+			}
+		} else {
+
+			this.gameState = this.client.getGameState();
+			this.keyState.setBomb(false);
+			this.keyState.setMovement(Movement.NONE);
+			audio.playEventList(gameState.getAudioEvents());
+		}
 	}
 
 	@Override
