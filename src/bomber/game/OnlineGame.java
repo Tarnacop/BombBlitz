@@ -80,14 +80,6 @@ public class OnlineGame implements GameInterface {
 	public void update(float interval) {
 
 		this.gameState = this.client.getGameState();
-		/*
-		 * float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f,
-		 * 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f }; for(Player player :
-		 * this.gameState.getPlayers()){
-		 * 
-		 * player.addMesh(new Mesh(32, 32, colours)); }
-		 */
-
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 		audio.playEventList(gameState.getAudioEvents());
@@ -106,7 +98,6 @@ public class OnlineGame implements GameInterface {
 		try {
 			this.client.sendMove(keyState);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

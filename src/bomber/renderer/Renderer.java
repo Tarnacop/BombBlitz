@@ -137,6 +137,7 @@ public class Renderer {
 		Texture boot = new Texture("src/resources/images/boot.png");
 		Texture blast = new Texture("src/resources/images/blast.png");
 		Texture newspritesheet = new Texture("src/resources/images/newspritesheet.png");
+		Texture controls = new Texture("src/resources/images/controls.png");
 
 		// Blocks
 		TextureMesh blankMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0f, 0f,
@@ -295,6 +296,9 @@ public class Renderer {
 
 		TextureMesh ingameBlastMesh = new TextureMesh(Constants.HEART_WIDTH, Constants.HEART_HEIGHT, blast);
 		textureMeshes.put("ingameBlastMesh", ingameBlastMesh);
+		
+		TextureMesh controlsMesh = new TextureMesh(400, 300, controls);
+		textureMeshes.put("controlsMesh", controlsMesh);
 
 	} // END
 		// OF
@@ -1063,7 +1067,12 @@ public class Renderer {
 		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
-
+				
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - 400 / 2);
+		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - 300 / 2);
+		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
+		textureShader.setUniform("model", modelMatrix);
+		textureMeshes.get("controlsMesh").render();
 		textureShader.unbind();
 
 	} // END OF renderBeginningTextures METHOD
@@ -1084,8 +1093,8 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 
 		hudTextItem.setText("5 SECONDS");
-		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
+		x = Constants.GENERAL_BOX_X + 400 + hudTextItem.getTextWidth();
+		float y = Constants.GENERAL_BOX_Y + 300 + hudTextItem.getTextHeight();
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
