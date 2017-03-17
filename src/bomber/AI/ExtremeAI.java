@@ -152,7 +152,7 @@ public class ExtremeAI extends AITemplate {
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy and
-			// fullfill it
+			// full-fill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs())) != null) {
 				if (!checkIfAIsReachable() || isPerformer())
 					performPlannedMoves(moves);
