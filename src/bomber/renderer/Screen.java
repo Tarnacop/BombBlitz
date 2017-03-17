@@ -116,11 +116,12 @@ public class Screen {
 
         });
 		// Get the resolution of the primary monitor
-		
-        if (!fullScreen) {
-            vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-			// Center the Screen
+        if(!fullScreen) {
+        	
+			vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	
+			// Centre the Screen
 			glfwSetWindowPos(screenID, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
         }
 		// Bind the screen with the openGL context current

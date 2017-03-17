@@ -156,65 +156,89 @@ public class Renderer {
 		textureMeshes.put("blastMesh", blastMesh);
 
 		// Player
-		TextureMesh ingamePlayerMesh1 = new TextureMesh(64, 64, 0.1f, 0.5f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh ingamePlayerMesh1 = new TextureMesh(64, 64, 0.2f, 0.33333333f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("ingamePlayerMesh1", ingamePlayerMesh1);
-		
-		TextureMesh ingamePlayerMesh2 = new TextureMesh(64, 64, 0.2f, 0.5f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+
+		TextureMesh ingamePlayerMesh2 = new TextureMesh(64, 64, 0.3f, 0.33333333f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("ingamePlayerMesh2", ingamePlayerMesh2);
-		
-		TextureMesh ingamePlayerMesh3 = new TextureMesh(64, 64, 0.3f, 0.5f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+
+		TextureMesh ingamePlayerMesh3 = new TextureMesh(64, 64, 0.4f, 0.33333333f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("ingamePlayerMesh3", ingamePlayerMesh3);
-		
-		TextureMesh playerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.1f, 0.5f,
+
+		TextureMesh playerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.2f, 0.33333333f,
 				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("playerMesh1", playerMesh1);
 
-		TextureMesh playerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.2f, 0.5f,
+		TextureMesh playerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.3f, 0.33333333f,
 				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("playerMesh2", playerMesh2);
 
-		TextureMesh playerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.3f, 0.5f,
+		TextureMesh playerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.4f, 0.33333333f,
 				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("playerMesh3", playerMesh3);
 
+		TextureMesh deadPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.5f,
+				0.33333333f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		textureMeshes.put("deadPlayerMesh1", deadPlayerMesh1);
+
+		TextureMesh deadPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.6f,
+				0.33333333f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		textureMeshes.put("deadPlayerMesh2", deadPlayerMesh2);
+
+		TextureMesh deadPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.7f,
+				0.33333333f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		textureMeshes.put("deadPlayerMesh3", deadPlayerMesh3);
+
 		// AI
-		TextureMesh ingameAiMesh1 = new TextureMesh(64, 64, 0.4f, 0.5f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh ingameAiMesh1 = new TextureMesh(64, 64, 0.2f, 0.66666666f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("ingameAiMesh1", ingameAiMesh1);
-		
-		TextureMesh ingameAiMesh2 = new TextureMesh(64, 64, 0.5f, 0.5f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+
+		TextureMesh ingameAiMesh2 = new TextureMesh(64, 64, 0.3f, 0.66666666f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("ingameAiMesh2", ingameAiMesh2);
-		
-		TextureMesh ingameAiMesh3 = new TextureMesh(64, 64, 0.6f, 0.5f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+
+		TextureMesh ingameAiMesh3 = new TextureMesh(64, 64, 0.4f, 0.66666666f, Constants.SPRITESHEET_COLS,
+				Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("ingameAiMesh3", ingameAiMesh3);
-		
-		TextureMesh aiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.4f, 0.5f,
+
+		TextureMesh aiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.2f, 0.66666666f,
 				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("aiMesh1", aiMesh1);
 
-		TextureMesh aiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.5f, 0.5f,
+		TextureMesh aiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.3f, 0.66666666f,
 				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("aiMesh2", aiMesh2);
 
-		TextureMesh aiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.6f, 0.5f,
+		TextureMesh aiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.4f, 0.66666666f,
 				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("aiMesh3", aiMesh3);
 
+		TextureMesh deadAiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.5f, 0.66666666f,
+				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		textureMeshes.put("deadAiMesh1", deadAiMesh1);
+
+		TextureMesh deadAiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.6f, 0.66666666f,
+				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		textureMeshes.put("deadAiMesh2", deadAiMesh2);
+
+		TextureMesh deadAiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.7f, 0.66666666f,
+				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		textureMeshes.put("deadAiMesh3", deadAiMesh3);
+
 		// Bomb
-		TextureMesh bombMesh1 = new TextureMesh(46, 46, 0.0f, 0.5f, Constants.SPRITESHEET_COLS,
+		TextureMesh bombMesh1 = new TextureMesh(46, 46, 0.0f, 0.33333333f, Constants.SPRITESHEET_COLS,
 				Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("bombMesh1", bombMesh1);
 
-		TextureMesh bombMesh2 = new TextureMesh(48, 48, 0.0f, 0.5f, Constants.SPRITESHEET_COLS,
+		TextureMesh bombMesh2 = new TextureMesh(48, 48, 0.1f, 0.33333333f, Constants.SPRITESHEET_COLS,
 				Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("bombMesh2", bombMesh2);
 
-		TextureMesh bombMesh3 = new TextureMesh(Constants.BOMB_WIDTH, Constants.BOMB_HEIGHT, 0.0f, 0.5f,
+		TextureMesh bombMesh3 = new TextureMesh(Constants.BOMB_WIDTH, Constants.BOMB_HEIGHT, 0.0f, 0.33333333f,
 				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
 		textureMeshes.put("bombMesh3", bombMesh3);
 
@@ -265,10 +289,10 @@ public class Renderer {
 
 		TextureMesh ingameBombMesh = new TextureMesh(Constants.HEART_WIDTH, Constants.HEART_HEIGHT, ingameBomb);
 		textureMeshes.put("ingameBombMesh", ingameBombMesh);
-		
+
 		TextureMesh bootMesh = new TextureMesh(Constants.HEART_WIDTH, Constants.HEART_HEIGHT, boot);
 		textureMeshes.put("bootMesh", bootMesh);
-		
+
 		TextureMesh ingameBlastMesh = new TextureMesh(Constants.HEART_WIDTH, Constants.HEART_HEIGHT, blast);
 		textureMeshes.put("ingameBlastMesh", ingameBlastMesh);
 
@@ -299,6 +323,7 @@ public class Renderer {
 	public void render(Screen screen, GameState state) {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		// Resize the screen if it needs to be resized
 		if (screen.isResized()) {
 
@@ -378,7 +403,6 @@ public class Renderer {
 			if (state.getPlayers().get(0) instanceof GameAI) {
 
 				if (playerAnimationCounter < 5) {
-
 					textureMeshes.get("ingameAiMesh1").render();
 				} else if (playerAnimationCounter < 10) {
 
@@ -410,16 +434,17 @@ public class Renderer {
 					1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("ingameBombMesh").render();
-			
+
 			x = x + Constants.FANCY_BOX_WIDTH / 4 + 20;
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX1_Y + Constants.BOX_PADDING - 7, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("bootMesh").render();
-			
-			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX1_Y + 2 * Constants.BOX_PADDING - 7, 0f, 1f);
+
+			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX1_Y + 2 * Constants.BOX_PADDING - 7, 0f,
+					1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("ingameBlastMesh").render();
-			
+
 		}
 
 		if (state.getPlayers().size() > 1) {
@@ -466,12 +491,12 @@ public class Renderer {
 					1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("ingameBombMesh").render();
-			
+
 			x = x + Constants.FANCY_BOX_WIDTH / 4 + 20;
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX2_Y + Constants.BOX_PADDING - 7, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("bootMesh").render();
-			
+
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX2_Y + 2 * Constants.BOX_PADDING - 7, 0f,
 					1f);
 			textureShader.setUniform("model", modelMatrix);
@@ -523,12 +548,12 @@ public class Renderer {
 					1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("ingameBombMesh").render();
-			
+
 			x = x + Constants.FANCY_BOX_WIDTH / 4 + 20;
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX3_Y + Constants.BOX_PADDING - 7, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("bootMesh").render();
-			
+
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX3_Y + 2 * Constants.BOX_PADDING - 7, 0f,
 					1f);
 			textureShader.setUniform("model", modelMatrix);
@@ -579,12 +604,12 @@ public class Renderer {
 					1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("ingameBombMesh").render();
-			
+
 			x = x + Constants.FANCY_BOX_WIDTH / 4 + 20;
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX4_Y + Constants.BOX_PADDING - 7, 0f, 1f);
 			textureShader.setUniform("model", modelMatrix);
 			textureMeshes.get("bootMesh").render();
-			
+
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX4_Y + 2 * Constants.BOX_PADDING - 7, 0f,
 					1f);
 			textureShader.setUniform("model", modelMatrix);
@@ -597,66 +622,66 @@ public class Renderer {
 
 				switch (blocks[i][j]) {
 
-					case BLANK:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("blankMesh").render();
-						break;
-					case SOFT:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("softMesh").render();
-						break;
-					case SOLID:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("solidMesh").render();
-						break;
-					case BLAST:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("blastMesh").render();
-						break;
-					case PLUS_SPEED:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("plusSpeedMesh").render();
-						break;
-					case MINUS_SPEED:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("minusSpeedMesh").render();
-						break;
-					case PLUS_BOMB:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("plusBombMesh").render();
-						break;
-					case MINUS_BOMB:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("minusBombMesh").render();
-						break;
-					case PLUS_RANGE:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("plusRangeMesh").render();
-						break;
-					case MINUS_RANGE:
-						modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
-								j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
-						textureShader.setUniform("model", modelMatrix);
-						textureMeshes.get("minusRangeMesh").render();
-						break;
+				case BLANK:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("blankMesh").render();
+					break;
+				case SOFT:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("softMesh").render();
+					break;
+				case SOLID:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("solidMesh").render();
+					break;
+				case BLAST:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("blastMesh").render();
+					break;
+				case PLUS_SPEED:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("plusSpeedMesh").render();
+					break;
+				case MINUS_SPEED:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("minusSpeedMesh").render();
+					break;
+				case PLUS_BOMB:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("plusBombMesh").render();
+					break;
+				case MINUS_BOMB:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("minusBombMesh").render();
+					break;
+				case PLUS_RANGE:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("plusRangeMesh").render();
+					break;
+				case MINUS_RANGE:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("minusRangeMesh").render();
+					break;
 				}
 			}
 		}
@@ -684,34 +709,61 @@ public class Renderer {
 		List<Player> playerList = state.getPlayers();
 		synchronized (playerList) {
 			for (Player player : playerList) {
-				if (!player.isAlive())
-					continue;
 				modelMatrix = transformation.getModelMatrix((float) player.getPos().x + 15,
 						(float) player.getPos().y + 15, 0f, 1f);
 				textureShader.setUniform("model", modelMatrix);
 				if (player instanceof GameAI) {
 
-					if (playerAnimationCounter < 5) {
+					if (player.isAlive()) {
 
-						textureMeshes.get("aiMesh1").render();
-					} else if (playerAnimationCounter < 10) {
+						if (playerAnimationCounter < 5) {
 
-						textureMeshes.get("aiMesh2").render();
-					} else if (playerAnimationCounter < 15) {
+							textureMeshes.get("aiMesh1").render();
+						} else if (playerAnimationCounter < 10) {
 
-						textureMeshes.get("aiMesh3").render();
+							textureMeshes.get("aiMesh2").render();
+						} else if (playerAnimationCounter < 15) {
+
+							textureMeshes.get("aiMesh3").render();
+						}
+					} else {
+
+						if (playerAnimationCounter < 5) {
+
+							textureMeshes.get("deadAiMesh1").render();
+						} else if (playerAnimationCounter < 10) {
+
+							textureMeshes.get("deadAiMesh2").render();
+						} else if (playerAnimationCounter < 15) {
+
+							textureMeshes.get("deadAiMesh3").render();
+						}
 					}
 				} else {
+					if (player.isAlive()) {
 
-					if (playerAnimationCounter < 5) {
+						if (playerAnimationCounter < 5) {
 
-						textureMeshes.get("playerMesh1").render();
-					} else if (playerAnimationCounter < 10) {
+							textureMeshes.get("playerMesh1").render();
+						} else if (playerAnimationCounter < 10) {
 
-						textureMeshes.get("playerMesh2").render();
-					} else if (playerAnimationCounter < 15) {
+							textureMeshes.get("playerMesh2").render();
+						} else if (playerAnimationCounter < 15) {
 
-						textureMeshes.get("playerMesh3").render();
+							textureMeshes.get("playerMesh3").render();
+						}
+					} else {
+
+						if (playerAnimationCounter < 5) {
+
+							textureMeshes.get("deadPlayerMesh1").render();
+						} else if (playerAnimationCounter < 10) {
+
+							textureMeshes.get("deadPlayerMesh2").render();
+						} else if (playerAnimationCounter < 15) {
+
+							textureMeshes.get("deadPlayerMesh3").render();
+						}
 					}
 				}
 			}
@@ -751,7 +803,7 @@ public class Renderer {
 					hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(0).getLives()));
@@ -760,7 +812,7 @@ public class Renderer {
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(0).getMaxNrOfBombs()));
@@ -768,24 +820,24 @@ public class Renderer {
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
-			hudTextItem.setText(Integer.toString((int)state.getPlayers().get(0).getSpeed()));
+
+			hudTextItem.setText(Integer.toString((int) state.getPlayers().get(0).getSpeed()));
 			x = x + Constants.FANCY_BOX_WIDTH / 4 + 20;
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX1_Y + Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
+
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(0).getBombRange()));
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX1_Y + 2 * Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 		}
 
@@ -797,7 +849,7 @@ public class Renderer {
 					hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(1).getLives()));
@@ -806,32 +858,32 @@ public class Renderer {
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
+
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(1).getMaxNrOfBombs()));
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX2_Y + 2 * Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
-			hudTextItem.setText(Integer.toString((int)state.getPlayers().get(1).getSpeed()));
+
+			hudTextItem.setText(Integer.toString((int) state.getPlayers().get(1).getSpeed()));
 			x = x + Constants.FANCY_BOX_WIDTH / 4 + 20;
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX2_Y + Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
+
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(1).getBombRange()));
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX2_Y + 2 * Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 		}
 
@@ -843,7 +895,7 @@ public class Renderer {
 					hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(2).getLives()));
@@ -852,32 +904,32 @@ public class Renderer {
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
+
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(2).getMaxNrOfBombs()));
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX3_Y + 2 * Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
-			hudTextItem.setText(Integer.toString((int)state.getPlayers().get(2).getSpeed()));
+
+			hudTextItem.setText(Integer.toString((int) state.getPlayers().get(2).getSpeed()));
 			x = x + Constants.FANCY_BOX_WIDTH / 4 + 20;
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX3_Y + Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
+
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(2).getBombRange()));
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX3_Y + 2 * Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 		}
 
@@ -889,7 +941,7 @@ public class Renderer {
 					hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(3).getLives()));
@@ -898,32 +950,32 @@ public class Renderer {
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
+
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(3).getMaxNrOfBombs()));
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX4_Y + 2 * Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
-			hudTextItem.setText(Integer.toString((int)state.getPlayers().get(3).getSpeed()));
+
+			hudTextItem.setText(Integer.toString((int) state.getPlayers().get(3).getSpeed()));
 			x = x + Constants.FANCY_BOX_WIDTH / 4 + 20;
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX4_Y + Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
-			
+
 			hudTextItem.setText(Integer.toString(state.getPlayers().get(3).getBombRange()));
 			modelMatrix = transformation.getModelMatrix(x, Constants.FANCY_BOX4_Y + 2 * Constants.BOX_PADDING,
 					hudTextItem.getRotation(), hudTextItem.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
-			hudShader.setUniform("colour",Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
+			hudShader.setUniform("colour", Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue());
 			hudTextItem.getMesh().render();
 		}
 
@@ -1139,8 +1191,8 @@ public class Renderer {
 
 			textureMeshes.get(key).dispose();
 		}
-		if(textureShader != null) {
-			
+		if (textureShader != null) {
+
 			textureShader.dispose();
 		}
 		if (hudShader != null) {
