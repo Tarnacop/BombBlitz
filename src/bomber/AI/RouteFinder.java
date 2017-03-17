@@ -345,8 +345,11 @@ public class RouteFinder {
 			// else we loop through all the neighbours
 			closed.add(temp);
 		}
-
+//		finishPositions.stream().forEach(n -> System.out.println(n.getCoord()));
+//		System.out.println('\n');
 		finish = findFurthestPositionFromEnemies(finishPositions);
+//		System.out.println(finish.getCoord());
+//		System.out.println('\n');
 		if (finish == null)
 			return null;
 		return getMovesFromPoints(finish);
@@ -681,7 +684,7 @@ public class RouteFinder {
 			moves = escapeFromExplotion(bombs);
 
 		}
-		if ((moves != null) && (moves.size() < 4))
+		if ((moves != null) && (moves.size() < 5 ))
 			return moves;
 		return null;
 	}
@@ -711,8 +714,12 @@ public class RouteFinder {
 			// if the head is final position we finish
 			Block singleBlock = map[temp.getCoord().x][temp.getCoord().y];
 			if (singleBlock == Block.PLUS_BOMB || singleBlock == Block.PLUS_RANGE || singleBlock == Block.PLUS_SPEED) {
-				finish = temp;
-				break;
+				if(isNearestAI(temp.getCoord()))
+				{
+					finish = temp;
+					break;
+				}
+				
 			}
 
 			for (Point p : getNeighbours(temp)) {
@@ -811,5 +818,21 @@ public class RouteFinder {
 		return numberOfPossibleMoves < 5;
 		
 
+	}
+	
+	private boolean isNearestAI(Point goal)
+	{
+		List<Player> ais = state.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive() && !p.equals(gameAI))
+				.collect(Collectors.toList());
+		int distanceFromThisAI = countDistance(gameAI.getGridPos(), goal);
+		int smallestDistance = Integer.MAX_VALUE;
+		int temp;
+		for(Player p : ais )
+		{
+			if((temp = countDistance(p.getGridPos(), goal)) < smallestDistance)
+				smallestDistance = temp;
+		}
+		
+		return distanceFromThisAI <= smallestDistance;
 	}
 }

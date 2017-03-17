@@ -90,35 +90,7 @@ public class AILevelTest{
 		state.setBombs(bombs);
 	}
 	
-	@Test
-	public void hardAITest() throws InterruptedException
-	{
-		players.clear();
-		players.add(ai);
-		player = new Player("name", new Point(12*scalar,12*scalar),1,30000);
-		players.add(player);
-		ai.setDifficulty(AIDifficulty.HARD);
-		ai.setPos( new Point(4*scalar,4*scalar));
-		ai.setAlive(true);
-		ai.begin();
-		assertTrue(checker.inDanger());
-		while(checker.inDanger()){
-			Thread.sleep(10);
-			this.physics.update();
-		}
-		assertFalse(checker.inDanger());	
-		state.setBombs(new ArrayList<>());
-		
-		assertTrue(player.isAlive());
-		while(player.isAlive())
-		{
-			Thread.sleep(10);
-			this.physics.update();
-		}
-		assertFalse(player.isAlive());
-		ai.setAlive(false);
-		
-	}
+
 	
 	
 	@Test
@@ -185,6 +157,36 @@ public class AILevelTest{
 		ai.setAlive(false);
 		player.setAlive(false);
 		assertFalse(ai.isAlive());
+	}
+	
+	@Test
+	public void hardAITest() throws InterruptedException
+	{
+		players.clear();
+		players.add(ai);
+		player = new Player("name", new Point(12*scalar,12*scalar),1,30000);
+		players.add(player);
+		ai.setDifficulty(AIDifficulty.HARD);
+		ai.setPos( new Point(4*scalar,4*scalar));
+		ai.setAlive(true);
+		ai.begin();
+		assertTrue(checker.inDanger());
+		while(checker.inDanger()){
+			Thread.sleep(10);
+			this.physics.update();
+		}
+		assertFalse(checker.inDanger());	
+		state.setBombs(new ArrayList<>());
+		
+		assertTrue(player.isAlive());
+		while(player.isAlive())
+		{
+			Thread.sleep(10);
+			this.physics.update();
+		}
+		assertFalse(player.isAlive());
+		ai.setAlive(false);
+		
 	}
 	
 	@Test

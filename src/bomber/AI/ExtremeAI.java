@@ -39,7 +39,7 @@ public class ExtremeAI extends AITemplate {
 	 */
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
-			while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
+			while (moves != null && !moves.isEmpty() && gameAI.isAlive() ) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
@@ -101,6 +101,8 @@ public class ExtremeAI extends AITemplate {
 		return false;
 	}
 
+	
+	
 	/**
 	 * Check if other AIs are reachable
 	 *
@@ -138,7 +140,7 @@ public class ExtremeAI extends AITemplate {
 			}
 
 			// else if there is an upgrade find the moves to it
-			else if ((moves = finder.findRouteToUpgrade()) != null && (!checkIfAIsReachable() || isPerformer())) {
+			else if ((moves = finder.findRouteToUpgrade()) != null /*&& (!checkIfAIsReachable() || isPerformer())*/) {
 
 				performMoves(moves, false);
 			}
@@ -150,7 +152,7 @@ public class ExtremeAI extends AITemplate {
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy and
-			// fullfill it
+			// full-fill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs())) != null) {
 				if (!checkIfAIsReachable() || isPerformer())
 					performPlannedMoves(moves);
