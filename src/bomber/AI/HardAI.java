@@ -91,7 +91,6 @@ public class HardAI extends AITemplate {
 
 			}
 
-			
 			// else if there is an upgrade find the moves to it
 			else if ((moves = finder.findRouteToUpgrade()) != null) {
 
@@ -106,10 +105,6 @@ public class HardAI extends AITemplate {
 				performMoves(moves, true);
 			}
 
-			// else if there is an upgrade find the moves to it
-			else if ((moves = finder.findRouteToUpgrade()) != null) {
-				performMoves(moves, false);
-			}
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemy()) != null) {
