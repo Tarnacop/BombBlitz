@@ -48,7 +48,7 @@ public class Game implements GameInterface {
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
 		audio = new AudioManager();
-		System.out.println("Game Music " + musicVolume + " Sound " + soundVolume);
+		//System.out.println("Game Music " + musicVolume + " Sound " + soundVolume);
 		audio.playMusic();
 		
 		try {
@@ -64,7 +64,7 @@ public class Game implements GameInterface {
 	@Override
 	public void init(Screen screen) {
 		try {
-			System.out.println("Giving screen to renderer");
+			//System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 			
 			List<Point> spawns = this.map.getSpawnPoints();
@@ -101,16 +101,7 @@ public class Game implements GameInterface {
 	@Override
 	public void update(float interval) {
 
-		if(this.player.getKeyState().isPaused()){
-			if(!this.gamePaused){
-				this.gamePaused = true;
-				for(Player player : this.gameState.getPlayers()){
-					player.pause();
-				}
-				renderer.displayPauseScreen();
-			}
-		}
-		else if(this.gameState.gameOver()){
+		if(this.gameState.gameOver()){
 			
 			if(gameOverCounter < 3) {
 				
@@ -120,15 +111,6 @@ public class Game implements GameInterface {
 				this.graphics.getScreen().close();
 			}
 		} else {
-			
-			if(this.gamePaused){
-				this.gamePaused = false;
-				for(Player player : this.gameState.getPlayers()){
-					player.resume();
-				}
-				renderer.stopPauseScreen();
-			}
-			
 			// Wait 5 seconds
 			if(frontScreenCounter <= 5) {
 				
@@ -143,14 +125,40 @@ public class Game implements GameInterface {
 				startAIs = false;
 			} 
 			else {
-				
 				renderer.stopFrontScreen();
+				
+				if(this.player.getKeyState().isPaused()){
+			
+					System.out.println("PLAYER HAS PRESSED PAUSE");
+					if(!this.gamePaused){
+						this.gamePaused = true;
+						for(Player player : this.gameState.getPlayers()){
+							player.pause();
+						}
+						System.out.println("PAUSED GAME");
+						renderer.displayPauseScreen();
+					}
+					else{
+						System.out.println("GAME IS STILL PAUSED");
+					}
+				}
+				else{
+					if(this.gamePaused){
+						this.gamePaused = false;
+						System.out.println("GAME WAS PAUSED, NOW UNPAUSED");
+						for(Player player : this.gameState.getPlayers()){
+							player.resume();
+						}
+						renderer.stopPauseScreen();
+					}
+
 				this.physics.update((int) (interval * 1000));
 				this.keyState.setBomb(false);
 				this.keyState.setMovement(Movement.NONE);
 				audio.playEventList(gameState.getAudioEvents());
 			}
 		}
+			}
 	}
 
 	@Override
@@ -173,7 +181,7 @@ public class Game implements GameInterface {
 		for (Player player : this.gameState.getPlayers()) {
 
 			player.setAlive(false);
-			System.out.println("Player " + player.getName() + " is alive: " + player.isAlive());
+			//System.out.println("Player " + player.getName() + " is alive: " + player.isAlive());
 		}
 		renderer.dispose();
 		audio.stopAudio();

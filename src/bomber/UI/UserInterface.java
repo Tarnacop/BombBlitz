@@ -138,6 +138,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private double boxHeight;
 	private double boxWidth;
 	private Font smallFont;
+	private CheckBox rememberServerBtn;
+	private boolean gotServer;
 	
 	public UserInterface(){
 
@@ -247,7 +249,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersBox2.setHgap(20);
 		
 		ScrollPane scrollPane = new ScrollPane();
-		scrollPane.setMinHeight(boxHeight);
+		scrollPane.setMinHeight(boxHeight*0.8);
 		scrollPane.setMaxHeight(boxHeight);
 		scrollPane.setMinWidth(boxWidth);
 		scrollPane.setContent(playersBox2);
@@ -258,7 +260,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersListPane.setMinWidth(boxWidth);
 		playersListPane.getChildren().addAll(playersTitle, scrollPane);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
-		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox2.minHeightProperty().add(70)));
+		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(scrollPane.minHeightProperty().add(100)));
 
 		readyTorch = new Rectangle();
 		readyTorch.setWidth(90);
@@ -283,7 +285,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyPane.setMinWidth(boxWidth+20);
 		readyPane.setMinHeight(boxHeight);
 		readyPane.setMaxHeight(boxHeight);
-		System.out.println(boxHeight);
+		//System.out.println(boxHeight);
 		readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 		
 		HBox playersReadyBox = new HBox();
@@ -446,23 +448,35 @@ public class UserInterface extends Application implements ClientNetInterface{
         ipText.setMinWidth(200);
         portNum = createTextField("Port Number");
         portNum.setMinWidth(200);
-        
+        gotServer = (!SettingsParser.getServerPort().equals("")) && (!SettingsParser.getServerIp().equals(""));
+        if(gotServer){
+        	ipText.setText(SettingsParser.getServerIp());
+        	portNum.setText(SettingsParser.getServerPort());
+        }
         ipBox.setSpacing(10);
         ipBox.setPrefSize(200, 50);
         ipBox.setAlignment(Pos.CENTER);
-        ipBox.getChildren().addAll(ipText, createLabel("/", false, false), portNum);
+        ipBox.getChildren().addAll(ipText, createLabel(":", false, false), portNum);
         
         connectBtn = createButton("Connect", 300, 75);
         connectBtn.setOnAction(e -> connect());
         
         Button backBtn = createBackButton("Cancel", false);
 
+        rememberServerBtn = new CheckBox();
+        rememberServerBtn.setSelected(gotServer);
+        
+        HBox rememberServerBox = new HBox();
+        rememberServerBox.setSpacing(10);
+        rememberServerBox.setAlignment(Pos.CENTER);
+        rememberServerBox.getChildren().addAll(createLabel("Remember Details", false, false), rememberServerBtn);
+        
         VBox connectBox = new VBox();
         connectBox.setSpacing(20);
         connectBox.setAlignment(Pos.CENTER);
         connectBox.maxWidthProperty().bind(ipBox.widthProperty().add(40));
         connectBox.getStyleClass().add("connectbox");
-        connectBox.getChildren().addAll(enterLabel, ipBox, connectBtn);
+        connectBox.getChildren().addAll(enterLabel, ipBox, rememberServerBox, connectBtn);
         
         connectPane = new VBox();
         connectPane.setAlignment(Pos.CENTER);
@@ -570,7 +584,7 @@ public class UserInterface extends Application implements ClientNetInterface{
     					aiDiff = AIDifficulty.EXTREME;
     					aiExplanation.setText("AI players will collaborate\nto bring you down!");
     				}
-    				System.out.println("Set difficulty to " + newValue);
+    				//System.out.println("Set difficulty to " + newValue);
     			}
             });	
 
@@ -873,12 +887,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 			musicMuted = true;
 			SettingsParser.setMusicVolume(volume);
 			AudioManager.setMusicVolume(volume);
-			System.out.println("SET AND STORED MUSIC " + volume);
+			//System.out.println("SET AND STORED MUSIC " + volume);
 		}else{
 			musicMuted = false;
 			SettingsParser.setMusicVolume((float)musicSlider.getValue());
 			AudioManager.setMusicVolume((float)musicSlider.getValue());
-			System.out.println("SET AND STORED MUSIC " + (float)musicSlider.getValue());
+			//System.out.println("SET AND STORED MUSIC " + (float)musicSlider.getValue());
 		}
 		SettingsParser.storeSettings();
 	}
@@ -889,12 +903,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 			soundMuted = true;
 			SettingsParser.setEffectsVolume(volume);
 			AudioManager.setEffectsVolume(volume);
-			System.out.println("SET AND STORED SOUND " + volume);
+			//System.out.println("SET AND STORED SOUND " + volume);
 		}else{
 			soundMuted = false;
 			SettingsParser.setEffectsVolume((float)soundSlider.getValue());
 			AudioManager.setEffectsVolume((float)soundSlider.getValue());
-			System.out.println("SET AND STORED SOUND " + (float)soundSlider.getValue());
+			//System.out.println("SET AND STORED SOUND " + (float)soundSlider.getValue());
 		}
 		SettingsParser.storeSettings();
 	}
@@ -1211,7 +1225,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 			
 			blankButton(connectBtn, "Connecting...");
 			this.expectingConnection = true;
-			
+			if(rememberServerBtn.isSelected()){
+				SettingsParser.setServer(host, String.valueOf(port));
+				SettingsParser.storeSettings();
+			}
+			else{
+				SettingsParser.setServer(null, null);
+				SettingsParser.storeSettings();
+			}
 		} 
 		catch (NumberFormatException e1) {
 			enterLabel.setText("Enter Server Details:\n( Invalid Port Number! )");
@@ -1314,7 +1335,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			readyPane.getChildren().clear();
 			readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 			for(ClientServerPlayer player : room.getHumanPlayerList()){
-				System.out.println(player.getName());
+				//System.out.println(player.getName());
 				Rectangle torch = new Rectangle();
 				torch.setWidth(40);
 				torch.setHeight(40);
@@ -1337,7 +1358,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			List<ClientServerAI> ais = room.getAIPlayerList();
 			if(ais.size() > 0){
 				AIDifficulty diff = room.getAIPlayerList().get(0).getDifficulty();
-				System.out.println("GOT DIFF: " + diff);
+				//System.out.println("GOT DIFF: " + diff);
 				int index = 1;
 				switch(diff){
 				case EASY: index = 0;aiDiff = AIDifficulty.EASY;break;
@@ -1398,8 +1419,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		
 		this.previousScenes.push(thisScene);
-		System.out.println("Added " + thisScene);
-		System.out.println(this.previousScenes);
+		//System.out.println("Added " + thisScene);
+		//System.out.println(this.previousScenes);
 		this.currentStage.getScene().setRoot(nextScene);
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
@@ -1438,7 +1459,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Map mapCopy = new Map(map.getName(), arrayCopy, map.getSpawnPoints());
 
 		Platform.setImplicitExit(false);
-		System.out.println("Ai difficulty: " + this.aiDiff);
+		//System.out.println("Ai difficulty: " + this.aiDiff);
 		
 		float musicVolume = 50;
 		if(muteMusicBtn.isSelected()){
@@ -1475,12 +1496,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 	@Override
 	public void connectionAccepted() {
 		
-		System.out.println("ADDED CONNECTION EVENT");
+		//System.out.println("ADDED CONNECTION EVENT");
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
-				System.out.println("Expecting Connection: " + expectingConnection);
+				//System.out.println("Expecting Connection: " + expectingConnection);
 				if(expectingConnection){
 					
 					advance(connectScene, serverScene);
@@ -1494,7 +1515,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 					displayRooms();
 					expectingConnection = false;
 					
-					System.out.println("CONNECTION ACCEPTED");
+					//System.out.println("CONNECTION ACCEPTED");
 				}
 			}
 			   
@@ -1504,7 +1525,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	@Override
 	public void connectionRejected() {
 		
-		System.out.println("CALLED CONNECTION REJECTED");
+		//System.out.println("CALLED CONNECTION REJECTED");
 		Platform.runLater(new Runnable(){
 
 			@Override
@@ -1525,7 +1546,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	@Override
 	public void notConnected() {
 		
-		System.out.println("CALLED NOT CONNECTED");
+		//System.out.println("CALLED NOT CONNECTED");
 		Platform.runLater(new Runnable(){
 
 			@Override
@@ -1570,7 +1591,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				System.out.println("Room creation accepted");
+				//System.out.println("Room creation accepted");
 				if(expectingRoomCreation){
 					mapName.set(". . .");
 					Label label = createLabel("Loading...", false, true);
@@ -1594,7 +1615,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 									e.printStackTrace();
 								}
 							}
-							System.out.println("SET ALL AI TO: " + aiDiff);
+							//System.out.println("SET ALL AI TO: " + aiDiff);
 						}
 			        });
 				}
@@ -1629,7 +1650,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				System.out.println("Room creation/join rejected");
+				//System.out.println("Room creation/join rejected");
 				if(expectingRoomCreation){
 					roomCreationLabel.setText("Create and join a room\nwith these settings\n( Something went wrong! )");
 					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
@@ -1708,7 +1729,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void connectionAttemptTimeout() {
-		System.out.println("CALLED CONNECTION TIMEOUT");
+		//System.out.println("CALLED CONNECTION TIMEOUT");
 		Platform.runLater(new Runnable(){
 
 			@Override
