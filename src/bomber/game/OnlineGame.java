@@ -114,7 +114,7 @@ public class OnlineGame implements GameInterface {
 	@Override
 	public void dispose() {
 
-		this.ui.show();
+		this.ui.show(this.fullScreen);
 		System.out.println("RETURNED TO MENU");
 		renderer.dispose();
 		audio.stopAudio();

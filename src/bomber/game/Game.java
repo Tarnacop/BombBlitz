@@ -168,7 +168,7 @@ public class Game implements GameInterface {
 	@Override
 	public void dispose() {
 
-		this.ui.show();
+		this.ui.show(this.fullScreen);
 		System.out.println("RETURNED TO MENU");
 		for (Player player : this.gameState.getPlayers()) {
 

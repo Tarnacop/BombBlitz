@@ -3,6 +3,8 @@ package bomber.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import bomber.AI.GameAI;
+
 public class GameState {
 
 	private Map map;				
@@ -20,20 +22,31 @@ public class GameState {
 
 	public boolean gameOver(){
 		
-		int living = 0;
+		int livingHumans = 0;
+		int livingAis = 0;
+		boolean result = false;
 		for(Player p : this.players){
 			
 			if(p.isAlive()){
-				living++;
+				if(p instanceof GameAI){
+					livingAis++;
+				}
+				else{
+					livingHumans++;
+				}
 			}
 		}
 		
-		if(living <= 1){
+		if(livingHumans == 0){
 			
-			return true;
+			result = true;
+		}
+		else if((livingHumans == 1) && (livingAis == 0)){
+			
+			result = true;
 		}
 		
-		return false;
+		return result;
 	}
 	
 	public List<AudioEvent> getAudioEvents() {

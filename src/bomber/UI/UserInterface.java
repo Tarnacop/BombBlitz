@@ -1692,12 +1692,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 		});
 	}
 	
-	public void show() {
+	public void show(boolean fullScreen) {
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
 				System.out.println("OPENING MENU");
+				currentStage.setFullScreen(fullScreen);
 				currentStage.show();
 				Platform.setImplicitExit(true);
 			}
