@@ -33,12 +33,12 @@ public class MediumAI extends AITemplate {
 	 */
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
-			while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
+			while (moves != null && !moves.isEmpty() && gameAI.isAlive() && !pause) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
-					&& !safetyCh.isEnemyInBombRange() && gameAI.isAlive()) {
+					&& !safetyCh.isEnemyInBombRange() && gameAI.isAlive() && !pause) {
 				makeSingleMove(moves.removeFirst());
 			}
 	}
@@ -51,7 +51,7 @@ public class MediumAI extends AITemplate {
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive()) {
+		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive() && !pause) {
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -66,7 +66,7 @@ public class MediumAI extends AITemplate {
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive()) {
+					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive() && !pause) {
 					}
 				}
 			}
@@ -87,6 +87,16 @@ public class MediumAI extends AITemplate {
 		SecureRandom random = new SecureRandom();
 		while (gameAI.isAlive()) {
 
+			while(pause)
+			{
+				try {
+					System.out.println("pause");
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			// if AI is in danger then find the escape route with 80%
 			// possibility
 			if (safetyCh.inDanger() && random.nextInt(10) < 8) {
