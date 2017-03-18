@@ -82,6 +82,9 @@ public class SafetyChecker {
 		case NONE:
 			newPosition = playerPos;
 			break;
+		default: 
+			newPosition = playerPos;
+			break;
 		} 
 		return newPosition.x >= getMap().length || newPosition.y >= getMap()[0].length || newPosition.x < 0
 				|| newPosition.y < 0 ? false

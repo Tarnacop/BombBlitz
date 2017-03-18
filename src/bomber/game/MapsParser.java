@@ -162,8 +162,21 @@ public class MapsParser extends DefaultHandler {
 			}	
 			mapHelper[j] = block;
 		}
-		Map singleMap = new Map(name, mapHelper, spawnPoints);
+		
+				
+		Map singleMap = new Map(name, transpose(mapHelper), spawnPoints);
 		return singleMap;
+	}
+	
+	
+	private Block[][] transpose(Block[][] map)
+	{
+		Block[][] transposedMap = new Block[map[0].length][map.length];
+		for(int i=0; i<map.length; i++)
+			for(int j=0; j<map[0].length; j++)
+				transposedMap[j][i] = map[i][j];
+		
+		return transposedMap;
 	}
 
 }
