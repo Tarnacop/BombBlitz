@@ -761,8 +761,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 				+ "\nUI/Game Logic - Owen Jenkins"
 				+ "\nNetworking - Qiyang Li"
 				+ "\n\nFonts:\nCredit to 'PurePixel'"
-				+ "\n\nImages:\nMain Menu Background - From the TRaK2 Texture set\nby Georges 'TRaK' Grondin."
-				+ "\n\nButtons: Credit to 'Buch', http://opengameart.org/users/buch";
+				+ "\n\nImages:\nSprites - Owen Jenkins\nMain Menu Background - From the TRaK2 Texture set\nby Georges 'TRaK' Grondin."
+				+ "\n\nButtons: Credit to 'Buch'\n[http://opengameart.org/users/buch]";
 
 		Label creditsLabel = createLabel(credits, false, true);
 		creditsLabel.getStyleClass().add("creditsbox");
