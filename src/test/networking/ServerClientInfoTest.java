@@ -2,6 +2,7 @@ package test.networking;
 
 import static org.junit.Assert.*;
 
+import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.time.Instant;
 
@@ -25,6 +26,30 @@ public class ServerClientInfoTest {
 
 	@Test
 	public void test() {
+		assertNotNull(sci.toString());
+
+		sci.updateTimeStamp();
+		assertTrue(sci.getTimeStamp() > 0);
+
+		assertEquals(new InetSocketAddress("1.1.1.1", 1111), sci.getSocketAddress());
+
+		for (short i = 0; i < 100; i++) {
+			assertFalse(sci.isSequenceDuplicate(i));
+		}
+
+		for (short i = 0; i < 101; i++) {
+			assertEquals(i, sci.getNextPacketSequenceAndIncrement());
+			sci.insertPacket(i, new DatagramPacket(new byte[1], 1));
+		}
+
+		for (short i = 0; i < 100; i++) {
+			assertTrue(sci.isSequenceDuplicate(i));
+		}
+
+		assertEquals(100, sci.getPacketHistoryList().size());
+
+		assertFalse(sci.isSequenceDuplicate((short) 100));
+
 		assertEquals(new InetSocketAddress("1.1.1.1", 1111), sci.getSocketAddress());
 
 		assertEquals("client111", sci.getName());
@@ -52,8 +77,18 @@ public class ServerClientInfoTest {
 		sci.setReadyToPlay(false);
 		assertFalse(sci.isReadyToPlay());
 
-		assertEquals(0, sci.getNextPacketSequenceAndIncrement());
-		assertEquals(1, sci.getNextPacketSequenceAndIncrement());
+		assertFalse(sci.isInGame());
+		sci.setInLobby(false);
+		assertFalse(sci.isInGame());
+
+		sci.setRoom(null);
+		assertEquals(null, sci.getRoom());
+
+		sci.setRoundTripDelay(10);
+		assertEquals(10l, sci.getRoundTripDelay());
+
+		assertEquals(101, sci.getNextPacketSequenceAndIncrement());
+		assertEquals(102, sci.getNextPacketSequenceAndIncrement());
 
 		assertFalse(sci.isSequenceDuplicate((short) 0));
 		assertTrue(sci.isSequenceDuplicate((short) 0));

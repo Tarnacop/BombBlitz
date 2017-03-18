@@ -11,10 +11,12 @@ import bomber.networking.ClientServerAI;
 
 public class ClientServerAiTest {
 	private ClientServerAI ai;
+	private ClientServerAI ai2;
 
 	@Before
 	public void setUp() throws Exception {
-		ai = new ClientServerAI((byte) 133, AIDifficulty.EXTREME);
+		ai = new ClientServerAI((byte) 133, null);
+		ai2 = new ClientServerAI((byte) 134, AIDifficulty.EXTREME);
 	}
 
 	@After
@@ -24,8 +26,10 @@ public class ClientServerAiTest {
 	@Test
 	public void test() {
 		assertEquals((byte) 133, ai.getID());
+		assertEquals((byte) 134, ai2.getID());
 
-		assertEquals(AIDifficulty.EXTREME, ai.getDifficulty());
+		assertEquals(AIDifficulty.MEDIUM, ai.getDifficulty());
+		assertEquals(AIDifficulty.EXTREME, ai2.getDifficulty());
 	}
 
 }

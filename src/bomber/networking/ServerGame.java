@@ -180,7 +180,7 @@ public class ServerGame implements Runnable {
 	public void run() {
 		inGame = true;
 
-		System.out.printf("ServerGame: game thread for room %d started, tick rate: %d, interval: %d\n", roomID,
+		System.out.printf("ServerGame: Game thread for room %d started, tick rate: %d, interval: %d\n", roomID,
 				tickRate, interval);
 
 		// initialise human & AI players and gameState
@@ -280,7 +280,7 @@ public class ServerGame implements Runnable {
 				try {
 					serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTART, true);
 				} catch (IOException e) {
-					System.out.println("ServerGame: failed to send packet: " + e);
+					System.out.println("ServerGame: Failed to send packet: " + e);
 				}
 			}
 		}
@@ -304,13 +304,13 @@ public class ServerGame implements Runnable {
 
 			// game is over when no human player is left in the room
 			if (playerList.size() < 1) {
-				System.out.printf("ServerGame: ending game in room %d due to no human players in room\n", roomID);
+				System.out.printf("ServerGame: Ending game in room %d due to no human players in room\n", roomID);
 				terminate();
 			}
 
 			// game is over when only one player is left in the room
 			if (playerList.size() + aiList.size() < 2) {
-				System.out.printf("ServerGame: ending game in room %d due to fewer than 2 players in room\n", roomID);
+				System.out.printf("ServerGame: Ending game in room %d due to fewer than 2 players in room\n", roomID);
 				terminate();
 			}
 
@@ -326,7 +326,7 @@ public class ServerGame implements Runnable {
 				}
 			}
 			if (humanPlayer == deadHumanPlayer) {
-				System.out.printf("ServerGame: ending game in room %d due to no human players alive\n", roomID);
+				System.out.printf("ServerGame: Ending game in room %d due to no human players alive\n", roomID);
 				terminate();
 			}
 
@@ -346,7 +346,7 @@ public class ServerGame implements Runnable {
 				}
 				if (shouldRemove && p != null && isIDHuman(p.getPlayerID()) && p.getLives() != 0 && p.isAlive()) {
 					// If no, kill this player
-					System.out.printf("ServerGame: killing player %d due to not in room\n", p.getPlayerID());
+					System.out.printf("ServerGame: Killing player %d due to not in room\n", p.getPlayerID());
 					p.setLives(0);
 					p.setAlive(false);
 				}
@@ -371,7 +371,7 @@ public class ServerGame implements Runnable {
 			try {
 				packetLen = ServerPacketEncoder.encodeGameState(gameState, roomID, sendBuffer);
 			} catch (IOException e) {
-				System.out.println("ServerGame: failed to encode game state: " + e);
+				System.out.println("ServerGame: Failed to encode game state: " + e);
 				continue;
 			}
 			packet.setLength(packetLen);
@@ -384,7 +384,7 @@ public class ServerGame implements Runnable {
 					try {
 						serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMESTATE, false);
 					} catch (IOException e) {
-						System.out.println("ServerGame: failed to send packet: " + e);
+						System.out.println("ServerGame: Failed to send packet: " + e);
 					}
 				}
 			}
@@ -396,7 +396,7 @@ public class ServerGame implements Runnable {
 				try {
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException e) {
-					System.out.println("ServerGame: thread is interrupted");
+					System.out.println("ServerGame: Thread is interrupted");
 				}
 			}
 
@@ -423,14 +423,14 @@ public class ServerGame implements Runnable {
 				try {
 					serverThread.sendPacket(packet, ProtocolConstant.MSG_S_ROOM_GAMEOVER, true);
 				} catch (IOException e) {
-					System.out.println("ServerGame: failed to send packet: " + e);
+					System.out.println("ServerGame: Failed to send packet: " + e);
 				}
 				// set all the players to not ready after the game
 				c.setReadyToPlay(false);
 			}
 		}
 
-		System.out.printf("ServerGame: game thread for room %d terminating\n", roomID);
+		System.out.printf("ServerGame: Game thread for room %d terminating\n", roomID);
 
 		inGame = false;
 	}

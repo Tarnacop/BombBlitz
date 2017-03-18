@@ -37,6 +37,14 @@ public class ClientServerRoomTest {
 
 	@Test
 	public void test() {
+		room.setAIPlayerNumber(1);
+		room.setHumanPlayerNumber(2);
+		room.setID(133);
+		room.setInGame(false);
+		room.setMapID(31);
+		room.setMaxMapID(35);
+		room.setName("Room 133");
+
 		assertEquals(133, room.getID());
 		assertEquals("Room 133", room.getName());
 		assertEquals(2, room.getHumanPlayerNumber());
