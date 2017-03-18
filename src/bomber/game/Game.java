@@ -33,9 +33,9 @@ public class Game implements GameInterface {
 	private UserInterface ui;
 	private int aiNum;
 	private AIDifficulty aiDiff;
+	private boolean fullScreen;
 	
-	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff, float musicVolume, float soundVolume) {
-
+	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum, AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen, int width, int height) {
 		this.aiNum = aiNum;
 		this.aiDiff = aiDiff;
 		this.ui = ui;
@@ -43,17 +43,16 @@ public class Game implements GameInterface {
 		this.playerName = playerName;
 		this.controlScheme = controls;
 		this.bombPressed = false;
+		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
 		audio = new AudioManager();
-		System.out.println("Game Music " + musicVolume + " Sound " + soundVolume);
+		//System.out.println("Game Music " + musicVolume + " Sound " + soundVolume);
 		audio.playMusic();
 		
 		try {
 			
-			int width = this.map.getPixelMap().length;
-			int height = this.map.getPixelMap()[0].length;
-			this.graphics = new Graphics("Bomb Blitz", width + 400, height, false, this);
+			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -64,12 +63,12 @@ public class Game implements GameInterface {
 	@Override
 	public void init(Screen screen) {
 		try {
-			System.out.println("Giving screen to renderer");
+			//System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 			
 			List<Point> spawns = this.map.getSpawnPoints();
 
-			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 100, 300);
+			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 5, 300);
 			this.keyState = this.player.getKeyState();
 			// System.out.println("Ours: " + this.keyState.toString() + "
 			// Theirs: " + this.player.getKeyState().toString());
@@ -96,6 +95,8 @@ public class Game implements GameInterface {
 	private float gameOverCounter = 0;
 	private	float frontScreenCounter = 0f;
 	private boolean startAIs = true;
+	private boolean gamePaused = false;
+	
 	@Override
 	public void update(float interval) {
 
@@ -106,11 +107,9 @@ public class Game implements GameInterface {
 				gameOverCounter += interval;
 				renderer.displayGameOver();
 			} else {
-				
-				dispose();
+				this.graphics.getScreen().close();
 			}
 		} else {
-			
 			// Wait 5 seconds
 			if(frontScreenCounter <= 5) {
 				
@@ -125,14 +124,40 @@ public class Game implements GameInterface {
 				startAIs = false;
 			} 
 			else {
-				
 				renderer.stopFrontScreen();
+				
+				if(this.player.getKeyState().isPaused()){
+			
+					System.out.println("PLAYER HAS PRESSED PAUSE");
+					if(!this.gamePaused){
+						this.gamePaused = true;
+						for(Player player : this.gameState.getPlayers()){
+							player.pause();
+						}
+						System.out.println("PAUSED GAME");
+						renderer.displayPauseScreen();
+					}
+					else{
+						System.out.println("GAME IS STILL PAUSED");
+					}
+				}
+				else{
+					if(this.gamePaused){
+						this.gamePaused = false;
+						System.out.println("GAME WAS PAUSED, NOW UNPAUSED");
+						for(Player player : this.gameState.getPlayers()){
+							player.resume();
+						}
+						renderer.stopPauseScreen();
+					}
+
 				this.physics.update((int) (interval * 1000));
 				this.keyState.setBomb(false);
 				this.keyState.setMovement(Movement.NONE);
 				audio.playEventList(gameState.getAudioEvents());
 			}
 		}
+			}
 	}
 
 	@Override
@@ -150,16 +175,14 @@ public class Game implements GameInterface {
 	@Override
 	public void dispose() {
 
-		this.ui.show();
+		this.ui.show(this.fullScreen);
 		System.out.println("RETURNED TO MENU");
 		for (Player player : this.gameState.getPlayers()) {
 
 			player.setAlive(false);
-			System.out.println("Player " + player.getName() + " is alive: " + player.isAlive());
+			//System.out.println("Player " + player.getName() + " is alive: " + player.isAlive());
 		}
 		renderer.dispose();
-		this.graphics.getScreen().close();
 		audio.stopAudio();
-		
 	}
 }

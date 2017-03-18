@@ -23,6 +23,7 @@ public class Screen {
 	private long screenID;
 	private boolean resized;
 	private boolean vSync;
+	private boolean fullScreen;
 	private GLFWVidMode vidmode;
 	
 	/**
@@ -31,16 +32,17 @@ public class Screen {
 	 * @param width The width of the screen
 	 * @param height The height of the screen
 	 * @param vSync Use vsync for rendering
+	 * @param fullScreen Is the Screen fullScreen or window
 	 */
-	public Screen(String title, int width, int height, boolean vSync) {
+	public Screen(String title, int width, int height, boolean vSync, boolean fullScreen) {
 
 		this.width = width;
 		this.height = height;
 		this.title = title;
 		this.vSync = vSync;
-		System.out.println("Made new screen in Screen.java");
+		this.fullScreen = fullScreen;
 	} // END OF CONSTRUCTOR
-
+	
 	/**
 	 * Get the state of the keyboard key with the given key code
 	 * @param keyCode The given key Code
@@ -77,7 +79,14 @@ public class Screen {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
 		// Create the screen
-		screenID = glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
+		
+		if(fullScreen) {
+        
+			screenID = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), MemoryUtil.NULL);
+		} else {
+			
+			screenID = glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
+		}
 		if (screenID == MemoryUtil.NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -107,11 +116,14 @@ public class Screen {
 
         });
 		// Get the resolution of the primary monitor
-		vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-		// Center the Screen
-		glfwSetWindowPos(screenID, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
-		
+        if(!fullScreen) {
+        	
+			vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	
+			// Centre the Screen
+			glfwSetWindowPos(screenID, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
+        }
 		// Bind the screen with the openGL context current
 		glfwMakeContextCurrent(screenID);
 		

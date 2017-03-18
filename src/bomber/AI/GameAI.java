@@ -18,6 +18,7 @@ public class GameAI extends Player {
 	private AITemplate ai;
 	
 
+	
 	/**
 	 * Instantiates a new game AI.
 	 *
@@ -51,7 +52,12 @@ public class GameAI extends Player {
 
 	public void stop()
 	{
-		this.setAlive(false);
+		this.setAlive(false);;
+	}
+	
+	public void resume()
+	{
+		ai.update();
 	}
 	
 	public void setDifficulty(AIDifficulty diff)
@@ -82,15 +88,9 @@ public class GameAI extends Player {
 	 * Pause the AI.
 	 */
 	public void pause() {
-		stop();
+		ai.pause();
 	}
 
-	/**
-	 * Resume the AI.
-	 */
-	public void resume() {
-		this.setAlive(true);
-		ai.start();
-	}
+	
 
 }

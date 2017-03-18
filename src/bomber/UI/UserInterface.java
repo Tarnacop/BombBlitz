@@ -2,18 +2,20 @@ package bomber.UI;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import bomber.game.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -32,6 +34,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -51,6 +55,14 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import bomber.AI.AIDifficulty;
 import bomber.audio.AudioManager;
+import bomber.game.Block;
+import bomber.game.Game;
+import bomber.game.GameState;
+import bomber.game.Map;
+import bomber.game.Maps;
+import bomber.game.OnlineGame;
+import bomber.game.Response;
+import bomber.game.SettingsParser;
 import bomber.networking.ClientNetInterface;
 import bomber.networking.ClientServerAI;
 import bomber.networking.ClientServerLobbyRoom;
@@ -65,11 +77,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Stage currentStage;
 	private BorderPane serverMenu;
 	private BorderPane singleMenu;
-	private Scene mainScene, serverScene, singleScene;
+	private Parent mainScene, serverScene, singleScene;
 	private TextField nameText, ipText;
 	private Button nameBtn;
 	private Button connectBtn;
-	private Stack<Scene> previousScenes;
+	private Stack<Parent> previousScenes;
 	private HashMap<Response, Integer> controls;
 	private Map map;
 	private SimpleStringProperty mapName;
@@ -80,26 +92,25 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label enterLabel;
 	private VBox connectPane;
 	private ClientThread client;
-	private FlowPane roomsBox;
+	private HBox roomsBox;
 	private FlowPane playersBox;
 	private boolean expectingConnection;
-	private Scene currentScene;
 	private Font font;
 	private Label roomCreationLabel;
 	private UserInterface ui;
 	
-	private Scene roomScene;
+	private Parent roomScene;
 	private String css;
-	private Scene creditsScene;
+	private Parent creditsScene;
 	private BorderPane creditsMenu;
 	private BorderPane roomMenu;
 	private Button createRoomBtn;
 	private BorderPane mainMenu;
 	private SimpleStringProperty currentNameText;
-	private int windowHeight;
-	private int windowWidth;
+	private double windowHeight;
+	private double windowWidth;
 	private BorderPane connectMenu;
-	private Scene connectScene;
+	private Parent connectScene;
 	private TextField roomNameField;
 	private SimpleIntegerProperty roomNumber;
 	private boolean expectingRoomCreation;
@@ -121,6 +132,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private double versionNumber;
 	private boolean musicMuted;
 	private boolean soundMuted;
+	private CheckBox fullScreenBtn;
+	private double screenHeight;
+	private double screenWidth;
+	private double boxHeight;
+	private double boxWidth;
+	private Font smallFont;
+	private CheckBox rememberServerBtn;
+	private boolean gotServer;
 	
 	public UserInterface(){
 
@@ -130,6 +149,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 		this.ui = this;
 		this.font = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 20);
+		this.smallFont = Font.loadFont(UserInterface.class.getResource("../../resources/minecraft.ttf").toExternalForm(), 15);
 		this.css = UserInterface.class.getResource("../../resources/stylesheet.css").toExternalForm(); 
 		this.playerName = new SimpleStringProperty(SettingsParser.getPlayerName());
 		this.aiNumber = new SimpleIntegerProperty(1);
@@ -147,8 +167,15 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.controls.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
 		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
-		this.windowHeight = 950;
-		this.windowWidth = 1100;
+		this.controls.put(Response.PAUSE_GAME, GLFW_KEY_P);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.screenHeight = screenSize.height;
+		this.screenWidth = screenSize.width;
+		this.windowHeight = screenHeight * 0.9;
+		this.windowWidth = screenWidth * 0.8;
+		
+		this.boxHeight = windowHeight/3;
+		this.boxWidth = windowWidth/6;
 	}
 	
 	public static void begin(){
@@ -162,10 +189,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 		currentStage.setMinHeight(windowHeight);
 		currentStage.setMinWidth(windowWidth);
 		primaryStage.setTitle(this.appName);
-		previousScenes = new Stack<Scene>();
+		previousScenes = new Stack<Parent>();
 		initScenes();
 		
-        primaryStage.setScene(mainScene);
+        primaryStage.setScene(new Scene(mainScene));
         primaryStage.setOnCloseRequest(e -> disconnect());
         primaryStage.show();
 	}
@@ -208,7 +235,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		onlineMapCanvas = new Pane();
 		onlineMapCanvas.setMinHeight(300);
 		onlineMapCanvas.setMinWidth(300);
-        centerBox.getChildren().addAll(createAiDifficultySelector(true), createMapSelector(onlineMapCanvas, true));
+		aiOnlineDifficultyChoice = new ChoiceBox<>();
+        centerBox.getChildren().addAll(createAiDifficultySelector(aiOnlineDifficultyChoice, true), createMapSelector(onlineMapCanvas, true));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn);
@@ -220,17 +248,23 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersBox2.setVgap(20);
 		playersBox2.setHgap(20);
 		
+		ScrollPane scrollPane = new ScrollPane();
+		scrollPane.setMinHeight(boxHeight*0.8);
+		scrollPane.setMaxHeight(boxHeight);
+		scrollPane.setMinWidth(boxWidth);
+		scrollPane.setContent(playersBox2);
+		
 		VBox playersListPane = new VBox();
 		playersListPane.getStyleClass().add("wideclearbox");
 		playersListPane.setSpacing(10);
-		playersListPane.setMinWidth(400);
-		playersListPane.getChildren().addAll(playersTitle, playersBox2);
+		playersListPane.setMinWidth(boxWidth);
+		playersListPane.getChildren().addAll(playersTitle, scrollPane);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
-		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox2.minHeightProperty().add(70)));
+		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(scrollPane.minHeightProperty().add(100)));
 
 		readyTorch = new Rectangle();
-		readyTorch.setWidth(110);
-		readyTorch.setHeight(140);
+		readyTorch.setWidth(90);
+		readyTorch.setHeight(120);
 		readyTorch.getStyleClass().add("wideclearbox");
 		readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 		
@@ -238,15 +272,20 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyBox.getStyleClass().add("namebox");
 		readyBox.setSpacing(10);
 		readyBox.setAlignment(Pos.CENTER);
-		readyBox.setMinWidth(300);
+		readyBox.setMinWidth(boxHeight);
+		readyBox.setMinHeight(boxHeight);
+		readyBox.setMaxHeight(boxHeight);
 		readyButton = createButton("Not Ready", 250, 50);
 		readyButton.setOnAction(e -> ready());
 		readyBox.getChildren().addAll(createLabel("Click to\ntoggle Ready:", false, false), readyTorch, readyButton);
 		
 		readyPane = new VBox();
 		readyPane.getStyleClass().add("menubox");
-		readyPane.setSpacing(20);
-		readyPane.setMinWidth(200);
+		readyPane.setSpacing(30);
+		readyPane.setMinWidth(boxWidth+20);
+		readyPane.setMinHeight(boxHeight);
+		readyPane.setMaxHeight(boxHeight);
+		//System.out.println(boxHeight);
 		readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 		
 		HBox playersReadyBox = new HBox();
@@ -340,27 +379,36 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		Label roomsTitle = createLabel("Rooms:				( Join or create a room to play a match! )", false, true);
 
-		roomsBox = new FlowPane();
-		roomsBox.setVgap(20);
-		roomsBox.setHgap(40);
-		roomsBox.setMinHeight(100);
+		roomsBox = new HBox();
+		roomsBox.setSpacing(40);
+		
+		ScrollPane scrollRooms = new ScrollPane();
+		scrollRooms.setMinHeight(250);
+		scrollRooms.setVbarPolicy(ScrollBarPolicy.NEVER);
+		scrollRooms.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		scrollRooms.setFitToHeight(true);
+		scrollRooms.setFitToWidth(true);
+		scrollRooms.setContent(roomsBox);
 		
 		VBox roomsListPane = new VBox();
 		roomsListPane.setSpacing(10);
 		roomsListPane.setAlignment(Pos.TOP_LEFT);
-		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(roomsBox.minHeightProperty().add(200)));
-		roomsListPane.getChildren().addAll(roomsTitle, roomsBox);
+		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(scrollRooms.minHeightProperty()));
+		roomsListPane.getChildren().addAll(roomsTitle, scrollRooms);
 
 		Label playersTitle = createLabel("Online Players:", false, true);
 
-		playersBox = new FlowPane(Orientation.VERTICAL);
+		playersBox = new FlowPane();
 		playersBox.setVgap(20);
 		playersBox.setHgap(20);
 		playersBox.setMinHeight(100);
 		
+		ScrollPane scrollPlayers = new ScrollPane();
+		scrollPlayers.setContent(playersBox);
+		
 		VBox playersListPane = new VBox();
 		playersListPane.setSpacing(10);
-		playersListPane.getChildren().addAll(playersTitle, playersBox);
+		playersListPane.getChildren().addAll(playersTitle, scrollPlayers);
 		playersListPane.setAlignment(Pos.TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox.minHeightProperty().add(70)));
 		
@@ -368,7 +416,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		roomsPlayersPane.setSpacing(40);
 		roomsPlayersPane.setAlignment(Pos.CENTER);
 		roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
-		roomsBox.maxWidthProperty().bind(roomsPlayersPane.widthProperty());
 		BorderPane serverPane = new BorderPane();
 		VBox serverBox = new VBox();
 		serverBox.setSpacing(20);
@@ -401,23 +448,35 @@ public class UserInterface extends Application implements ClientNetInterface{
         ipText.setMinWidth(200);
         portNum = createTextField("Port Number");
         portNum.setMinWidth(200);
-        
+        gotServer = (!SettingsParser.getServerPort().equals("")) && (!SettingsParser.getServerIp().equals(""));
+        if(gotServer){
+        	ipText.setText(SettingsParser.getServerIp());
+        	portNum.setText(SettingsParser.getServerPort());
+        }
         ipBox.setSpacing(10);
         ipBox.setPrefSize(200, 50);
         ipBox.setAlignment(Pos.CENTER);
-        ipBox.getChildren().addAll(ipText, createLabel("/", false, false), portNum);
+        ipBox.getChildren().addAll(ipText, createLabel(":", false, false), portNum);
         
         connectBtn = createButton("Connect", 300, 75);
         connectBtn.setOnAction(e -> connect());
         
         Button backBtn = createBackButton("Cancel", false);
 
+        rememberServerBtn = new CheckBox();
+        rememberServerBtn.setSelected(gotServer);
+        
+        HBox rememberServerBox = new HBox();
+        rememberServerBox.setSpacing(10);
+        rememberServerBox.setAlignment(Pos.CENTER);
+        rememberServerBox.getChildren().addAll(createLabel("Remember Details", false, false), rememberServerBtn);
+        
         VBox connectBox = new VBox();
         connectBox.setSpacing(20);
         connectBox.setAlignment(Pos.CENTER);
         connectBox.maxWidthProperty().bind(ipBox.widthProperty().add(40));
         connectBox.getStyleClass().add("connectbox");
-        connectBox.getChildren().addAll(enterLabel, ipBox, connectBtn);
+        connectBox.getChildren().addAll(enterLabel, ipBox, rememberServerBox, connectBtn);
         
         connectPane = new VBox();
         connectPane.setAlignment(Pos.CENTER);
@@ -434,7 +493,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         Button startBtn = createButton("Start Game", 300, 75);
         
         HBox startBtnPane = new HBox();
-        startBtnPane.setPadding(new Insets(0, 0, 40, 0));
+        startBtnPane.setPadding(new Insets(0, 0, 10, 0));
         startBtnPane.setAlignment(Pos.CENTER);
         startBtnPane.getChildren().add(startBtn);
         startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls, this.aiNumber.get()));
@@ -448,11 +507,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 		mapCanvas = new Pane();
 		mapCanvas.setMinHeight(300);
 		mapCanvas.setMinWidth(300);
-        centerBox.getChildren().addAll(createAiDifficultySelector(false), createMapSelector(mapCanvas, false));
+		aiDifficultyChoice = new ChoiceBox<>();
+        centerBox.getChildren().addAll(createAiDifficultySelector(aiDifficultyChoice, false), createMapSelector(mapCanvas, false));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn);
-        backBtnPane.setPadding(new Insets(20, 10, 20, 10));
+        backBtnPane.setPadding(new Insets(10, 10, 10, 10));
         
         singleBox.setCenter(centerBox);
         singleBox.setTop(backBtnPane);
@@ -461,7 +521,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         setBackgroundPane(singleMenu, singleBox);
 	}
 
-	private VBox createAiDifficultySelector(boolean online){
+	private VBox createAiDifficultySelector(ChoiceBox<String> selector, boolean online){
 		
 		Button upAiToggle = new Button();
         upAiToggle.setPrefWidth(30);
@@ -490,18 +550,18 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiPane.getStyleClass().add("namebox");
         aiPane.setSpacing(20);
         aiPane.getChildren().addAll(aiBox, aiLabel);
-        Label aiExplanation = createLabel("AI players will\nseek to\ndestroy you.", true, true);
+        Label aiExplanation = createLabel("AI players will seek\nto destroy you.", true, true);
+        aiExplanation.setFont(smallFont);
         aiExplanation.setAlignment(Pos.CENTER);
-        aiExplanation.setPrefWidth(200);
-        if(online){
-        	aiOnlineDifficultyChoice = new ChoiceBox<>();
-            aiOnlineDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
-            aiOnlineDifficultyChoice.setPrefHeight(50);
-            aiOnlineDifficultyChoice.setPrefWidth(200);
-            aiOnlineDifficultyChoice.getStyleClass().add("textfield");
-            aiOnlineDifficultyChoice.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
-            aiOnlineDifficultyChoice.getSelectionModel().select(1);
-            aiOnlineDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
+        aiExplanation.setPrefWidth(boxWidth);
+        	selector = new ChoiceBox<>();
+            selector.setTooltip(new Tooltip("Change AI Difficulty"));
+            selector.setPrefHeight(50);
+            selector.setPrefWidth(boxWidth);
+            selector.getStyleClass().add("textfield");
+            selector.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
+            selector.getSelectionModel().select(1);
+            selector.getSelectionModel().selectedItemProperty().addListener(new
                     ChangeListener<String>() {
     			@Override
     			public void changed(ObservableValue<? extends String> ob,
@@ -509,22 +569,22 @@ public class UserInterface extends Application implements ClientNetInterface{
     				switch(newValue){
     				case "Easy": 
     					aiDiff = AIDifficulty.EASY; 
-    					aiExplanation.setText("AI players will\nmove randomly.");
+    					aiExplanation.setText("AI players will move\nrandomly.");
     					
     					break;
     				case "Medium": 
     					aiDiff = AIDifficulty.MEDIUM;
-    					aiExplanation.setText("AI players will\nseek to\ndestroy you.");
+    					aiExplanation.setText("AI players will seek\nto destroy you.");
     					break;
     				case "Hard": 
     					aiDiff = AIDifficulty.HARD; 
-    					aiExplanation.setText("AI players will\nbe tough\nto beat!");
+    					aiExplanation.setText("AI players will be tough\nto beat!");
     					break;
     				case "Extreme": 
     					aiDiff = AIDifficulty.EXTREME;
-    					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
+    					aiExplanation.setText("AI players will collaborate\nto bring you down!");
     				}
-    				System.out.println("Set difficulty to " + newValue);
+    				//System.out.println("Set difficulty to " + newValue);
     			}
             });	
 
@@ -532,8 +592,8 @@ public class UserInterface extends Application implements ClientNetInterface{
             aiDiffBox.setAlignment(Pos.CENTER);
             aiDiffBox.getStyleClass().add("namebox");
             aiDiffBox.setSpacing(20);
-            aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), aiOnlineDifficultyChoice, aiExplanation);
-            aiDiffBox.setMinHeight(300);
+            aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), selector, aiExplanation);
+            aiDiffBox.setMinHeight(boxHeight/2);
             
             VBox aiContainer = new VBox();
             aiContainer.setAlignment(Pos.CENTER);
@@ -546,59 +606,7 @@ public class UserInterface extends Application implements ClientNetInterface{
     		aiPad.getChildren().add(aiContainer);
     		
     		return aiPad;
-        }
-        else{
-        aiDifficultyChoice = new ChoiceBox<>();
-        aiDifficultyChoice.setTooltip(new Tooltip("Change AI Difficulty"));
-        aiDifficultyChoice.setPrefHeight(50);
-        aiDifficultyChoice.setPrefWidth(200);
-        aiDifficultyChoice.getStyleClass().add("textfield");
-        aiDifficultyChoice.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
-        aiDifficultyChoice.getSelectionModel().select(1);
-        aiDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
-                ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> ob,
-					String oldValue, String newValue) {
-				switch(newValue){
-				case "Easy": 
-					aiDiff = AIDifficulty.EASY; 
-					aiExplanation.setText("AI players will\nmove randomly.");
-					break;
-				case "Medium": 
-					aiDiff = AIDifficulty.MEDIUM;
-					aiExplanation.setText("AI players will\nseek to\ndestroy you.");
-					break;
-				case "Hard": 
-					aiDiff = AIDifficulty.HARD; 
-					aiExplanation.setText("AI players will\nbe tough\nto beat!");
-					break;
-				case "Extreme": 
-					aiDiff = AIDifficulty.EXTREME;
-					aiExplanation.setText("AI players will\ncollaborate\nto bring\nyou down!");
-				}
-			}
-        });
-
-        VBox aiDiffBox = new VBox();
-        aiDiffBox.setAlignment(Pos.CENTER);
-        aiDiffBox.getStyleClass().add("namebox");
-        aiDiffBox.setSpacing(20);
-        aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), aiDifficultyChoice, aiExplanation);
         
-        VBox aiContainer = new VBox();
-        aiContainer.setAlignment(Pos.CENTER);
-        aiContainer.getStyleClass().add("menubox");
-        aiContainer.setSpacing(20);
-        aiContainer.getChildren().addAll(aiPane, aiDiffBox);
-        
-		VBox aiPad = new VBox();
-		aiPad.setAlignment(Pos.CENTER);
-		aiPad.getChildren().add(aiContainer);
-		
-		return aiPad;
-        
-        }
 	}
 	
 	private VBox createMapSelector(Pane mapCanvas, boolean online){
@@ -649,8 +657,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         rightMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
         leftMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
         
-        //mapPane.maxHeightProperty().bind(aiBox.heightProperty());
-        
         VBox mapPad = new VBox();
 		mapPad.setAlignment(Pos.CENTER);
 		mapPad.getChildren().add(mapPane);
@@ -660,14 +666,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	private void drawMap(Pane mapCanvas, boolean online) {
 
-		int height = 300;
-		int width;
-		if(online){
-			width = 565;
-		}else{
-			width = 535;
-		}
-		//System.out.println(mapCanvas + "size " + mapCanvas.getWidth() + ", " + mapCanvas.getHeight());
+		double height = 300;
+		double width = online?565:535;
 		int xpadding = 250;
 		int ypadding = 50;
 		
@@ -753,7 +753,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private void initCreditsScene() {
 		
 		String credits = "Credits:\n"
-				+ "\nGraphics - Alexandru Blindu"
+				+ "\nGraphics - Alexandru Blinda"
 				+ "\nPhysics/Audio - Alexandru Rosu"
 				+ "\nAI - Jokubas Liutkus"
 				+ "\nUI/Game Logic - Owen Jenkins"
@@ -854,8 +854,16 @@ public class UserInterface extends Application implements ClientNetInterface{
         audioPane.setPadding(new Insets(10, 0, 0, 0));
         audioPane.getChildren().addAll(musicLabelBox, musicSlider, soundLabelBox, soundSlider);
         
+        fullScreenBtn = new CheckBox();
+        fullScreenBtn.setOnAction(e -> fullScreen());
+        
+        HBox fullScreenBox = new HBox();
+        fullScreenBox.setAlignment(Pos.CENTER);
+        fullScreenBox.setSpacing(5);
+        fullScreenBox.getChildren().addAll(createLabel("Fullscreen ", false, false), fullScreenBtn);
+        
         namePane.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
-        		nameText, nameBtn, audioPane);
+        		nameText, nameBtn, audioPane, fullScreenBox);
         
         
         Button exitBtn = createButton("Exit", 200, 50);
@@ -865,17 +873,26 @@ public class UserInterface extends Application implements ClientNetInterface{
         setBackgroundPane(mainMenu, logoPane);
 	}
 
+	private void fullScreen() {
+		if(fullScreenBtn.isSelected()){
+			this.currentStage.setFullScreen(true);
+		}
+		else{
+			this.currentStage.setFullScreen(false);
+		}
+	}
+
 	private void setMusic(float volume) {
 		if(muteMusicBtn.isSelected()){
 			musicMuted = true;
 			SettingsParser.setMusicVolume(volume);
 			AudioManager.setMusicVolume(volume);
-			System.out.println("SET AND STORED MUSIC " + volume);
+			//System.out.println("SET AND STORED MUSIC " + volume);
 		}else{
 			musicMuted = false;
 			SettingsParser.setMusicVolume((float)musicSlider.getValue());
 			AudioManager.setMusicVolume((float)musicSlider.getValue());
-			System.out.println("SET AND STORED MUSIC " + (float)musicSlider.getValue());
+			//System.out.println("SET AND STORED MUSIC " + (float)musicSlider.getValue());
 		}
 		SettingsParser.storeSettings();
 	}
@@ -886,12 +903,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 			soundMuted = true;
 			SettingsParser.setEffectsVolume(volume);
 			AudioManager.setEffectsVolume(volume);
-			System.out.println("SET AND STORED SOUND " + volume);
+			//System.out.println("SET AND STORED SOUND " + volume);
 		}else{
 			soundMuted = false;
 			SettingsParser.setEffectsVolume((float)soundSlider.getValue());
 			AudioManager.setEffectsVolume((float)soundSlider.getValue());
-			System.out.println("SET AND STORED SOUND " + (float)soundSlider.getValue());
+			//System.out.println("SET AND STORED SOUND " + (float)soundSlider.getValue());
 		}
 		SettingsParser.storeSettings();
 	}
@@ -911,8 +928,9 @@ public class UserInterface extends Application implements ClientNetInterface{
         pane.setCenter(background);
 	}
 	
-	private Scene createScene(Parent menu){
-		Scene scene = new Scene(menu, windowWidth, windowHeight);
+	private Parent createScene(Parent menu){
+		BorderPane scene = new BorderPane();
+		scene.setCenter(menu);
 		scene.getStylesheets().add(css);
 		return scene;
 	}
@@ -983,7 +1001,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		return button;
 	}
 	
-	private Button createSceneButton(String label, double width, double height, Scene currentScene, Scene nextScene){
+	private Button createSceneButton(String label, double width, double height, Parent currentScene, Parent nextScene){
 		Button button = new Button(label);
 		button.setFont(font);
 		button.setPrefWidth(width);
@@ -1191,11 +1209,11 @@ public class UserInterface extends Application implements ClientNetInterface{
 		beep();
 		enterLabel.setText("Enter Server Details:");
 		String host = ipText.getText().trim();
+		this.client = null;
 		try{
 			int port = Integer.parseInt(portNum.getText());
 		
-		//System.out.println("Attempting connection to: " + host + ", port = " + port);
-		this.client = null;
+			//System.out.println("Attempting connection to: " + host + ", port = " + port);
 			client = new ClientThread(host, port);
 
 			client.addNetListener(this);
@@ -1207,6 +1225,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 			
 			blankButton(connectBtn, "Connecting...");
 			this.expectingConnection = true;
+			if(rememberServerBtn.isSelected()){
+				SettingsParser.setServer(host, String.valueOf(port));
+				SettingsParser.storeSettings();
+			}
+			else{
+				SettingsParser.setServer(null, null);
+				SettingsParser.storeSettings();
+			}
 		} 
 		catch (NumberFormatException e1) {
 			enterLabel.setText("Enter Server Details:\n( Invalid Port Number! )");
@@ -1228,7 +1254,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			
 			VBox roomContainer = new VBox();
 			roomContainer.setMinHeight(100);
-			roomContainer.setMinWidth(100);
+			roomContainer.setMinWidth(210);
 			roomContainer.setSpacing(5);
 			roomContainer.setAlignment(Pos.CENTER);
 			roomContainer.getStyleClass().add("namebox");
@@ -1297,7 +1323,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		this.playersBox2.getChildren().clear();
 		
 		for(ClientServerPlayer player : connectedPlayers){
-			this.playersBox.getChildren().add(createLabel("- P" + player.getID() + ":   " + player.getName(), true, true));
+			this.playersBox.getChildren().add(createLabel("- Player ID [" + player.getID() + "] Name:   " + player.getName(), true, true));
 			this.playersBox2.getChildren().add(createLabel("- P" + player.getID() + ":   " + player.getName(), true, true));
 		}
 		
@@ -1309,7 +1335,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			readyPane.getChildren().clear();
 			readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 			for(ClientServerPlayer player : room.getHumanPlayerList()){
-				System.out.println(player.getName());
+				//System.out.println(player.getName());
 				Rectangle torch = new Rectangle();
 				torch.setWidth(40);
 				torch.setHeight(40);
@@ -1332,7 +1358,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			List<ClientServerAI> ais = room.getAIPlayerList();
 			if(ais.size() > 0){
 				AIDifficulty diff = room.getAIPlayerList().get(0).getDifficulty();
-				System.out.println("GOT DIFF: " + diff);
+				//System.out.println("GOT DIFF: " + diff);
 				int index = 1;
 				switch(diff){
 				case EASY: index = 0;aiDiff = AIDifficulty.EASY;break;
@@ -1361,12 +1387,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		double x = this.currentStage.getWidth();
 		double y = this.currentStage.getHeight();
 		
-		System.out.println("am at " + this.currentScene);
-		Scene lastScene = this.previousScenes.pop();
-		this.currentStage.setScene(lastScene);
-		this.currentScene = lastScene;
-		System.out.println("now at " + this.currentScene);
-		
+		//System.out.println("am at " + this.currentScene);
+		Parent lastScene = this.previousScenes.pop();
+		this.currentStage.getScene().setRoot(lastScene);
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
 		
@@ -1379,10 +1402,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		this.aiNumber.set(1);
 		this.humanPlayers = 1;
+		if(this.currentStage.isFullScreen()){
+			fullScreenBtn.setSelected(true);
+		}
+		else{
+			fullScreenBtn.setSelected(false);
+		}
 		}
 	
 	
-	private void advance(Scene thisScene, Scene nextScene) {
+	private void advance(Parent thisScene, Parent nextScene) {
 		
 		beep();
 		double x = this.currentStage.getWidth();
@@ -1390,11 +1419,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		
 		this.previousScenes.push(thisScene);
-		System.out.println("Added " + thisScene);
-		System.out.println(this.previousScenes);
-		this.currentStage.setScene(nextScene);
-		this.currentScene = nextScene;
-		
+		//System.out.println("Added " + thisScene);
+		//System.out.println(this.previousScenes);
+		this.currentStage.getScene().setRoot(nextScene);
 		this.currentStage.setWidth(x);
 		this.currentStage.setHeight(y);
 	}
@@ -1432,7 +1459,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Map mapCopy = new Map(map.getName(), arrayCopy, map.getSpawnPoints());
 
 		Platform.setImplicitExit(false);
-		System.out.println("Ai difficulty: " + this.aiDiff);
+		//System.out.println("Ai difficulty: " + this.aiDiff);
 		
 		float musicVolume = 50;
 		if(muteMusicBtn.isSelected()){
@@ -1448,7 +1475,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			soundVolume = (float) soundSlider.getValue();
 		}
 		
-		new Game(this, mapCopy, playerName, controls, aiNum, this.aiDiff, musicVolume, soundVolume);
+		new Game(this, mapCopy, playerName, controls, aiNum, this.aiDiff, musicVolume, soundVolume, this.currentStage.isFullScreen(), (int)this.currentStage.getWidth(), (int)this.currentStage.getHeight());
 	}
 
 	@Override
@@ -1469,12 +1496,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 	@Override
 	public void connectionAccepted() {
 		
-		System.out.println("ADDED CONNECTION EVENT");
+		//System.out.println("ADDED CONNECTION EVENT");
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
-				System.out.println("Expecting Connection: " + expectingConnection);
+				//System.out.println("Expecting Connection: " + expectingConnection);
 				if(expectingConnection){
 					
 					advance(connectScene, serverScene);
@@ -1488,7 +1515,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 					displayRooms();
 					expectingConnection = false;
 					
-					System.out.println("CONNECTION ACCEPTED");
+					//System.out.println("CONNECTION ACCEPTED");
 				}
 			}
 			   
@@ -1498,7 +1525,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	@Override
 	public void connectionRejected() {
 		
-		System.out.println("CALLED CONNECTION REJECTED");
+		//System.out.println("CALLED CONNECTION REJECTED");
 		Platform.runLater(new Runnable(){
 
 			@Override
@@ -1519,7 +1546,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	@Override
 	public void notConnected() {
 		
-		System.out.println("CALLED NOT CONNECTED");
+		//System.out.println("CALLED NOT CONNECTED");
 		Platform.runLater(new Runnable(){
 
 			@Override
@@ -1564,7 +1591,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				System.out.println("Room creation accepted");
+				//System.out.println("Room creation accepted");
 				if(expectingRoomCreation){
 					mapName.set(". . .");
 					Label label = createLabel("Loading...", false, true);
@@ -1588,7 +1615,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 									e.printStackTrace();
 								}
 							}
-							System.out.println("SET ALL AI TO: " + aiDiff);
+							//System.out.println("SET ALL AI TO: " + aiDiff);
 						}
 			        });
 				}
@@ -1623,7 +1650,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				System.out.println("Room creation/join rejected");
+				//System.out.println("Room creation/join rejected");
 				if(expectingRoomCreation){
 					roomCreationLabel.setText("Create and join a room\nwith these settings\n( Something went wrong! )");
 					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
@@ -1659,7 +1686,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			public void run() {
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
-				new OnlineGame(ui, client, gameState, playerName.get(), controls);
+				new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
 			}
 			   
 		});
@@ -1686,12 +1713,13 @@ public class UserInterface extends Application implements ClientNetInterface{
 		});
 	}
 	
-	public void show() {
+	public void show(boolean fullScreen) {
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
 				System.out.println("OPENING MENU");
+				currentStage.setFullScreen(fullScreen);
 				currentStage.show();
 				Platform.setImplicitExit(true);
 			}
@@ -1701,7 +1729,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void connectionAttemptTimeout() {
-		System.out.println("CALLED CONNECTION TIMEOUT");
+		//System.out.println("CALLED CONNECTION TIMEOUT");
 		Platform.runLater(new Runnable(){
 
 			@Override

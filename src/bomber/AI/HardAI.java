@@ -31,12 +31,12 @@ public class HardAI extends AITemplate {
 	 */
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
-			while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
+			while (moves != null && !moves.isEmpty() && gameAI.isAlive() && !pause) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
-					&& !safetyCh.isEnemyInBombRange() && gameAI.isAlive()) {
+					&& !safetyCh.isEnemyInBombRange() && gameAI.isAlive() && !pause) {
 				makeSingleMove(moves.removeFirst());
 			}
 	}
@@ -49,7 +49,7 @@ public class HardAI extends AITemplate {
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive()) {
+		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive() && !pause) {
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -64,7 +64,7 @@ public class HardAI extends AITemplate {
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive()) {
+					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive() && !pause) {
 					}
 				}
 			}
@@ -83,6 +83,16 @@ public class HardAI extends AITemplate {
 	protected void move() {
 		LinkedList<AIActions> moves;
 		while (gameAI.isAlive()) {
+			while(pause)
+			{
+				try {
+					System.out.println("pause");
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 
 			// if AI is in danger then find the escape route
 			if (safetyCh.inDanger()) {
@@ -91,7 +101,6 @@ public class HardAI extends AITemplate {
 
 			}
 
-			
 			// else if there is an upgrade find the moves to it
 			else if ((moves = finder.findRouteToUpgrade()) != null) {
 
@@ -106,10 +115,6 @@ public class HardAI extends AITemplate {
 				performMoves(moves, true);
 			}
 
-			// else if there is an upgrade find the moves to it
-			else if ((moves = finder.findRouteToUpgrade()) != null) {
-				performMoves(moves, false);
-			}
 			// if enemy is accessible(no boxes are blocking the path) then
 			// find a route to it and make moves
 			else if ((moves = getMovesToEnemy()) != null) {

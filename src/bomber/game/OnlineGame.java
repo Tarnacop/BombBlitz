@@ -27,9 +27,10 @@ public class OnlineGame implements GameInterface {
 	private UserInterface ui;
 	// private int aiNum;
 	private ClientThread client;
+	private boolean fullScreen;
 
 	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
-			HashMap<Response, Integer> controls) {
+			HashMap<Response, Integer> controls, boolean fullScreen, int width, int height) {
 
 		this.ui = ui;
 		this.gameState = gameState;
@@ -37,6 +38,7 @@ public class OnlineGame implements GameInterface {
 		// this.playerName = playerName;
 		this.controlScheme = controls;
 		this.bombPressed = false;
+		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
 		audio = new AudioManager();
@@ -44,9 +46,7 @@ public class OnlineGame implements GameInterface {
 
 		try {
 
-			int width = this.client.getMapWidth() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
-			int height = this.client.getMapHeight() * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
-			this.graphics = new Graphics("Bomb Blitz", width, height, false, this);
+			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
 			this.graphics.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -80,14 +80,6 @@ public class OnlineGame implements GameInterface {
 	public void update(float interval) {
 
 		this.gameState = this.client.getGameState();
-		/*
-		 * float[] colours = new float[] { 0.1f, 0.3f, 0.5f, 0f, 0.1f, 0.3f,
-		 * 0.5f, 0f, 0.1f, 0.3f, 0.5f, 0f }; for(Player player :
-		 * this.gameState.getPlayers()){
-		 * 
-		 * player.addMesh(new Mesh(32, 32, colours)); }
-		 */
-
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
 		audio.playEventList(gameState.getAudioEvents());
@@ -106,7 +98,6 @@ public class OnlineGame implements GameInterface {
 		try {
 			this.client.sendMove(keyState);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -114,10 +105,9 @@ public class OnlineGame implements GameInterface {
 	@Override
 	public void dispose() {
 
-		this.ui.show();
+		this.ui.show(this.fullScreen);
 		System.out.println("RETURNED TO MENU");
 		renderer.dispose();
-		this.graphics.getScreen().close();
 		audio.stopAudio();
 
 	}

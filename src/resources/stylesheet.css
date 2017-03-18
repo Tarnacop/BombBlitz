@@ -6,6 +6,67 @@
 	-fx-border-width: 2px;
 }*/
 
+.scroll-bar:horizontal, .scroll-bar:vertical{
+	-fx-background: transparent;
+	-fx-background-color: transparent;
+}
+
+.scroll-bar:horizontal .thumb{
+	-fx-background: transparent;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/horizontalscroll.png");
+	-fx-border: 2px;
+	-fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.scroll-bar:vertical .thumb{
+	-fx-background: transparent;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/verticalscroll.png");
+	-fx-border: 2px;
+	-fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+
+.increment-button:horizontal{
+	-fx-background: transparent;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/rightscroll.png");
+	-fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.increment-button:vertical{
+	-fx-background: transparent;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/upscroll.png");
+	-fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.decrement-button:horizontal{
+	-fx-background: transparent;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/leftscroll.png");
+	-fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.decrement-button:vertical{
+	-fx-background: transparent;
+	-fx-background-color: transparent;
+	-fx-background-image: url("images/downscroll.png");
+	-fx-background-size:100% 100%;
+        -fx-background-repeat:no-repeat;
+}
+
+.scroll-pane{
+	-fx-background: transparent;
+	-fx-background-color: transparent;
+}
+
 .box{
 	-fx-background-color: transparent;
         -fx-background-image: url("images/checkbox.png");

@@ -39,12 +39,12 @@ public class ExtremeAI extends AITemplate {
 	 */
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
 		if (inDanger)
-			while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
+			while (moves != null && !moves.isEmpty() && gameAI.isAlive() && !pause) {
 				makeSingleMove(moves.removeFirst());
 			}
 		else
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
-					&& !safetyCh.isEnemyInBombRangeExludeAIs() && gameAI.isAlive()) {
+					&& !safetyCh.isEnemyInBombRangeExludeAIs() && gameAI.isAlive()  && !pause) {
 				makeSingleMove(moves.removeFirst());
 			}
 	}
@@ -59,7 +59,7 @@ public class ExtremeAI extends AITemplate {
 		AIActions action;
 
 		while (moves != null && !moves.isEmpty() && getMovesToEnemyExcludeAIs() == null && gameAI.isAlive()
-				&& (!checkIfAIsReachable() || isPerformer())) {
+				&& (!checkIfAIsReachable() || isPerformer())  && !pause) {
 			action = moves.removeFirst();
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
@@ -74,7 +74,7 @@ public class ExtremeAI extends AITemplate {
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
-					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive()) {
+					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive() && !pause) {
 
 					}
 				}
@@ -101,6 +101,8 @@ public class ExtremeAI extends AITemplate {
 		return false;
 	}
 
+	
+	
 	/**
 	 * Check if other AIs are reachable
 	 *
@@ -122,6 +124,17 @@ public class ExtremeAI extends AITemplate {
 	protected void move() {
 		LinkedList<AIActions> moves;
 		while (gameAI.isAlive()) {
+			
+			while(pause)
+			{
+				try {
+					System.out.println("pause");
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 
 			// if AI is in danger then find the escape route
 			if (safetyCh.inDanger()) {
@@ -138,7 +151,7 @@ public class ExtremeAI extends AITemplate {
 			}
 
 			// else if there is an upgrade find the moves to it
-			else if ((moves = finder.findRouteToUpgrade()) != null && (!checkIfAIsReachable() || isPerformer())) {
+			else if ((moves = finder.findRouteToUpgrade()) != null /*&& (!checkIfAIsReachable() || isPerformer())*/) {
 
 				performMoves(moves, false);
 			}
@@ -150,7 +163,7 @@ public class ExtremeAI extends AITemplate {
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy and
-			// fullfill it
+			// full-fill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs())) != null) {
 				if (!checkIfAIsReachable() || isPerformer())
 					performPlannedMoves(moves);
