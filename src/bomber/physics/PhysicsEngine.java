@@ -7,7 +7,9 @@ import java.awt.*;
 import java.util.*;
 
 /**
- * Created by Alexandru Rosu on 15.01.2017.
+ * Manages the physics of the game
+ *
+ * @author Alexandru Rosu
  */
 public class PhysicsEngine
 {
@@ -20,6 +22,7 @@ public class PhysicsEngine
 
     /**
      * Creates an engine using a GameState
+     *
      * @param gameState The GameState object
      */
     public PhysicsEngine(GameState gameState)
@@ -32,42 +35,39 @@ public class PhysicsEngine
     /**
      * Gets the player corresponding to a certain name
      * Assumes there is at most one player named that way
+     * Returns null if there is none
+     *
      * @param name The name
      * @return The player object
      */
     public Player getPlayerNamed(String name)
     {
-        Optional<Player> maybePlayer =  gameState.getPlayers().stream().filter(p -> p.getName().equals(name)).findAny();
+        Optional<Player> maybePlayer = gameState.getPlayers().stream().filter(p -> p.getName().equals(name)).findAny();
         return maybePlayer.orElse(null);
     }
 
+    /**
+     * Gets the location where a player will place a bomb
+     *
+     * @param playerPosition The position of the player
+     * @return A Point at the location of the bomb
+     */
     private Point getBombLocation(Point playerPosition)
     {
-        int xOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_WIDTH)/2;
-        int YOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_HEIGHT)/2;
-        return new Point((playerPosition.x+ Constants.PLAYER_WIDTH/2)/64 * 64+xOffset, (playerPosition.y+ Constants.PLAYER_HEIGHT/2)/64*64+YOffset);
+        int xOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_WIDTH) / 2;
+        int YOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_HEIGHT) / 2;
+        return new Point((playerPosition.x + Constants.PLAYER_WIDTH / 2) / 64 * 64 + xOffset, (playerPosition.y + Constants.PLAYER_HEIGHT / 2) / 64 * 64 + YOffset);
     }
 
+    /**
+     * Updates all the objects in the game world
+     *
+     * @param milliseconds The amount of time in milliseconds from the last update
+     */
     public synchronized void update(int milliseconds)
     {
         // update map after blast
-        Map map = gameState.getMap();
-        // generate power-ups
-        while(!powerUpPossibleLocations.isEmpty())
-        {
-            Point p = powerUpPossibleLocations.pop();
-            //System.out.println("Possible power-up at " + p.toString());
-            map.setGridBlockAt(p, getRandomBlock());
-        }
-        // clear the blast
-        int width = gameState.getMap().getGridMap().length;
-        int height = gameState.getMap().getGridMap()[0].length;
-        for(int x=0; x<width; x++)
-            for(int y=0; y<height; y++)
-                if (map.getGridBlockAt(x,y) == Block.BLAST)
-                {
-                    map.setGridBlockAt(new Point(x,y), Block.BLANK);
-                }
+        updateMap();
 
         // update bombs
         ArrayList<Bomb> toBeDeleted = new ArrayList<>();
@@ -78,6 +78,9 @@ public class PhysicsEngine
         gameState.getPlayers().forEach(p -> updatePlayer(p, milliseconds));
     }
 
+    /**
+     * Updates all the objects in the game world, using a default delta time of 1 second
+     */
     public synchronized void update()
     {
         update(1000);
@@ -88,6 +91,12 @@ public class PhysicsEngine
     // Player update related methods
     // -----------------------------
 
+    /**
+     * Updates a player
+     *
+     * @param player       The Player to be updated
+     * @param milliseconds The amount of time in milliseconds from the last update
+     */
     private void updatePlayer(Player player, int milliseconds)
     {
 
@@ -168,7 +177,7 @@ public class PhysicsEngine
                     bombCount++;
             if (bombCount < player.getMaxNrOfBombs())
             {
-                plantBomb(player, Constants.DEFAULT_BOMB_TIME);
+                plantBomb(player);
                 okToPlaceBomb.put(player.getName(), false);
             }
         }
@@ -226,38 +235,63 @@ public class PhysicsEngine
 
     }
 
+    /**
+     * Checks if a player touches (collides with) any block of a given type on the map.
+     * If so, it returns the position of one of them. Otherwise, it return null.
+     *
+     * @param pos   The position of the player
+     * @param block The type of block
+     * @return The position of the block or null
+     */
     private Point playerTouchesBlock(Point pos, Block block)
     {
-        // Return: 0 no, 1 up-left, 2 up-right, 3 down-left, 4 down-right
         Map map = gameState.getMap();
-        if (map.getPixelBlockAt(pos.x, pos.y)== block)
-            return new Point(pos.x/64,pos.y/64);
-        if (map.getPixelBlockAt(pos.x+ Constants.PLAYER_WIDTH,pos.y+ Constants.PLAYER_HEIGHT)== block)
-            return new Point((pos.x+ Constants.PLAYER_WIDTH)/64,(pos.y+ Constants.PLAYER_HEIGHT)/64);
-        if (map.getPixelBlockAt(pos.x,pos.y+ Constants.PLAYER_HEIGHT)== block)
-            return new Point(pos.x/64,(pos.y+ Constants.PLAYER_HEIGHT)/64);
-        if (map.getPixelBlockAt(pos.x+ Constants.PLAYER_WIDTH,pos.y)== block)
-            return new Point((pos.x+ Constants.PLAYER_WIDTH)/64,pos.y/64);
+        if (map.getPixelBlockAt(pos.x, pos.y) == block)
+            return new Point(pos.x / 64, pos.y / 64);
+        if (map.getPixelBlockAt(pos.x + Constants.PLAYER_WIDTH, pos.y + Constants.PLAYER_HEIGHT) == block)
+            return new Point((pos.x + Constants.PLAYER_WIDTH) / 64, (pos.y + Constants.PLAYER_HEIGHT) / 64);
+        if (map.getPixelBlockAt(pos.x, pos.y + Constants.PLAYER_HEIGHT) == block)
+            return new Point(pos.x / 64, (pos.y + Constants.PLAYER_HEIGHT) / 64);
+        if (map.getPixelBlockAt(pos.x + Constants.PLAYER_WIDTH, pos.y) == block)
+            return new Point((pos.x + Constants.PLAYER_WIDTH) / 64, pos.y / 64);
         return null;
     }
 
+    /**
+     * Translates a point by a vector (represented through a Point)
+     *
+     * @param point The point to be translated
+     * @param delta The movement vector
+     */
     private void translatePoint(Point point, Point delta)
     {
         point.translate(delta.x, delta.y);
     }
 
-    public void plantBomb(Player player, int time)
+    /**
+     * Makes a player plant a bomb that will explode in the default time (from Constants)
+     *
+     * @param player The player that plants the bomb
+     */
+    public void plantBomb(Player player)
     {
-        Bomb bomb = new Bomb(player.getName(),  getBombLocation(player.getPos()), time, player.getBombRange());
+        Bomb bomb = new Bomb(player.getName(), getBombLocation(player.getPos()), Constants.DEFAULT_BOMB_TIME, player.getBombRange());
         bomb.setPlayerID(player.getPlayerID());
         gameState.getBombs().add(bomb);
         gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
     }
 
+    /**
+     * Resolves a possible collision between a player and a block corner
+     *
+     * @param fromDirection The opposite of the movement vector of the player
+     * @param corner        The position of the corner
+     * @param playerPos     The position of the player
+     */
     private void revertPosition(Point fromDirection, Point corner, Point playerPos)
     {
         Map map = gameState.getMap();
-        while(map.getPixelBlockAt(corner.x, corner.y) == Block.SOLID || map.getPixelBlockAt(corner.x, corner.y) == Block.SOFT)
+        while (map.getPixelBlockAt(corner.x, corner.y) == Block.SOLID || map.getPixelBlockAt(corner.x, corner.y) == Block.SOFT)
         {
             translatePoint(corner, fromDirection);
             translatePoint(playerPos, fromDirection);
@@ -269,28 +303,42 @@ public class PhysicsEngine
     // Bomb update related methods
     // ---------------------------
 
+    /**
+     * Updates a bomb
+     *
+     * @param bomb         The Bomb to be updated
+     * @param toBeDeleted  A list where the bomb will be put if it needs to be deleted (it explodes)
+     * @param milliseconds The amount of time in milliseconds from the last update
+     */
     private void updateBomb(Bomb bomb, ArrayList<Bomb> toBeDeleted, int milliseconds)
     {
         decreaseBombTimer(bomb, milliseconds);
-        if(bomb.getTime()<=0)
+        if (bomb.getTime() <= 0)
         {
             toBeDeleted.add(bomb);
             Point pos = bomb.getPos();
             int radius = bomb.getRadius();
-            addBlast(pos.x/64, pos.y/64, radius, 0);
+            addBlast(pos.x / 64, pos.y / 64, radius, 0);
             gameState.getAudioEvents().add(AudioEvent.EXPLOSION);
         }
     }
 
+    /**
+     * Simulates the propagation of an explosion, adding Blast blocks to the map
+     *
+     * @param x         The x coordinate of the blast
+     * @param y         The y coordinate of the blast
+     * @param radius    The "power" of the blast (it is decreased by 1 for each block the explosion travels through)
+     * @param direction The direction of the blast propagation (0 all, 1 up, 2 right, 3 down, 4 left)
+     */
     private void addBlast(int x, int y, int radius, int direction)
     {
-        // direction: 0 all, 1 up, 2 right, 3 down, 4 left
         Point pos = new Point(x, y);
-        if(!gameState.getMap().isInGridBounds(pos))
+        if (!gameState.getMap().isInGridBounds(pos))
             return;
-        if(radius==0 || gameState.getMap().getGridBlockAt(x, y)==Block.SOLID)
+        if (radius == 0 || gameState.getMap().getGridBlockAt(x, y) == Block.SOLID)
             return;
-        if(gameState.getMap().getGridBlockAt(x, y) == Block.SOFT)
+        if (gameState.getMap().getGridBlockAt(x, y) == Block.SOFT)
             powerUpPossibleLocations.push(pos);
         else
             switch (direction)
@@ -318,25 +366,59 @@ public class PhysicsEngine
         gameState.getMap().setGridBlockAt(pos, Block.BLAST);
     }
 
+    /**
+     * Updates the timer of a bomb
+     *
+     * @param bomb         The bomb to be updated
+     * @param milliseconds The amount of time in milliseconds from the last update
+     */
     private void decreaseBombTimer(Bomb bomb, int milliseconds)
     {
-        bomb.setTime(bomb.getTime()-milliseconds);
+        bomb.setTime(bomb.getTime() - milliseconds);
     }
 
     // --------------------------
     // Map update related methods
     // --------------------------
 
+    /**
+     * Updates the map
+     */
+    private void updateMap()
+    {
+        Map map = gameState.getMap();
+
+        // generate power-ups
+        while (!powerUpPossibleLocations.isEmpty())
+        {
+            Point p = powerUpPossibleLocations.pop();
+            map.setGridBlockAt(p, getRandomBlock());
+        }
+
+        // clear the blast
+        int width = gameState.getMap().getGridMap().length;
+        int height = gameState.getMap().getGridMap()[0].length;
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                if (map.getGridBlockAt(x, y) == Block.BLAST)
+                    map.setGridBlockAt(new Point(x, y), Block.BLANK);
+    }
+
+    /**
+     * Randomly generates a block type, according to the probabilities in Constants
+     *
+     * @return A random Block object
+     */
     private Block getRandomBlock()
     {
         Random generator = new Random();
         boolean isPowerup = generator.nextInt(100) < Constants.POWERUP_PROBABILITY;
-        if(!isPowerup)
+        if (!isPowerup)
             return Block.BLANK;
         int isPositive = generator.nextInt(100) < Constants.POSITIVE_POWERUP_PROBABILITY ? 0 : 10; // 0 is positive, 10 is negative
         int powerup = generator.nextInt(3); // first, second or third power-up
 
-        switch (isPositive+powerup)
+        switch (isPositive + powerup)
         {
             case 0:
                 return Block.PLUS_BOMB;

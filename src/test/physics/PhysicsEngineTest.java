@@ -102,7 +102,7 @@ public class PhysicsEngineTest
         buddy.getKeyState().setMovement(Movement.RIGHT);
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
-        engine.plantBomb(buddy, 0);
+        engine.plantBomb(buddy);
 
         assertTrue("Bomb was not planted.", 1==gameState.getBombs().size());
 
@@ -129,13 +129,13 @@ public class PhysicsEngineTest
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
         buddy.setLives(1);
-        engine.plantBomb(buddy, 0);
+        engine.plantBomb(buddy);
         engine.update();
         assertFalse("The player was not killed by standing on a bomb", buddy.isAlive());
 
         buddy.setLives(3);
         buddy.setAlive(true);
-        engine.plantBomb(buddy, 0);
+        engine.plantBomb(buddy);
         engine.update();
         assertEquals("The number of lives of the player did not decrease", 2, buddy.getLives());
     }
