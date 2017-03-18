@@ -6,7 +6,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.Random;
 
 /**
  * Manages the physics of the game
@@ -17,7 +16,6 @@ public class PhysicsEngine
 {
 
     private GameState gameState;
-
     private HashMap<String, Boolean> okToPlaceBomb;
 
     /**
@@ -29,33 +27,6 @@ public class PhysicsEngine
     {
         this.gameState = gameState;
         okToPlaceBomb = new HashMap<>();
-    }
-
-    /**
-     * Gets the player corresponding to a certain name
-     * Assumes there is at most one player named that way
-     * Returns null if there is none
-     *
-     * @param name The name
-     * @return The player object
-     */
-    public Player getPlayerNamed(String name)
-    {
-        Optional<Player> maybePlayer = gameState.getPlayers().stream().filter(p -> p.getName().equals(name)).findAny();
-        return maybePlayer.orElse(null);
-    }
-
-    /**
-     * Gets the location where a player will place a bomb
-     *
-     * @param playerPosition The position of the player
-     * @return A Point at the location of the bomb
-     */
-    private Point getBombLocation(Point playerPosition)
-    {
-        int xOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_WIDTH) / 2;
-        int YOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_HEIGHT) / 2;
-        return new Point((playerPosition.x + Constants.PLAYER_WIDTH / 2) / 64 * 64 + xOffset, (playerPosition.y + Constants.PLAYER_HEIGHT / 2) / 64 * 64 + YOffset);
     }
 
     /**
@@ -104,6 +75,7 @@ public class PhysicsEngine
 
         // Initialise data
         Point pos = player.getPos();
+        Point initialPos = new Point(pos);
 
         // Update invulnerability period
         int invulnerability = player.getInvulnerability();
@@ -170,6 +142,14 @@ public class PhysicsEngine
             Point downRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y + Constants.PLAYER_HEIGHT);
             revertPosition(fromDirection, downRightCorner, pos);
 
+            // Collision with holes
+            if(playerTouchesBlock(initialPos, Block.HOLE)==null && playerTouchesBlock(pos, Block.HOLE)!=null)
+            {
+                player.setLives(player.getLives() - 1);
+                if (player.getLives() == 0)
+                    player.setAlive(false);
+                gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
+            }
         }
 
         // -------- Planting bombs --------
@@ -278,12 +258,25 @@ public class PhysicsEngine
      *
      * @param player The player that plants the bomb
      */
-    public void plantBomb(Player player)
+    private void plantBomb(Player player)
     {
         Bomb bomb = new Bomb(player.getName(), getBombLocation(player.getPos()), Constants.DEFAULT_BOMB_TIME, player.getBombRange());
         bomb.setPlayerID(player.getPlayerID());
         gameState.getBombs().add(bomb);
         gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
+    }
+
+    /**
+     * Gets the location where a player will place a bomb
+     *
+     * @param playerPosition The position of the player
+     * @return A Point at the location of the bomb
+     */
+    private Point getBombLocation(Point playerPosition)
+    {
+        int xOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_WIDTH) / 2;
+        int YOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_HEIGHT) / 2;
+        return new Point((playerPosition.x + Constants.PLAYER_WIDTH / 2) / 64 * 64 + xOffset, (playerPosition.y + Constants.PLAYER_HEIGHT / 2) / 64 * 64 + YOffset);
     }
 
     /**
@@ -344,10 +337,13 @@ public class PhysicsEngine
         if (radius == 0 || gameState.getMap().getGridBlockAt(x, y) == Block.SOLID)
             return;
         if (gameState.getMap().getGridBlockAt(x, y) == Block.SOFT)
-            gameState.getBlastList().add(new BlastTimer(pos, true));
+            gameState.getBlastList().add(new BlastTimer(pos));
         else
         {
-            gameState.getBlastList().add(new BlastTimer(pos, false));
+            if (gameState.getMap().getGridBlockAt(x, y) == Block.HOLE)  // this can't be destroyed but does not stop the blast
+                gameState.getBlastList().add(new BlastTimer(pos, Block.HOLE));
+            else
+                updateBlastList(pos, Block.BLANK);
             switch (direction)
             {
                 case 0:
@@ -373,6 +369,22 @@ public class PhysicsEngine
 
         gameState.getMap().setGridBlockAt(pos, Block.BLAST);
 
+    }
+
+    /**
+     * Updates the blast list entry corresponding to a position.
+     * If an entry is already there, it updates the timer. If not, it adds a new entry.
+     * @param position
+     * @param reveal
+     */
+    private void updateBlastList(Point position, Block reveal)
+    {
+        Optional<BlastTimer> blastTimer = gameState.getBlastList().stream()
+                .filter(timer -> timer.getLocation().equals(position)).findAny();
+        if(blastTimer.isPresent())
+            blastTimer.get().setTimer(Constants.EXPLOSION_LENGTH);
+        else
+            gameState.getBlastList().add(new BlastTimer(position, reveal));
     }
 
     /**
@@ -404,47 +416,9 @@ public class PhysicsEngine
         {
             blastTimer.decreaseTimer(milliseconds);
             if (blastTimer.isDone())
-                if (blastTimer.makesPowerup())
-                    map.setGridBlockAt(blastTimer.getLocation(), getRandomBlock());
-                else
-                    map.setGridBlockAt(blastTimer.getLocation(), Block.BLANK);
+                map.setGridBlockAt(blastTimer.getLocation(), blastTimer.getReveal());
         });
         gameState.getBlastList().removeIf(BlastTimer::isDone);
-    }
-
-    /**
-     * Randomly generates a block type, according to the probabilities in Constants
-     *
-     * @return A random Block object
-     */
-    private Block getRandomBlock()
-    {
-        Random generator = new Random();
-        boolean isPowerup = generator.nextInt(100) < Constants.POWERUP_PROBABILITY;
-        if (!isPowerup)
-            return Block.BLANK;
-        int isPositive = generator.nextInt(100) < Constants.POSITIVE_POWERUP_PROBABILITY ? 0 : 10; // 0 is positive, 10 is negative
-        int powerup = generator.nextInt(3); // first, second or third power-up
-
-        switch (isPositive + powerup)
-        {
-            case 0:
-                return Block.PLUS_BOMB;
-            case 1:
-                return Block.PLUS_RANGE;
-            case 2:
-                return Block.PLUS_SPEED;
-            case 10:
-                return Block.MINUS_BOMB;
-            case 11:
-                return Block.MINUS_RANGE;
-            case 12:
-                return Block.MINUS_SPEED;
-            default:
-                System.err.println("Unexpected result in Physics.getRandomBlock().");
-                return Block.BLANK;
-        }
-
     }
 
 }

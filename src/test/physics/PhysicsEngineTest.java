@@ -12,7 +12,9 @@ import static bomber.game.Block.*;
 import static org.junit.Assert.*;
 
 /**
- * Created by Alexandru Rosu on 26.01.2017.
+ * Tests the physics engine
+ *
+ * @author Alexandru Rosu
  */
 public class PhysicsEngineTest
 {
@@ -42,15 +44,15 @@ public class PhysicsEngineTest
     @Test
     public void addPlayer() throws Exception
     {
-        gameState.getPlayers().add(new Player("TestPlayer1", new Point(5,5), 1, 10));
-        Player testPlayer1 = engine.getPlayerNamed("TestPlayer1");
+        Player testPlayer1 = new Player("TestPlayer1", new Point(5,5), 1, 10);
+        gameState.getPlayers().add(testPlayer1);
         assertNotNull("Player was not added or does not have the given name.", testPlayer1);
         assertEquals("Added player does not have the given position", new Point(5,5), testPlayer1.getPos());
         assertEquals("Added player does not have the given number of lives", 1, testPlayer1.getLives());
         assertEquals("Added player does not have the given speed", 10.0, testPlayer1.getSpeed(), 0);
 
-        gameState.getPlayers().add(new Player("TestPlayer2", new Point(3,4), 3, 14));
-        Player testPlayer2 = engine.getPlayerNamed("TestPlayer2");
+        Player testPlayer2 = new Player("TestPlayer2", new Point(3,4), 3, 14);
+        gameState.getPlayers().add(testPlayer2);
         assertNotNull("Player was not added or does not have the given name.", testPlayer2);
         assertEquals("Added player does not have the given position", new Point(3, 4), testPlayer2.getPos());
         assertEquals("Added player does not have the given number of lives", 3, testPlayer2.getLives());
@@ -102,18 +104,18 @@ public class PhysicsEngineTest
         buddy.getKeyState().setMovement(Movement.RIGHT);
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
-        engine.plantBomb(buddy);
+        buddy.getKeyState().setBomb(true);
 
         assertTrue("Bomb was not planted.", 1==gameState.getBombs().size());
 
-        engine.update();
+        engine.update(2000);
 
         assertTrue("Bomb did not explode.", 0==gameState.getBombs().size());
         assertEquals("Blast expected at the place of an explosion.",BLAST, gameState.getMap().getGridBlockAt(1, 8));
 
         engine.update();
 
-        assertEquals("Bomb blast did not turn to Blank after a frame", BLANK, gameState.getMap().getGridBlockAt(1, 8));
+        assertEquals("Bomb blast did not turn to Blank after a second", BLANK, gameState.getMap().getGridBlockAt(1, 8));
 
         Map map = gameState.getMap();
         int width = gameState.getMap().getGridMap().length;
@@ -129,13 +131,13 @@ public class PhysicsEngineTest
         buddy.setPos(new Point(66, 8*64+1));
         buddy.setSpeed(0);
         buddy.setLives(1);
-        engine.plantBomb(buddy);
+        buddy.getKeyState().setBomb(true);
         engine.update();
         assertFalse("The player was not killed by standing on a bomb", buddy.isAlive());
 
         buddy.setLives(3);
         buddy.setAlive(true);
-        engine.plantBomb(buddy);
+        buddy.getKeyState().setBomb(true);
         engine.update();
         assertEquals("The number of lives of the player did not decrease", 2, buddy.getLives());
     }
