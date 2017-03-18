@@ -102,7 +102,7 @@ public class EasyAI extends AITemplate {
 				performMoves(moves, true);
 
 			}
-	
+
 			// if enemy is in bomb range then place the bomb and go to the
 			//// // safe location only with 30% possibility
 			else if (safetyCh.isEnemyInBombRange() && random.nextInt(10) > 4) {
@@ -120,8 +120,8 @@ public class EasyAI extends AITemplate {
 
 			// otherwise just generate a random goal and start fullfilling it
 			else {
-				int x = random.nextInt(gameState.getMap().getGridMap()[0].length);
-				int y = random.nextInt(gameState.getMap().getGridMap().length);
+				int x = random.nextInt(gameState.getMap().getGridMap().length);
+				int y = random.nextInt(gameState.getMap().getGridMap()[0].length);
 				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
 				performPlannedMoves(moves);
 			}
