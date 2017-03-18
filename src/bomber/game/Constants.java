@@ -24,6 +24,7 @@ public abstract class Constants
     public static final int HIGH_PLAYER_SPEED = 400;
     public static final int POWERUP_PROBABILITY = 25;
     public static final int POSITIVE_POWERUP_PROBABILITY = 75;
+    public static final int INVULNERABILITY_LENGTH = 2000;
 
     // Audio files
     public static final String AUDIO_FILES_PATH = "/resources/sounds/";

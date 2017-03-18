@@ -17,6 +17,7 @@ public class Player {
 	private final int scalar = 64;
 	private KeyboardState keyState;
 	private boolean isAlive;
+	private int invulnerability;
 	
 	public Player(String name, Point pos, int lives, double speed) {
 
@@ -31,6 +32,7 @@ public class Player {
 		this.isAlive = true;
 		this.keyState = new KeyboardState();
 		this.gridPos = new Point();
+		this.invulnerability = 0;
 	}
 
 	public int getPlayerID() {
@@ -138,7 +140,17 @@ public class Player {
 	{
 		this.maxNrOfBombs = maxNrOfBombs;
 	}
-	
+
+	public int getInvulnerability()
+	{
+		return invulnerability;
+	}
+
+	public void setInvulnerability(int invulnerability)
+	{
+		this.invulnerability = invulnerability;
+	}
+
 	public void setDifficulty(AIDifficulty diff)
 	{
 		

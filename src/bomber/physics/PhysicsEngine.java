@@ -106,6 +106,11 @@ public class PhysicsEngine
         // Initialise data
         Point pos = player.getPos();
 
+        // Update invulnerability period
+        int invulnerability = player.getInvulnerability();
+        if (invulnerability>0)
+            player.setInvulnerability(Math.max(0, invulnerability - milliseconds));
+
         // -------- Movement --------
         Movement movement = player.getKeyState().getMovement();
         if (movement != Movement.NONE)
@@ -186,8 +191,9 @@ public class PhysicsEngine
 
 
         // -------- Damage --------
-        if (playerTouchesBlock(pos, Block.BLAST) != null)
+        if (player.getInvulnerability()==0 && playerTouchesBlock(pos, Block.BLAST) != null)
         {
+            player.setInvulnerability(Constants.INVULNERABILITY_LENGTH);
             player.setLives(player.getLives() - 1);
             if (player.getLives() == 0)
                 player.setAlive(false);
