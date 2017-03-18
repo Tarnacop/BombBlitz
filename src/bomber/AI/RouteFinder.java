@@ -820,6 +820,12 @@ public class RouteFinder {
 
 	}
 	
+	/**
+	 * Checks if this AI is nearest to the goal
+	 *
+	 * @param goal the goal
+	 * @return true, if this AI is nearest to the goal
+	 */
 	private boolean isNearestAI(Point goal)
 	{
 		List<Player> ais = state.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive() && !p.equals(gameAI))
