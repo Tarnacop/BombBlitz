@@ -21,6 +21,7 @@ import bomber.AI.RouteFinder;
 import bomber.AI.SafetyChecker;
 import bomber.game.Block;
 import bomber.game.Bomb;
+import bomber.game.Constants;
 import bomber.game.GameState;
 import bomber.game.Map;
 import bomber.game.Player;
@@ -33,7 +34,7 @@ public class AITests {
 	private GameAI ai;
 	private RouteFinder finder;
 	private SafetyChecker checker;
-	private final int scalar = 64;
+
 	
 	
 	@Before
@@ -65,22 +66,22 @@ public class AITests {
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
-				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK},
+				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT},
 				  {Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
-				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK}};	
+				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.BLANK}};	
 	
 		map = new Map("",blocks,null);
 
 		bombs = new ArrayList<>();
 		bombs.add(new Bomb("", new Point(0, 0), 5, 5));
-		bombs.add(new Bomb("", new Point(2*scalar, 2*scalar), 5, 5));
-		bombs.add(new Bomb("", new Point(4*scalar, 4*scalar), 5, 5));
+		bombs.add(new Bomb("", new Point(2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER), 5, 5));
+		bombs.add(new Bomb("", new Point(4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER), 5, 5));
 
 		players = new ArrayList<>();
 		state = new GameState(map, players);
 		state.setBombs(bombs);
 
-		ai = new GameAI("ai", new Point(4*scalar,4*scalar), 3, 10, state, AIDifficulty.EXTREME);
+		ai = new GameAI("ai", new Point(4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER), 3, 10, state, AIDifficulty.EXTREME);
 		players.add(ai);
 		checker = new SafetyChecker(state, ai);
 		finder = new RouteFinder(state, ai,checker);
@@ -93,8 +94,8 @@ public class AITests {
 
 		int xStart = 0;
 		int yStart = 0;
-		int xEnd = 12;
-		int yEnd = 12;
+		int xEnd = 10;
+		int yEnd = 10;
 		List<AIActions> moves = finder.findRoute(new Point(xStart, yStart), new Point(xEnd, yEnd));
 		assertEquals(moves.size(), (Math.abs(xStart - xEnd) + Math.abs(yStart - yEnd)));
 
@@ -125,29 +126,29 @@ public class AITests {
 	@Test
 	public void enemyCheckTest() {
 
-		Player player = new Player("name", new Point(2*scalar, 2*scalar), 5, 10);
+		Player player = new Player("name", new Point(2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER), 5, 10);
 		players.add(player);
 		assertFalse(checker.isEnemyInBombRange());
 
-		Player player2 = new Player("name2", new Point(4*scalar, 2*scalar), 5, 10);
+		Player player2 = new Player("name2", new Point(4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER), 5, 10);
 		players.add(player2);
 		assertTrue(checker.isEnemyInBombRange());
 
-		ai.setPos(new Point(8*scalar, 2*scalar));
+		ai.setPos(new Point(8*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertFalse(checker.isEnemyInBombRange());
 
-		ai.setPos(new Point(6*scalar, 2*scalar));
+		ai.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertTrue(checker.isEnemyInBombRange());
 		
-		Player ai2 = new GameAI("ai", new Point(6*scalar,6*scalar), 3, 10, state, AIDifficulty.EXTREME);	
-		ai.setPos(new Point(6*scalar,8*scalar));
+		Player ai2 = new GameAI("ai", new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER), 3, 10, state, AIDifficulty.EXTREME);	
+		ai.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,8*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		players.add(ai2);
 		players.add(ai);
 	
 		assertTrue(checker.isEnemyInBombRange());
 		assertFalse(checker.isEnemyInBombRangeExludeAIs());
 		
-		player.setPos(new Point(6*scalar, 6*scalar));
+		player.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertTrue(checker.isEnemyInBombRangeExludeAIs());
 		
 		ai2.setAlive(false);
@@ -156,20 +157,20 @@ public class AITests {
 		assertFalse(checker.isEnemyInBombRange());
 		
 		player.setAlive(true);
-		player.setPos(new Point(4*scalar, 7*scalar));
-		ai.setPos(new Point(6*scalar,7*scalar));
+		player.setPos(new Point(4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 7*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
+		ai.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,7*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertFalse(checker.isEnemyInBombRangeExludeAIs());
 		
-		player.setPos(new Point(5*scalar, 6*scalar));
-		ai.setPos(new Point(5*scalar,8*scalar));
+		player.setPos(new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
+		ai.setPos(new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,8*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertFalse(checker.isEnemyInBombRangeExludeAIs());
 	
-		ai.setPos(new Point(4*scalar, 7*scalar));
-		player.setPos(new Point(6*scalar,7*scalar));
+		ai.setPos(new Point(4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 7*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
+		player.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,7*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertFalse(checker.isEnemyInBombRangeExludeAIs());
 		
-		ai.setPos(new Point(5*scalar, 6*scalar));
-		player.setPos(new Point(5*scalar,8*scalar));
+		ai.setPos(new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
+		player.setPos(new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,8*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertFalse(checker.isEnemyInBombRangeExludeAIs());
 
 		
@@ -185,15 +186,15 @@ public class AITests {
 		escapeMoves = finder.escapeFromExplotion(checker.getTilesAffectedByBombs());
 		assertEquals(escapeMoves.size(), 5);
 
-		ai.setPos(new Point(2*scalar, 7*scalar));
+		ai.setPos(new Point(2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 7*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		escapeMoves = finder.escapeFromExplotion(checker.getTilesAffectedByBombs());
 		assertEquals(escapeMoves.size(), 0);
 
-		ai.setPos(new Point(6*scalar, 6*scalar));
+		ai.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		escapeMoves = finder.escapeFromExplotion(checker.getTilesAffectedByBombs());
 		assertEquals(escapeMoves.size(), 0);
 
-		ai.setPos(new Point(3*scalar, 2*scalar));
+		ai.setPos(new Point(3*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		escapeMoves = finder.escapeFromExplotion(checker.getTilesAffectedByBombs());
 		assertEquals(escapeMoves.size(), 4);
 
@@ -202,18 +203,18 @@ public class AITests {
 	
 	@Test
 	public void inDangerCheckTest() {
-		ai.setPos(new Point(2*scalar, 3*scalar));
+		ai.setPos(new Point(2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 3*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertTrue(checker.inDanger());
 
-		ai.setPos(new Point(6*scalar, 0));
+		ai.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 0));
 		assertFalse(checker.inDanger());
 
-		ai.setPos(new Point(8*scalar, 4*scalar));
+		ai.setPos(new Point(8*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertTrue(checker.inDanger());
 
-		ai.setPos(new Point(12*scalar, 12*scalar));
+		ai.setPos(new Point(12*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 12*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		List<Bomb> bombs = new ArrayList<>();
-		bombs.add(new Bomb("name", new Point(12*scalar, 9*scalar), 5, 4));
+		bombs.add(new Bomb("name", new Point(12*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 9*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER), 5, 4));
 		state.setBombs(bombs);
 
 		assertTrue(checker.inDanger());
@@ -223,31 +224,31 @@ public class AITests {
 	@Test
 	public void moveSafetyTest() {
 		
-		ai.setPos(new Point(0,6*scalar));
+		ai.setPos(new Point(0,6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertTrue(checker.checkMoveSafety(AIActions.UP));
 		assertTrue(checker.checkMoveSafety(AIActions.RIGHT));
 		assertTrue(checker.checkMoveSafety(AIActions.NONE));
 		
 		
-		ai.setPos(new Point(0,5*scalar));
+		ai.setPos(new Point(0,5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertFalse(checker.checkMoveSafety(AIActions.UP));
 		
-		ai.setPos(new Point(6*scalar,3*scalar));
+		ai.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,3*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertFalse(checker.checkMoveSafety(AIActions.UP));
 		assertFalse(checker.checkMoveSafety(AIActions.DOWN));
 		assertTrue(checker.checkMoveSafety(AIActions.NONE));
 		
-		ai.setPos(new Point(3*scalar,6*scalar));
+		ai.setPos(new Point(3*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertFalse(checker.checkMoveSafety(AIActions.RIGHT));
 		assertFalse(checker.checkMoveSafety(AIActions.LEFT));
 		assertTrue(checker.checkMoveSafety(AIActions.NONE));
 		
-		ai.setPos(new Point(5*scalar,8*scalar));
+		ai.setPos(new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,8*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertTrue(checker.checkMoveSafety(AIActions.RIGHT));
 		assertFalse(checker.checkMoveSafety(AIActions.LEFT));
 		assertTrue(checker.checkMoveSafety(AIActions.NONE));
 		
-		ai.setPos(new Point(10*scalar,10*scalar));
+		ai.setPos(new Point(10*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,10*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertTrue(checker.checkMoveSafety(AIActions.RIGHT));
 		assertTrue(checker.checkMoveSafety(AIActions.LEFT));
 		assertTrue(checker.checkMoveSafety(AIActions.UP));
@@ -260,21 +261,21 @@ public class AITests {
 	@Test
 	public void nereastEnemyTest() {
 		ai.setPos(new Point(0,0));
-		Player player1 = new Player("nr1",new Point(0,12*scalar),3,0);
+		Player player1 = new Player("nr1",new Point(0,12*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER),3,0);
 		players.add(player1);
-		Player player2 = new Player("nr1",new Point(12*scalar,0),3,0);
+		Player player2 = new Player("nr1",new Point(12*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,0),3,0);
 		players.add(player2);
-		Player player3 = new Player("nr1",new Point(5*scalar,6*scalar),3,0);
+		Player player3 = new Player("nr1",new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER),3,0);
 		players.add(player3);
 		state.setPlayers(players);
 		
 		assertEquals(new Point(5,6),finder.getNearestEnemy());
 		
-		player3.setPos(new Point(6*scalar,7*scalar));
+		player3.setPos(new Point(6*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,7*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		assertNotEquals(new Point(6,7),finder.getNearestEnemy());
 		
-		player3.setPos(new Point(4*scalar,3*scalar));
-		Player ai2 = new GameAI("name", new Point(0*scalar, 4*scalar),1, 1, state, AIDifficulty.EXTREME);
+		player3.setPos(new Point(4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,3*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
+		Player ai2 = new GameAI("name", new Point(0*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER),1, 1, state, AIDifficulty.EXTREME);
 		players.add(ai2);
 		assertEquals(new Point(0,4),finder.getNearestEnemy());
 		assertNotEquals(new Point(0,4),finder.getNearestEnemyExcludeAIs());
@@ -291,23 +292,31 @@ public class AITests {
 		assertNull(finder.canPutBombAndEscape());
 		assertNull(finder.canPutBombAndEscapeExcludeAIs());
 		
-		ai.setGridPos(new Point(0,4*scalar));
-		Player ai3 = new GameAI("name", new Point(0*scalar, 4*scalar),1, 1, state, AIDifficulty.EXTREME);
+		ai.setGridPos(new Point(0,4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
+		Player ai3 = new GameAI("name", new Point(0*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 4*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER),1, 1, state, AIDifficulty.EXTREME);
 		players.add(ai3);
 		assertNull(finder.canPutBombAndEscape());
 		assertNull(finder.canPutBombAndEscapeExcludeAIs());
 		
-		ai3.setPos(new Point(0,8*scalar));
-		ai.setPos(new Point(0,7*scalar));
+		ai3.setPos(new Point(0,8*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
+		ai.setPos(new Point(0,7*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 	
 		assertNotNull(finder.canPutBombAndEscape());
 		assertNull(finder.canPutBombAndEscapeExcludeAIs());
 		
-		Player player = new Player("nr1",new Point(0*scalar,9*scalar),3,0);
+		Player player = new Player("nr1",new Point(0*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,9*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER),3,0);
 		players.add(player);
 		
 		assertNotNull(finder.canPutBombAndEscapeExcludeAIs());
 		
 	}
 
+	
+	@Test
+	public void isEnclosureTest()
+	{
+		assertFalse(finder.isEnclosure(new ArrayList<>(), new Point(0,0)));
+		assertTrue(finder.isEnclosure(new ArrayList<>(), new Point(12*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,12*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER)));
+		
+	}
 }

@@ -41,7 +41,7 @@ public class PlanningTest {
 			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][s][ ][ ]
 			[ ][x][ ][x][ ][x][ ][x][ ][x][s][x][S]
 			[ ][ ][ ][ ][ ][ ][ ][ ][ ][ ][s][ ][ ]*/
-	
+
 		Block[][] blocks = {{Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK},
@@ -55,7 +55,7 @@ public class PlanningTest {
 				  {Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT,Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK}};	
-		
+//		
 		map = new Map("",blocks,null);
 		state = new GameState(map, null);
 		ai = new GameAI("ai", new Point(12,0), 3, 10, state, AIDifficulty.HARD);
