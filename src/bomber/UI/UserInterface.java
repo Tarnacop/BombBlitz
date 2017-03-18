@@ -140,6 +140,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Font smallFont;
 	private CheckBox rememberServerBtn;
 	private boolean gotServer;
+	protected boolean gameEnded;
+	private Button leaveRoomBtn;
 	
 	public UserInterface(){
 
@@ -225,8 +227,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
         BorderPane roomBox = new BorderPane();
 		
-        Button backBtn = createButton("Leave Room", 300, 50);
-        backBtn.setOnAction(e -> leaveRoom());
+        leaveRoomBtn = createButton("Leave Room", 300, 50);
+        leaveRoomBtn.setOnAction(e -> leaveRoom());
         
         HBox centerBox = new HBox();
         centerBox.setAlignment(Pos.CENTER);
@@ -239,7 +241,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         centerBox.getChildren().addAll(createAiDifficultySelector(aiOnlineDifficultyChoice, true), createMapSelector(onlineMapCanvas, true));
         
         HBox backBtnPane = new HBox();
-        backBtnPane.getChildren().add(backBtn);
+        backBtnPane.getChildren().add(leaveRoomBtn);
         backBtnPane.setPadding(new Insets(20, 10, 20, 10));
         
         Label playersTitle = createLabel("Online Players:", false, true);
@@ -1684,8 +1686,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
+				blankButton(leaveRoomBtn, "Game in progress...");
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
+				try {
+					client.readyToPlay(false);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
 			}
 			   
@@ -1698,7 +1706,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void gameEnded() {
-		
+		Platform.runLater(new Runnable(){
+
+			@Override
+			public void run() {
+				resetButton(leaveRoomBtn, "Leave Room", e -> leaveRoom());
+				readyButton.setText("Not Ready");
+				readyButton.setOnAction(e -> ready());
+				readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
+			}
+			   
+		});
 	}
 
 	public void hide() {

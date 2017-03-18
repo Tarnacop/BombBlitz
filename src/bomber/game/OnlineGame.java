@@ -3,6 +3,7 @@ package bomber.game;
 import java.io.IOException;
 import java.util.HashMap;
 
+import bomber.AI.GameAI;
 import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
 import bomber.networking.ClientThread;
@@ -69,20 +70,42 @@ public class OnlineGame implements GameInterface {
 			this.keyState = new KeyboardState();
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		this.ui.hide();
 	}
 
+	private float gameOverCounter = 0;
+	private	float frontScreenCounter = 0f;
+	
 	@Override
 	public void update(float interval) {
 
 		this.gameState = this.client.getGameState();
-		this.keyState.setBomb(false);
-		this.keyState.setMovement(Movement.NONE);
-		audio.playEventList(gameState.getAudioEvents());
+		if(this.gameState.gameOver()){
+			
+			if(gameOverCounter < 3) {
+				
+				gameOverCounter += interval;
+				renderer.displayGameOver();
+			} else {
+				this.graphics.getScreen().close();
+			}
+		}else {
+			// Wait 5 seconds
+			if(frontScreenCounter <= 5) {
+				
+				frontScreenCounter += interval;
+			} 
+			else {
+				renderer.stopFrontScreen();
+				this.keyState.setBomb(false);
+				this.keyState.setMovement(Movement.NONE);
+				audio.playEventList(gameState.getAudioEvents());
+			}
+		}
+		
 	}
 
 	@Override
