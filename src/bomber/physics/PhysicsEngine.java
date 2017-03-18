@@ -1,10 +1,12 @@
 package bomber.physics;
 
 import bomber.game.*;
-import bomber.game.Map;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.Random;
 
 /**
  * Manages the physics of the game
@@ -18,8 +20,6 @@ public class PhysicsEngine
 
     private HashMap<String, Boolean> okToPlaceBomb;
 
-    private Stack<Point> powerUpPossibleLocations;
-
     /**
      * Creates an engine using a GameState
      *
@@ -29,7 +29,6 @@ public class PhysicsEngine
     {
         this.gameState = gameState;
         okToPlaceBomb = new HashMap<>();
-        powerUpPossibleLocations = new Stack<>();
     }
 
     /**
@@ -67,7 +66,7 @@ public class PhysicsEngine
     public synchronized void update(int milliseconds)
     {
         // update map after blast
-        updateMap();
+        updateMap(milliseconds);
 
         // update bombs
         ArrayList<Bomb> toBeDeleted = new ArrayList<>();
@@ -345,8 +344,10 @@ public class PhysicsEngine
         if (radius == 0 || gameState.getMap().getGridBlockAt(x, y) == Block.SOLID)
             return;
         if (gameState.getMap().getGridBlockAt(x, y) == Block.SOFT)
-            powerUpPossibleLocations.push(pos);
+            gameState.getBlastList().add(new BlastTimer(pos, true));
         else
+        {
+            gameState.getBlastList().add(new BlastTimer(pos, false));
             switch (direction)
             {
                 case 0:
@@ -368,8 +369,10 @@ public class PhysicsEngine
                     addBlast(x - 1, y, radius - 1, 4);
                     break;
             }
+        }
 
         gameState.getMap().setGridBlockAt(pos, Block.BLAST);
+
     }
 
     /**
@@ -389,25 +392,24 @@ public class PhysicsEngine
 
     /**
      * Updates the map
+     *
+     * @param milliseconds The amount of time in milliseconds from the last update
      */
-    private void updateMap()
+    private void updateMap(int milliseconds)
     {
         Map map = gameState.getMap();
 
-        // generate power-ups
-        while (!powerUpPossibleLocations.isEmpty())
-        {
-            Point p = powerUpPossibleLocations.pop();
-            map.setGridBlockAt(p, getRandomBlock());
-        }
-
         // clear the blast
-        int width = gameState.getMap().getGridMap().length;
-        int height = gameState.getMap().getGridMap()[0].length;
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
-                if (map.getGridBlockAt(x, y) == Block.BLAST)
-                    map.setGridBlockAt(new Point(x, y), Block.BLANK);
+        gameState.getBlastList().forEach(blastTimer ->
+        {
+            blastTimer.decreaseTimer(milliseconds);
+            if (blastTimer.isDone())
+                if (blastTimer.makesPowerup())
+                    map.setGridBlockAt(blastTimer.getLocation(), getRandomBlock());
+                else
+                    map.setGridBlockAt(blastTimer.getLocation(), Block.BLANK);
+        });
+        gameState.getBlastList().removeIf(BlastTimer::isDone);
     }
 
     /**
