@@ -78,34 +78,35 @@ public class OnlineGame implements GameInterface {
 	}
 
 	private float gameOverCounter = 0;
-	private	float frontScreenCounter = 0f;
+	// private float frontScreenCounter = 0f;
+
 	@Override
 	public void update(float interval) {
 
 		this.gameState = this.client.getGameState();
-		if(gameEnded /*this.gameState.gameOver()*/){
-			
-			if(gameOverCounter < 3) {
-				
+		if (gameEnded /* this.gameState.gameOver() */) {
+
+			if (gameOverCounter < 3) {
+
 				gameOverCounter += interval;
 				renderer.displayGameOver();
 			} else {
 				this.graphics.getScreen().close();
 			}
-		}else {
+		} else {
 			// Wait 5 seconds
-			if(frontScreenCounter <= 5) {
-				
-				frontScreenCounter += interval;
-			} 
-			else {
-				renderer.stopFrontScreen();
-				this.keyState.setBomb(false);
-				this.keyState.setMovement(Movement.NONE);
-				audio.playEventList(gameState.getAudioEvents());
-			}
+			/*
+			 * if (frontScreenCounter <= 5) {
+			 * 
+			 * frontScreenCounter += interval; } else {
+			 */
+			renderer.stopFrontScreen();
+			this.keyState.setBomb(false);
+			this.keyState.setMovement(Movement.NONE);
+			audio.playEventList(gameState.getAudioEvents());
+			// }
 		}
-		
+
 	}
 
 	@Override
@@ -134,9 +135,9 @@ public class OnlineGame implements GameInterface {
 		audio.stopAudio();
 
 	}
-	
+
 	public void setGameEnded(boolean gameEnded) {
 		this.gameEnded = gameEnded;
 	}
-	
+
 }
