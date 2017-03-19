@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.Map;
 import bomber.game.Maps;
 import bomber.networking.ServerClientInfo;
@@ -22,6 +23,8 @@ public class ServerRoomTest {
 	public void setUp() throws Exception {
 		maps = new Maps().getMaps();
 		client = new ServerClientInfo(null, "Player 1");
+		room = new ServerRoom(null, client, maps, 0);
+		room = new ServerRoom(null, client, null, 0);
 		room = new ServerRoom("Test Room", client, maps, 0);
 	}
 
@@ -31,6 +34,12 @@ public class ServerRoomTest {
 
 	@Test
 	public void test() {
+		room.setID(0);
+		assertEquals(0, room.getID());
+
+		room.addPlayer(null);
+		room.addPlayer(client);
+
 		assertFalse(room.isInGame());
 
 		assertEquals("Test Room", room.getName());
@@ -38,6 +47,8 @@ public class ServerRoomTest {
 		assertEquals("N", room.getName());
 
 		assertEquals(0, room.getMapID());
+		room.setMapID(-1);
+		room.setMapID(300);
 		room.setMapID(3);
 		assertEquals(3, room.getMapID());
 
@@ -71,9 +82,13 @@ public class ServerRoomTest {
 		assertEquals(2, room.getPlayerNumber());
 
 		room.addAI();
+		room.setAIDifficulty(0, AIDifficulty.EASY);
 		room.addAI();
+		room.setAIDifficulty(1, AIDifficulty.MEDIUM);
 		room.addAI();
+		room.setAIDifficulty(2, AIDifficulty.HARD);
 		room.addAI();
+		room.setAIDifficulty(3, AIDifficulty.EXTREME);
 		room.addAI();
 
 		assertEquals(2, room.getHumanPlayerNumber());
@@ -88,6 +103,9 @@ public class ServerRoomTest {
 
 		room.addCustomMap(new Maps().getMaps().get(2));
 		assertEquals(maps.size() + 1, room.getMaxMapID());
+
+		assertEquals(room.getHumanPlayerNumber(), room.getHumanPlayers().length);
+		assertEquals(room.getAIPlayerNumber(), room.getAIPlayers().length);
 
 		room.removeAI();
 		room.removeAI();

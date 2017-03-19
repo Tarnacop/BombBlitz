@@ -6,6 +6,9 @@ package bomber.game;
 public abstract class Constants
 {
 
+	//Game Name:
+	public static final String GAME_NAME = "Bomb Blitz";
+	
     // Game World Constants
     public static final int PLAYER_WIDTH = 36;
     public static final int PLAYER_HEIGHT = 36;
@@ -56,8 +59,10 @@ public abstract class Constants
 	public static final float V_WIDTH = 1262f;
 	public static final float V_HEIGHT = 869f;
 	
-	public static final float SPRITESHEET_ROWS = 3f;
-	public static final float SPRITESHEET_COLS = 10f;
+	public static final float SPRITESHEET_ROWS = 8f;
+	public static final float SPRITESHEET_COLS = 18f;
+	public static final float SPRITESHEET_ELEM_WIDTH = 1f / SPRITESHEET_COLS;
+	public static final float SPRITESHEET_ELEM_HEIGHT = 1f / SPRITESHEET_ROWS;
 	
 	public static final float BACKGROUND_WIDTH = 1262f;
 	public static final float BACKGROUND_HEIGHT = 869f;
@@ -92,6 +97,34 @@ public abstract class Constants
 	
 	public static final float HEART_WIDTH = 32f;
 	public static final float HEART_HEIGHT = 32f;
-
 	public static final float BOX_PADDING = 60f;
+	
+	public static final int CONTROLS_WIDTH = 400;
+	public static final int CONTROLS_HEIGHT = 300;
+
+	//User Interface Constants
+	public static final float SCREEN_HEIGHT_SCALAR = 0.9f;
+	public static final float SCREEN_WIDTH_SCALAR = 0.8f;
+	
+	public static final float MENU_BOX_HEIGHT_SCALAR = 3.5f;
+	public static final float MENU_BOX_WIDTH_SCALAR = 5.0f;
+	
+	public static final float MENU_BUTTON_WIDTH = 200;
+	public static final float MENU_BUTTON_HEIGHT = 50;
+	public static final float LARGE_MENU_BUTTON_WIDTH = 250;
+	public static final float LARGE_MENU_BUTTON_HEIGHT = 75;
+	
+	public static final float TINY_PAD = 5;
+	public static final float SMALL_PAD = 10;
+	public static final float LITTLE_PAD = 15;
+	public static final float MEDIUM_PAD = 20;
+	public static final float LARGE_PAD = 30;
+	public static final float HUGE_PAD = 80;
+	public static final float MASSIVE_PAD = 100;
+	
+	public static final float TORCH_WIDTH = 70;
+	public static final float TORCH_HEIGHT = 90;
+	
+	public static final float MAP_CANVAS_WIDTH = 300;
+	public static final float MAP_CANVAS_HEIGHT = 300;
 }
