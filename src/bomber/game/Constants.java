@@ -21,6 +21,7 @@ public abstract class Constants
     public static final int MAXIMUM_BOMB_RANGE = 6;
     public static final int BOMB_RANGE_CHANGE = 1;
     public static final int LOW_PLAYER_SPEED = 200;
+    public static final int DEFAULT_PLAYER_SPEED = 300;
     public static final int HIGH_PLAYER_SPEED = 400;
     public static final int POWERUP_PROBABILITY = 25;
     public static final int POSITIVE_POWERUP_PROBABILITY = 75;
