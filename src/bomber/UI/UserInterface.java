@@ -76,7 +76,6 @@ import bomber.networking.ClientThread;
 
 public class UserInterface extends Application implements ClientNetInterface{
 
-	private final String appName = "Bomb Blitz v1";
 	private SimpleStringProperty playerName;
 	private Stage currentStage;
 	private BorderPane serverMenu;
@@ -102,7 +101,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Font font;
 	private Label roomCreationLabel;
 	private UserInterface ui;
-	
 	private Parent roomScene;
 	private String css;
 	private Parent creditsScene;
@@ -193,7 +191,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		currentStage = primaryStage;
 		currentStage.setMinHeight(windowHeight);
 		currentStage.setMinWidth(windowWidth);
-		primaryStage.setTitle(this.appName);
+		primaryStage.setTitle(GAME_NAME);
 		previousScenes = new Stack<Parent>();
 		initScenes();
 		
@@ -230,46 +228,46 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
         BorderPane roomBox = new BorderPane();
 		
-        leaveRoomBtn = createButton("Leave Room", 300, 50);
+        leaveRoomBtn = createButton("Leave Room", BIG_MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
         leaveRoomBtn.setOnAction(e -> leaveRoom());
         
         HBox centerBox = new HBox();
         centerBox.setAlignment(CENTER);
-        centerBox.setSpacing(20);
+        centerBox.setSpacing(MEDIUM_PAD);
 
 		onlineMapCanvas = new Pane();
-		onlineMapCanvas.setMinHeight(300);
-		onlineMapCanvas.setMinWidth(300);
+		onlineMapCanvas.setMinHeight(MAP_CANVAS_HEIGHT);
+		onlineMapCanvas.setMinWidth(MAP_CANVAS_WIDTH);
 		aiOnlineDifficultyChoice = new ChoiceBox<>();
         centerBox.getChildren().addAll(createAiDifficultySelector(aiOnlineDifficultyChoice, true), createMapSelector(onlineMapCanvas, true));
         
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(leaveRoomBtn);
-        backBtnPane.setPadding(new Insets(20, 10, 20, 10));
+        backBtnPane.setPadding(new Insets(MEDIUM_PAD, SMALL_PAD, MEDIUM_PAD, SMALL_PAD));
         
         Label playersTitle = createLabel("Online Players:", false, true);
 
 		playersBox2 = new FlowPane(VERTICAL);
-		playersBox2.setVgap(20);
-		playersBox2.setHgap(20);
+		playersBox2.setVgap(MEDIUM_PAD);
+		playersBox2.setHgap(MEDIUM_PAD);
 		
 		ScrollPane scrollPane = new ScrollPane();
-		scrollPane.setMinHeight(boxHeight*0.8);
+		//scrollPane.setMinHeight(boxHeight*0.8);
 		scrollPane.setMaxHeight(boxHeight);
 		scrollPane.setMinWidth(boxWidth);
 		scrollPane.setContent(playersBox2);
 		
 		VBox playersListPane = new VBox();
 		playersListPane.getStyleClass().add("wideclearbox");
-		playersListPane.setSpacing(10);
+		playersListPane.setSpacing(SMALL_PAD);
 		playersListPane.setMinWidth(boxWidth);
 		playersListPane.getChildren().addAll(playersTitle, scrollPane);
 		playersListPane.setAlignment(TOP_LEFT);
-		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(scrollPane.minHeightProperty().add(100)));
+		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(scrollPane.minHeightProperty().add(MASSIVE_PAD)));
 
 		readyTorch = new Rectangle();
-		readyTorch.setWidth(90);
-		readyTorch.setHeight(120);
+		readyTorch.setWidth(TORCH_WIDTH);
+		readyTorch.setHeight(TORCH_HEIGHT);
 		readyTorch.getStyleClass().add("wideclearbox");
 		readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 		
