@@ -33,8 +33,9 @@ public class OnlineGame implements GameInterface {
 	private String playerName;
 	private List<ClientServerPlayer> onlinePlayers;
 
-	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName, List<ClientServerPlayer> onlinePlayers,
-			HashMap<Response, Integer> controls, boolean fullScreen, int width, int height) {
+	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
+			List<ClientServerPlayer> onlinePlayers, HashMap<Response, Integer> controls, boolean fullScreen, int width,
+			int height) {
 
 		this.ui = ui;
 		this.gameState = gameState;
@@ -70,26 +71,28 @@ public class OnlineGame implements GameInterface {
 				Thread.sleep(100);
 				this.gameState = this.client.getGameState();
 			}
-			
+
 			int inc = 1;
 			for (Player player : this.gameState.getPlayers()) {
-				if (player.getPlayerID() < 31) {
+				if (player.getPlayerID() <= 31) {
 					for (ClientServerPlayer onlinePlayer : this.onlinePlayers) {
 						if (player.getPlayerID() == onlinePlayer.getID()) {
 							player.setName(onlinePlayer.getName());
 							break;
 						}
 					}
+					if (player.getName() == null) {
+						player.setName("Player " + player.getPlayerID());
+					}
 					if (player.getName().equals(this.playerName)) {
 						this.player = player;
 					}
-				}
-				else{
+				} else {
 					player.setName("AI " + inc);
 					inc++;
 				}
 			}
-			
+
 			this.keyState = new KeyboardState();
 
 		} catch (Exception e) {
@@ -111,25 +114,24 @@ public class OnlineGame implements GameInterface {
 			if (gameOverCounter < 3) {
 
 				gameOverCounter += interval;
-				if(this.player != null && this.player.isAlive()){
+				if (this.player != null && this.player.isAlive()) {
 					renderer.displayGameOver(true);
-					if(playMusic){
+					if (playMusic) {
 						this.audio.stopAudio();
 						AudioManager.playGameOverWon();
 						playMusic = false;
 					}
-				}
-				else{
+				} else {
 					renderer.displayGameOver(false);
-					if(playMusic){
+					if (playMusic) {
 						this.audio.stopAudio();
 						AudioManager.playGameOverLost();
 						playMusic = false;
 					}
 				}
-				
+
 			} else {
-				
+
 				this.graphics.getScreen().close();
 			}
 		} else {
