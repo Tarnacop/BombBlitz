@@ -144,6 +144,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private boolean gotServer;
 	protected boolean gameEnded;
 	private Button leaveRoomBtn;
+	private OnlineGame onlineGame;
 	
 	public UserInterface(){
 
@@ -1689,12 +1690,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 				blankButton(leaveRoomBtn, "Game in progress...");
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
-				try {
+				/*try {
 					client.readyToPlay(false);
 				} catch (IOException e) {
 					e.printStackTrace();
-				}
-				new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
+				}*/
+				onlineGame = new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
 			}
 			   
 		});
@@ -1710,6 +1711,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
+				onlineGame.setGameEnded(true);
 				resetButton(leaveRoomBtn, "Leave Room", e -> leaveRoom());
 				readyButton.setText("Not Ready");
 				readyButton.setOnAction(e -> ready());
