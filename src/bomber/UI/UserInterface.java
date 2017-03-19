@@ -7,6 +7,12 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
+import static bomber.game.Constants.*;
+import static bomber.AI.AIDifficulty.*;
+import static bomber.game.Response.*;
+import static javafx.geometry.Pos.*;
+import static javafx.geometry.Orientation.*;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -25,8 +31,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -145,7 +149,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	
 	public UserInterface(){
 
-		this.versionNumber = 1.2;
+		this.versionNumber = 1.3;
 		
 		SettingsParser.init();
 
@@ -158,26 +162,25 @@ public class UserInterface extends Application implements ClientNetInterface{
 		new SimpleIntegerProperty(1);
 		this.roomNumber = new SimpleIntegerProperty(4);
 		this.roomCreationLabel = createLabel("Create and join a room\nwith these settings", false, true);
-		this.aiDiff = AIDifficulty.EASY;
+		this.aiDiff = MEDIUM;
 		Maps maps = new Maps();
 		this.maps = maps.getMaps();
 		this.map = this.maps.get(0);
 		this.mapName = new SimpleStringProperty(this.map.getName());
 		this.controls = new HashMap<Response, Integer>();
-		this.controls.put(Response.PLACE_BOMB, GLFW_KEY_SPACE);
-		this.controls.put(Response.UP_MOVE, GLFW_KEY_UP);
-		this.controls.put(Response.DOWN_MOVE, GLFW_KEY_DOWN);
-		this.controls.put(Response.LEFT_MOVE, GLFW_KEY_LEFT);
-		this.controls.put(Response.RIGHT_MOVE, GLFW_KEY_RIGHT);	
-		this.controls.put(Response.PAUSE_GAME, GLFW_KEY_P);
+		this.controls.put(PLACE_BOMB, GLFW_KEY_SPACE);
+		this.controls.put(UP_MOVE, GLFW_KEY_UP);
+		this.controls.put(DOWN_MOVE, GLFW_KEY_DOWN);
+		this.controls.put(LEFT_MOVE, GLFW_KEY_LEFT);
+		this.controls.put(RIGHT_MOVE, GLFW_KEY_RIGHT);	
+		this.controls.put(PAUSE_GAME, GLFW_KEY_P);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.screenHeight = screenSize.height;
 		this.screenWidth = screenSize.width;
-		this.windowHeight = screenHeight * 0.9;
-		this.windowWidth = screenWidth * 0.8;
-		
-		this.boxHeight = windowHeight/3;
-		this.boxWidth = windowWidth/6;
+		this.windowHeight = screenHeight * SCREEN_HEIGHT_SCALAR;
+		this.windowWidth = screenWidth * SCREEN_WIDTH_SCALAR;
+		this.boxHeight = windowHeight/MENU_BOX_HEIGHT_SCALAR;
+		this.boxWidth = windowWidth/MENU_BOX_WIDTH_SCALAR;
 	}
 	
 	public static void begin(){
@@ -231,7 +234,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         leaveRoomBtn.setOnAction(e -> leaveRoom());
         
         HBox centerBox = new HBox();
-        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setAlignment(CENTER);
         centerBox.setSpacing(20);
 
 		onlineMapCanvas = new Pane();
@@ -246,7 +249,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         Label playersTitle = createLabel("Online Players:", false, true);
 
-		playersBox2 = new FlowPane(Orientation.VERTICAL);
+		playersBox2 = new FlowPane(VERTICAL);
 		playersBox2.setVgap(20);
 		playersBox2.setHgap(20);
 		
@@ -261,7 +264,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersListPane.setSpacing(10);
 		playersListPane.setMinWidth(boxWidth);
 		playersListPane.getChildren().addAll(playersTitle, scrollPane);
-		playersListPane.setAlignment(Pos.TOP_LEFT);
+		playersListPane.setAlignment(TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(scrollPane.minHeightProperty().add(100)));
 
 		readyTorch = new Rectangle();
@@ -273,7 +276,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		VBox readyBox = new VBox();
 		readyBox.getStyleClass().add("namebox");
 		readyBox.setSpacing(10);
-		readyBox.setAlignment(Pos.CENTER);
+		readyBox.setAlignment(CENTER);
 		readyBox.setMinWidth(boxHeight);
 		readyBox.setMinHeight(boxHeight);
 		readyBox.setMaxHeight(boxHeight);
@@ -291,7 +294,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 		
 		HBox playersReadyBox = new HBox();
-		playersReadyBox.setAlignment(Pos.CENTER);
+		playersReadyBox.setAlignment(CENTER);
 		playersReadyBox.setSpacing(20);
 		playersReadyBox.setPadding(new Insets(10, 10, 10, 10));
 		playersReadyBox.getChildren().addAll(playersListPane, readyPane, readyBox);
@@ -311,7 +314,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Button disconnectBtn = createBackButton("Disconnect", true);
 
 		HBox backBox = new HBox();
-		backBox.setAlignment(Pos.CENTER_LEFT);
+		backBox.setAlignment(CENTER_LEFT);
 		backBox.setPadding(new Insets(20, 10, 20, 10));
 		backBox.getChildren().add(disconnectBtn);
 		
@@ -333,7 +336,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         downRoomNumToggle.setOnAction(e -> decrementRoomNum());
         
         VBox roomNumBox = new VBox();
-        roomNumBox.setAlignment(Pos.CENTER);
+        roomNumBox.setAlignment(CENTER);
         roomNumBox.getStyleClass().add("nopadbox");
         roomNumBox.maxHeightProperty().bind(upRoomNumToggle.heightProperty().add(displayRoomNum.heightProperty().add(downRoomNumToggle.heightProperty())));
         roomNumBox.getChildren().addAll(upRoomNumToggle, displayRoomNum, downRoomNumToggle);
@@ -341,7 +344,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         Label roomNumLabel = createLabel("Room\nCapacity", false, false);
         
         HBox roomNumPane = new HBox();
-        roomNumPane.setAlignment(Pos.CENTER);
+        roomNumPane.setAlignment(CENTER);
         roomNumPane.getStyleClass().add("namebox");
         roomNumPane.setSpacing(20);
         roomNumPane.setMinWidth(250);
@@ -352,13 +355,13 @@ public class UserInterface extends Application implements ClientNetInterface{
         VBox roomNameBox = new VBox();
         roomNameBox.setSpacing(10);
         roomNameBox.getStyleClass().add("namebox");
-        roomNameBox.setAlignment(Pos.CENTER);
+        roomNameBox.setAlignment(CENTER);
         roomNameBox.setMinWidth(200);
         roomNameBox.getChildren().addAll(createLabel("Room Name:", false, false), roomNameField);
         
         VBox roomDisplay = new VBox();
         roomDisplay.setSpacing(20);
-        roomDisplay.setAlignment(Pos.CENTER);
+        roomDisplay.setAlignment(CENTER);
         roomDisplay.setMinWidth(300);
         roomDisplay.getChildren().addAll(this.roomCreationLabel, createRoomBtn);
         
@@ -373,7 +376,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		torch2.setFill(new ImagePattern(new Image("resources/images/torch.png")));
         
 		HBox createRoomPane = new HBox();
-		createRoomPane.setAlignment(Pos.CENTER);
+		createRoomPane.setAlignment(CENTER);
 		createRoomPane.setSpacing(20);
 		createRoomPane.getStyleClass().add("wideclearbox");
 		createRoomPane.maxWidthProperty().bind(roomNumPane.widthProperty().add(roomNameBox.widthProperty().add(roomDisplay.widthProperty())));
@@ -394,7 +397,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		VBox roomsListPane = new VBox();
 		roomsListPane.setSpacing(10);
-		roomsListPane.setAlignment(Pos.TOP_LEFT);
+		roomsListPane.setAlignment(TOP_LEFT);
 		roomsListPane.minHeightProperty().bind(roomsTitle.minHeightProperty().add(scrollRooms.minHeightProperty()));
 		roomsListPane.getChildren().addAll(roomsTitle, scrollRooms);
 
@@ -411,17 +414,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 		VBox playersListPane = new VBox();
 		playersListPane.setSpacing(10);
 		playersListPane.getChildren().addAll(playersTitle, scrollPlayers);
-		playersListPane.setAlignment(Pos.TOP_LEFT);
+		playersListPane.setAlignment(TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox.minHeightProperty().add(70)));
 		
 		VBox roomsPlayersPane = new VBox();
 		roomsPlayersPane.setSpacing(40);
-		roomsPlayersPane.setAlignment(Pos.CENTER);
+		roomsPlayersPane.setAlignment(CENTER);
 		roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
 		BorderPane serverPane = new BorderPane();
 		VBox serverBox = new VBox();
 		serverBox.setSpacing(20);
-		serverBox.setAlignment(Pos.CENTER);
+		serverBox.setAlignment(CENTER);
 		roomsPlayersPane.getStyleClass().add("wideclearbox");
 		roomsPlayersPane.minHeightProperty().bind(roomsListPane.minHeightProperty().add(playersListPane.minHeightProperty().add(50)));
 		serverBox.minHeightProperty().bind(roomsPlayersPane.minHeightProperty());
@@ -457,7 +460,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         }
         ipBox.setSpacing(10);
         ipBox.setPrefSize(200, 50);
-        ipBox.setAlignment(Pos.CENTER);
+        ipBox.setAlignment(CENTER);
         ipBox.getChildren().addAll(ipText, createLabel(":", false, false), portNum);
         
         connectBtn = createButton("Connect", 300, 75);
@@ -470,18 +473,18 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         HBox rememberServerBox = new HBox();
         rememberServerBox.setSpacing(10);
-        rememberServerBox.setAlignment(Pos.CENTER);
+        rememberServerBox.setAlignment(CENTER);
         rememberServerBox.getChildren().addAll(createLabel("Remember Details", false, false), rememberServerBtn);
         
         VBox connectBox = new VBox();
         connectBox.setSpacing(20);
-        connectBox.setAlignment(Pos.CENTER);
+        connectBox.setAlignment(CENTER);
         connectBox.maxWidthProperty().bind(ipBox.widthProperty().add(40));
         connectBox.getStyleClass().add("connectbox");
         connectBox.getChildren().addAll(enterLabel, ipBox, rememberServerBox, connectBtn);
         
         connectPane = new VBox();
-        connectPane.setAlignment(Pos.CENTER);
+        connectPane.setAlignment(CENTER);
         connectPane.setSpacing(40);
         connectPane.getChildren().addAll(connectBox, backBtn);
         
@@ -496,14 +499,14 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         HBox startBtnPane = new HBox();
         startBtnPane.setPadding(new Insets(0, 0, 10, 0));
-        startBtnPane.setAlignment(Pos.CENTER);
+        startBtnPane.setAlignment(CENTER);
         startBtnPane.getChildren().add(startBtn);
         startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls, this.aiNumber.get()));
         
         Button backBtn = createBackButton("Back", false);
         
         HBox centerBox = new HBox();
-        centerBox.setAlignment(Pos.CENTER);
+        centerBox.setAlignment(CENTER);
         centerBox.setSpacing(20);
 
 		mapCanvas = new Pane();
@@ -540,7 +543,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         downAiToggle.setOnAction(online?e -> decrementOnlineAi():e -> decrementAi());
         
         VBox aiBox = new VBox();
-        aiBox.setAlignment(Pos.CENTER);
+        aiBox.setAlignment(CENTER);
         aiBox.getStyleClass().add("nopadbox");
         aiBox.maxHeightProperty().bind(upAiToggle.heightProperty().add(displayAi.heightProperty().add(downAiToggle.heightProperty())));
         aiBox.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
@@ -548,13 +551,13 @@ public class UserInterface extends Application implements ClientNetInterface{
         Label aiLabel = createLabel("Number of\nAI Players", false, false);
         
         HBox aiPane = new HBox();
-        aiPane.setAlignment(Pos.CENTER);
+        aiPane.setAlignment(CENTER);
         aiPane.getStyleClass().add("namebox");
         aiPane.setSpacing(20);
         aiPane.getChildren().addAll(aiBox, aiLabel);
         Label aiExplanation = createLabel("AI players will seek\nto destroy you.", true, true);
         aiExplanation.setFont(smallFont);
-        aiExplanation.setAlignment(Pos.CENTER);
+        aiExplanation.setAlignment(CENTER);
         aiExplanation.setPrefWidth(boxWidth);
         	selector = new ChoiceBox<>();
             selector.setTooltip(new Tooltip("Change AI Difficulty"));
@@ -570,20 +573,20 @@ public class UserInterface extends Application implements ClientNetInterface{
     					String oldValue, String newValue) {
     				switch(newValue){
     				case "Easy": 
-    					aiDiff = AIDifficulty.EASY; 
+    					aiDiff = EASY; 
     					aiExplanation.setText("AI players will move\nrandomly.");
     					
     					break;
     				case "Medium": 
-    					aiDiff = AIDifficulty.MEDIUM;
+    					aiDiff = MEDIUM;
     					aiExplanation.setText("AI players will seek\nto destroy you.");
     					break;
     				case "Hard": 
-    					aiDiff = AIDifficulty.HARD; 
+    					aiDiff = HARD; 
     					aiExplanation.setText("AI players will be tough\nto beat!");
     					break;
     				case "Extreme": 
-    					aiDiff = AIDifficulty.EXTREME;
+    					aiDiff = EXTREME;
     					aiExplanation.setText("AI players will collaborate\nto bring you down!");
     				}
     				//System.out.println("Set difficulty to " + newValue);
@@ -591,20 +594,20 @@ public class UserInterface extends Application implements ClientNetInterface{
             });	
 
             VBox aiDiffBox = new VBox();
-            aiDiffBox.setAlignment(Pos.CENTER);
+            aiDiffBox.setAlignment(CENTER);
             aiDiffBox.getStyleClass().add("namebox");
             aiDiffBox.setSpacing(20);
             aiDiffBox.getChildren().addAll(createLabel("AI Difficulty:", false, false), selector, aiExplanation);
             aiDiffBox.setMinHeight(boxHeight/2);
             
             VBox aiContainer = new VBox();
-            aiContainer.setAlignment(Pos.CENTER);
+            aiContainer.setAlignment(CENTER);
             aiContainer.getStyleClass().add("menubox");
             aiContainer.setSpacing(20);
             aiContainer.getChildren().addAll(aiPane, aiDiffBox);
             
     		VBox aiPad = new VBox();
-    		aiPad.setAlignment(Pos.CENTER);
+    		aiPad.setAlignment(CENTER);
     		aiPad.getChildren().add(aiContainer);
     		
     		return aiPad;
@@ -615,7 +618,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
-		mapContainer.setAlignment(Pos.CENTER);
+		mapContainer.setAlignment(CENTER);
 		Label mapNameLabel = createBoundLabel(this.mapName, false, true);
 		mapNameLabel.getStyleClass().add("maplabel");
 		Image keyImage;
@@ -628,12 +631,12 @@ public class UserInterface extends Application implements ClientNetInterface{
         ImageView mapKey = new ImageView(keyImage);
         
         VBox currentPane = new VBox();
-        currentPane.setAlignment(Pos.CENTER);
+        currentPane.setAlignment(CENTER);
         currentPane.setSpacing(10);
         currentPane.getChildren().addAll(createLabel("Current Map:", false, true), mapNameLabel);
         
         HBox keyPane = new HBox();
-        keyPane.setAlignment(Pos.CENTER);
+        keyPane.setAlignment(CENTER);
         keyPane.setSpacing(40);
         keyPane.setPadding(new Insets(20));
         keyPane.getChildren().addAll(currentPane, mapKey);
@@ -653,14 +656,14 @@ public class UserInterface extends Application implements ClientNetInterface{
         leftMapToggle.setOnAction(online?e -> decrementOnlineMap():e -> decrementMap());
 		
         HBox mapPane = new HBox();
-        mapPane.setAlignment(Pos.CENTER);
+        mapPane.setAlignment(CENTER);
         mapPane.getChildren().addAll(leftMapToggle, mapContainer, rightMapToggle);
         
         rightMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
         leftMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
         
         VBox mapPad = new VBox();
-		mapPad.setAlignment(Pos.CENTER);
+		mapPad.setAlignment(CENTER);
 		mapPad.getChildren().add(mapPane);
 		drawMap(mapCanvas, online);
 		return mapPad;
@@ -767,7 +770,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Label creditsLabel = createLabel(credits, false, true);
 		creditsLabel.getStyleClass().add("creditsbox");
 		VBox creditsBox = new VBox();
-		creditsBox.setAlignment(Pos.CENTER);
+		creditsBox.setAlignment(CENTER);
 		creditsBox.setSpacing(20);
 		creditsBox.getChildren().addAll(createLabel("Version: " + this.versionNumber, false, true), creditsLabel, createBackButton("Back", false));
 
@@ -791,11 +794,11 @@ public class UserInterface extends Application implements ClientNetInterface{
         
         HBox logoPane = new HBox();
         logoPane.setSpacing(20);
-        logoPane.setAlignment(Pos.CENTER);
+        logoPane.setAlignment(CENTER);
 
         VBox menuBox = new VBox();
         menuBox.setSpacing(30);
-        menuBox.setAlignment(Pos.CENTER);
+        menuBox.setAlignment(CENTER);
         logoPane.getChildren().addAll(logoImageView, menuBox);
         
         musicSlider = new Slider();
@@ -839,19 +842,19 @@ public class UserInterface extends Application implements ClientNetInterface{
         }
         
         VBox namePane = new VBox();
-        namePane.setAlignment(Pos.CENTER);
+        namePane.setAlignment(CENTER);
         namePane.setSpacing(5);
         namePane.getStyleClass().add("namebox");
         
         HBox musicLabelBox = new HBox();
-        musicLabelBox.setAlignment(Pos.CENTER);
+        musicLabelBox.setAlignment(CENTER);
         musicLabelBox.getChildren().addAll(createLabel("Music (Mute ", false, false), muteMusicBtn, createLabel(")", false, false));
         HBox soundLabelBox = new HBox();
-        soundLabelBox.setAlignment(Pos.CENTER);
+        soundLabelBox.setAlignment(CENTER);
         soundLabelBox.getChildren().addAll(createLabel("Sounds (Mute ", false, false), muteSoundBtn, createLabel(")", false, false));
         
         VBox audioPane = new VBox();
-        audioPane.setAlignment(Pos.CENTER);
+        audioPane.setAlignment(CENTER);
         audioPane.setSpacing(5);
         audioPane.setPadding(new Insets(10, 0, 0, 0));
         audioPane.getChildren().addAll(musicLabelBox, musicSlider, soundLabelBox, soundSlider);
@@ -860,7 +863,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         fullScreenBtn.setOnAction(e -> fullScreen());
         
         HBox fullScreenBox = new HBox();
-        fullScreenBox.setAlignment(Pos.CENTER);
+        fullScreenBox.setAlignment(CENTER);
         fullScreenBox.setSpacing(5);
         fullScreenBox.getChildren().addAll(createLabel("Fullscreen ", false, false), fullScreenBtn);
         
@@ -924,7 +927,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         mainImageView.fitWidthProperty().bind(imagePane.widthProperty()); 
         mainImageView.fitHeightProperty().bind(imagePane.heightProperty());
         StackPane background = new StackPane();
-        background.setAlignment(Pos.CENTER);
+        background.setAlignment(CENTER);
         background.getChildren().add(imagePane);
         background.getChildren().add(content);
         pane.setCenter(background);
@@ -941,7 +944,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Label label = new Label(text);
 		label.setFont(font);
 		if(white)label.setTextFill(Color.WHITE);
-		label.setAlignment(Pos.CENTER);
+		label.setAlignment(CENTER);
 		label.setTextAlignment(TextAlignment.CENTER);
 		if(shaded){
 			label.getStyleClass().add("shaded");
@@ -954,7 +957,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		text.setPromptText(defaultText);
 		text.getStyleClass().add("textfield");
 		text.setFont(font);
-		text.setAlignment(Pos.CENTER);
+		text.setAlignment(CENTER);
 		return text;
 	}
 	
@@ -962,7 +965,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Label label = new Label();
 		label.setFont(font);
 		if(white)label.setTextFill(Color.WHITE);
-		label.setAlignment(Pos.CENTER);
+		label.setAlignment(CENTER);
 		label.textProperty().bind(property.asString());
 		if(shaded){
 			label.getStyleClass().add("shaded");
@@ -974,7 +977,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Label label = new Label();
 		label.setFont(font);
 		if(white)label.setTextFill(Color.WHITE);
-		label.setAlignment(Pos.CENTER);
+		label.setAlignment(CENTER);
 		label.textProperty().bind(property);
 		if(shaded){
 			label.getStyleClass().add("shaded");
@@ -987,7 +990,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		button.setFont(font);
 		button.setPrefWidth(width);
 		button.setPrefHeight(height);
-		button.setAlignment(Pos.CENTER);
+		button.setAlignment(CENTER);
 		button.getStyleClass().add("menubutton");
 		return button;
 	}
@@ -997,7 +1000,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		button.setFont(font);
 		button.setPrefWidth(200);
 		button.setPrefHeight(50);
-		button.setAlignment(Pos.CENTER);
+		button.setAlignment(CENTER);
 		button.getStyleClass().add("menubutton");
 		button.setOnAction(online?e -> disconnect():e -> previous());
 		return button;
@@ -1008,7 +1011,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		button.setFont(font);
 		button.setPrefWidth(width);
 		button.setPrefHeight(height);
-		button.setAlignment(Pos.CENTER);
+		button.setAlignment(CENTER);
 		button.getStyleClass().add("menubutton");
 		button.setOnAction(e -> advance(currentScene, nextScene));
 		return button;
@@ -1258,16 +1261,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 			roomContainer.setMinHeight(100);
 			roomContainer.setMinWidth(210);
 			roomContainer.setSpacing(5);
-			roomContainer.setAlignment(Pos.CENTER);
+			roomContainer.setAlignment(CENTER);
 			roomContainer.getStyleClass().add("namebox");
 			Label roomID = createLabel("Room " + room.getID() +":", false, false);
 			Label roomName = createLabel(room.getName(), false, true);
-			roomName.setAlignment(Pos.CENTER);
+			roomName.setAlignment(CENTER);
 			roomName.getStyleClass().add("maplabel");
 			HBox roomPane = new HBox();
 			roomPane.setSpacing(15);
 			roomPane.setPrefHeight(50);
-			roomPane.setAlignment(Pos.CENTER);
+			roomPane.setAlignment(CENTER);
 			Label numPlayers = createLabel(room.getPlayerNumber() + "/" + room.getMaxPlayer(), true, true);
 			Label playersLabel = createLabel("", true, true);
 			playersLabel.setMinWidth(160);
@@ -1348,7 +1351,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 				}
 				HBox playerBox = new HBox();
 				playerBox.setSpacing(20);
-				playerBox.setAlignment(Pos.CENTER);
+				playerBox.setAlignment(CENTER);
 				Label playerName = createLabel(player.getName(), true, true);
 				playerName.setPrefHeight(20);
 				playerName.setPrefWidth(180);
@@ -1360,13 +1363,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 			List<ClientServerAI> ais = room.getAIPlayerList();
 			if(ais.size() > 0){
 				AIDifficulty diff = room.getAIPlayerList().get(0).getDifficulty();
-				//System.out.println("GOT DIFF: " + diff);
 				int index = 1;
 				switch(diff){
-				case EASY: index = 0;aiDiff = AIDifficulty.EASY;break;
-				case MEDIUM: index = 1;aiDiff = AIDifficulty.MEDIUM;break;
-				case HARD: index = 2;aiDiff = AIDifficulty.HARD;break;
-				case EXTREME: index = 3;aiDiff = AIDifficulty.EXTREME;break;
+				case EASY: index = 0;aiDiff = EASY;break;
+				case MEDIUM: index = 1;aiDiff = MEDIUM;break;
+				case HARD: index = 2;aiDiff = HARD;break;
+				case EXTREME: index = 3;aiDiff = EXTREME;break;
 				}
 				aiOnlineDifficultyChoice.getSelectionModel().select(index);
 			}
