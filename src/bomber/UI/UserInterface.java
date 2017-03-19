@@ -12,6 +12,7 @@ import static bomber.AI.AIDifficulty.*;
 import static bomber.game.Response.*;
 import static javafx.geometry.Pos.*;
 import static javafx.geometry.Orientation.*;
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.*;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -255,6 +256,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		ScrollPane scrollPane = new ScrollPane();
 		scrollPane.setMaxHeight(boxHeight - MASSIVE_PAD);
 		scrollPane.setMinWidth(boxWidth + MASSIVE_PAD);
+		scrollPane.setVbarPolicy(AS_NEEDED);
 		scrollPane.setContent(playersBox2);
 		
 		VBox playersListPane = new VBox();
@@ -267,7 +269,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyTorch = new Rectangle();
 		readyTorch.setWidth(TORCH_WIDTH);
 		readyTorch.setHeight(TORCH_HEIGHT);
-		readyTorch.getStyleClass().add("wideclearbox");
+		readyTorch.getStyleClass().add("mapbox");
 		readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 		
 		VBox readyBox = new VBox();
@@ -392,8 +394,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		ScrollPane scrollRooms = new ScrollPane();
 		scrollRooms.setMinHeight(boxHeight + LARGE_PAD);
-		scrollRooms.setVbarPolicy(ScrollBarPolicy.NEVER);
-		scrollRooms.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		scrollRooms.setVbarPolicy(NEVER);
+		scrollRooms.setHbarPolicy(AS_NEEDED);
 		scrollRooms.setFitToHeight(true);
 		scrollRooms.setFitToWidth(true);
 		scrollRooms.setContent(roomsBox);
@@ -407,17 +409,18 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Label playersTitle = createLabel("Online Players:", false, true);
 
 		playersBox = new FlowPane();
-		playersBox.setVgap(20);
-		playersBox.setHgap(20);
+		playersBox.setVgap(SMALL_PAD);
+		playersBox.setHgap(SMALL_PAD);
 		playersBox.setMinHeight(100);
 		
 		ScrollPane scrollPlayers = new ScrollPane();
+		scrollPlayers.setVbarPolicy(AS_NEEDED);
 		scrollPlayers.setContent(playersBox);
 		
 		VBox playersListPane = new VBox();
 		playersListPane.setSpacing(10);
 		playersListPane.getChildren().addAll(playersTitle, scrollPlayers);
-		playersListPane.setAlignment(TOP_LEFT);
+		//playersListPane.setAlignment(TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox.minHeightProperty().add(70)));
 		
 		VBox roomsPlayersPane = new VBox();

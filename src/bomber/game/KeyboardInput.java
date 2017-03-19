@@ -14,6 +14,29 @@ public class KeyboardInput {
 		
 	}
 	
+	public boolean pauseCheck(Screen screen, KeyboardState keyState, HashMap<Response, Integer> controlScheme, boolean pausePressed){
+		int state = GLFW_RELEASE;
+		//check for pause
+				if(getKey(Response.PAUSE_GAME, controlScheme).isPresent()){
+					state = screen.getKeyState(getKey(Response.PAUSE_GAME, controlScheme).get());
+				}
+				if(state == GLFW_PRESS && !pausePressed){
+			
+				   if(keyState.isPaused()){
+					   keyState.setPaused(false);
+				   }
+				   else{
+					   keyState.setPaused(true);
+				   }
+				   state = GLFW_RELEASE;
+				   pausePressed = true;
+				}
+				else if(state == GLFW_RELEASE){
+					pausePressed = false;
+				}
+			return pausePressed;
+	}
+	
 	public boolean update(Screen screen, KeyboardState keyState, HashMap<Response, Integer> controlScheme, boolean bombPressed){
 		
 		//System.out.println("polling the keyboard with keyState" + keyState.toString());
@@ -23,20 +46,6 @@ public class KeyboardInput {
 			
 			//System.out.println("Checking again...");
 			
-		//check for pause
-		if(getKey(Response.PAUSE_GAME, controlScheme).isPresent()){
-			state = screen.getKeyState(getKey(Response.PAUSE_GAME, controlScheme).get());
-		}
-		if(state == GLFW_PRESS){
-		   if(keyState.isPaused()){
-			   keyState.setPaused(false);
-		   }
-		   else{
-			   keyState.setPaused(true);
-		   }
-		    state = GLFW_RELEASE;
-		}else{
-		
 			//check for bomb
 			if(getKey(Response.PLACE_BOMB, controlScheme).isPresent()){
 				state = screen.getKeyState(getKey(Response.PLACE_BOMB, controlScheme).get());
@@ -86,7 +95,7 @@ public class KeyboardInput {
 			    keyState.setMovement(Movement.RIGHT);
 			    state = GLFW_RELEASE;
 			}
-		}
+		
 			return bombPressed;
 	}
 	
