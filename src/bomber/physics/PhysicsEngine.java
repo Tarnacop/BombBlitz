@@ -27,6 +27,7 @@ public class PhysicsEngine
     {
         this.gameState = gameState;
         okToPlaceBomb = new HashMap<>();
+        gameState.getPlayers().forEach(player -> okToPlaceBomb.put(player.getName(), true));
     }
 
     /**
@@ -88,7 +89,7 @@ public class PhysicsEngine
         {
 
             // Play sound effects
-            gameState.getAudioEvents().add(AudioEvent.MOVEMENT);
+            //gameState.getAudioEvents().add(AudioEvent.MOVEMENT);
 
             // Initialise data
             int speed = (int) (milliseconds * player.getSpeed() / 1000);
@@ -117,7 +118,6 @@ public class PhysicsEngine
             assert (fromDirection != null);
 
             // Collision with bombs
-            // If the dimensions ever change, this should be checked
             Rectangle translatedPlayerRect = new Rectangle(pos.x, pos.y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
             for (Bomb bomb : gameState.getBombs())
             {
@@ -142,18 +142,10 @@ public class PhysicsEngine
             Point downRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y + Constants.PLAYER_HEIGHT);
             revertPosition(fromDirection, downRightCorner, pos);
 
-            // Collision with holes
-            if(playerTouchesBlock(initialPos, Block.HOLE)==null && playerTouchesBlock(pos, Block.HOLE)!=null)
-            {
-                player.setLives(player.getLives() - 1);
-                if (player.getLives() == 0)
-                    player.setAlive(false);
-                gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
-            }
         }
 
         // -------- Planting bombs --------
-        if (player.getKeyState().isBomb() && okToPlaceBomb.get(player.getName()) != null && okToPlaceBomb.get(player.getName()))
+        if (player.getKeyState().isBomb() && okToPlaceBomb.get(player.getName()))
         {
             int bombCount = 0;
             for (Bomb bomb : gameState.getBombs())
@@ -177,6 +169,16 @@ public class PhysicsEngine
             if (player.getLives() == 0)
                 player.setAlive(false);
             gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
+        }
+
+        // Collision with holes
+        if(player.getInvulnerability()==0 && playerTouchesBlock(pos, Block.HOLE)!=null)
+        {
+            player.setLives(player.getLives() - 1);
+            if (player.getLives() == 0)
+                player.setAlive(false);
+            gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
+            player.setInvulnerability(Constants.INVULNERABILITY_LENGTH);
         }
 
         // -------- Getting power-ups --------
@@ -207,13 +209,19 @@ public class PhysicsEngine
         }
         while ((powerup = playerTouchesBlock(pos, Block.MINUS_SPEED)) != null)
         {
-            player.setSpeed(Constants.LOW_PLAYER_SPEED);
+            if(player.getSpeed()==Constants.HIGH_PLAYER_SPEED)
+                player.setSpeed(Constants.DEFAULT_PLAYER_SPEED);
+            else
+                player.setSpeed(Constants.LOW_PLAYER_SPEED);
             gameState.getAudioEvents().add(AudioEvent.POWERUP);
             gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
         }
         while ((powerup = playerTouchesBlock(pos, Block.PLUS_SPEED)) != null)
         {
-            player.setSpeed(Constants.HIGH_PLAYER_SPEED);
+            if(player.getSpeed()==Constants.LOW_PLAYER_SPEED)
+                player.setSpeed(Constants.DEFAULT_PLAYER_SPEED);
+            else
+                player.setSpeed(Constants.HIGH_PLAYER_SPEED);
             gameState.getAudioEvents().add(AudioEvent.POWERUP);
             gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
         }
