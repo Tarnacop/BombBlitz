@@ -29,6 +29,7 @@ public class OnlineGame implements GameInterface {
 	// private int aiNum;
 	private ClientThread client;
 	private boolean fullScreen;
+	private boolean gameEnded;
 
 	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
 			HashMap<Response, Integer> controls, boolean fullScreen, int width, int height) {
@@ -82,7 +83,7 @@ public class OnlineGame implements GameInterface {
 	public void update(float interval) {
 
 		this.gameState = this.client.getGameState();
-		if(this.gameState.gameOver()){
+		if(gameEnded /*this.gameState.gameOver()*/){
 			
 			if(gameOverCounter < 3) {
 				
@@ -133,4 +134,9 @@ public class OnlineGame implements GameInterface {
 		audio.stopAudio();
 
 	}
+	
+	public void setGameEnded(boolean gameEnded) {
+		this.gameEnded = gameEnded;
+	}
+	
 }
