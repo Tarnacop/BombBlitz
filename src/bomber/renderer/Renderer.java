@@ -46,6 +46,7 @@ public class Renderer {
 	private boolean gameOver;
 	private boolean frontScreen;
 	private boolean gamePaused;
+	private boolean youWon;
 
 	private HashMap<String, TextureMesh> textureMeshes;
 
@@ -1724,15 +1725,32 @@ public class Renderer {
 		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio,
 				screen.getHeight() * h_ratio, 0f);
 
-		hudTextItem.setText("GAME OVER");
-		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
-		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - hudTextItem.getTextHeight() / 2);
-		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
+		hudTextItemBig.setText("GAME OVER");
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItemBig.getTextWidth() / 2);
+		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - hudTextItemBig.getTextHeight() / 2);
+		modelMatrix = transformation.getModelMatrix(x, y, hudTextItemBig.getRotation(), hudTextItemBig.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
-		hudTextItem.getMesh().render();
+		hudTextItemBig.getMesh().render();
 
+		y += hudTextItemBig.getTextHeight();
+		if(youWon == true) {
+			
+			hudTextItemBig.setText("YOU WON");
+			x = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BLOCK_WIDTH - hudTextItemBig.getTextWidth() / 2);
+			modelMatrix = transformation.getModelMatrix(x, y, hudTextItemBig.getRotation(), hudTextItemBig.getScale());
+			hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
+			hudTextItemBig.getMesh().render();
+		} else {
+			
+			hudTextItemBig.setText("YOU LOST");
+			x = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BLOCK_WIDTH - hudTextItemBig.getTextWidth() / 2);
+			modelMatrix = transformation.getModelMatrix(x, y, hudTextItemBig.getRotation(), hudTextItemBig.getScale());
+			hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
+			hudTextItemBig.getMesh().render();
+		}
+		
 		hudShader.unbind();
 	} // END OF renderGameOverHud METHOD
 
@@ -1875,10 +1893,12 @@ public class Renderer {
 
 	/**
 	 * Display game over screen
+	 * @param youWon Boolean showing if this client won or lost
 	 */
-	public void displayGameOver() {
+	public void displayGameOver(boolean youWon) {
 
 		gameOver = true;
+		this.youWon = youWon;
 	} // END OF displayGameOver METHOD
 
 	/**
