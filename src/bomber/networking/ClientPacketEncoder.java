@@ -806,6 +806,10 @@ public class ClientPacketEncoder {
 			block = Block.MINUS_SPEED;
 			break;
 
+		case 10:
+			block = Block.HOLE;
+			break;
+
 		default:
 			block = Block.BLANK;
 			break;
@@ -894,6 +898,10 @@ public class ClientPacketEncoder {
 
 		case MINUS_SPEED:
 			b = 9;
+			break;
+
+		case HOLE:
+			b = 10;
 			break;
 
 		default:

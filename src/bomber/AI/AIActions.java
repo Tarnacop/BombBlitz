@@ -2,11 +2,11 @@ package bomber.AI;
 
 
 /**
- * The Enum for AI Actions
+ * The Enum for AI Actions.
  * @author Jokubas Liutkus
  */
 public enum AIActions{
-	
+
 /** The up. */
 UP,
 /** The down. */

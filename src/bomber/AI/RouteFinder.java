@@ -185,7 +185,7 @@ public class RouteFinder {
 		int y = neigh.y;
 		Block[][] map = getMap();
 
-		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOLID)
+		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOLID || map[x][y] == Block.HOLE)
 			return;
 
 		for (Node nd : closed)
@@ -279,7 +279,7 @@ public class RouteFinder {
 
 		if ((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID || map[x][y] == Block.MINUS_BOMB || map[x][y] == Block.MINUS_RANGE
-				|| map[x][y] == Block.MINUS_SPEED)
+				|| map[x][y] == Block.MINUS_SPEED || map[x][y] == Block.HOLE)
 			return;
 		List<Bomb> bombs = new ArrayList<Bomb>(state.getBombs());
 
@@ -789,7 +789,7 @@ public class RouteFinder {
 		Block[][] map = getMap();
 		return !((x < 0) || (y < 0) || map.length <= x || map[0].length <= y || map[x][y] == Block.SOFT
 				|| map[x][y] == Block.SOLID || map[x][y] == Block.MINUS_BOMB || map[x][y] == Block.MINUS_RANGE
-				|| map[x][y] == Block.MINUS_SPEED);
+				|| map[x][y] == Block.MINUS_SPEED || map[x][y]  == Block.HOLE);
 	}
 
 	
@@ -820,6 +820,12 @@ public class RouteFinder {
 
 	}
 	
+	/**
+	 * Checks if this AI is nearest to the goal
+	 *
+	 * @param goal the goal
+	 * @return true, if this AI is nearest to the goal
+	 */
 	private boolean isNearestAI(Point goal)
 	{
 		List<Player> ais = state.getPlayers().stream().filter(p -> (p instanceof GameAI) && p.isAlive() && !p.equals(gameAI))

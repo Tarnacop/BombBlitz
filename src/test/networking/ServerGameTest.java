@@ -46,6 +46,7 @@ public class ServerGameTest {
 
 		game.setPlayerKeyState(-123331, new KeyboardState());
 		game.setPlayerKeyState(331, new KeyboardState());
+
 	}
 
 }

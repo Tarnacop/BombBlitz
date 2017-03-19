@@ -679,6 +679,10 @@ public class ServerPacketEncoder {
 			b = 9;
 			break;
 
+		case HOLE:
+			b = 10;
+			break;
+
 		default:
 			b = 0;
 			break;
@@ -765,6 +769,10 @@ public class ServerPacketEncoder {
 
 		case 9:
 			block = Block.MINUS_SPEED;
+			break;
+
+		case 10:
+			block = Block.HOLE;
 			break;
 
 		default:

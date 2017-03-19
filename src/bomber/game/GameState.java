@@ -1,9 +1,10 @@
 package bomber.game;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import bomber.AI.GameAI;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GameState {
 
@@ -11,6 +12,9 @@ public class GameState {
 	private List<Player> players;		
 	private List<Bomb> bombs;
 	private List<AudioEvent> audioEvents;
+	private List<BlastTimer> blastList;
+
+
 
 	public GameState(Map map, List<Player> players){	
 		
@@ -18,6 +22,7 @@ public class GameState {
 		this.players = players;
 		this.bombs = new ArrayList<Bomb>();
 		this.audioEvents = new ArrayList<AudioEvent>();
+		this.blastList = new LinkedList<>();
 	}
 
 	public boolean gameOver(){
@@ -81,7 +86,12 @@ public class GameState {
 	public void setMap(Map map) {
 		this.map = map;
 	}
-	
+
+	public List<BlastTimer> getBlastList()
+	{
+		return blastList;
+	}
+
 	@Override
 	public String toString(){
 		

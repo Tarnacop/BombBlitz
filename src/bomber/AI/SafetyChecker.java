@@ -20,15 +20,17 @@ public class SafetyChecker {
 
 	/** The game state. */
 	private GameState state;
-	
+
 	/** The game AI. */
 	private GameAI gameAI;
 
 	/**
 	 * Instantiates a new safety checker.
 	 *
-	 * @param state the game state
-	 * @param gameAI the game AI
+	 * @param state
+	 *            the game state
+	 * @param gameAI
+	 *            the game AI
 	 */
 	public SafetyChecker(GameState state, GameAI gameAI) {
 		this.state = state;
@@ -36,8 +38,7 @@ public class SafetyChecker {
 	}
 
 	/**
-	 * Gets the map.
-	 * getting the map from the game state
+	 * Gets the map. getting the map from the game state
 	 *
 	 * @return the map
 	 */
@@ -46,8 +47,8 @@ public class SafetyChecker {
 	}
 
 	/**
-	 * In danger.
-	 * Checks if the player is in range of the bomb explosion
+	 * In danger. Checks if the player is in range of the bomb explosion
+	 * 
 	 * @return true, if AI is in danger
 	 */
 	public boolean inDanger() {
@@ -56,10 +57,10 @@ public class SafetyChecker {
 	}
 
 	/**
-	 * Check move safety.
-	 * Checks if the move from a particular position is safe
+	 * Check move safety. Checks if the move from a particular position is safe
 	 *
-	 * @param move the move
+	 * @param move
+	 *            the move
 	 * @return true, if move is safe
 	 */
 	public boolean checkMoveSafety(AIActions move) {
@@ -81,15 +82,20 @@ public class SafetyChecker {
 		case NONE:
 			newPosition = playerPos;
 			break;
-		}
-		return !positionSafety(newPosition) && getMap()[newPosition.x][newPosition.y] != Block.BLAST;
+		default: 
+			newPosition = playerPos;
+			break;
+		} 
+		return newPosition.x >= getMap().length || newPosition.y >= getMap()[0].length || newPosition.x < 0
+				|| newPosition.y < 0 ? false
+						: !positionSafety(newPosition) && getMap()[newPosition.x][newPosition.y] != Block.BLAST;
 	}
 
 	/**
-	 * Position safety.
-	 * Checks if the position is safe (no bombs are in range)
+	 * Position safety. Checks if the position is safe (no bombs are in range)
 	 *
-	 * @param position the position
+	 * @param position
+	 *            the position
 	 * @return true, if successful
 	 */
 	private boolean positionSafety(Point position) {
@@ -107,21 +113,24 @@ public class SafetyChecker {
 		List<Bomb> bombs = new ArrayList<>(state.getBombs());
 
 		bombs.forEach(b -> points.addAll(getBombCoverage(b, getMap())));
-		
+
 		return points;
 	}
 
 	/**
 	 * Gets the single bomb coverage.
 	 *
-	 * @param bomb the bomb
-	 * @param map the map
+	 * @param bomb
+	 *            the bomb
+	 * @param map
+	 *            the map
 	 * @return the tiles which are affected by a single bomb
 	 */
 	public ArrayList<Point> getBombCoverage(Bomb bomb, Block[][] map) {
-		//TODO need to solve the issue
+		// TODO need to solve the issue
 		ArrayList<Point> points = new ArrayList<>();
-		if(bomb == null) return points;
+		if (bomb == null)
+			return points;
 		points.add(bomb.getGridPos());
 		Point temp = bomb.getGridPos();
 		int bombX = temp.x;
@@ -159,7 +168,7 @@ public class SafetyChecker {
 		for (Player p : state.getPlayers()) {
 			if (p.equals(gameAI) || !p.isAlive())
 				continue;
-			
+
 			if (isStraightDistance(playerPos, p.getGridPos(), bombRange) || p.getGridPos().equals(gameAI.getGridPos()))
 				return true;
 
@@ -170,22 +179,26 @@ public class SafetyChecker {
 	/**
 	 * Checks if is straight distance to enemy.
 	 *
-	 * @param p1 the position 1
-	 * @param p2 the position 2
-	 * @param range the bomb range
+	 * @param p1
+	 *            the position 1
+	 * @param p2
+	 *            the position 2
+	 * @param range
+	 *            the bomb range
 	 * @return true, if is straight distance
 	 */
 	private boolean isStraightDistance(Point p1, Point p2, int range) {
 		Block[][] map = getMap();
-		
-		if( (p1.x == p2.x) && (p1.y == p2.y)) return true;
-		
+
+		if ((p1.x == p2.x) && (p1.y == p2.y))
+			return true;
+
 		else if (p1.x == p2.x) {
 			int sign = 1;
 			if (p1.y < p2.y)
 				sign = -1;
 			for (int i = 1; i < range; i++) {
-				if ( map[p2.x][p2.y + sign * i] == Block.SOFT || map[p2.x][p2.y + sign * i] == Block.SOLID)
+				if (map[p2.x][p2.y + sign * i] == Block.SOFT || map[p2.x][p2.y + sign * i] == Block.SOLID)
 					return false;
 				else if ((p1.y == p2.y + sign * i))
 					return true;
@@ -206,31 +219,30 @@ public class SafetyChecker {
 
 		return false;
 	}
-	
-	
-	
+
 	/**
 	 * Checks if is next move is bomb.
 	 *
-	 * @param updatedPos the position after move
+	 * @param updatedPos
+	 *            the position after move
 	 * @return true, if there is a bomb in the moving position
 	 */
-	public boolean isNextMoveBomb(Point updatedPos)
-	{
-			ArrayList<Bomb> bombs = new ArrayList<>(state.getBombs());
-			Optional<Bomb> b = bombs.stream().filter(bomb -> bomb.getGridPos().equals(updatedPos)).findAny();
-			return b.isPresent();
+	public boolean isNextMoveBomb(Point updatedPos) {
+		ArrayList<Bomb> bombs = new ArrayList<>(state.getBombs());
+		Optional<Bomb> b = bombs.stream().filter(bomb -> bomb.getGridPos().equals(updatedPos)).findAny();
+		return b.isPresent();
 	}
-	
-	//----------------------------------------------------------------------------------
-	//----------------------------------------------------------------------------------
-	//----------------------------------------------------------------------------------
-	//----------------------------------------------------------------------------------
-	//------------------------EXTREME AI------------------------------------------------
-	//----------------------------------------------------------------------------------
-	//----------------------------------------------------------------------------------
-	//----------------------------------------------------------------------------------
-	
+
+	// ----------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------
+	// ------------------------EXTREME
+	// AI------------------------------------------------
+	// ----------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------
+
 	/**
 	 * Checks if enemy is in bomb range.
 	 *
@@ -239,18 +251,16 @@ public class SafetyChecker {
 	public boolean isEnemyInBombRangeExludeAIs() {
 		Point playerPos = gameAI.getGridPos();
 		int bombRange = gameAI.getBombRange();
-		List<Player> players = state.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive()).collect(Collectors.toList());;
+		List<Player> players = state.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive())
+				.collect(Collectors.toList());
+		;
 		for (Player p : players) {
-			
+
 			if (isStraightDistance(playerPos, p.getGridPos(), bombRange) || p.getGridPos().equals(gameAI.getGridPos()))
 				return true;
 
 		}
 		return false;
 	}
-	
-	
 
-	
-	
 }
