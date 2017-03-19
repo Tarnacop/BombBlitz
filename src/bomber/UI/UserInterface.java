@@ -229,7 +229,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
         BorderPane roomBox = new BorderPane();
 		
-        leaveRoomBtn = createButton("Leave Room", BIG_MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
+        leaveRoomBtn = createButton("Leave Room", LARGE_MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
         leaveRoomBtn.setOnAction(e -> leaveRoom());
         
         HBox centerBox = new HBox();
@@ -249,23 +249,21 @@ public class UserInterface extends Application implements ClientNetInterface{
         Label playersTitle = createLabel("Online Players:", false, true);
 
 		playersBox2 = new FlowPane(VERTICAL);
-		playersBox2.setVgap(MEDIUM_PAD);
+		playersBox2.setVgap(TINY_PAD);
 		playersBox2.setHgap(MEDIUM_PAD);
 		
 		ScrollPane scrollPane = new ScrollPane();
-		//scrollPane.setMinHeight(boxHeight*0.8);
-		scrollPane.setMaxHeight(boxHeight);
-		scrollPane.setMinWidth(boxWidth);
+		scrollPane.setMaxHeight(boxHeight - MASSIVE_PAD);
+		scrollPane.setMinWidth(boxWidth + MASSIVE_PAD);
 		scrollPane.setContent(playersBox2);
 		
 		VBox playersListPane = new VBox();
 		playersListPane.getStyleClass().add("wideclearbox");
 		playersListPane.setSpacing(SMALL_PAD);
-		playersListPane.setMinWidth(boxWidth);
+		playersListPane.setMinWidth(boxWidth + MASSIVE_PAD);
 		playersListPane.getChildren().addAll(playersTitle, scrollPane);
-		playersListPane.setAlignment(TOP_LEFT);
-		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(scrollPane.minHeightProperty().add(MASSIVE_PAD)));
-
+		//playersListPane.setAlignment(TOP_LEFT);
+		
 		readyTorch = new Rectangle();
 		readyTorch.setWidth(TORCH_WIDTH);
 		readyTorch.setHeight(TORCH_HEIGHT);
@@ -274,12 +272,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		VBox readyBox = new VBox();
 		readyBox.getStyleClass().add("namebox");
-		readyBox.setSpacing(10);
+		readyBox.setSpacing(MEDIUM_PAD);
 		readyBox.setAlignment(CENTER);
 		readyBox.setMinWidth(boxHeight);
 		readyBox.setMinHeight(boxHeight);
 		readyBox.setMaxHeight(boxHeight);
-		readyButton = createButton("Not Ready", 250, 50);
+		readyButton = createButton("Not Ready", LARGE_MENU_BUTTON_WIDTH, LARGE_MENU_BUTTON_HEIGHT);
 		readyButton.setOnAction(e -> ready());
 		
 		HBox torchBox = new HBox();
@@ -290,7 +288,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		readyPane = new VBox();
 		readyPane.getStyleClass().add("menubox");
-		readyPane.setSpacing(SMALL_PAD);
+		readyPane.setSpacing(LITTLE_PAD);
 		readyPane.setMinWidth(boxWidth+MEDIUM_PAD);
 		readyPane.setMinHeight(boxHeight);
 		readyPane.setMaxHeight(boxHeight);
@@ -299,11 +297,12 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		HBox playersReadyBox = new HBox();
 		playersReadyBox.setAlignment(CENTER);
-		playersReadyBox.setSpacing(20);
+		playersReadyBox.setSpacing(LARGE_PAD);
 		playersReadyBox.setPadding(new Insets(10, 10, 10, 10));
 		playersReadyBox.getChildren().addAll(playersListPane, readyPane, readyBox);
 		
 		VBox centerPane = new VBox();
+		centerPane.setAlignment(CENTER);
 		centerPane.setSpacing(10);
 		centerPane.getChildren().addAll(centerBox, playersReadyBox);
 		
@@ -392,7 +391,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		roomsBox.setSpacing(40);
 		
 		ScrollPane scrollRooms = new ScrollPane();
-		scrollRooms.setMinHeight(250);
+		scrollRooms.setMinHeight(boxHeight + LARGE_PAD);
 		scrollRooms.setVbarPolicy(ScrollBarPolicy.NEVER);
 		scrollRooms.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
 		scrollRooms.setFitToHeight(true);
@@ -499,10 +498,10 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		BorderPane singleBox = new BorderPane();
 		
-        Button startBtn = createButton("Start Game", 300, 75);
+        Button startBtn = createButton("Start Game", LARGE_MENU_BUTTON_WIDTH*1.5, LARGE_MENU_BUTTON_HEIGHT*1.5);
         
         HBox startBtnPane = new HBox();
-        startBtnPane.setPadding(new Insets(0, 0, 10, 0));
+        startBtnPane.setPadding(new Insets(0, 0, SMALL_PAD, 0));
         startBtnPane.setAlignment(CENTER);
         startBtnPane.getChildren().add(startBtn);
         startBtn.setOnAction(e -> beginGame(this.map, this.playerName.getValue(), this.controls, this.aiNumber.get()));
@@ -519,13 +518,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 		aiDifficultyChoice = new ChoiceBox<>();
         centerBox.getChildren().addAll(createAiDifficultySelector(aiDifficultyChoice, false), createMapSelector(mapCanvas, false));
         
+        VBox centerPane = new VBox();
+        centerPane.setSpacing(HUGE_PAD);
+        centerPane.setAlignment(CENTER);
+        centerPane.getChildren().addAll(centerBox, startBtnPane);
+        
         HBox backBtnPane = new HBox();
         backBtnPane.getChildren().add(backBtn);
         backBtnPane.setPadding(new Insets(10, 10, 10, 10));
         
-        singleBox.setCenter(centerBox);
+        singleBox.setCenter(centerPane);
         singleBox.setTop(backBtnPane);
-        singleBox.setBottom(startBtnPane);
         
         setBackgroundPane(singleMenu, singleBox);
 	}
@@ -562,11 +565,11 @@ public class UserInterface extends Application implements ClientNetInterface{
         Label aiExplanation = createLabel("AI players will seek\nto destroy you.", true, true);
         aiExplanation.setFont(smallFont);
         aiExplanation.setAlignment(CENTER);
-        aiExplanation.setPrefWidth(boxWidth);
+        aiExplanation.setPrefWidth(boxWidth*0.9);
         	selector = new ChoiceBox<>();
             selector.setTooltip(new Tooltip("Change AI Difficulty"));
             selector.setPrefHeight(50);
-            selector.setPrefWidth(boxWidth);
+            selector.setPrefWidth(boxWidth*0.9);
             selector.getStyleClass().add("textfield");
             selector.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
             selector.getSelectionModel().select(1);
@@ -1262,9 +1265,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 		for(ClientServerLobbyRoom room : rooms){
 			
 			VBox roomContainer = new VBox();
-			roomContainer.setMinHeight(100);
-			roomContainer.setMinWidth(210);
-			roomContainer.setSpacing(5);
+			roomContainer.setMaxHeight(boxHeight*0.7);
+			//roomContainer.setMinWidth(210);
+			roomContainer.setSpacing(TINY_PAD);
 			roomContainer.setAlignment(CENTER);
 			roomContainer.getStyleClass().add("namebox");
 			Label roomID = createLabel("Room " + room.getID() +":", false, false);
@@ -1272,13 +1275,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 			roomName.setAlignment(CENTER);
 			roomName.getStyleClass().add("maplabel");
 			HBox roomPane = new HBox();
-			roomPane.setSpacing(15);
+			roomPane.setSpacing(LITTLE_PAD);
 			roomPane.setPrefHeight(50);
 			roomPane.setAlignment(CENTER);
 			Label numPlayers = createLabel(room.getPlayerNumber() + "/" + room.getMaxPlayer(), true, true);
 			Label playersLabel = createLabel("", true, true);
 			playersLabel.setMinWidth(160);
 			int[] playerids = room.getPlayerID();
+			playersLabel.setMinHeight(boxHeight/2.2);
 			for(ClientServerPlayer player : this.client.getPlayerList()){
 				if(player.getID() == playerids[0]){
 					playersLabel.setText(playersLabel.getText() + " + " + player.getName());
@@ -1545,7 +1549,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				enterLabel.setText("Enter Server Details:\n( A player with your name is already\nconncted to the server!\nChange and try again! )");
+				enterLabel.setText("Enter Server Details:\n( A player with your name is\n already connected to the server!\nChange and try again! )");
 				resetButton(connectBtn, "Connect", e -> connect());
 				expectingConnection = false;
 			}
