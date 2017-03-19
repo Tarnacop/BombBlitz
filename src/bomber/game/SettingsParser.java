@@ -58,7 +58,7 @@ public class SettingsParser
             document.getDocumentElement().normalize();
         } catch (SAXException e)
         {
-            System.err.println("Error in parsing settings.xml."); // TODO Maybe reinitialise it
+            System.err.println("Error in parsing settings.xml.");
             e.printStackTrace();
         } catch (IOException e)
         {
@@ -111,7 +111,7 @@ public class SettingsParser
         serverIp.appendChild(document.createTextNode(Constants.DEFAULT_SERVER_IP));
         server.appendChild(serverIp);
         Element serverPort = document.createElement("port");
-        serverPort.appendChild(document.createTextNode(String.valueOf(Constants.DEFAULST_SERVER_PORT)));
+        serverPort.appendChild(document.createTextNode(String.valueOf(Constants.DEFAULT_SERVER_PORT)));
         server.appendChild(serverPort);
         servers.appendChild(server);
         root.appendChild(servers);
@@ -154,18 +154,6 @@ public class SettingsParser
     private static String getTagText(String tag)
     {
         return document.getElementsByTagName(tag).item(0).getTextContent();
-    }
-
-    /**
-     * Gets the text of a tag from a given element
-     *
-     * @param element The element
-     * @param tag The tag
-     * @return The text inside the tag
-     */
-    private static String getTagText(Element element, String tag)
-    {
-        return element.getElementsByTagName(tag).item(0).getTextContent();
     }
 
     /**
@@ -292,27 +280,6 @@ public class SettingsParser
     }
 
     /**
-     * Debug method for printing the settings to the console
-     */
-    private static void printSettings()
-    {
-        System.out.println("\nSettings from XML:\n");
-        System.out.println("Name: " + getTagText("name"));
-        System.out.println("Music volume: " + getTagText("musicVolume"));
-        System.out.println("Effects volume: " + getTagText("effectsVolume"));
-        System.out.println("Show tutorial: " + Boolean.valueOf(getTagText("showTutorial")));
-
-        System.out.println("Servers:");
-        NodeList servers = document.getElementsByTagName("server");
-        for (int i = 0; i < servers.getLength(); i++)
-        {
-            Element server = (Element) servers.item(i);
-            System.out.println(getTagText(server, "name") + " - " + getTagText(server, "ip")
-                    + ":" + getTagText(server, "port"));
-        }
-    }
-
-    /**
      * Error handler for the DocumentBuilder
      */
     private static class SettingsErrorHandler implements ErrorHandler
@@ -370,37 +337,6 @@ public class SettingsParser
             String message = "Settings parser fatal Error: " + getParseExceptionInfo(spe);
             throw new SAXException(message);
         }
-    }
-
-    public static void main(String[] args)
-    {
-
-        // delete settings.xml to check automatic initialisation
-        File file = new File(Constants.SETTING_XML_PATH);
-        file.delete();
-        System.out.println("Deleted settings.xml");
-
-        SettingsParser.init();
-
-        SettingsParser.printSettings();
-
-        SettingsParser.setPlayerName("Test");
-        System.out.println(SettingsParser.getPlayerName());
-
-        SettingsParser.storeSettings();
-        SettingsParser.init();
-
-        System.out.println(SettingsParser.getPlayerName());
-
-        System.out.println("....................");
-
-        System.out.println(SettingsParser.getServerIp());
-        System.out.println(SettingsParser.getServerPort());
-
-        SettingsParser.setServer("server.ip", "server.port");
-        SettingsParser.storeSettings();
-        System.out.println(SettingsParser.getServerIp());
-        System.out.println(SettingsParser.getServerPort());
     }
 
 }
