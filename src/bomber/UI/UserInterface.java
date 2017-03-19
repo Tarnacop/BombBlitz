@@ -12,6 +12,7 @@ import static bomber.AI.AIDifficulty.*;
 import static bomber.game.Response.*;
 import static javafx.geometry.Pos.*;
 import static javafx.geometry.Orientation.*;
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.*;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -255,6 +256,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		ScrollPane scrollPane = new ScrollPane();
 		scrollPane.setMaxHeight(boxHeight - MASSIVE_PAD);
 		scrollPane.setMinWidth(boxWidth + MASSIVE_PAD);
+		scrollPane.setVbarPolicy(AS_NEEDED);
 		scrollPane.setContent(playersBox2);
 		
 		VBox playersListPane = new VBox();
@@ -267,7 +269,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyTorch = new Rectangle();
 		readyTorch.setWidth(TORCH_WIDTH);
 		readyTorch.setHeight(TORCH_HEIGHT);
-		readyTorch.getStyleClass().add("wideclearbox");
+		readyTorch.getStyleClass().add("mapbox");
 		readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 		
 		VBox readyBox = new VBox();
@@ -392,8 +394,8 @@ public class UserInterface extends Application implements ClientNetInterface{
 		
 		ScrollPane scrollRooms = new ScrollPane();
 		scrollRooms.setMinHeight(boxHeight + LARGE_PAD);
-		scrollRooms.setVbarPolicy(ScrollBarPolicy.NEVER);
-		scrollRooms.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		scrollRooms.setVbarPolicy(NEVER);
+		scrollRooms.setHbarPolicy(AS_NEEDED);
 		scrollRooms.setFitToHeight(true);
 		scrollRooms.setFitToWidth(true);
 		scrollRooms.setContent(roomsBox);
@@ -407,17 +409,18 @@ public class UserInterface extends Application implements ClientNetInterface{
 		Label playersTitle = createLabel("Online Players:", false, true);
 
 		playersBox = new FlowPane();
-		playersBox.setVgap(20);
-		playersBox.setHgap(20);
+		playersBox.setVgap(SMALL_PAD);
+		playersBox.setHgap(SMALL_PAD);
 		playersBox.setMinHeight(100);
 		
 		ScrollPane scrollPlayers = new ScrollPane();
+		scrollPlayers.setVbarPolicy(AS_NEEDED);
 		scrollPlayers.setContent(playersBox);
 		
 		VBox playersListPane = new VBox();
 		playersListPane.setSpacing(10);
 		playersListPane.getChildren().addAll(playersTitle, scrollPlayers);
-		playersListPane.setAlignment(TOP_LEFT);
+		//playersListPane.setAlignment(TOP_LEFT);
 		playersListPane.minHeightProperty().bind(playersTitle.minHeightProperty().add(playersBox.minHeightProperty().add(70)));
 		
 		VBox roomsPlayersPane = new VBox();
@@ -971,7 +974,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label createBoundLabel(SimpleIntegerProperty property, boolean shaded, boolean white) {
 		Label label = new Label();
 		label.setFont(font);
-		if(white)label.setTextFill(Color.WHITE);
+		label.setTextFill(white?Color.WHITE:Color.BLACK);
 		label.setAlignment(CENTER);
 		label.textProperty().bind(property.asString());
 		if(shaded){
@@ -983,7 +986,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label createBoundLabel(SimpleStringProperty property, boolean shaded, boolean white) {
 		Label label = new Label();
 		label.setFont(font);
-		if(white)label.setTextFill(Color.WHITE);
+		label.setTextFill(white?Color.WHITE:Color.BLACK);
 		label.setAlignment(CENTER);
 		label.textProperty().bind(property);
 		if(shaded){
@@ -995,6 +998,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button createButton(String label, double width, double height) {
 		Button button = new Button(label);
 		button.setFont(font);
+		button.setTextFill(Color.BLACK);
 		button.setPrefWidth(width);
 		button.setPrefHeight(height);
 		button.setAlignment(CENTER);
@@ -1005,8 +1009,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button createBackButton(String label, boolean online){
 		Button button = new Button(label);
 		button.setFont(font);
-		button.setPrefWidth(200);
-		button.setPrefHeight(50);
+		button.setTextFill(Color.BLACK);
+		button.setPrefWidth(MENU_BUTTON_WIDTH);
+		button.setPrefHeight(MENU_BUTTON_HEIGHT);
 		button.setAlignment(CENTER);
 		button.getStyleClass().add("menubutton");
 		button.setOnAction(online?e -> disconnect():e -> previous());
@@ -1016,6 +1021,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button createSceneButton(String label, double width, double height, Parent currentScene, Parent nextScene){
 		Button button = new Button(label);
 		button.setFont(font);
+		button.setTextFill(Color.BLACK);
 		button.setPrefWidth(width);
 		button.setPrefHeight(height);
 		button.setAlignment(CENTER);
@@ -1083,6 +1089,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 			}
 			this.expectingRoomCreation = false;
 			this.expectingRoomJoin = false;
+			readyButton.setText("Not Ready");
+			readyButton.setOnAction(e -> ready());
+			readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 			previous();
 		}
 	}

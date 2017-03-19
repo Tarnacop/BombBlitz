@@ -12,11 +12,11 @@ import org.joml.Matrix4f;
 
 import com.sun.prism.paint.Color;
 
-import bomber.AI.GameAI;
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.Constants;
 import bomber.game.GameState;
+import bomber.game.Movement;
 import bomber.game.Player;
 import bomber.renderer.shaders.FontTexture;
 import bomber.renderer.shaders.ShaderProgram;
@@ -140,132 +140,541 @@ public class Renderer {
 		Texture controls = new Texture("src/resources/images/controls.png");
 
 		// Blocks
-		TextureMesh blankMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0f, 0f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		System.out.println(Constants.SPRITESHEET_ELEM_WIDTH + " " + Constants.SPRITESHEET_ELEM_HEIGHT);
+		TextureMesh blankMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				0 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blankMesh", blankMesh);
 
-		TextureMesh softMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.2f, 0f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
-		textureMeshes.put("softMesh", softMesh);
-
-		TextureMesh solidMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.1f, 0f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh solidMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				1 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("solidMesh", solidMesh);
 
-		TextureMesh blastMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.3f, 0f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh softMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				2 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("softMesh", softMesh);
+
+		TextureMesh blastMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				3 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blastMesh", blastMesh);
 
-		// Player
-		TextureMesh ingamePlayerMesh1 = new TextureMesh(64, 64, 0.2f, 0.33333333f, Constants.SPRITESHEET_COLS,
-				Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh holeMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				0 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("holeMesh", holeMesh);
+
+		// Player 1
+		TextureMesh ingamePlayerMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				2 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("ingamePlayerMesh1", ingamePlayerMesh1);
 
-		TextureMesh ingamePlayerMesh2 = new TextureMesh(64, 64, 0.3f, 0.33333333f, Constants.SPRITESHEET_COLS,
-				Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh ingamePlayerMesh2 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				3 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("ingamePlayerMesh2", ingamePlayerMesh2);
 
-		TextureMesh ingamePlayerMesh3 = new TextureMesh(64, 64, 0.4f, 0.33333333f, Constants.SPRITESHEET_COLS,
-				Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh ingamePlayerMesh3 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				4 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("ingamePlayerMesh3", ingamePlayerMesh3);
 
-		TextureMesh playerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.2f, 0.33333333f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
-		textureMeshes.put("playerMesh1", playerMesh1);
+		TextureMesh downPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				2 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("downPlayerMesh1", downPlayerMesh1);
 
-		TextureMesh playerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.3f, 0.33333333f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
-		textureMeshes.put("playerMesh2", playerMesh2);
+		TextureMesh downPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				3 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("downPlayerMesh2", downPlayerMesh2);
 
-		TextureMesh playerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.4f, 0.33333333f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
-		textureMeshes.put("playerMesh3", playerMesh3);
+		TextureMesh downPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				4 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("downPlayerMesh3", downPlayerMesh3);
 
-		TextureMesh deadPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.5f,
-				0.33333333f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh deadPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				5 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("deadPlayerMesh1", deadPlayerMesh1);
 
-		TextureMesh deadPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.6f,
-				0.33333333f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh deadPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				6 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("deadPlayerMesh2", deadPlayerMesh2);
 
-		TextureMesh deadPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.7f,
-				0.33333333f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh deadPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				7 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("deadPlayerMesh3", deadPlayerMesh3);
 
+		TextureMesh leftPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				8 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("leftPlayerMesh1", leftPlayerMesh1);
+
+		TextureMesh leftPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				9 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("leftPlayerMesh2", leftPlayerMesh2);
+
+		TextureMesh leftPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				10 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("leftPlayerMesh3", leftPlayerMesh3);
+
+		TextureMesh upPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				11 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("upPlayerMesh1", upPlayerMesh1);
+
+		TextureMesh upPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				12 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("upPlayerMesh2", upPlayerMesh2);
+
+		TextureMesh upPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				13 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("upPlayerMesh3", upPlayerMesh3);
+
+		TextureMesh rightPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				14 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("rightPlayerMesh1", rightPlayerMesh1);
+
+		TextureMesh rightPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				15 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("rightPlayerMesh2", rightPlayerMesh2);
+
+		TextureMesh rightPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				16 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("rightPlayerMesh3", rightPlayerMesh3);
+
+		// Player 2
+		TextureMesh secondIngamePlayerMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 2 * Constants.SPRITESHEET_ELEM_WIDTH,
+				3 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondIngamePlayerMesh1", secondIngamePlayerMesh1);
+
+		TextureMesh secondIngamePlayerMesh2 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 3 * Constants.SPRITESHEET_ELEM_WIDTH,
+				3 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondIngamePlayerMesh2", secondIngamePlayerMesh2);
+
+		TextureMesh secondIngamePlayerMesh3 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 4 * Constants.SPRITESHEET_ELEM_WIDTH,
+				3 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondIngamePlayerMesh3", secondIngamePlayerMesh3);
+
+		TextureMesh secondDownPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				2 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondDownPlayerMesh1", secondDownPlayerMesh1);
+
+		TextureMesh secondDownPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				3 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondDownPlayerMesh2", secondDownPlayerMesh2);
+
+		TextureMesh secondDownPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				4 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondDownPlayerMesh3", secondDownPlayerMesh3);
+
+		TextureMesh secondDeadPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				5 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondDeadPlayerMesh1", secondDeadPlayerMesh1);
+
+		TextureMesh secondDeadPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				6 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondDeadPlayerMesh2", secondDeadPlayerMesh2);
+
+		TextureMesh secondDeadPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				7 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondDeadPlayerMesh3", secondDeadPlayerMesh3);
+
+		TextureMesh secondLeftPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				8 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondLeftPlayerMesh1", secondLeftPlayerMesh1);
+
+		TextureMesh secondLeftPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				9 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondLeftPlayerMesh2", secondLeftPlayerMesh2);
+
+		TextureMesh secondLeftPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				10 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondLeftPlayerMesh3", secondLeftPlayerMesh3);
+
+		TextureMesh secondUpPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				11 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondUpPlayerMesh1", secondUpPlayerMesh1);
+
+		TextureMesh secondUpPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				12 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondUpPlayerMesh2", secondUpPlayerMesh2);
+
+		TextureMesh secondUpPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				13 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondUpPlayerMesh3", secondUpPlayerMesh3);
+
+		TextureMesh secondRightPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				14 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondRightPlayerMesh1", secondRightPlayerMesh1);
+
+		TextureMesh secondRightPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				15 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondRightPlayerMesh2", secondRightPlayerMesh2);
+
+		TextureMesh secondRightPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				16 * Constants.SPRITESHEET_ELEM_WIDTH, 3 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("secondRightPlayerMesh3", secondRightPlayerMesh3);
+
+		// Player 3
+		TextureMesh thirdIngamePlayerMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 2 * Constants.SPRITESHEET_ELEM_WIDTH,
+				4 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdIngamePlayerMesh1", thirdIngamePlayerMesh1);
+
+		TextureMesh thirdIngamePlayerMesh2 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 3 * Constants.SPRITESHEET_ELEM_WIDTH,
+				4 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdIngamePlayerMesh2", thirdIngamePlayerMesh2);
+
+		TextureMesh thirdIngamePlayerMesh3 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 4 * Constants.SPRITESHEET_ELEM_WIDTH,
+				4 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdIngamePlayerMesh3", thirdIngamePlayerMesh3);
+
+		TextureMesh thirdDownPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				2 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdDownPlayerMesh1", thirdDownPlayerMesh1);
+
+		TextureMesh thirdDownPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				3 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdDownPlayerMesh2", thirdDownPlayerMesh2);
+
+		TextureMesh thirdDownPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				4 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdDownPlayerMesh3", thirdDownPlayerMesh3);
+
+		TextureMesh thirdDeadPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				5 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdDeadPlayerMesh1", thirdDeadPlayerMesh1);
+
+		TextureMesh thirdDeadPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				6 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdDeadPlayerMesh2", thirdDeadPlayerMesh2);
+
+		TextureMesh thirdDeadPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				7 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdDeadPlayerMesh3", thirdDeadPlayerMesh3);
+
+		TextureMesh thirdLeftPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				8 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdLeftPlayerMesh1", thirdLeftPlayerMesh1);
+
+		TextureMesh thirdLeftPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				9 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdLeftPlayerMesh2", thirdLeftPlayerMesh2);
+
+		TextureMesh thirdLeftPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				10 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdLeftPlayerMesh3", thirdLeftPlayerMesh3);
+
+		TextureMesh thirdUpPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				11 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdUpPlayerMesh1", thirdUpPlayerMesh1);
+
+		TextureMesh thirdUpPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				12 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdUpPlayerMesh2", thirdUpPlayerMesh2);
+
+		TextureMesh thirdUpPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				13 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdUpPlayerMesh3", thirdUpPlayerMesh3);
+
+		TextureMesh thirdRightPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				14 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdRightPlayerMesh1", thirdRightPlayerMesh1);
+
+		TextureMesh thirdRightPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				15 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdRightPlayerMesh2", thirdRightPlayerMesh2);
+
+		TextureMesh thirdRightPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				16 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("thirdRightPlayerMesh3", thirdRightPlayerMesh3);
+
+		// Player 4
+		TextureMesh fourthIngamePlayerMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 2 * Constants.SPRITESHEET_ELEM_WIDTH,
+				5 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthIngamePlayerMesh1", fourthIngamePlayerMesh1);
+
+		TextureMesh fourthIngamePlayerMesh2 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 3 * Constants.SPRITESHEET_ELEM_WIDTH,
+				5 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthIngamePlayerMesh2", fourthIngamePlayerMesh2);
+
+		TextureMesh fourthIngamePlayerMesh3 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH,
+				Constants.GENERAL_BLOCK_HEIGHT, 4 * Constants.SPRITESHEET_ELEM_WIDTH,
+				5 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthIngamePlayerMesh3", fourthIngamePlayerMesh3);
+
+		TextureMesh fourthDownPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				2 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthDownPlayerMesh1", fourthDownPlayerMesh1);
+
+		TextureMesh fourthDownPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				3 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthDownPlayerMesh2", fourthDownPlayerMesh2);
+
+		TextureMesh fourthDownPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				4 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthDownPlayerMesh3", fourthDownPlayerMesh3);
+
+		TextureMesh fourthDeadPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				5 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthDeadPlayerMesh1", fourthDeadPlayerMesh1);
+
+		TextureMesh fourthDeadPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				6 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthDeadPlayerMesh2", fourthDeadPlayerMesh2);
+
+		TextureMesh fourthDeadPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				7 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthDeadPlayerMesh3", fourthDeadPlayerMesh3);
+
+		TextureMesh fourthLeftPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				8 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthLeftPlayerMesh1", fourthLeftPlayerMesh1);
+
+		TextureMesh fourthLeftPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				9 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthLeftPlayerMesh2", fourthLeftPlayerMesh2);
+
+		TextureMesh fourthLeftPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				10 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthLeftPlayerMesh3", fourthLeftPlayerMesh3);
+
+		TextureMesh fourthUpPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				11 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthUpPlayerMesh1", fourthUpPlayerMesh1);
+
+		TextureMesh fourthUpPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				12 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthUpPlayerMesh2", fourthUpPlayerMesh2);
+
+		TextureMesh fourthUpPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				13 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthUpPlayerMesh3", fourthUpPlayerMesh3);
+
+		TextureMesh fourthRightPlayerMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				14 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthRightPlayerMesh1", fourthRightPlayerMesh1);
+
+		TextureMesh fourthRightPlayerMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				15 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthRightPlayerMesh2", fourthRightPlayerMesh2);
+
+		TextureMesh fourthRightPlayerMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				16 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("fourthRightPlayerMesh3", fourthRightPlayerMesh3);
+
 		// AI
-		TextureMesh ingameAiMesh1 = new TextureMesh(64, 64, 0.2f, 0.66666666f, Constants.SPRITESHEET_COLS,
-				Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh ingameAiMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				2 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("ingameAiMesh1", ingameAiMesh1);
 
-		TextureMesh ingameAiMesh2 = new TextureMesh(64, 64, 0.3f, 0.66666666f, Constants.SPRITESHEET_COLS,
-				Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh ingameAiMesh2 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				3 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("ingameAiMesh2", ingameAiMesh2);
 
-		TextureMesh ingameAiMesh3 = new TextureMesh(64, 64, 0.4f, 0.66666666f, Constants.SPRITESHEET_COLS,
-				Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh ingameAiMesh3 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				4 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("ingameAiMesh3", ingameAiMesh3);
 
-		TextureMesh aiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.2f, 0.66666666f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
-		textureMeshes.put("aiMesh1", aiMesh1);
+		TextureMesh downAiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				2 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("downAiMesh1", downAiMesh1);
 
-		TextureMesh aiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.3f, 0.66666666f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
-		textureMeshes.put("aiMesh2", aiMesh2);
+		TextureMesh downAiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				3 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("downAiMesh2", downAiMesh2);
 
-		TextureMesh aiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.4f, 0.66666666f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
-		textureMeshes.put("aiMesh3", aiMesh3);
+		TextureMesh downAiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				4 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("downAiMesh3", downAiMesh3);
 
-		TextureMesh deadAiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.5f, 0.66666666f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh deadAiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				5 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("deadAiMesh1", deadAiMesh1);
 
-		TextureMesh deadAiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.6f, 0.66666666f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh deadAiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				6 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("deadAiMesh2", deadAiMesh2);
 
-		TextureMesh deadAiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT, 0.7f, 0.66666666f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh deadAiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				7 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("deadAiMesh3", deadAiMesh3);
 
+		TextureMesh leftAiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				8 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("leftAiMesh1", leftAiMesh1);
+
+		TextureMesh leftAiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				9 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("leftAiMesh2", leftAiMesh2);
+
+		TextureMesh leftAiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				10 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("leftAiMesh3", leftAiMesh3);
+
+		TextureMesh upAiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				11 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("upAiMesh1", upAiMesh1);
+
+		TextureMesh upAiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				12 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("upAiMesh2", upAiMesh2);
+
+		TextureMesh upAiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				13 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("upAiMesh3", upAiMesh3);
+
+		TextureMesh rightAiMesh1 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				14 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("rightAiMesh1", rightAiMesh1);
+
+		TextureMesh rightAiMesh2 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				15 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("rightAiMesh2", rightAiMesh2);
+
+		TextureMesh rightAiMesh3 = new TextureMesh(Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT,
+				16 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("rightAiMesh3", rightAiMesh3);
+
 		// Bomb
-		TextureMesh bombMesh1 = new TextureMesh(46, 46, 0.0f, 0.33333333f, Constants.SPRITESHEET_COLS,
-				Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh bombMesh1 = new TextureMesh(46, 46, 0 * Constants.SPRITESHEET_ELEM_WIDTH,
+				1 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("bombMesh1", bombMesh1);
 
-		TextureMesh bombMesh2 = new TextureMesh(48, 48, 0.1f, 0.33333333f, Constants.SPRITESHEET_COLS,
-				Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh bombMesh2 = new TextureMesh(48, 48, 1 * Constants.SPRITESHEET_ELEM_WIDTH,
+				1 * Constants.SPRITESHEET_ELEM_HEIGHT, Constants.SPRITESHEET_ELEM_WIDTH,
+				Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("bombMesh2", bombMesh2);
 
-		TextureMesh bombMesh3 = new TextureMesh(Constants.BOMB_WIDTH, Constants.BOMB_HEIGHT, 0.0f, 0.33333333f,
-				Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh bombMesh3 = new TextureMesh(Constants.BOMB_WIDTH, Constants.BOMB_HEIGHT,
+				0 * Constants.SPRITESHEET_ELEM_WIDTH, 1 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("bombMesh3", bombMesh3);
 
 		// Powerups
-		TextureMesh plusSpeedMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.4f,
-				0.0f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh plusSpeedMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				4 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("plusSpeedMesh", plusSpeedMesh);
 
 		TextureMesh minusSpeedMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-				0.5f, 0.0f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+				5 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("minusSpeedMesh", minusSpeedMesh);
 
-		TextureMesh plusBombMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.6f,
-				0.0f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh plusBombMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				6 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("plusBombMesh", plusBombMesh);
 
-		TextureMesh minusBombMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.7f,
-				0.0f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh minusBombMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				7 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("minusBombMesh", minusBombMesh);
 
-		TextureMesh plusRangeMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT, 0.8f,
-				0.0f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+		TextureMesh plusRangeMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				8 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("plusRangeMesh", plusRangeMesh);
 
 		TextureMesh minusRangeMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-				0.9f, 0.0f, Constants.SPRITESHEET_COLS, Constants.SPRITESHEET_ROWS, newspritesheet);
+				9 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("minusRangeMesh", minusRangeMesh);
 
 		// In-game design
@@ -296,7 +705,7 @@ public class Renderer {
 
 		TextureMesh ingameBlastMesh = new TextureMesh(Constants.HEART_WIDTH, Constants.HEART_HEIGHT, blast);
 		textureMeshes.put("ingameBlastMesh", ingameBlastMesh);
-		
+
 		TextureMesh controlsMesh = new TextureMesh(400, 300, controls);
 		textureMeshes.put("controlsMesh", controlsMesh);
 
@@ -476,13 +885,13 @@ public class Renderer {
 
 				if (playerAnimationCounter < 5) {
 
-					textureMeshes.get("ingamePlayerMesh1").render();
+					textureMeshes.get("secondIngamePlayerMesh1").render();
 				} else if (playerAnimationCounter < 10) {
 
-					textureMeshes.get("ingamePlayerMesh2").render();
+					textureMeshes.get("secondIngamePlayerMesh2").render();
 				} else if (playerAnimationCounter < 15) {
 
-					textureMeshes.get("ingamePlayerMesh3").render();
+					textureMeshes.get("secondIngamePlayerMesh3").render();
 				}
 			}
 
@@ -532,13 +941,13 @@ public class Renderer {
 
 				if (playerAnimationCounter < 5) {
 
-					textureMeshes.get("ingamePlayerMesh1").render();
+					textureMeshes.get("thirdIngamePlayerMesh1").render();
 				} else if (playerAnimationCounter < 10) {
 
-					textureMeshes.get("ingamePlayerMesh2").render();
+					textureMeshes.get("thirdIngamePlayerMesh2").render();
 				} else if (playerAnimationCounter < 15) {
 
-					textureMeshes.get("ingamePlayerMesh3").render();
+					textureMeshes.get("thirdIngamePlayerMesh3").render();
 				}
 
 			}
@@ -589,13 +998,13 @@ public class Renderer {
 
 				if (playerAnimationCounter < 5) {
 
-					textureMeshes.get("ingamePlayerMesh1").render();
+					textureMeshes.get("fourthIngamePlayerMesh1").render();
 				} else if (playerAnimationCounter < 10) {
 
-					textureMeshes.get("ingamePlayerMesh2").render();
+					textureMeshes.get("fourthIngamePlayerMesh2").render();
 				} else if (playerAnimationCounter < 15) {
 
-					textureMeshes.get("ingamePlayerMesh3").render();
+					textureMeshes.get("fourthIngamePlayerMesh3").render();
 				}
 			}
 
@@ -686,6 +1095,12 @@ public class Renderer {
 					textureShader.setUniform("model", modelMatrix);
 					textureMeshes.get("minusRangeMesh").render();
 					break;
+				case HOLE:
+					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
+							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
+					textureShader.setUniform("model", modelMatrix);
+					textureMeshes.get("holeMesh").render();
+					break;
 				}
 			}
 		}
@@ -712,7 +1127,8 @@ public class Renderer {
 
 		List<Player> playerList = state.getPlayers();
 		synchronized (playerList) {
-			for (Player player : playerList) {
+			for (int i = 0; i < playerList.size(); i++) {
+				Player player = playerList.get(i);
 				modelMatrix = transformation.getModelMatrix((float) player.getPos().x + 15,
 						(float) player.getPos().y + 15, 0f, 1f);
 				textureShader.setUniform("model", modelMatrix);
@@ -721,13 +1137,52 @@ public class Renderer {
 
 						if (playerAnimationCounter < 5) {
 
-							textureMeshes.get("aiMesh1").render();
+							if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+								textureMeshes.get("rightAiMesh1").render();
+							} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+								textureMeshes.get("upAiMesh1").render();
+							} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+								textureMeshes.get("leftAiMesh1").render();
+							} else if (player.getKeyState().getMovement() == Movement.DOWN
+									|| player.getKeyState().getMovement() == Movement.NONE) {
+
+								textureMeshes.get("downAiMesh1").render();
+							}
 						} else if (playerAnimationCounter < 10) {
 
-							textureMeshes.get("aiMesh2").render();
+							if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+								textureMeshes.get("rightAiMesh2").render();
+							} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+								textureMeshes.get("upAiMesh2").render();
+							} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+								textureMeshes.get("leftAiMesh2").render();
+							} else if (player.getKeyState().getMovement() == Movement.DOWN
+									|| player.getKeyState().getMovement() == Movement.NONE) {
+
+								textureMeshes.get("downAiMesh2").render();
+							}
 						} else if (playerAnimationCounter < 15) {
 
-							textureMeshes.get("aiMesh3").render();
+							if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+								textureMeshes.get("rightAiMesh3").render();
+							} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+								textureMeshes.get("upAiMesh3").render();
+							} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+								textureMeshes.get("leftAiMesh3").render();
+							} else if (player.getKeyState().getMovement() == Movement.DOWN
+									|| player.getKeyState().getMovement() == Movement.NONE) {
+
+								textureMeshes.get("downAiMesh3").render();
+							}
 						}
 					} else {
 
@@ -743,30 +1198,264 @@ public class Renderer {
 						}
 					}
 				} else {
-					
+
 					if (player.isAlive()) {
 
-						if (playerAnimationCounter < 5) {
+						if (i == 0) {
 
-							textureMeshes.get("playerMesh1").render();
-						} else if (playerAnimationCounter < 10) {
+							if (playerAnimationCounter < 5) {
 
-							textureMeshes.get("playerMesh2").render();
-						} else if (playerAnimationCounter < 15) {
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
 
-							textureMeshes.get("playerMesh3").render();
+									textureMeshes.get("rightPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("upPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("leftPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("downPlayerMesh1").render();
+								}
+							} else if (playerAnimationCounter < 10) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("rightPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("upPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("leftPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("downPlayerMesh2").render();
+								}
+							} else if (playerAnimationCounter < 15) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("rightPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("upPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("leftPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("downPlayerMesh3").render();
+								}
+
+							}
+						} else if (i == 1) {
+
+							if (playerAnimationCounter < 5) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("secondRightPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("secondUpPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("secondLeftPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("secondDownPlayerMesh1").render();
+								}
+							} else if (playerAnimationCounter < 10) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("secondRightPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("secondUpPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("secondLeftPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("secondDownPlayerMesh2").render();
+								}
+							} else if (playerAnimationCounter < 15) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("secondRightPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("secondUpPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("secondLeftPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("secondDownPlayerMesh3").render();
+								}
+							}
+						} else if (i == 2) {
+							
+							if (playerAnimationCounter < 5) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("thirdRightPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("thirdUpPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("thirdLeftPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("thirdDownPlayerMesh1").render();
+								}
+							} else if (playerAnimationCounter < 10) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("thirdRightPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("thirdUpPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("thirdLeftPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("thirdDownPlayerMesh2").render();
+								}
+							} else if (playerAnimationCounter < 15) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("thirdRightPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("thirdUpPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("thirdLeftPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("thirdDownPlayerMesh3").render();
+								}
+							}
+						} else if(i == 3) {
+							if (playerAnimationCounter < 5) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("fourthRightPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("fourthUpPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("fourthLeftPlayerMesh1").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("fourthDownPlayerMesh1").render();
+								}
+							} else if (playerAnimationCounter < 10) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("fourthRightPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("fourthUpPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("fourthLeftPlayerMesh2").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("fourthDownPlayerMesh2").render();
+								}
+							} else if (playerAnimationCounter < 15) {
+
+								if (player.getKeyState().getMovement() == Movement.RIGHT) {
+
+									textureMeshes.get("fourthRightPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.UP) {
+
+									textureMeshes.get("fourthUpPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.LEFT) {
+
+									textureMeshes.get("fourthLeftPlayerMesh3").render();
+								} else if (player.getKeyState().getMovement() == Movement.DOWN
+										|| player.getKeyState().getMovement() == Movement.NONE) {
+
+									textureMeshes.get("fourthDownPlayerMesh3").render();
+								}
+							}
+							
 						}
 					} else {
 
-						if (playerAnimationCounter < 5) {
+						if (i == 0) {
+							if (playerAnimationCounter < 5) {
 
-							textureMeshes.get("deadPlayerMesh1").render();
-						} else if (playerAnimationCounter < 10) {
+								textureMeshes.get("deadPlayerMesh1").render();
+							} else if (playerAnimationCounter < 10) {
 
-							textureMeshes.get("deadPlayerMesh2").render();
-						} else if (playerAnimationCounter < 15) {
+								textureMeshes.get("deadPlayerMesh2").render();
+							} else if (playerAnimationCounter < 15) {
 
-							textureMeshes.get("deadPlayerMesh3").render();
+								textureMeshes.get("deadPlayerMesh3").render();
+							}
+						} else if (i == 1) {
+
+							if (playerAnimationCounter < 5) {
+
+								textureMeshes.get("secondDeadPlayerMesh1").render();
+							} else if (playerAnimationCounter < 10) {
+
+								textureMeshes.get("secondDeadPlayerMesh2").render();
+							} else if (playerAnimationCounter < 15) {
+
+								textureMeshes.get("secondDeadPlayerMesh3").render();
+							}
+						} else if (i == 2) {
+							
+							if (playerAnimationCounter < 5) {
+
+								textureMeshes.get("thirdDeadPlayerMesh1").render();
+							} else if (playerAnimationCounter < 10) {
+
+								textureMeshes.get("thirdDeadPlayerMesh2").render();
+							} else if (playerAnimationCounter < 15) {
+
+								textureMeshes.get("thirdDeadPlayerMesh3").render();
+							}
+						} else if (i == 3) {
+							
+							if (playerAnimationCounter < 5) {
+
+								textureMeshes.get("fourthDeadPlayerMesh1").render();
+							} else if (playerAnimationCounter < 10) {
+
+								textureMeshes.get("fourthDeadPlayerMesh2").render();
+							} else if (playerAnimationCounter < 15) {
+
+								textureMeshes.get("fourthDeadPlayerMesh3").render();
+							}
 						}
 					}
 				}
@@ -1067,7 +1756,7 @@ public class Renderer {
 		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
-				
+
 		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2);
 		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
@@ -1086,7 +1775,8 @@ public class Renderer {
 	 *            The given game state
 	 */
 	private float seconds = 5;
-	private float interval = 1f/Constants.TARGET_FPS;
+	private float interval = 1f / Constants.TARGET_FPS;
+
 	private void renderBeginningHud(Screen screen, GameState state) {
 
 		hudShader.bind();
@@ -1095,14 +1785,16 @@ public class Renderer {
 				screen.getHeight() * h_ratio, 0f);
 
 		hudTextItem.setText(Integer.toString((int) seconds));
-		x =  Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2) + Constants.CONTROLS_WIDTH / 2;
-		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2) + Constants.CONTROLS_HEIGHT + 10;
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2)
+				+ Constants.CONTROLS_WIDTH / 2;
+		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2)
+				+ Constants.CONTROLS_HEIGHT + 10;
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 		hudTextItem.getMesh().render();
-		
+
 		seconds -= interval;
 
 		hudShader.unbind();
@@ -1131,7 +1823,7 @@ public class Renderer {
 		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
-		
+
 		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2);
 		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
@@ -1155,16 +1847,18 @@ public class Renderer {
 		hudShader.setUniform("texture_sampler", 0);
 		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio,
 				screen.getHeight() * h_ratio, 0f);
-		
+
 		hudTextItem.setText("PRESS P TO UNPAUSE THE GAME");
-		x =  Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2) + (Constants.CONTROLS_WIDTH / 2 - hudTextItem.getTextWidth() / 2); 
-		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2) + Constants.CONTROLS_HEIGHT + 10;
+		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2)
+				+ (Constants.CONTROLS_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2)
+				+ Constants.CONTROLS_HEIGHT + 10;
 		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 		hudTextItem.getMesh().render();
-		
+
 		hudShader.unbind();
 	} // END OF renderPauseHud METHOD
 

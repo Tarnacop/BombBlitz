@@ -27,6 +27,7 @@ public class Game implements GameInterface {
 	private Graphics graphics;
 	private Renderer renderer;
 	private boolean bombPressed;
+	private boolean pausePressed;
 	private KeyboardInput input;
 	private Player player;
 	private AudioManager audio;
@@ -44,6 +45,7 @@ public class Game implements GameInterface {
 		this.playerName = playerName;
 		this.controlScheme = controls;
 		this.bombPressed = false;
+		this.pausePressed = false;
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer();
@@ -57,7 +59,6 @@ public class Game implements GameInterface {
 			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
 			this.graphics.start();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -152,8 +153,6 @@ public class Game implements GameInterface {
 					}
 
 					this.physics.update((int) (interval * 1000));
-					this.keyState.setBomb(false);
-					this.keyState.setMovement(Movement.NONE);
 					audio.playEventList(gameState.getAudioEvents());
 				}
 			}
@@ -169,6 +168,9 @@ public class Game implements GameInterface {
 	@Override
 	public void input(Screen screen) {
 
+		this.keyState.setBomb(false);
+		this.keyState.setMovement(Movement.NONE);
+		this.pausePressed = this.input.pauseCheck(screen, this.keyState, this.controlScheme, this.pausePressed);
 		this.bombPressed = this.input.update(screen, this.keyState, this.controlScheme, this.bombPressed);
 	}
 

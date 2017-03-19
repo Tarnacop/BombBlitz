@@ -87,8 +87,7 @@ public class MediumAI extends AITemplate {
 		SecureRandom random = new SecureRandom();
 		while (gameAI.isAlive()) {
 
-			while(pause)
-			{
+			while (pause) {
 				try {
 					System.out.println("pause");
 					Thread.sleep(100);
@@ -97,44 +96,43 @@ public class MediumAI extends AITemplate {
 					e.printStackTrace();
 				}
 			}
-			// if AI is in danger then find the escape route with 80%
+			// if AI is in danger then find the escape route with 60%
 			// possibility
-			if (safetyCh.inDanger() && random.nextInt(10) < 8) {
+			if (safetyCh.inDanger() && random.nextInt(10) < 6) {
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 
 			}
-
+			// otherwise just generate a random goal and start full-filling it
+			else if (random.nextBoolean()) {
+				int x = random.nextInt(gameState.getMap().getGridMap().length);
+				int y = random.nextInt(gameState.getMap().getGridMap()[0].length);
+				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
+				performPlannedMoves(moves);
+			}
 			// else if there is an upgrade find the moves to it
-			else if ((moves = finder.findRouteToUpgrade()) != null) {
+			else if (random.nextBoolean() && (moves = finder.findRouteToUpgrade()) != null) {
 
 				performMoves(moves, false);
 			}
 
 			// if enemy is in bomb range then place the bomb and go to the
-			// safe location with 50% possibility
-			else if (random.nextBoolean() && safetyCh.isEnemyInBombRange()) {
+			// safe location with 30% possibility
+			else if (random.nextInt(100) < 30 && safetyCh.isEnemyInBombRange()) {
 				gameAI.getKeyState().setBomb(true);
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 			}
 
 			// if enemy is accessible(no boxes are blocking the path) then
-			// find a route to it and make moves with 50% possibility
-			else if (random.nextBoolean() && (moves = getMovesToEnemy()) != null) {
+			// find a route to it and make moves with 40% possibility
+			else if (random.nextInt(100) < 40 && (moves = getMovesToEnemy()) != null) {
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy and
-			// fullfill it
+			// full-fill it
 			else if (random.nextBoolean()
 					&& (moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
-				performPlannedMoves(moves);
-			}
-			// otherwise just generate a random goal and start fullfilling it
-			else {
-				int x = random.nextInt(gameState.getMap().getGridMap().length);
-				int y = random.nextInt(gameState.getMap().getGridMap()[0].length);
-				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
 				performPlannedMoves(moves);
 			}
 			gameAI.getKeyState().setBomb(false);
