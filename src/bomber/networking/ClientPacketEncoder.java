@@ -491,7 +491,7 @@ public class ClientPacketEncoder {
 			}
 			k.setBomb(BitArray.getBit(keyState, 5));
 
-			player.setName("player " + id);
+			// player.setName("player " + id);
 			player.getPos().x = posX;
 			player.getPos().y = posY;
 			player.setLives(lives);
@@ -671,7 +671,7 @@ public class ClientPacketEncoder {
 				k.setMovement(Movement.RIGHT);
 			}
 			k.setBomb(BitArray.getBit(keyState, 5));
-			Player p = new Player("player " + id, new Point(posX, posY), lives, speed);
+			Player p = new Player(/* "player " + id */null, new Point(posX, posY), lives, speed);
 			p.setPlayerID(id);
 			p.setBombRange(bombRange);
 			p.setMaxNrOfBombs(maxBomb);
@@ -688,7 +688,7 @@ public class ClientPacketEncoder {
 			int posY = buffer.getInt();
 			int time = buffer.getInt();
 			int radius = buffer.getInt();
-			Bomb b = new Bomb("player " + playerID, new Point(posX, posY), time, radius);
+			Bomb b = new Bomb(/* "player " + playerID */null, new Point(posX, posY), time, radius);
 			b.setPlayerID(playerID);
 			bombList.add(b);
 		}
