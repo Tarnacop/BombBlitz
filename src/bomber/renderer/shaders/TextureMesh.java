@@ -37,7 +37,7 @@ public class TextureMesh {
 	 * @param rowsNumber The number of rows of the sprite sheet
 	 * @param texture The sprite sheet given as a texture
 	 */
-	public TextureMesh(float width, float height, float textX, float textY, float colsNumber, float rowsNumber, Texture texture) {
+	public TextureMesh(float width, float height, float textX, float textY, float textWidth, float textHeight, Texture texture) {
 		
 		int[] indices = new int[] { 0, 1, 3, 3, 1, 2, };
 		float[] positions = {
@@ -54,13 +54,13 @@ public class TextureMesh {
 		float[] textureCoords = new float[] {
 				
 				// For V0
-				textX, textY + (1f / rowsNumber),
+				textX, textY + textHeight,
 				// For V1
 				textX, textY,
 				// For V2
-				textX + (1f / colsNumber), textY,
+				textX + textWidth, textY,
 				// FOR V3
-				textX + (1f / colsNumber), textY + (1f / rowsNumber)
+				textX + textWidth, textY + textHeight
 		};
 		
 		vao = new VertexArrayObject();
