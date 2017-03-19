@@ -45,7 +45,18 @@ public class OnlineGame implements GameInterface {
 		this.bombPressed = false;
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
-		this.renderer = new Renderer();
+		List<String> playerNames = new ArrayList<String>();
+		this.gameState = this.client.getGameState();
+		for (Player player : this.gameState.getPlayers()) {
+				for (ClientServerPlayer onlinePlayer : this.onlinePlayers) {
+					if (player.getPlayerID() == onlinePlayer.getID()) {
+						player.setName(onlinePlayer.getName());
+						break;
+					}
+				}
+			playerNames.add(player.getName());
+		}
+		this.renderer = new Renderer(playerNames);
 		audio = new AudioManager();
 		audio.playMusic();
 
@@ -87,10 +98,8 @@ public class OnlineGame implements GameInterface {
 	@Override
 	public void update(float interval) {
 
-		//System.err.println("CALLED UPDATE");
 		this.gameState = this.client.getGameState();
 		for (Player player : this.gameState.getPlayers()) {
-			if (!(player instanceof GameAI)) {
 				for (ClientServerPlayer onlinePlayer : this.onlinePlayers) {
 					if (player.getPlayerID() == onlinePlayer.getID()) {
 						player.setName(onlinePlayer.getName());
@@ -99,10 +108,9 @@ public class OnlineGame implements GameInterface {
 				}
 				if (player.getName().equals(this.playerName)) {
 					this.player = player;
-					//System.err.println("FOUND " + this.player.getName());
 					break;
 				}
-			}
+			
 		}
 		if (gameEnded) {
 

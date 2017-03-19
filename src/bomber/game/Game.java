@@ -9,6 +9,7 @@ import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
 import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
+import bomber.networking.ClientServerPlayer;
 import bomber.physics.PhysicsEngine;
 import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
@@ -48,10 +49,15 @@ public class Game implements GameInterface {
 		this.pausePressed = false;
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
-		this.renderer = new Renderer();
+		List<String> playerNames = new ArrayList<String>();
+		playerNames.add(this.playerName);
+		int inc = 1;
+		while(inc <= aiNum){
+			playerNames.add("AI " + inc);
+			inc++;
+		}
+		this.renderer = new Renderer(playerNames);
 		audio = new AudioManager();
-		// System.out.println("Game Music " + musicVolume + " Sound " +
-		// soundVolume);
 		audio.playMusic();
 
 		try {

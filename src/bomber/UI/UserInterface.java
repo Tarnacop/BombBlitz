@@ -1115,7 +1115,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		beep();
 		try{
 		int index = this.client.getMapID();
-		//System.out.println("INDEX: " + index);
+		//System.out.println("INDEX: " + index + " out of " + (this.maps.size()-1));
 		if(index > 0){
 			this.client.setRoomMapID(index-1);
 			this.map = this.maps.get(index-1);
@@ -1148,7 +1148,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		beep();
 		try{
 		int index = this.client.getMapID();
-		//System.out.println("INDEX: " + index);
+		//System.out.println("INDEX: " + index + " out of " + (this.maps.size()-1));
 		if(index < (this.maps.size()-1)){
 			this.client.setRoomMapID(index+1);
 			this.map = this.maps.get(index+1);
