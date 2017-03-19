@@ -1738,15 +1738,20 @@ public class Renderer {
 		if(youWon == true) {
 			
 			hudTextItemBig.setText("YOU WON");
-			x = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BLOCK_WIDTH - hudTextItemBig.getTextWidth() / 2);
+			x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItemBig.getTextWidth() / 2);
+			y += Constants.GENERAL_BOX_Y + hudTextItemBig.getTextHeight() / 2;
 			modelMatrix = transformation.getModelMatrix(x, y, hudTextItemBig.getRotation(), hudTextItemBig.getScale());
+			hudShader.setUniform("projModelMatrix",
+					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 			hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 			hudTextItemBig.getMesh().render();
 		} else {
 			
 			hudTextItemBig.setText("YOU LOST");
-			x = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BLOCK_WIDTH - hudTextItemBig.getTextWidth() / 2);
+			x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2- hudTextItemBig.getTextWidth() / 2);
 			modelMatrix = transformation.getModelMatrix(x, y, hudTextItemBig.getRotation(), hudTextItemBig.getScale());
+			hudShader.setUniform("projModelMatrix",
+					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 			hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 			hudTextItemBig.getMesh().render();
 		}
