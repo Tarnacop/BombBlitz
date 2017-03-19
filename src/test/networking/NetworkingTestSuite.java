@@ -8,8 +8,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({ BitArrayTest.class, ClientServerAiTest.class, ClientServerInfoTest.class,
 		ClientServerLobbyRoomTest.class, ClientServerPlayerTest.class, ClientServerRoomTest.class,
 		PacketEncodeDecodeTest.class, PacketHistoryEntryTest.class, ServerAITest.class, ServerClientInfoTest.class,
-		ServerClientTableTest.class, ServerConfigurationTest.class, ServerGameTest.class, ServerRoomTableTest.class,
-		ServerRoomTest.class
+		ServerClientTableTest.class, ServerClientTest.class, ServerConfigurationTest.class, ServerGameTest.class,
+		ServerRoomTableTest.class, ServerRoomTest.class
 
 })
 

@@ -78,7 +78,6 @@ public class OnlineGame implements GameInterface {
 
 	private float gameOverCounter = 0;
 	private	float frontScreenCounter = 0f;
-	
 	@Override
 	public void update(float interval) {
 

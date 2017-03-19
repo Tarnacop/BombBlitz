@@ -16,6 +16,7 @@ public class ServerAITest {
 
 	@Before
 	public void setUp() throws Exception {
+		ai = new ServerAI((byte) 0);
 		ai = new ServerAI((byte) 0, AIDifficulty.EASY);
 		ai.setGameAI(gai);
 	}
@@ -29,6 +30,10 @@ public class ServerAITest {
 		assertEquals((byte) 0, ai.getID());
 		assertEquals(AIDifficulty.EASY, ai.getDifficulty());
 		assertEquals(gai, ai.getGameAI());
+
+		ai.setDifficulty(null);
+		assertEquals(AIDifficulty.MEDIUM, ai.getDifficulty());
+
 		ai.setDifficulty(AIDifficulty.EXTREME);
 		assertEquals(AIDifficulty.EXTREME, ai.getDifficulty());
 	}
