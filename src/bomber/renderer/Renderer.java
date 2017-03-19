@@ -147,15 +147,15 @@ public class Renderer {
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blankMesh", blankMesh);
 
-		TextureMesh softMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+		TextureMesh solidMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				1 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
-		textureMeshes.put("softMesh", softMesh);
+		textureMeshes.put("solidMesh", solidMesh);
 
-		TextureMesh solidMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+		TextureMesh softMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				2 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
-		textureMeshes.put("solidMesh", solidMesh);
+		textureMeshes.put("softMesh", softMesh);
 
 		TextureMesh blastMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				3 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
