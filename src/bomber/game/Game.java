@@ -100,6 +100,7 @@ public class Game implements GameInterface {
 	private float frontScreenCounter = 0f;
 	private boolean startAIs = true;
 	private boolean gamePaused = false;
+	private boolean playMusic = true;
 	
 	@Override
 	public void update(float interval) {
@@ -109,7 +110,23 @@ public class Game implements GameInterface {
 			if (gameOverCounter < 3) {
 
 				gameOverCounter += interval;
-				renderer.displayGameOver(this.player.isAlive()?true:false);
+				if(this.player.isAlive()){
+					renderer.displayGameOver(true);
+					if(playMusic){
+						this.audio.stopAudio();
+						AudioManager.playGameOverWon();
+						playMusic = false;
+					}
+				}
+				else{
+					renderer.displayGameOver(false);
+					if(playMusic){
+						this.audio.stopAudio();
+						AudioManager.playGameOverLost();
+						playMusic = false;
+					}
+				}
+				
 			} else {
 				
 				this.graphics.getScreen().close();
@@ -131,21 +148,16 @@ public class Game implements GameInterface {
 
 				if (this.player.getKeyState().isPaused()) {
 
-					System.out.println("PLAYER HAS PRESSED PAUSE");
 					if (!this.gamePaused) {
 						this.gamePaused = true;
 						for (Player player : this.gameState.getPlayers()) {
 							player.pause();
 						}
-						System.out.println("PAUSED GAME");
 						renderer.displayPauseScreen();
-					} else {
-						System.out.println("GAME IS STILL PAUSED");
 					}
 				} else {
 					if (this.gamePaused) {
 						this.gamePaused = false;
-						System.out.println("GAME WAS PAUSED, NOW UNPAUSED");
 						for (Player player : this.gameState.getPlayers()) {
 							player.resume();
 						}
