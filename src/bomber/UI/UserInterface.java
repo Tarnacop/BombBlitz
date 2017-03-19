@@ -281,12 +281,17 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyBox.setMaxHeight(boxHeight);
 		readyButton = createButton("Not Ready", 250, 50);
 		readyButton.setOnAction(e -> ready());
-		readyBox.getChildren().addAll(createLabel("Click to\ntoggle Ready:", false, false), readyTorch, readyButton);
+		
+		HBox torchBox = new HBox();
+		torchBox.setSpacing(SMALL_PAD);
+		torchBox.setAlignment(CENTER);
+		torchBox.getChildren().addAll(createLabel("Click to\ntoggle Ready:", false, false), readyTorch);
+		readyBox.getChildren().addAll(torchBox, readyButton);
 		
 		readyPane = new VBox();
 		readyPane.getStyleClass().add("menubox");
-		readyPane.setSpacing(30);
-		readyPane.setMinWidth(boxWidth+20);
+		readyPane.setSpacing(SMALL_PAD);
+		readyPane.setMinWidth(boxWidth+MEDIUM_PAD);
 		readyPane.setMinHeight(boxHeight);
 		readyPane.setMaxHeight(boxHeight);
 		//System.out.println(boxHeight);
@@ -1694,7 +1699,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				//blankButton(leaveRoomBtn, "Game in progress...");
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
 				onlineGame = new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
@@ -1714,7 +1718,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				onlineGame.setGameEnded(true);
-				//resetButton(leaveRoomBtn, "Leave Room", e -> leaveRoom());
 				readyButton.setText("Not Ready");
 				readyButton.setOnAction(e -> ready());
 				readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
@@ -1735,16 +1738,16 @@ public class UserInterface extends Application implements ClientNetInterface{
 		});
 	}
 	
-	public void show(boolean fullScreen) {
+	public void show(boolean fullScreen, boolean online, boolean gameFinished) {
 		Platform.runLater(new Runnable(){
 
 			@Override
 			public void run() {
-				System.out.println("OPENING MENU");
+				//System.out.println("OPENING MENU");
 				currentStage.setFullScreen(fullScreen);
 				currentStage.show();
 				Platform.setImplicitExit(true);
-				leaveRoom();
+				if(online && !gameFinished)leaveRoom();
 			}
 			   
 		});
@@ -1752,7 +1755,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	@Override
 	public void connectionAttemptTimeout() {
-		//System.out.println("CALLED CONNECTION TIMEOUT");
 		Platform.runLater(new Runnable(){
 
 			@Override

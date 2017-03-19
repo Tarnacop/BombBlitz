@@ -116,10 +116,11 @@ public abstract class Constants
 	public static final float TINY_PAD = 5;
 	public static final float SMALL_PAD = 10;
 	public static final float MEDIUM_PAD = 20;
+	public static final float LARGE_PAD = 30;
 	public static final float MASSIVE_PAD = 100;
 	
-	public static final float TORCH_WIDTH = 90;
-	public static final float TORCH_HEIGHT = 120;
+	public static final float TORCH_WIDTH = 60;
+	public static final float TORCH_HEIGHT = 90;
 	
 	public static final float MAP_CANVAS_WIDTH = 300;
 	public static final float MAP_CANVAS_HEIGHT = 300;
