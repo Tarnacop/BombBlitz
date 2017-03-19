@@ -942,7 +942,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label createLabel(String text, boolean shaded, boolean white){
 		Label label = new Label(text);
 		label.setFont(font);
-		if(white)label.setTextFill(Color.WHITE);
+		label.setTextFill(white?Color.WHITE:Color.BLACK);
 		label.setAlignment(CENTER);
 		label.setTextAlignment(TextAlignment.CENTER);
 		if(shaded){
@@ -1286,7 +1286,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 					}
 				}
 			}
-			if(room.getPlayerNumber() < room.getMaxPlayer()){
+			if(room.isInGame()){
+				Label fullLabel = createLabel("IN GAME", false, false);
+				fullLabel.setPrefWidth(100);
+				fullLabel.setPrefHeight(50);
+				fullLabel.getStyleClass().add("textfield");
+				roomPane.getChildren().addAll(fullLabel, numPlayers);
+			}
+			else if(room.getPlayerNumber() < room.getMaxPlayer()){
 				Button joinButton = createButton("Join", 100, 50);
 				joinButton.setOnAction(e -> joinRoom(room.getID(), joinButton));
 				roomPane.getChildren().addAll(joinButton, numPlayers);
@@ -1687,14 +1694,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				blankButton(leaveRoomBtn, "Game in progress...");
+				//blankButton(leaveRoomBtn, "Game in progress...");
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
-				/*try {
-					client.readyToPlay(false);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}*/
 				onlineGame = new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
 			}
 			   
@@ -1712,7 +1714,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			@Override
 			public void run() {
 				onlineGame.setGameEnded(true);
-				resetButton(leaveRoomBtn, "Leave Room", e -> leaveRoom());
+				//resetButton(leaveRoomBtn, "Leave Room", e -> leaveRoom());
 				readyButton.setText("Not Ready");
 				readyButton.setOnAction(e -> ready());
 				readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
@@ -1742,6 +1744,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 				currentStage.setFullScreen(fullScreen);
 				currentStage.show();
 				Platform.setImplicitExit(true);
+				leaveRoom();
 			}
 			   
 		});
