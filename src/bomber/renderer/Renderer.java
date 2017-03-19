@@ -12,7 +12,6 @@ import org.joml.Matrix4f;
 
 import com.sun.prism.paint.Color;
 
-import bomber.AI.GameAI;
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.Constants;
