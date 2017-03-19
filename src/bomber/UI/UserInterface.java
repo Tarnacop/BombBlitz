@@ -1089,6 +1089,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 			}
 			this.expectingRoomCreation = false;
 			this.expectingRoomJoin = false;
+			readyButton.setText("Not Ready");
+			readyButton.setOnAction(e -> ready());
+			readyTorch.setFill(new ImagePattern(new Image("resources/images/darktorch.png")));
 			previous();
 		}
 	}
