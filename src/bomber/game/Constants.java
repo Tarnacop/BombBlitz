@@ -105,8 +105,11 @@ public abstract class Constants
 	public static final int CONTROLS_HEIGHT = 450;
 
 	//User Interface Constants
-	public static final float SCREEN_HEIGHT_SCALAR = 0.9f;
-	public static final float SCREEN_WIDTH_SCALAR = 0.8f;
+	public static final float SCREEN_HEIGHT_SCALAR = 1.0f;
+	public static final float SCREEN_WIDTH_SCALAR = 1.0f;
+	
+	public static final float FONT_SIZE = 20;
+	
 	
 	public static final float MENU_BOX_HEIGHT_SCALAR = 3.5f;
 	public static final float MENU_BOX_WIDTH_SCALAR = 5.0f;

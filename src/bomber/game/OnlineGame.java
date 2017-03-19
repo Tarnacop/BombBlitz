@@ -45,18 +45,7 @@ public class OnlineGame implements GameInterface {
 		this.bombPressed = false;
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
-		List<String> playerNames = new ArrayList<String>();
-		this.gameState = this.client.getGameState();
-		for (Player player : this.gameState.getPlayers()) {
-				for (ClientServerPlayer onlinePlayer : this.onlinePlayers) {
-					if (player.getPlayerID() == onlinePlayer.getID()) {
-						player.setName(onlinePlayer.getName());
-						break;
-					}
-				}
-			playerNames.add(player.getName());
-		}
-		this.renderer = new Renderer(playerNames);
+		this.renderer = new Renderer();
 		audio = new AudioManager();
 		audio.playMusic();
 
@@ -78,10 +67,29 @@ public class OnlineGame implements GameInterface {
 			renderer.stopFrontScreen();
 
 			while (this.gameState == null) {
-				this.gameState = this.client.getGameState();
 				Thread.sleep(100);
+				this.gameState = this.client.getGameState();
 			}
-
+			
+			int inc = 1;
+			for (Player player : this.gameState.getPlayers()) {
+				if (player.getPlayerID() < 31) {
+					for (ClientServerPlayer onlinePlayer : this.onlinePlayers) {
+						if (player.getPlayerID() == onlinePlayer.getID()) {
+							player.setName(onlinePlayer.getName());
+							break;
+						}
+					}
+					if (player.getName().equals(this.playerName)) {
+						this.player = player;
+					}
+				}
+				else{
+					player.setName("AI " + inc);
+					inc++;
+				}
+			}
+			
 			this.keyState = new KeyboardState();
 
 		} catch (Exception e) {
@@ -98,20 +106,6 @@ public class OnlineGame implements GameInterface {
 	@Override
 	public void update(float interval) {
 
-		this.gameState = this.client.getGameState();
-		for (Player player : this.gameState.getPlayers()) {
-				for (ClientServerPlayer onlinePlayer : this.onlinePlayers) {
-					if (player.getPlayerID() == onlinePlayer.getID()) {
-						player.setName(onlinePlayer.getName());
-						break;
-					}
-				}
-				if (player.getName().equals(this.playerName)) {
-					this.player = player;
-					break;
-				}
-			
-		}
 		if (gameEnded) {
 
 			if (gameOverCounter < 3) {

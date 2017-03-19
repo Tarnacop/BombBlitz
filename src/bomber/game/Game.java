@@ -49,14 +49,7 @@ public class Game implements GameInterface {
 		this.pausePressed = false;
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
-		List<String> playerNames = new ArrayList<String>();
-		playerNames.add(this.playerName);
-		int inc = 1;
-		while(inc <= aiNum){
-			playerNames.add("AI " + inc);
-			inc++;
-		}
-		this.renderer = new Renderer(playerNames);
+		this.renderer = new Renderer();
 		audio = new AudioManager();
 		audio.playMusic();
 
