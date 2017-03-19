@@ -158,7 +158,14 @@ public class MapsParser extends DefaultHandler {
 					block[i] = Block.BLANK;
 					spawnPoints.add(new Point(i*scalar, j*scalar));
 					break;
+				case "H":
+					block[i] = Block.HOLE;
+					break;
+				default: 
+					block[i] = Block.SOFT;
+					break;
 				}
+				
 			}	
 			mapHelper[j] = block;
 		}

@@ -175,7 +175,8 @@ public abstract class AITemplate extends Thread {
 		
 		// waiting for the move to be mande
 		while (checkIfReachedDestination(gameAI.getPos(), updatedPosPixel) && gameAI.isAlive()
-				&& !safetyCh.isNextMoveBomb(updatedPos) && stuckChecker < 75 && !pause) {
+				&& !safetyCh.isNextMoveBomb(updatedPos) && stuckChecker < 75 ) {
+			pausedGame();
 			stuckChecker++;
 			try {
 				sleep(10);
@@ -187,6 +188,18 @@ public abstract class AITemplate extends Thread {
 		// setting keyboard back to normal
 		gameAI.getKeyState().setMovement(Movement.NONE);
 
+	}
+	
+	protected void pausedGame()
+	{
+		while(pause)
+		{
+			try {
+				sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
