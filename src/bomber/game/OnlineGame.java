@@ -84,12 +84,12 @@ public class OnlineGame implements GameInterface {
 	public void update(float interval) {
 
 		this.gameState = this.client.getGameState();
-		if (gameEnded /* this.gameState.gameOver() */) {
+		if (gameEnded) {
 
 			if (gameOverCounter < 3) {
 
 				gameOverCounter += interval;
-				renderer.displayGameOver();
+				renderer.displayGameOver(this.player.isAlive()?true:false);
 			} else {
 				this.graphics.getScreen().close();
 			}

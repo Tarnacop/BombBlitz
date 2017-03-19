@@ -100,7 +100,7 @@ public class Game implements GameInterface {
 	private float frontScreenCounter = 0f;
 	private boolean startAIs = true;
 	private boolean gamePaused = false;
-
+	
 	@Override
 	public void update(float interval) {
 
@@ -109,7 +109,7 @@ public class Game implements GameInterface {
 			if (gameOverCounter < 3) {
 
 				gameOverCounter += interval;
-				renderer.displayGameOver();
+				renderer.displayGameOver(this.player.isAlive()?true:false);
 			} else {
 				
 				this.graphics.getScreen().close();
@@ -179,12 +179,12 @@ public class Game implements GameInterface {
 
 		this.ui.show(this.fullScreen, false, true);
 		System.out.println("RETURNED TO MENU");
-		for (Player player : this.gameState.getPlayers()) {
-
-			player.setAlive(false);
-			// System.out.println("Player " + player.getName() + " is alive: " +
-			// player.isAlive());
-		}
+//		for (Player player : this.gameState.getPlayers()) {
+//
+//			player.setAlive(false);
+//			// System.out.println("Player " + player.getName() + " is alive: " +
+//			// player.isAlive());
+//		}
 		renderer.dispose();
 		audio.stopAudio();
 	}
