@@ -85,6 +85,7 @@ public class OnlineGame implements GameInterface {
 
 		this.gameState = this.client.getGameState();
 		for(Player player : this.gameState.getPlayers()){
+			System.out.println(player.getName());
 			if(player.getName().equals(this.playerName)){
 				this.player = player;
 			}
@@ -94,22 +95,22 @@ public class OnlineGame implements GameInterface {
 			if (gameOverCounter < 3) {
 
 				gameOverCounter += interval;
-				if(this.player.isAlive()){
-					renderer.displayGameOver(true);
-					if(playMusic){
-						this.audio.stopAudio();
-						AudioManager.playGameOverWon();
-						playMusic = false;
-					}
-				}
-				else{
-					renderer.displayGameOver(false);
-					if(playMusic){
-						this.audio.stopAudio();
-						AudioManager.playGameOverLost();
-						playMusic = false;
-					}
-				}
+//				if(this.player.isAlive()){
+//					renderer.displayGameOver(true);
+//					if(playMusic){
+//						this.audio.stopAudio();
+//						AudioManager.playGameOverWon();
+//						playMusic = false;
+//					}
+//				}
+//				else{
+//					renderer.displayGameOver(false);
+//					if(playMusic){
+//						this.audio.stopAudio();
+//						AudioManager.playGameOverLost();
+//						playMusic = false;
+//					}
+//				}
 				
 			} else {
 				

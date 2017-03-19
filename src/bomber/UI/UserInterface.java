@@ -568,11 +568,12 @@ public class UserInterface extends Application implements ClientNetInterface{
         Label aiExplanation = createLabel("AI players will seek\nto destroy you.", true, true);
         aiExplanation.setFont(smallFont);
         aiExplanation.setAlignment(CENTER);
-        aiExplanation.setPrefWidth(boxWidth*0.9);
+        double width = boxWidth*0.7;
+        aiExplanation.setPrefWidth(width);
         	selector = new ChoiceBox<>();
             selector.setTooltip(new Tooltip("Change AI Difficulty"));
             selector.setPrefHeight(50);
-            selector.setPrefWidth(boxWidth*0.9);
+            selector.setPrefWidth(width);
             selector.getStyleClass().add("textfield");
             selector.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
             selector.getSelectionModel().select(1);
