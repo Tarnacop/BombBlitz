@@ -974,7 +974,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label createBoundLabel(SimpleIntegerProperty property, boolean shaded, boolean white) {
 		Label label = new Label();
 		label.setFont(font);
-		if(white)label.setTextFill(Color.WHITE);
+		label.setTextFill(white?Color.WHITE:Color.BLACK);
 		label.setAlignment(CENTER);
 		label.textProperty().bind(property.asString());
 		if(shaded){
@@ -986,7 +986,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Label createBoundLabel(SimpleStringProperty property, boolean shaded, boolean white) {
 		Label label = new Label();
 		label.setFont(font);
-		if(white)label.setTextFill(Color.WHITE);
+		label.setTextFill(white?Color.WHITE:Color.BLACK);
 		label.setAlignment(CENTER);
 		label.textProperty().bind(property);
 		if(shaded){
@@ -998,6 +998,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button createButton(String label, double width, double height) {
 		Button button = new Button(label);
 		button.setFont(font);
+		button.setTextFill(Color.BLACK);
 		button.setPrefWidth(width);
 		button.setPrefHeight(height);
 		button.setAlignment(CENTER);
@@ -1008,8 +1009,9 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button createBackButton(String label, boolean online){
 		Button button = new Button(label);
 		button.setFont(font);
-		button.setPrefWidth(200);
-		button.setPrefHeight(50);
+		button.setTextFill(Color.BLACK);
+		button.setPrefWidth(MENU_BUTTON_WIDTH);
+		button.setPrefHeight(MENU_BUTTON_HEIGHT);
 		button.setAlignment(CENTER);
 		button.getStyleClass().add("menubutton");
 		button.setOnAction(online?e -> disconnect():e -> previous());
@@ -1019,6 +1021,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	private Button createSceneButton(String label, double width, double height, Parent currentScene, Parent nextScene){
 		Button button = new Button(label);
 		button.setFont(font);
+		button.setTextFill(Color.BLACK);
 		button.setPrefWidth(width);
 		button.setPrefHeight(height);
 		button.setAlignment(CENTER);

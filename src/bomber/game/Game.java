@@ -153,8 +153,6 @@ public class Game implements GameInterface {
 					}
 
 					this.physics.update((int) (interval * 1000));
-					this.keyState.setBomb(false);
-					this.keyState.setMovement(Movement.NONE);
 					audio.playEventList(gameState.getAudioEvents());
 				}
 			}
@@ -170,6 +168,8 @@ public class Game implements GameInterface {
 	@Override
 	public void input(Screen screen) {
 
+		this.keyState.setBomb(false);
+		this.keyState.setMovement(Movement.NONE);
 		this.pausePressed = this.input.pauseCheck(screen, this.keyState, this.controlScheme, this.pausePressed);
 		this.bombPressed = this.input.update(screen, this.keyState, this.controlScheme, this.bombPressed);
 	}
