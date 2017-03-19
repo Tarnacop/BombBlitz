@@ -41,6 +41,7 @@ public class Renderer {
 	private Matrix4f projectionMatrix;
 	private Matrix4f modelMatrix;
 	private TextItem hudTextItem;
+	private TextItem hudTextItemBig;
 
 	private boolean gameOver;
 	private boolean frontScreen;
@@ -140,7 +141,6 @@ public class Renderer {
 		Texture controls = new Texture("src/resources/images/controls.png");
 
 		// Blocks
-		System.out.println(Constants.SPRITESHEET_ELEM_WIDTH + " " + Constants.SPRITESHEET_ELEM_HEIGHT);
 		TextureMesh blankMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				0 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
@@ -706,7 +706,7 @@ public class Renderer {
 		TextureMesh ingameBlastMesh = new TextureMesh(Constants.HEART_WIDTH, Constants.HEART_HEIGHT, blast);
 		textureMeshes.put("ingameBlastMesh", ingameBlastMesh);
 
-		TextureMesh controlsMesh = new TextureMesh(400, 300, controls);
+		TextureMesh controlsMesh = new TextureMesh(Constants.CONTROLS_WIDTH, Constants.CONTROLS_HEIGHT, controls);
 		textureMeshes.put("controlsMesh", controlsMesh);
 
 	} // END
@@ -723,6 +723,9 @@ public class Renderer {
 
 		FontTexture hudFontTexture = new FontTexture("src/resources/minecraftbig.ttf", 25, Font.PLAIN);
 		hudTextItem = new TextItem("", hudFontTexture);
+		
+		hudFontTexture = new FontTexture("src/resources/minecraftbig.ttf", 35, Font.PLAIN);
+		hudTextItemBig = new TextItem("", hudFontTexture);
 	} // END OF setupHuds METHOD
 
 	/**
@@ -1674,7 +1677,7 @@ public class Renderer {
 
 		hudShader.unbind();
 
-	} // END OF renderHud METHOD
+	} // END OF renderGameHud METHOD
 
 	// -------------------------------------- Game Over Render
 	// ----------------------------
@@ -1784,16 +1787,16 @@ public class Renderer {
 		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio,
 				screen.getHeight() * h_ratio, 0f);
 
-		hudTextItem.setText(Integer.toString((int) seconds));
+		hudTextItemBig.setText(Integer.toString((int) seconds));
 		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2)
 				+ Constants.CONTROLS_WIDTH / 2;
 		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2)
 				+ Constants.CONTROLS_HEIGHT + 10;
-		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
+		modelMatrix = transformation.getModelMatrix(x, y, hudTextItemBig.getRotation(), hudTextItemBig.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
-		hudTextItem.getMesh().render();
+		hudTextItemBig.getMesh().render();
 
 		seconds -= interval;
 
@@ -1848,16 +1851,16 @@ public class Renderer {
 		projectionMatrix = transformation.getOrthographicProjection(0, screen.getWidth() * w_ratio,
 				screen.getHeight() * h_ratio, 0f);
 
-		hudTextItem.setText("PRESS P TO UNPAUSE THE GAME");
+		hudTextItemBig.setText("PRESS P TO UNPAUSE THE GAME");
 		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2)
-				+ (Constants.CONTROLS_WIDTH / 2 - hudTextItem.getTextWidth() / 2);
+				+ (Constants.CONTROLS_WIDTH / 2 - hudTextItemBig.getTextWidth() / 2);
 		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2)
 				+ Constants.CONTROLS_HEIGHT + 10;
-		modelMatrix = transformation.getModelMatrix(x, y, hudTextItem.getRotation(), hudTextItem.getScale());
+		modelMatrix = transformation.getModelMatrix(x, y, hudTextItemBig.getRotation(), hudTextItemBig.getScale());
 		hudShader.setUniform("projModelMatrix",
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
-		hudTextItem.getMesh().render();
+		hudTextItemBig.getMesh().render();
 
 		hudShader.unbind();
 	} // END OF renderPauseHud METHOD

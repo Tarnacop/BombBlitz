@@ -99,8 +99,8 @@ public abstract class Constants
 	public static final float HEART_HEIGHT = 32f;
 	public static final float BOX_PADDING = 60f;
 	
-	public static final int CONTROLS_WIDTH = 400;
-	public static final int CONTROLS_HEIGHT = 300;
+	public static final int CONTROLS_WIDTH = 600;
+	public static final int CONTROLS_HEIGHT = 450;
 
 	//User Interface Constants
 	public static final float SCREEN_HEIGHT_SCALAR = 0.9f;
