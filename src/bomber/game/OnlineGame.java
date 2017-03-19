@@ -2,9 +2,12 @@ package bomber.game;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
+import bomber.AI.GameAI;
 import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
+import bomber.networking.ClientServerPlayer;
 import bomber.networking.ClientThread;
 import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
@@ -22,20 +25,22 @@ public class OnlineGame implements GameInterface {
 	private Renderer renderer;
 	private boolean bombPressed;
 	private KeyboardInput input;
-	// private Player player;
 	private AudioManager audio;
 	private UserInterface ui;
-	// private int aiNum;
 	private ClientThread client;
 	private boolean fullScreen;
+	private boolean gameEnded;
+	private String playerName;
+	private List<ClientServerPlayer> onlinePlayers;
 
-	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
+	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName, List<ClientServerPlayer> onlinePlayers,
 			HashMap<Response, Integer> controls, boolean fullScreen, int width, int height) {
 
 		this.ui = ui;
 		this.gameState = gameState;
 		this.client = client;
-		// this.playerName = playerName;
+		this.playerName = playerName;
+		this.onlinePlayers = onlinePlayers;
 		this.controlScheme = controls;
 		this.bombPressed = false;
 		this.fullScreen = fullScreen;
@@ -69,20 +74,69 @@ public class OnlineGame implements GameInterface {
 			this.keyState = new KeyboardState();
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		this.ui.hide();
 	}
 
+	private float gameOverCounter = 0;
+	private boolean playMusic = true;
+	private Player player;
+
 	@Override
 	public void update(float interval) {
 
+		//System.err.println("CALLED UPDATE");
 		this.gameState = this.client.getGameState();
-		this.keyState.setBomb(false);
-		this.keyState.setMovement(Movement.NONE);
-		audio.playEventList(gameState.getAudioEvents());
+		for (Player player : this.gameState.getPlayers()) {
+			if (!(player instanceof GameAI)) {
+				for (ClientServerPlayer onlinePlayer : this.onlinePlayers) {
+					if (player.getPlayerID() == onlinePlayer.getID()) {
+						player.setName(onlinePlayer.getName());
+						break;
+					}
+				}
+				if (player.getName().equals(this.playerName)) {
+					this.player = player;
+					//System.err.println("FOUND " + this.player.getName());
+					break;
+				}
+			}
+		}
+		if (gameEnded) {
+
+			if (gameOverCounter < 3) {
+
+				gameOverCounter += interval;
+				if(this.player != null && this.player.isAlive()){
+					renderer.displayGameOver(true);
+					if(playMusic){
+						this.audio.stopAudio();
+						AudioManager.playGameOverWon();
+						playMusic = false;
+					}
+				}
+				else{
+					renderer.displayGameOver(false);
+					if(playMusic){
+						this.audio.stopAudio();
+						AudioManager.playGameOverLost();
+						playMusic = false;
+					}
+				}
+				
+			} else {
+				
+				this.graphics.getScreen().close();
+			}
+		} else {
+			renderer.stopFrontScreen();
+			this.keyState.setBomb(false);
+			this.keyState.setMovement(Movement.NONE);
+			audio.playEventList(gameState.getAudioEvents());
+		}
+
 	}
 
 	@Override
@@ -105,10 +159,15 @@ public class OnlineGame implements GameInterface {
 	@Override
 	public void dispose() {
 
-		this.ui.show(this.fullScreen);
+		this.ui.show(this.fullScreen, true, this.gameEnded);
 		System.out.println("RETURNED TO MENU");
 		renderer.dispose();
 		audio.stopAudio();
 
 	}
+
+	public void setGameEnded(boolean gameEnded) {
+		this.gameEnded = gameEnded;
+	}
+
 }

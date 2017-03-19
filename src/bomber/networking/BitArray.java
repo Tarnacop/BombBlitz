@@ -49,14 +49,4 @@ public class BitArray {
 		}
 	}
 
-	public static void main(String[] args) {
-		long num = 0;
-		num = setBit(num, 5, true);
-
-		num = setBit(num, 63, true);
-
-		for (int i = 0; i < 64; i++) {
-			System.out.println(getBit(num, i));
-		}
-	}
 }

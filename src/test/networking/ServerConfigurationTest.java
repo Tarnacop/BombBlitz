@@ -13,6 +13,10 @@ public class ServerConfigurationTest {
 
 	@Before
 	public void setUp() throws Exception {
+		config = new ServerConfiguration(25, -10, -500, 10, -32);
+		config = new ServerConfiguration(25, 10, 500, 10, 32);
+		config = new ServerConfiguration(-25, -10, -32);
+		config = new ServerConfiguration(25, 10, 32);
 		config = new ServerConfiguration();
 	}
 
@@ -30,18 +34,32 @@ public class ServerConfigurationTest {
 
 		assertEquals(500, config.getRetransmitInterval());
 
+		config.setTickRate(-1);
 		assertEquals(30, config.getTickRate());
 		config.setTickRate(33);
 		assertEquals(33, config.getTickRate());
 
+		config.setMaxRetransmitCount(-1);
 		assertEquals(10, config.getMaxRetransmitCount());
 		config.setMaxRetransmitCount(30);
 		assertEquals(30, config.getMaxRetransmitCount());
 
 		assertEquals(32, config.getMaxPlayer());
 
+		config.setServerName(null);
+		assertNotNull(config.getServerName());
+
+		config.setServerName("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		assertEquals("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", config.getServerName());
+
 		config.setServerName("Test Name");
 		assertEquals("Test Name", config.getServerName());
+
+		assertEquals("Bomb Blitz", config.getGameName());
+
+		assertTrue(config.getMaxNameLength() > 1);
+
+		assertNotNull(config.getVersion());
 	}
 
 }

@@ -13,10 +13,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import bomber.AI.AIDifficulty;
 import bomber.game.AudioEvent;
 import bomber.game.Block;
 import bomber.game.Bomb;
 import bomber.game.GameState;
+import bomber.game.KeyboardState;
 import bomber.game.Map;
 import bomber.game.Movement;
 import bomber.game.Player;
@@ -305,6 +307,7 @@ public class PacketEncodeDecodeTest {
 		assertArrayEquals(referenceGameStateArray, arr);
 
 		try {
+			testGameState = ClientPacketEncoder.decodeGameState(null, arr, ret);
 			testGameState = ClientPacketEncoder.decodeGameState(testGameState, arr, ret);
 		} catch (IOException e) {
 			fail("decodeGameState: " + e);
@@ -356,6 +359,147 @@ public class PacketEncodeDecodeTest {
 		assertEquals(4, decodedMap.getSpawnPoints().size());
 		assertEquals(253, decodedMap.getSpawnPoints().get(0).x);
 		assertEquals(128, decodedMap.getSpawnPoints().get(0).y);
+	}
+
+	@Test
+	public void testKeyboardState() {
+		KeyboardState k = new KeyboardState();
+		k.setBomb(true);
+		k.setMovement(Movement.UP);
+		short ks = ClientPacketEncoder.keyboardStateToShort(k);
+		assertEquals((short) 34, ks);
+		k = ServerPacketEncoder.shortToKeyboardState(ks);
+		assertEquals(Movement.UP, k.getMovement());
+
+		k.setMovement(Movement.DOWN);
+		ks = ClientPacketEncoder.keyboardStateToShort(k);
+		assertEquals((short) 36, ks);
+		k = ServerPacketEncoder.shortToKeyboardState(ks);
+		assertEquals(Movement.DOWN, k.getMovement());
+
+		k.setMovement(Movement.LEFT);
+		ks = ClientPacketEncoder.keyboardStateToShort(k);
+		assertEquals((short) 40, ks);
+		k = ServerPacketEncoder.shortToKeyboardState(ks);
+		assertEquals(Movement.LEFT, k.getMovement());
+
+		k.setMovement(Movement.RIGHT);
+		ks = ClientPacketEncoder.keyboardStateToShort(k);
+		assertEquals((short) 48, ks);
+		k = ServerPacketEncoder.shortToKeyboardState(ks);
+		assertEquals(Movement.RIGHT, k.getMovement());
+
+		k.setMovement(Movement.NONE);
+		ks = ClientPacketEncoder.keyboardStateToShort(k);
+		assertEquals((short) 33, ks);
+		k = ServerPacketEncoder.shortToKeyboardState(ks);
+		assertEquals(Movement.NONE, k.getMovement());
+	}
+
+	@Test
+	public void testBlock() {
+		Block b = Block.BLANK;
+		byte bb = ClientPacketEncoder.blockToByte(b);
+		Block b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.BLAST;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.MINUS_BOMB;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.MINUS_RANGE;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.MINUS_SPEED;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.PLUS_BOMB;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.PLUS_RANGE;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.PLUS_SPEED;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.SOFT;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+
+		b = Block.SOLID;
+		bb = ClientPacketEncoder.blockToByte(b);
+		b2 = ClientPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+		bb = ServerPacketEncoder.blockToByte(b);
+		b2 = ServerPacketEncoder.byteToBlock(bb);
+		assertEquals(b, b2);
+	}
+
+	@Test
+	public void testAIDifficulty() {
+		byte ab = ServerPacketEncoder.aiDifficultyToByte(AIDifficulty.EASY);
+		AIDifficulty a = ClientPacketEncoder.byteToAIDifficulty(ab);
+		assertEquals(AIDifficulty.EASY, a);
+
+		ab = ServerPacketEncoder.aiDifficultyToByte(AIDifficulty.MEDIUM);
+		a = ClientPacketEncoder.byteToAIDifficulty(ab);
+		assertEquals(AIDifficulty.MEDIUM, a);
+
+		ab = ServerPacketEncoder.aiDifficultyToByte(AIDifficulty.HARD);
+		a = ClientPacketEncoder.byteToAIDifficulty(ab);
+		assertEquals(AIDifficulty.HARD, a);
+
+		ab = ServerPacketEncoder.aiDifficultyToByte(AIDifficulty.EXTREME);
+		a = ClientPacketEncoder.byteToAIDifficulty(ab);
+		assertEquals(AIDifficulty.EXTREME, a);
+
+		ab = -1;
+		a = ClientPacketEncoder.byteToAIDifficulty(ab);
+		assertEquals(AIDifficulty.MEDIUM, a);
 	}
 
 }
