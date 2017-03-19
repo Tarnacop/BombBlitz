@@ -142,14 +142,6 @@ public class PhysicsEngine
             Point downRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y + Constants.PLAYER_HEIGHT);
             revertPosition(fromDirection, downRightCorner, pos);
 
-            // Collision with holes
-            if(playerTouchesBlock(initialPos, Block.HOLE)==null && playerTouchesBlock(pos, Block.HOLE)!=null)
-            {
-                player.setLives(player.getLives() - 1);
-                if (player.getLives() == 0)
-                    player.setAlive(false);
-                gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
-            }
         }
 
         // -------- Planting bombs --------
@@ -177,6 +169,16 @@ public class PhysicsEngine
             if (player.getLives() == 0)
                 player.setAlive(false);
             gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
+        }
+
+        // Collision with holes
+        if(player.getInvulnerability()==0 && playerTouchesBlock(pos, Block.HOLE)!=null)
+        {
+            player.setLives(player.getLives() - 1);
+            if (player.getLives() == 0)
+                player.setAlive(false);
+            gameState.getAudioEvents().add(AudioEvent.PLAYER_DEATH);
+            player.setInvulnerability(Constants.INVULNERABILITY_LENGTH);
         }
 
         // -------- Getting power-ups --------

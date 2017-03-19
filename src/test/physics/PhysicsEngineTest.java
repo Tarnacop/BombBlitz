@@ -313,6 +313,11 @@ public class PhysicsEngineTest
 
         engine.update(20);
         assertEquals("The hole decreased the lives of the player twice", 2, buddy.getLives());
+
+        engine.update(60);
+        buddy.getKeyState().setMovement(Movement.LEFT);
+        engine.update(60);
+        assertEquals("The hole decreased the lives of the player twice", 2, buddy.getLives());
     }
 
     @Test
