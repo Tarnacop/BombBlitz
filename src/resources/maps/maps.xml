@@ -133,4 +133,20 @@
 		<item>X,*,_,O,_,O,_,O,_,O,_,*,X</item>
 		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
 	</map>
+	<map>
+		<name>The Pit</name>
+		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
+		<item>X,*,_,O,_,O,_,O,_,O,_,*,X</item>
+		<item>X,_,X,_,X,H,H,H,X,_,X,_,X</item>
+		<item>X,O,H,H,H,H,H,H,H,H,H,O,X</item>
+		<item>X,_,X,H,H,H,H,H,X,_,X,_,X</item>
+		<item>X,O,_,O,H,H,H,H,H,O,H,O,X</item>
+		<item>X,_,X,_,X,_,X,_,X,_,X,_,X</item>
+		<item>X,O,_,H,H,O,H,O,H,O,H,O,X</item>
+		<item>X,_,X,H,X,_,X,H,H,H,X,_,X</item>
+		<item>X,O,_,O,_,O,H,O,H,H,H,O,X</item>
+		<item>X,_,X,_,X,_,X,_,X,_,X,_,X</item>
+		<item>X,*,_,O,_,O,_,O,_,O,_,*,X</item>
+		<item>X,X,X,X,X,X,X,X,X,X,X,X,X</item>
+	</map>
 </maps>
