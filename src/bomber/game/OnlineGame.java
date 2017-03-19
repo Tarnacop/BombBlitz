@@ -2,10 +2,12 @@ package bomber.game;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import bomber.AI.GameAI;
 import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
+import bomber.networking.ClientServerPlayer;
 import bomber.networking.ClientThread;
 import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
@@ -29,14 +31,16 @@ public class OnlineGame implements GameInterface {
 	private boolean fullScreen;
 	private boolean gameEnded;
 	private String playerName;
+	private List<ClientServerPlayer> onlinePlayers;
 
-	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
+	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName, List<ClientServerPlayer> onlinePlayers,
 			HashMap<Response, Integer> controls, boolean fullScreen, int width, int height) {
 
 		this.ui = ui;
 		this.gameState = gameState;
 		this.client = client;
 		this.playerName = playerName;
+		this.onlinePlayers = onlinePlayers;
 		this.controlScheme = controls;
 		this.bombPressed = false;
 		this.fullScreen = fullScreen;
@@ -83,11 +87,21 @@ public class OnlineGame implements GameInterface {
 	@Override
 	public void update(float interval) {
 
+		//System.err.println("CALLED UPDATE");
 		this.gameState = this.client.getGameState();
-		for(Player player : this.gameState.getPlayers()){
-			System.out.println(player.getName());
-			if(player.getName().equals(this.playerName)){
-				this.player = player;
+		for (Player player : this.gameState.getPlayers()) {
+			if (!(player instanceof GameAI)) {
+				for (ClientServerPlayer onlinePlayer : this.onlinePlayers) {
+					if (player.getPlayerID() == onlinePlayer.getID()) {
+						player.setName(onlinePlayer.getName());
+						break;
+					}
+				}
+				if (player.getName().equals(this.playerName)) {
+					this.player = player;
+					//System.err.println("FOUND " + this.player.getName());
+					break;
+				}
 			}
 		}
 		if (gameEnded) {
@@ -95,22 +109,22 @@ public class OnlineGame implements GameInterface {
 			if (gameOverCounter < 3) {
 
 				gameOverCounter += interval;
-//				if(this.player.isAlive()){
-//					renderer.displayGameOver(true);
-//					if(playMusic){
-//						this.audio.stopAudio();
-//						AudioManager.playGameOverWon();
-//						playMusic = false;
-//					}
-//				}
-//				else{
-//					renderer.displayGameOver(false);
-//					if(playMusic){
-//						this.audio.stopAudio();
-//						AudioManager.playGameOverLost();
-//						playMusic = false;
-//					}
-//				}
+				if(this.player != null && this.player.isAlive()){
+					renderer.displayGameOver(true);
+					if(playMusic){
+						this.audio.stopAudio();
+						AudioManager.playGameOverWon();
+						playMusic = false;
+					}
+				}
+				else{
+					renderer.displayGameOver(false);
+					if(playMusic){
+						this.audio.stopAudio();
+						AudioManager.playGameOverLost();
+						playMusic = false;
+					}
+				}
 				
 			} else {
 				

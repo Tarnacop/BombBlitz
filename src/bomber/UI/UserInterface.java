@@ -146,6 +146,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 	protected boolean gameEnded;
 	private Button leaveRoomBtn;
 	private OnlineGame onlineGame;
+	private List<ClientServerPlayer> connectedPlayers;
 	
 	public UserInterface(){
 
@@ -264,7 +265,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 		playersListPane.setSpacing(SMALL_PAD);
 		playersListPane.setMinWidth(boxWidth + MASSIVE_PAD);
 		playersListPane.getChildren().addAll(playersTitle, scrollPane);
-		//playersListPane.setAlignment(TOP_LEFT);
 		
 		readyTorch = new Rectangle();
 		readyTorch.setWidth(TORCH_WIDTH);
@@ -291,6 +291,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		readyPane = new VBox();
 		readyPane.getStyleClass().add("menubox");
 		readyPane.setSpacing(LITTLE_PAD);
+		readyPane.setAlignment(CENTER);
 		readyPane.setMinWidth(boxWidth+MEDIUM_PAD);
 		readyPane.setMinHeight(boxHeight);
 		readyPane.setMaxHeight(boxHeight);
@@ -1069,7 +1070,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Name too short! )");
 		}
 		else if(text.length() > 11){
-			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( Name too long! )");
+			this.roomCreationLabel.setText("Create and join a room\nwith these settings\n( 11 char limit! )");
 		}
 			else{
 		try {
@@ -1348,14 +1349,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 	private void displayPlayers() {
 		
-		List<ClientServerPlayer> connectedPlayers = this.client.getPlayerList();
+		connectedPlayers = this.client.getPlayerList();
 		
 		this.playersBox.getChildren().clear();
 		this.playersBox2.getChildren().clear();
 		
 		for(ClientServerPlayer player : connectedPlayers){
-			this.playersBox.getChildren().add(createLabel("- Player ID [" + player.getID() + "] Name:   " + player.getName(), true, true));
-			this.playersBox2.getChildren().add(createLabel("- P" + player.getID() + ":   " + player.getName(), true, true));
+			this.playersBox.getChildren().add(createLabel("- Player: " + player.getName(), true, true));
+			this.playersBox2.getChildren().add(createLabel("- Player: " + player.getName(), true, true));
 		}
 		
 		if(this.client.isInRoom()){
@@ -1366,7 +1367,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			readyPane.getChildren().clear();
 			readyPane.getChildren().add(createLabel("Game will begin when all\nplayers click ready!", false, false));
 			for(ClientServerPlayer player : room.getHumanPlayerList()){
-				//System.out.println(player.getName());
 				Rectangle torch = new Rectangle();
 				torch.setWidth(40);
 				torch.setHeight(40);
@@ -1467,7 +1467,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			this.currentNameText.set("Current Name:");
 		}
 		else if(string.length() > 0){
-			this.currentNameText.set("Current Name:\n ( Too long! )");
+			this.currentNameText.set("Current Name:\n( 11 char limit! )");
 		}
 		else{
 			this.currentNameText.set("Current Name:\n( Too short! )");
@@ -1716,7 +1716,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 			public void run() {
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
-				onlineGame = new OnlineGame(ui, client, gameState, playerName.get(), controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
+				onlineGame = new OnlineGame(ui, client, gameState, playerName.get(), connectedPlayers, controls, currentStage.isFullScreen(), (int)currentStage.getWidth(), (int)currentStage.getHeight());
 			}
 			   
 		});
