@@ -163,6 +163,7 @@ public abstract class Constants
 	public static final float MAP_Y_PADDING = 50;
 	
 	//UI Files Paths
+	public static final String BOMB_PATH = "resources/images/bomb.png";
 	public static final String BACKGROUND_PATH = "resources/images/background.png";
 	public static final String LOGO_PATH = "resources/images/logo.png";
 	public static final String FONT_PATH = "../../resources/minecraft.ttf";

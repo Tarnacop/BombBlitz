@@ -235,6 +235,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         primaryStage.setScene(new Scene(mainScene));
         primaryStage.show();
         
+        primaryStage.getIcons().add(new Image(BOMB_PATH));
+        
         //If the stage is closed, disconnect from the server just in case.
         primaryStage.setOnCloseRequest(e -> disconnect());
         
