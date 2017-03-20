@@ -275,29 +275,42 @@ public class UserInterface extends Application implements ClientNetInterface{
 	 */
 	private void initMainScene() {
 		
-		//currentNameText - the label above the name setter, used to display 
+		//'currentNameText' - the label above the name setter, used to display error info when players try
+		//and set their names (ie if it's too short, or too long).
 		currentNameText = new SimpleStringProperty("Current Name:");
+		
+		//'nameText' - textfield for name input
 		nameText = createTextField("Enter Name");
 		
+		//'nameBtn' - button to set the name text.
         nameBtn = createButton("Set Name", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
         nameBtn.setOnAction(e -> setName(nameText.getText()));
         
+        //Create the buttons to advance the scenes.
         Button singlePlayerBtn = createSceneButton("Single Player", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, singleScene);
         Button multiPlayerBtn = createSceneButton("Multiplayer", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, connectScene);
         Button creditsBtn = createSceneButton("Credits", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, creditsScene);
         
+        //Create menu button to exit the game
+        Button exitBtn = createButton("Exit", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
+        exitBtn.setOnAction(e -> System.exit(0));
+        
+        //Create logo image for the front screen.
         Image logoImage = new Image(LOGO_PATH);
         ImageView logoImageView = new ImageView(logoImage);
         
-        HBox logoPane = new HBox();
-        logoPane.setSpacing(MEDIUM_PAD);
-        logoPane.setAlignment(CENTER);
-
-        VBox menuBox = new VBox();
-        menuBox.setSpacing(LARGE_PAD);
-        menuBox.setAlignment(CENTER);
-        logoPane.getChildren().addAll(logoImageView, menuBox);
+        //Create box to hold the menu selection.
+        VBox menuVBox = new VBox();
+        menuVBox.setSpacing(LARGE_PAD);
+        menuVBox.setAlignment(CENTER);
         
+        //Create box to hold the logo and the menu selection.
+        HBox logoHBox = new HBox();
+        logoHBox.setSpacing(MEDIUM_PAD);
+        logoHBox.setAlignment(CENTER);
+        logoHBox.getChildren().addAll(logoImageView, menuVBox);
+        
+        //'musicSlider' - slider to control music volume
         musicSlider = new Slider();
         musicSlider.setMin(0);
         musicSlider.setMax(100);
@@ -305,7 +318,8 @@ public class UserInterface extends Application implements ClientNetInterface{
         musicSlider.setShowTickLabels(false);
         musicSlider.setShowTickMarks(false);
         musicSlider.setOnMouseReleased(e -> setMusic(musicMuted?0:(float)musicSlider.getValue()));
-        
+
+        //'soundSlider' - slider to control sound effects volume
         soundSlider = new Slider();
         soundSlider.setMin(0);
         soundSlider.setMax(100);
@@ -314,12 +328,13 @@ public class UserInterface extends Application implements ClientNetInterface{
         soundSlider.setShowTickMarks(false);
         soundSlider.setOnDragDone(e -> setSound(soundMuted?0:(float)soundSlider.getValue()));
         
-        muteMusicBtn = new CheckBox();
-        muteMusicBtn.setOnAction(e -> setMusic(0));
-        
+        //Set the volumes from the settings extracted from the SettingsParser.
         AudioManager.setMusicVolume(SettingsParser.getMusicVolume());
         AudioManager.setEffectsVolume(SettingsParser.getEffectsVolume());
         
+        //'muteMusicBtn' - checkbox for muting the music volume.
+        muteMusicBtn = new CheckBox();
+        muteMusicBtn.setOnAction(e -> setMusic(0));
         if(SettingsParser.getMusicVolume() == 0){
         	musicMuted = true;
         	muteMusicBtn.setSelected(true);
@@ -327,9 +342,10 @@ public class UserInterface extends Application implements ClientNetInterface{
         	musicMuted = false;
         	muteMusicBtn.setSelected(false);
         }
+        
+        //'muteSoundBtn' - checkbox for muting the sound effect volume.
         muteSoundBtn = new CheckBox();
         muteSoundBtn.setOnAction(e -> setSound(0));
-        
         if(SettingsParser.getEffectsVolume() == 0){
         	soundMuted = true;
         	muteSoundBtn.setSelected(true);
@@ -338,41 +354,45 @@ public class UserInterface extends Application implements ClientNetInterface{
         	muteSoundBtn.setSelected(false);
         }
         
-        VBox namePane = new VBox();
-        namePane.setAlignment(CENTER);
-        namePane.setSpacing(TINY_PAD);
-        namePane.getStyleClass().add("namebox");
+        //Create box to hold the settings options.
+        VBox settingsVBox = new VBox();
+        settingsVBox.setAlignment(CENTER);
+        settingsVBox.setSpacing(TINY_PAD);
+        settingsVBox.getStyleClass().add("namebox");
         
-        HBox musicLabelBox = new HBox();
-        musicLabelBox.setAlignment(CENTER);
-        musicLabelBox.getChildren().addAll(createLabel("Music (Mute ", false, false), muteMusicBtn, createLabel(")", false, false));
-        HBox soundLabelBox = new HBox();
-        soundLabelBox.setAlignment(CENTER);
-        soundLabelBox.getChildren().addAll(createLabel("Sounds (Mute ", false, false), muteSoundBtn, createLabel(")", false, false));
+        //Create boxes to hold the info and mute buttons for the music and sound effects volume.
+        HBox musicHBox = new HBox();
+        musicHBox.setAlignment(CENTER);
+        musicHBox.getChildren().addAll(createLabel("Music (Mute ", false, false), muteMusicBtn, createLabel(")", false, false));
+        HBox soundHBox = new HBox();
+        soundHBox.setAlignment(CENTER);
+        soundHBox.getChildren().addAll(createLabel("Sounds (Mute ", false, false), muteSoundBtn, createLabel(")", false, false));
         
-        VBox audioPane = new VBox();
-        audioPane.setAlignment(CENTER);
-        audioPane.setSpacing(TINY_PAD);
-        audioPane.setPadding(new Insets(SMALL_PAD, 0, 0, 0));
-        audioPane.getChildren().addAll(musicLabelBox, musicSlider, soundLabelBox, soundSlider);
+        VBox audioVBox = new VBox();
+        audioVBox.setAlignment(CENTER);
+        audioVBox.setSpacing(TINY_PAD);
+        audioVBox.setPadding(new Insets(SMALL_PAD, 0, 0, 0));
+        audioVBox.getChildren().addAll(musicHBox, musicSlider, soundHBox, soundSlider);
         
+        //'fullScreenBtn' - checkbox to set the game to fullscreen. 
         fullScreenBtn = new CheckBox();
         fullScreenBtn.setOnAction(e -> fullScreen());
         
-        HBox fullScreenBox = new HBox();
-        fullScreenBox.setAlignment(CENTER);
-        fullScreenBox.setSpacing(TINY_PAD);
-        fullScreenBox.getChildren().addAll(createLabel("Fullscreen ", false, false), fullScreenBtn);
+        //Create box to contain the fullscreen label and checkbox.
+        HBox fullScreenHBox = new HBox();
+        fullScreenHBox.setAlignment(CENTER);
+        fullScreenHBox.setSpacing(TINY_PAD);
+        fullScreenHBox.getChildren().addAll(createLabel("Fullscreen ", false, false), fullScreenBtn);
         
-        namePane.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
-        		nameText, nameBtn, audioPane, fullScreenBox);
+        //Add settings options to the settings container.
+        settingsVBox.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
+        		nameText, nameBtn, audioVBox, fullScreenHBox);
         
+        //Add settings container and other menu buttons to the menu container.
+        menuVBox.getChildren().addAll(settingsVBox, singlePlayerBtn, multiPlayerBtn, creditsBtn, exitBtn);
         
-        Button exitBtn = createButton("Exit", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
-        exitBtn.setOnAction(e -> System.exit(0));
-        
-        menuBox.getChildren().addAll(namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn, exitBtn);
-        setBackgroundPane(mainMenu, logoPane);
+        //Set the background of the scene.
+        setBackgroundPane(mainMenu, logoHBox);
 	}
 	
 	/**
@@ -720,7 +740,6 @@ public class UserInterface extends Application implements ClientNetInterface{
         aiExplanation.setAlignment(CENTER);
         double width = boxWidth*0.7;
         aiExplanation.setPrefWidth(width);
-        	selector = new ChoiceBox<>();
             selector.setTooltip(new Tooltip("Change AI Difficulty"));
             selector.setPrefHeight(50);
             selector.setPrefWidth(width);
@@ -732,6 +751,7 @@ public class UserInterface extends Application implements ClientNetInterface{
     			@Override
     			public void changed(ObservableValue<? extends String> ob,
     					String oldValue, String newValue) {
+    				System.out.println("CHANGED: " + oldValue + " -> " + newValue);
     				switch(newValue){
     				case "Easy": 
     					aiDiff = EASY; 
@@ -750,7 +770,6 @@ public class UserInterface extends Application implements ClientNetInterface{
     					aiDiff = EXTREME;
     					aiExplanation.setText("AI players will collaborate\nto bring you down!");
     				}
-    				//System.out.println("Set difficulty to " + newValue);
     			}
             });	
 
@@ -1232,13 +1251,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 			if(this.aiNumber.get() < (4 - this.humanPlayers)){
 			try {
 				this.client.addAI();
-				for(ClientServerAI ai : client.getRoom().getAIPlayerList()){
-					try {
-						client.setAIDifficulty(ai.getID(), aiDiff);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -1402,6 +1414,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 				}
 			}
 			List<ClientServerAI> ais = room.getAIPlayerList();
+			for(ClientServerAI ai : ais){
+				try {
+					System.out.println("REQUESTING CHANGE AI: " + ai.getID() + " TO " + aiDiff);
+					client.setAIDifficulty(ai.getID(), aiDiff);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 			if(ais.size() > 0){
 				AIDifficulty diff = room.getAIPlayerList().get(0).getDifficulty();
 				int index = 1;
@@ -1604,7 +1624,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 
 			@Override
 			public void run() {
-				//System.out.println("Displaying Rooms");
 				displayRooms();
 			}
 			   
@@ -1628,20 +1647,6 @@ public class UserInterface extends Application implements ClientNetInterface{
 					roomCreationLabel.setText("Create and join a room\nwith these settings");
 					resetButton(createRoomBtn, "Create New Room", e -> createRoom());
 					expectingRoomCreation = false;
-					aiOnlineDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
-			                ChangeListener<String>() {
-						@Override
-						public void changed(ObservableValue<? extends String> ob,
-								String oldValue, String newValue) {
-							for(ClientServerAI ai : client.getRoom().getAIPlayerList()){
-								try {
-									client.setAIDifficulty(ai.getID(), aiDiff);
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							}
-						}
-			        });
 				}
 				else if(expectingRoomJoin){
 					advance(serverScene, roomScene);
@@ -1649,6 +1654,24 @@ public class UserInterface extends Application implements ClientNetInterface{
 					displayRooms();
 					expectingRoomJoin = false;
 				}
+				
+				aiOnlineDifficultyChoice.getSelectionModel().selectedItemProperty().addListener(new
+	                    ChangeListener<String>() {
+	    			@Override
+	    			public void changed(ObservableValue<? extends String> ob,
+	    					String oldValue, String newValue) {
+						System.out.println("DETECTED CHANGE");
+						System.out.println("AIS: " + client.getRoom().getAIPlayerList());
+						for(ClientServerAI ai : client.getRoom().getAIPlayerList()){
+							try {
+								client.setAIDifficulty(ai.getID(), aiDiff);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+		        });
+				System.out.println("ADDED NEW LISTENER");
 			}
 			   
 		});
