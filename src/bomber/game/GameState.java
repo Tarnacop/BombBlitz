@@ -1,6 +1,7 @@
 package bomber.game;
 
 import bomber.AI.GameAI;
+import bomber.physics.BlastTimer;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -42,13 +43,9 @@ public class GameState {
 			}
 		}
 		
-		System.out.println("LIVING HUMANS: " + livingHumans + ", LIVING AI: " + livingAis);
+		//System.out.println("LIVING HUMANS: " + livingHumans + ", LIVING AI: " + livingAis);
 		
-		if(livingHumans == 0){
-			
-			result = true;
-		}
-		else if((livingHumans == 1) && (livingAis == 0)){
+		if(((livingHumans == 1) && (livingAis == 0)) || (livingHumans == 0)){
 			
 			result = true;
 		}

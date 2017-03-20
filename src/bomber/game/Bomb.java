@@ -1,7 +1,7 @@
 package bomber.game;
 
 import java.awt.Point;
-
+import static bomber.game.Constants.*;
 
 public class Bomb {
 
@@ -10,8 +10,7 @@ public class Bomb {
 	private Point pos;			
 	private int time;			
 
-	private int radius;		
-	private int scalar = 64;
+	private int radius;
 
 	private Point gridPos;
 	
@@ -31,14 +30,6 @@ public class Bomb {
 
 	public void setPlayerID(int playerID) {
 		this.playerID = playerID;
-	}
-
-	public int getScalar() {
-		return scalar;
-	}
-
-	public void setScalar(int scalar) {
-		this.scalar = scalar;
 	}
 
 	public void setPlayerName(String playerName) {
@@ -69,16 +60,14 @@ public class Bomb {
 	
 	public Point getGridPos()
 	{
-		int x = pos.x/scalar;
-		if(pos.x%scalar > 32) x++;
-		int y = pos.y/scalar;
-		if(pos.x%scalar > 32) x++;
+		int x = pos.x/MAP_BLOCK_TO_GRID_MULTIPLIER;
+		int y = pos.y/MAP_BLOCK_TO_GRID_MULTIPLIER;
 		return new Point(x,y);
 	}
 	
 	private void updatePos()
 	{
-		this.gridPos.setLocation((pos.x/scalar),(pos.y/scalar) );
+		this.gridPos.setLocation((pos.x/MAP_BLOCK_TO_GRID_MULTIPLIER),(pos.y/MAP_BLOCK_TO_GRID_MULTIPLIER) );
 	}
 	
 	public int getTime(){

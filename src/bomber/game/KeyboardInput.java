@@ -39,12 +39,7 @@ public class KeyboardInput {
 	
 	public boolean update(Screen screen, KeyboardState keyState, HashMap<Response, Integer> controlScheme, boolean bombPressed){
 		
-		//System.out.println("polling the keyboard with keyState" + keyState.toString());
-		
-		
 		int state = GLFW_RELEASE;
-			
-			//System.out.println("Checking again...");
 			
 			//check for bomb
 			if(getKey(Response.PLACE_BOMB, controlScheme).isPresent()){

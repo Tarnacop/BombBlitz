@@ -6,7 +6,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
-
 import static bomber.game.Constants.*;
 import static bomber.AI.AIDifficulty.*;
 import static bomber.game.Response.*;
@@ -271,6 +270,114 @@ public class UserInterface extends Application implements ClientNetInterface{
 		initRoomScene();
 	}
 	
+	/**
+	 * Initialise the main menu scene.
+	 */
+	private void initMainScene() {
+		
+		//currentNameText - the label above the name setter, used to display 
+		currentNameText = new SimpleStringProperty("Current Name:");
+		nameText = createTextField("Enter Name");
+		
+        nameBtn = createButton("Set Name", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
+        nameBtn.setOnAction(e -> setName(nameText.getText()));
+        
+        Button singlePlayerBtn = createSceneButton("Single Player", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, singleScene);
+        Button multiPlayerBtn = createSceneButton("Multiplayer", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, connectScene);
+        Button creditsBtn = createSceneButton("Credits", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, creditsScene);
+        
+        Image logoImage = new Image(LOGO_PATH);
+        ImageView logoImageView = new ImageView(logoImage);
+        
+        HBox logoPane = new HBox();
+        logoPane.setSpacing(MEDIUM_PAD);
+        logoPane.setAlignment(CENTER);
+
+        VBox menuBox = new VBox();
+        menuBox.setSpacing(LARGE_PAD);
+        menuBox.setAlignment(CENTER);
+        logoPane.getChildren().addAll(logoImageView, menuBox);
+        
+        musicSlider = new Slider();
+        musicSlider.setMin(0);
+        musicSlider.setMax(100);
+        musicSlider.setValue(SettingsParser.getMusicVolume());
+        musicSlider.setShowTickLabels(false);
+        musicSlider.setShowTickMarks(false);
+        musicSlider.setOnMouseReleased(e -> setMusic(musicMuted?0:(float)musicSlider.getValue()));
+        
+        soundSlider = new Slider();
+        soundSlider.setMin(0);
+        soundSlider.setMax(100);
+        soundSlider.setValue(SettingsParser.getEffectsVolume());
+        soundSlider.setShowTickLabels(false);
+        soundSlider.setShowTickMarks(false);
+        soundSlider.setOnDragDone(e -> setSound(soundMuted?0:(float)soundSlider.getValue()));
+        
+        muteMusicBtn = new CheckBox();
+        muteMusicBtn.setOnAction(e -> setMusic(0));
+        
+        AudioManager.setMusicVolume(SettingsParser.getMusicVolume());
+        AudioManager.setEffectsVolume(SettingsParser.getEffectsVolume());
+        
+        if(SettingsParser.getMusicVolume() == 0){
+        	musicMuted = true;
+        	muteMusicBtn.setSelected(true);
+        }else{
+        	musicMuted = false;
+        	muteMusicBtn.setSelected(false);
+        }
+        muteSoundBtn = new CheckBox();
+        muteSoundBtn.setOnAction(e -> setSound(0));
+        
+        if(SettingsParser.getEffectsVolume() == 0){
+        	soundMuted = true;
+        	muteSoundBtn.setSelected(true);
+        }else{
+        	soundMuted = false;
+        	muteSoundBtn.setSelected(false);
+        }
+        
+        VBox namePane = new VBox();
+        namePane.setAlignment(CENTER);
+        namePane.setSpacing(TINY_PAD);
+        namePane.getStyleClass().add("namebox");
+        
+        HBox musicLabelBox = new HBox();
+        musicLabelBox.setAlignment(CENTER);
+        musicLabelBox.getChildren().addAll(createLabel("Music (Mute ", false, false), muteMusicBtn, createLabel(")", false, false));
+        HBox soundLabelBox = new HBox();
+        soundLabelBox.setAlignment(CENTER);
+        soundLabelBox.getChildren().addAll(createLabel("Sounds (Mute ", false, false), muteSoundBtn, createLabel(")", false, false));
+        
+        VBox audioPane = new VBox();
+        audioPane.setAlignment(CENTER);
+        audioPane.setSpacing(TINY_PAD);
+        audioPane.setPadding(new Insets(SMALL_PAD, 0, 0, 0));
+        audioPane.getChildren().addAll(musicLabelBox, musicSlider, soundLabelBox, soundSlider);
+        
+        fullScreenBtn = new CheckBox();
+        fullScreenBtn.setOnAction(e -> fullScreen());
+        
+        HBox fullScreenBox = new HBox();
+        fullScreenBox.setAlignment(CENTER);
+        fullScreenBox.setSpacing(TINY_PAD);
+        fullScreenBox.getChildren().addAll(createLabel("Fullscreen ", false, false), fullScreenBtn);
+        
+        namePane.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
+        		nameText, nameBtn, audioPane, fullScreenBox);
+        
+        
+        Button exitBtn = createButton("Exit", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
+        exitBtn.setOnAction(e -> System.exit(0));
+        
+        menuBox.getChildren().addAll(namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn, exitBtn);
+        setBackgroundPane(mainMenu, logoPane);
+	}
+	
+	/**
+	 * Initialise the Scene within an online multiplayer room.
+	 */
 	private void initRoomScene() {
 		
         BorderPane roomBox = new BorderPane();
@@ -559,7 +666,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         centerBox.setSpacing(MEDIUM_PAD);
 
 		mapCanvas = new Pane();
-		mapCanvas.setMinHeight(MAP_CANVAS_WIDTH);
+		mapCanvas.setMinHeight(MAP_CANVAS_HEIGHT);
 		mapCanvas.setMinWidth(MAP_CANVAS_WIDTH);
 		aiDifficultyChoice = new ChoiceBox<>();
         centerBox.getChildren().addAll(createAiDifficultySelector(aiDifficultyChoice, false), createMapSelector(mapCanvas, false));
@@ -786,14 +893,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 			Point pos = map.getSpawnPoints().get(x);
 			Rectangle rect = new Rectangle(10, 10);
 			if(x == 0){
-				rect.setFill(new ImagePattern(new Image("resources/images/playerspawnpoint.png")));
+				rect.setFill(new ImagePattern(new Image(PLAYER_SPAWN_PATH)));
 			}
 			else{
 				if(online){
-					rect.setFill(new ImagePattern(new Image("resources/images/playerspawnpoint.png")));
+					rect.setFill(new ImagePattern(new Image(PLAYER_SPAWN_PATH)));
 				}
 				else{
-					rect.setFill(new ImagePattern(new Image("resources/images/spawnpoint.png")));
+					rect.setFill(new ImagePattern(new Image(SPAWN_PATH)));
 				}
 			}
 			rect.setStroke(Color.BLACK);
@@ -815,106 +922,7 @@ public class UserInterface extends Application implements ClientNetInterface{
 		setBackgroundPane(creditsMenu, creditsBox);
 	}
 
-	private void initMainScene() {
-		
-		this.currentNameText = new SimpleStringProperty("Current Name:");
-		nameText = createTextField("Enter Name");
-		
-        nameBtn = createButton("Set Name", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
-        nameBtn.setOnAction(e -> setName(nameText.getText()));
-        
-        Button singlePlayerBtn = createSceneButton("Single Player", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, singleScene);
-        Button multiPlayerBtn = createSceneButton("Multiplayer", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, connectScene);
-        Button creditsBtn = createSceneButton("Credits", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, creditsScene);
-        
-        Image logoImage = new Image(LOGO_PATH);
-        ImageView logoImageView = new ImageView(logoImage);
-        
-        HBox logoPane = new HBox();
-        logoPane.setSpacing(MEDIUM_PAD);
-        logoPane.setAlignment(CENTER);
-
-        VBox menuBox = new VBox();
-        menuBox.setSpacing(LARGE_PAD);
-        menuBox.setAlignment(CENTER);
-        logoPane.getChildren().addAll(logoImageView, menuBox);
-        
-        musicSlider = new Slider();
-        musicSlider.setMin(0);
-        musicSlider.setMax(100);
-        musicSlider.setValue(SettingsParser.getMusicVolume());
-        musicSlider.setShowTickLabels(false);
-        musicSlider.setShowTickMarks(false);
-        musicSlider.setOnMouseReleased(e -> setMusic(musicMuted?0:(float)musicSlider.getValue()));
-        
-        soundSlider = new Slider();
-        soundSlider.setMin(0);
-        soundSlider.setMax(100);
-        soundSlider.setValue(SettingsParser.getEffectsVolume());
-        soundSlider.setShowTickLabels(false);
-        soundSlider.setShowTickMarks(false);
-        soundSlider.setOnDragDone(e -> setSound(soundMuted?0:(float)soundSlider.getValue()));
-        
-        muteMusicBtn = new CheckBox();
-        muteMusicBtn.setOnAction(e -> setMusic(0));
-        
-        AudioManager.setMusicVolume(SettingsParser.getMusicVolume());
-        AudioManager.setEffectsVolume(SettingsParser.getEffectsVolume());
-        
-        if(SettingsParser.getMusicVolume() == 0){
-        	musicMuted = true;
-        	muteMusicBtn.setSelected(true);
-        }else{
-        	musicMuted = false;
-        	muteMusicBtn.setSelected(false);
-        }
-        muteSoundBtn = new CheckBox();
-        muteSoundBtn.setOnAction(e -> setSound(0));
-        
-        if(SettingsParser.getEffectsVolume() == 0){
-        	soundMuted = true;
-        	muteSoundBtn.setSelected(true);
-        }else{
-        	soundMuted = false;
-        	muteSoundBtn.setSelected(false);
-        }
-        
-        VBox namePane = new VBox();
-        namePane.setAlignment(CENTER);
-        namePane.setSpacing(TINY_PAD);
-        namePane.getStyleClass().add("namebox");
-        
-        HBox musicLabelBox = new HBox();
-        musicLabelBox.setAlignment(CENTER);
-        musicLabelBox.getChildren().addAll(createLabel("Music (Mute ", false, false), muteMusicBtn, createLabel(")", false, false));
-        HBox soundLabelBox = new HBox();
-        soundLabelBox.setAlignment(CENTER);
-        soundLabelBox.getChildren().addAll(createLabel("Sounds (Mute ", false, false), muteSoundBtn, createLabel(")", false, false));
-        
-        VBox audioPane = new VBox();
-        audioPane.setAlignment(CENTER);
-        audioPane.setSpacing(TINY_PAD);
-        audioPane.setPadding(new Insets(SMALL_PAD, 0, 0, 0));
-        audioPane.getChildren().addAll(musicLabelBox, musicSlider, soundLabelBox, soundSlider);
-        
-        fullScreenBtn = new CheckBox();
-        fullScreenBtn.setOnAction(e -> fullScreen());
-        
-        HBox fullScreenBox = new HBox();
-        fullScreenBox.setAlignment(CENTER);
-        fullScreenBox.setSpacing(TINY_PAD);
-        fullScreenBox.getChildren().addAll(createLabel("Fullscreen ", false, false), fullScreenBtn);
-        
-        namePane.getChildren().addAll(createBoundLabel(this.currentNameText, false, false), createBoundLabel(this.playerName, false, false),
-        		nameText, nameBtn, audioPane, fullScreenBox);
-        
-        
-        Button exitBtn = createButton("Exit", MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
-        exitBtn.setOnAction(e -> System.exit(0));
-        
-        menuBox.getChildren().addAll(namePane, singlePlayerBtn, multiPlayerBtn, creditsBtn, exitBtn);
-        setBackgroundPane(mainMenu, logoPane);
-	}
+	
 
 	private void fullScreen() {
 		if(fullScreenBtn.isSelected()){

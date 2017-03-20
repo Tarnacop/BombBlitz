@@ -137,6 +137,9 @@ public class ServerClientTest implements ClientNetInterface {
 			client.sendRaw(
 					new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x54, 0x53, 0x6F, 0x75, 0x72, 0x63,
 							0x65, 0x20, 0x45, 0x6E, 0x67, 0x69, 0x6E, 0x65, 0x20, 0x51, 0x75, 0x65, 0x72, 0x79, 0x00 });
+			client.sendRaw(
+					new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x54, 0x53, 0x6F, 0x75, 0x72, 0x63,
+							0x65, 0x20, 0x55, 0x6E, 0x67, 0x69, 0x6E, 0x65, 0x20, 0x51, 0x75, 0x65, 0x72, 0x79, 0x00 });
 			client.setAIDifficulty(0, AIDifficulty.EXTREME);
 			client.setRoomMapID(2);
 			client.setRoomMaxPlayer(3);
@@ -285,6 +288,26 @@ public class ServerClientTest implements ClientNetInterface {
 			if (!roomAccepted && !roomRejected) {
 				fail("Failed to join room");
 			}
+			roomRejected = false;
+
+			client.createRoom("R00900000000000000000000000000000000000000000", 55, 1234);
+			for (int i = 0; i < 2000; i++) {
+				Thread.sleep(1);
+				if (roomAccepted) {
+					fail("Server failed to check room name length");
+				} else if (roomRejected) {
+					assertTrue(client.isInLobby());
+					assertFalse(client.isInGame());
+					assertFalse(client.isInRoom());
+					assertTrue(client.getRoomRejectedReason() > -1);
+					break;
+				}
+			}
+			if (!roomAccepted && !roomRejected) {
+				fail("Failed to create room");
+			}
+
+			roomAccepted = false;
 			roomRejected = false;
 
 			client.createRoom("R0", 3, 5);

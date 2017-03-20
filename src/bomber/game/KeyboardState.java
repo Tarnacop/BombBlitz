@@ -12,11 +12,6 @@ public class KeyboardState {
 		this.bomb = false;
 		this.pause = false;
 	}
-
-	public boolean placeBomb(){
-		
-		return this.bomb;//return true if the player has placed the bomb press key
-	}
 		
 	public boolean isBomb() {
 		return bomb;

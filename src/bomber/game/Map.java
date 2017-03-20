@@ -33,7 +33,7 @@ public class Map {
 		this.pixelMap = convertToPixel(this.gridMap);
 	}
 
-	private Block[][] convertToPixel(Block[][] gridMap) {
+	public Block[][] convertToPixel(Block[][] gridMap) {
 		
 		int gridWidth = gridMap[0].length;
 	    	int gridHeight = gridMap.length;
@@ -74,8 +74,8 @@ public class Map {
 		update();
 	}
 
-	public void setPixelBlockAt(int x, int y, Block b) {
-		pixelMap[x][y]=b;
+	public void setPixelBlockAt(Point p, Block b) {
+		pixelMap[p.x][p.y]=b;
 	}
 
 	public boolean isInGridBounds(Point p) {
@@ -86,13 +86,11 @@ public class Map {
 	
 public String toStringWithPlayersBombs(List<Player> players, List<Bomb> bombs){
 		
-	//System.out.println("Drawing map");
 		ArrayList<Point> playerPositions = new ArrayList<>();
 	
 		for(Player player : players){
 			
 			playerPositions.add(new Point(player.getPos().x/64, player.getPos().y/64));
-			//System.out.println("Player at : " + new Point(player.getPos().x/64, player.getPos().y/64).toString());
 		}
 		
 		ArrayList<Point> bombPositions = new ArrayList<>();
@@ -110,7 +108,6 @@ public String toStringWithPlayersBombs(List<Player> players, List<Bomb> bombs){
 			
 			for(int x = 0; x < this.gridMap.length; x++){
 			
-				//System.out.println("Checking for player at: " + new Point(x, y).toString());
 				if(playerPositions.contains(new Point(i, j))){
 				
 					s += "PP";
@@ -119,13 +116,27 @@ public String toStringWithPlayersBombs(List<Player> players, List<Bomb> bombs){
 					s += "o*";
 				}else{
 					switch(this.gridMap[x][y]){
-					case BLANK: s += "  ";
-						break;
 					case BLAST: s += "XX";
 						break;
 					case SOFT:	s += "OO";
 						break;
 					case SOLID:	s += "HH";
+						break;
+					case HOLE: s += "__";
+						break;
+					case MINUS_BOMB: s+= "-b";
+						break;
+					case MINUS_RANGE: s+= "-r";
+						break;
+					case MINUS_SPEED: s += "-s";
+						break;
+					case PLUS_BOMB: s += "+b";
+						break;
+					case PLUS_RANGE: s += "+r";
+						break;
+					case PLUS_SPEED: s += "+s";
+						break;
+					default: s += "  "; 
 						break;
 					}
 				}
