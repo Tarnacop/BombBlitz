@@ -457,7 +457,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 		VBox infoVBox = new VBox();
 		infoVBox.setAlignment(CENTER);
 		infoVBox.setSpacing(MEDIUM_PAD);
-		infoVBox.setPadding(new Insets(0, MASSIVE_PAD*2, 0, MASSIVE_PAD*2));
+		infoVBox.setPadding(new Insets(0, MASSIVE_PAD, 0, MASSIVE_PAD));
 		infoVBox.getChildren().addAll(tutorialHBox, createBackButton("Back", false));
 
 		//Set the background of the menu.
