@@ -437,24 +437,31 @@ public class UserInterface extends Application implements ClientNetInterface {
 	private void initTutorialScene() {
 
 		// Create story image.
-//		Image storyImage = new Image(STORY_PATH);
-//		ImageView storyImageView = new ImageView(storyImage);
-//		storyImageView.getStyleClass().add("creditsbox");	
-//		
+		Image storyImage = new Image(STORY_PATH);
+		ImageView storyImageView = new ImageView(storyImage);
+		storyImageView.getStyleClass().add("creditsbox");	
+		
 		// Create tutorial image.
 		Image tutorialImage = new Image(TUTORIAL_PATH);
 		ImageView tutorialImageView = new ImageView(tutorialImage);
-		tutorialImageView.getStyleClass().add("creditsbox");
 		
-		//Create a container to hold the story image, tutorial image and back button.
-		VBox tutorialVBox = new VBox();
-		tutorialVBox.setAlignment(CENTER);
-		tutorialVBox.setSpacing(MEDIUM_PAD);
-		tutorialVBox.getChildren().addAll( //storyImageView,
-		tutorialImageView, createBackButton("Back", false));
+		//Create a container to hold the story image and tutorial image.
+		HBox tutorialHBox = new HBox();
+		tutorialHBox.setAlignment(CENTER);
+		tutorialHBox.setSpacing(HUGE_PAD);
+		tutorialHBox.getStyleClass().add("creditsbox");
+		tutorialHBox.getChildren().addAll( 
+		storyImageView, tutorialImageView);
+		
+		//Create a container to hold the tutorial container and back button.
+		VBox infoVBox = new VBox();
+		infoVBox.setAlignment(CENTER);
+		infoVBox.setSpacing(MEDIUM_PAD);
+		infoVBox.setPadding(new Insets(0, MASSIVE_PAD*2, 0, MASSIVE_PAD*2));
+		infoVBox.getChildren().addAll(tutorialHBox, createBackButton("Back", false));
 
 		//Set the background of the menu.
-		setBackgroundPane(tutorialMenu, tutorialVBox);
+		setBackgroundPane(tutorialMenu, infoVBox);
 	}
 	
 	/**
@@ -468,8 +475,8 @@ public class UserInterface extends Application implements ClientNetInterface {
 		creditsBox.setAlignment(CENTER);
 		creditsBox.setSpacing(MEDIUM_PAD);
 		creditsBox.getChildren().addAll(
-				createLabel("Version: " + VERSION_NUMBER, false, true),
-				creditsLabel, createBackButton("Back", false));
+		createLabel("Version: " + VERSION_NUMBER, false, true),
+		creditsLabel, createBackButton("Back", false));
 
 		setBackgroundPane(creditsMenu, creditsBox);
 	}
