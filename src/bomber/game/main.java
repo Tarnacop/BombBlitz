@@ -2,7 +2,7 @@ package bomber.game;
 
 import bomber.UI.UserInterface;
 
-public class main {
+public class Main {
 	
 	public static void main(String[] args) {
 		

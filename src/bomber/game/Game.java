@@ -188,12 +188,10 @@ public class Game implements GameInterface {
 
 		this.ui.show(this.fullScreen, false, true);
 		System.out.println("RETURNED TO MENU");
-//		for (Player player : this.gameState.getPlayers()) {
-//
-//			player.setAlive(false);
-//			// System.out.println("Player " + player.getName() + " is alive: " +
-//			// player.isAlive());
-//		}
+		for (Player player : this.gameState.getPlayers()) {
+
+			player.setAlive(false);
+		}
 		renderer.dispose();
 		audio.stopAudio();
 	}
