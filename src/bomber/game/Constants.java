@@ -51,7 +51,7 @@ public abstract class Constants
     public static final String DEFAULT_PLAYER_NAME = "Player";
     public static final String DEFAULT_SERVER_NAME = "Default server";
     public static final String DEFAULT_SERVER_IP = "localhost";
-    public static final int DEFAULST_SERVER_PORT = 1234;
+    public static final int DEFAULT_SERVER_PORT = 1234;
     
     // Renderer constants
     public static final int TARGET_FPS = 60;

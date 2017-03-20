@@ -21,16 +21,23 @@ import java.io.IOException;
 
 
 /**
- * Created by Alexandru Rosu on 05/03/2017.
+ * Takes care of saving the settings of the game using XML
+ *
+ * @author Alexandru Rosu
  */
 public class SettingsParser
 {
 
     private static Document document;
 
-    // preventing instantiation, as the class should only be used statically
+    /**
+     * Private constructor preventing instantiation, as the class should only be used statically
+     */
     private SettingsParser() {}
 
+    /**
+     * Initialises the settings manager
+     */
     public static void init()
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -51,7 +58,7 @@ public class SettingsParser
             document.getDocumentElement().normalize();
         } catch (SAXException e)
         {
-            System.err.println("Error in parsing settings.xml."); // TODO Maybe reinitialise it
+            System.err.println("Error in parsing settings.xml.");
             e.printStackTrace();
         } catch (IOException e)
         {
@@ -61,6 +68,11 @@ public class SettingsParser
 
     }
 
+    /**
+     * Writes the default settings into the xml file defined in Constants
+     *
+     * @param builder The builder used to create the document
+     */
     private static void initialiseXML(DocumentBuilder builder)
     {
         document = builder.newDocument();
@@ -99,16 +111,18 @@ public class SettingsParser
         serverIp.appendChild(document.createTextNode(Constants.DEFAULT_SERVER_IP));
         server.appendChild(serverIp);
         Element serverPort = document.createElement("port");
-        serverPort.appendChild(document.createTextNode(String.valueOf(Constants.DEFAULST_SERVER_PORT)));
+        serverPort.appendChild(document.createTextNode(String.valueOf(Constants.DEFAULT_SERVER_PORT)));
         server.appendChild(serverPort);
         servers.appendChild(server);
         root.appendChild(servers);
-
 
         // write the content into xml file
         storeSettings();
     }
 
+    /**
+     * Writes the settings to the xml file defined in Constants
+     */
     public static void storeSettings()
     {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -131,98 +145,152 @@ public class SettingsParser
         }
     }
 
+    /**
+     * Gets the text of a tag from the document
+     *
+     * @param tag The tag
+     * @return The text inside the tag
+     */
     private static String getTagText(String tag)
     {
         return document.getElementsByTagName(tag).item(0).getTextContent();
     }
 
-    private static String getTagText(Element element, String tag)
-    {
-        return element.getElementsByTagName(tag).item(0).getTextContent();
-    }
-
+    /**
+     * Sets the text of a tag to a given value
+     *
+     * @param tag The tag
+     * @param text The text to be put inside the tag
+     */
     private static void setTagText(String tag, String text)
     {
         document.getElementsByTagName(tag).item(0).setTextContent(text);
     }
 
+    /**
+     * Sets a new player name
+     *
+     * @param name The new name of the player
+     */
     public static void setPlayerName(String name)
     {
         setTagText("name", name);
     }
 
+    /**
+     * Sets a new music volume
+     *
+     * @param volume The new volume of the music
+     */
     public static void setMusicVolume(float volume)
     {
         setTagText("musicVolume", String.valueOf(volume));
     }
 
+    /**
+     * Sets a new sound effects volume
+     *
+     * @param volume The new volume of the sound effects
+     */
     public static void setEffectsVolume(float volume)
     {
         setTagText("effectsVolume", String.valueOf(volume));
     }
 
+    /**
+     * Sets whether the interface should highlight the tutorial
+     *
+     * @param show True if the interface should highlight the tutorial, false if not
+     */
     public static void setShowTutorial(boolean show)
     {
         setTagText("showTutorial", String.valueOf(show));
     }
 
+    /**
+     * Sets the details of the default server
+     *
+     * @param ip The ip of the server
+     * @param port The port of the server
+     */
     public static void setServer(String ip, String port)
     {
         setTagText("ip", ip);
         setTagText("port", port);
     }
 
+    /**
+     * Gets the player name stored in the settings
+     *
+     * @return The name of the player
+     */
     public static String getPlayerName()
     {
         return getTagText("name");
     }
 
+    /**
+     * Gets the music volume stored in the settings
+     *
+     * @return The volume of the music
+     */
     public static float getMusicVolume()
     {
         return Float.parseFloat(getTagText("musicVolume"));
     }
 
+    /**
+     * Gets the sound effects volume stored in the settings
+     *
+     * @return The volume of the sound effects
+     */
     public static float getEffectsVolume()
     {
         return Float.parseFloat(getTagText("effectsVolume"));
     }
 
+    /**
+     * Gets whether the interface should highlight the tutorial
+     *
+     * @return True if the interface should highlight the tutorial, false if not
+     */
     public static boolean getShowTutorial()
     {
         return Boolean.parseBoolean(getTagText("showTutorial"));
     }
 
+    /**
+     * Gets the server ip stored in the settings
+     *
+     * @return The ip of the server
+     */
     public static String getServerIp()
     {
         return getTagText("ip");
     }
 
+    /**
+     * Gets the server port stored in the settings
+     *
+     * @return The port of the server
+     */
     public static String getServerPort()
     {
         return getTagText("port");
     }
 
-    private static void printSettings()
-    {
-        System.out.println("\nSettings from XML:\n");
-        System.out.println("Name: " + getTagText("name"));
-        System.out.println("Music volume: " + getTagText("musicVolume"));
-        System.out.println("Effects volume: " + getTagText("effectsVolume"));
-        System.out.println("Show tutorial: " + Boolean.valueOf(getTagText("showTutorial")));
-
-        System.out.println("Servers:");
-        NodeList servers = document.getElementsByTagName("server");
-        for (int i = 0; i < servers.getLength(); i++)
-        {
-            Element server = (Element) servers.item(i);
-            System.out.println(getTagText(server, "name") + " - " + getTagText(server, "ip")
-                    + ":" + getTagText(server, "port"));
-        }
-    }
-
+    /**
+     * Error handler for the DocumentBuilder
+     */
     private static class SettingsErrorHandler implements ErrorHandler
     {
 
+        /**
+         * Gets the details of a SAX parse exception
+         *
+         * @param spe The parse exception
+         * @return The details
+         */
         private String getParseExceptionInfo(SAXParseException spe)
         {
             String systemId = spe.getSystemId();
@@ -236,53 +304,39 @@ public class SettingsParser
             return info;
         }
 
-        public void warning(SAXParseException spe) throws SAXException
+        /**
+         * Prints a warning
+         *
+         * @param spe The exception that leads to the warning
+         */
+        public void warning(SAXParseException spe)
         {
             System.err.println("Settings parser warning: " + getParseExceptionInfo(spe));
         }
 
+        /**
+         * Signals an error by throwing an exception
+         *
+         * @param spe The exception that leads to the error message
+         * @throws SAXException Thrown to signal the error. Has the details of the error.
+         */
         public void error(SAXParseException spe) throws SAXException
         {
             String message = "Settings parser error: " + getParseExceptionInfo(spe);
             throw new SAXException(message);
         }
 
+        /**
+         * Signals a fatal error by throwing an exception
+         *
+         * @param spe The exception that leads to the error message
+         * @throws SAXException Thrown to signal the error. Has the details of the error.
+         */
         public void fatalError(SAXParseException spe) throws SAXException
         {
             String message = "Settings parser fatal Error: " + getParseExceptionInfo(spe);
             throw new SAXException(message);
         }
-    }
-
-    public static void main(String[] args)
-    {
-
-        // delete settings.xml to check automatic initialisation
-        File file = new File(Constants.SETTING_XML_PATH);
-        file.delete();
-        System.out.println("Deleted settings.xml");
-
-        SettingsParser.init();
-
-        SettingsParser.printSettings();
-
-        SettingsParser.setPlayerName("Test");
-        System.out.println(SettingsParser.getPlayerName());
-
-        SettingsParser.storeSettings();
-        SettingsParser.init();
-
-        System.out.println(SettingsParser.getPlayerName());
-
-        System.out.println("....................");
-
-        System.out.println(SettingsParser.getServerIp());
-        System.out.println(SettingsParser.getServerPort());
-
-        SettingsParser.setServer("server.ip", "server.port");
-        SettingsParser.storeSettings();
-        System.out.println(SettingsParser.getServerIp());
-        System.out.println(SettingsParser.getServerPort());
     }
 
 }
