@@ -14,6 +14,8 @@ public class GameState {
 	private List<Bomb> bombs;
 	private List<AudioEvent> audioEvents;
 	private List<BlastTimer> blastList;
+	private int gameCounter;
+	private int holeCounter;
 
 
 
@@ -89,6 +91,26 @@ public class GameState {
 	public List<BlastTimer> getBlastList()
 	{
 		return blastList;
+	}
+
+	public int getGameCounter()
+	{
+		return gameCounter;
+	}
+
+	public void setGameCounter(int gameCounter)
+	{
+		this.gameCounter = gameCounter;
+	}
+
+	public int getHoleCounter()
+	{
+		return holeCounter;
+	}
+
+	public void setHoleCounter(int holeCounter)
+	{
+		this.holeCounter = holeCounter;
 	}
 
 	@Override

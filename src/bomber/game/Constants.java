@@ -30,6 +30,10 @@ public abstract class Constants
     public static final int POSITIVE_POWERUP_PROBABILITY = 75;
     public static final int INVULNERABILITY_LENGTH = 2000;
     public static final int EXPLOSION_LENGTH = 500;
+    public static final int HOLES_FIRST_PHASE_BEGINNING = 120000;
+	public static final int HOLES_FIRST_PHASE_RANDOM_TIMER = 3000;
+	public static final int HOLES_SECOND_PHASE_BEGINNING = 180000;
+	public static final int HOLES_SECOND_PHASE_RANDOM_TIMER = 1000;
 
     // Audio files
     public static final String AUDIO_FILES_PATH = "/resources/sounds/";
