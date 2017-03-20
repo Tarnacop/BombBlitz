@@ -110,7 +110,7 @@ public abstract class Constants
 	public static final float SCREEN_WIDTH_SCALAR = 1.0f;
 	
 	public static final float FONT_SIZE = 20;
-	
+	public static final float SMALL_FONT_SIZE = 15;
 	
 	public static final float MENU_BOX_HEIGHT_SCALAR = 3.5f;
 	public static final float MENU_BOX_WIDTH_SCALAR = 5.0f;
@@ -119,18 +119,65 @@ public abstract class Constants
 	public static final float MENU_BUTTON_HEIGHT = 50;
 	public static final float LARGE_MENU_BUTTON_WIDTH = 250;
 	public static final float LARGE_MENU_BUTTON_HEIGHT = 75;
+	public static final float HUGE_MENU_BUTTON_WIDTH = 300;
+	public static final float HUGE_MENU_BUTTON_HEIGHT = 100;
+	
+	public static final float SMALL_LABEL_WIDTH = 100;
+	public static final float SMALL_LABEL_HEIGHT = 50;
+	
+	public static final float TOGGLE_WIDTH = 30;
+	public static final float MAP_TOGGLE_WIDTH = 90;
+	
+	public static final float TINY_PANE_HEIGHT = 50;
+	public static final float THIN_PANE_HEIGHT = 100;
+	
+	public static final float THIN_PANE_WIDTH = 200;
+	public static final float PANE_WIDTH = 250;
+	public static final float THICK_PANE_WIDTH = 300;
 	
 	public static final float TINY_PAD = 5;
 	public static final float SMALL_PAD = 10;
 	public static final float LITTLE_PAD = 15;
 	public static final float MEDIUM_PAD = 20;
 	public static final float LARGE_PAD = 30;
+	public static final float BIG_PAD = 40;
 	public static final float HUGE_PAD = 80;
 	public static final float MASSIVE_PAD = 100;
 	
 	public static final float TORCH_WIDTH = 70;
 	public static final float TORCH_HEIGHT = 90;
 	
-	public static final float MAP_CANVAS_WIDTH = 300;
+	public static final float SMALL_TORCH_WIDTH = 60;
+	public static final float SMALL_TORCH_HEIGHT = 80;
+	
+	public static final float TINY_TORCH_SIZE = 40;
+	
+	public static final float MAP_CANVAS_WIDTH = 535;
+	public static final float ONLINE_MAP_CANVAS_WIDTH = 565;
 	public static final float MAP_CANVAS_HEIGHT = 300;
+	public static final float MAP_X_PADDING = 250;
+	public static final float MAP_Y_PADDING = 50;
+	
+	//UI Files Paths
+	public static final String BACKGROUND_PATH = "resources/images/background.png";
+	public static final String LOGO_PATH = "resources/images/logo.png";
+	public static final String FONT_PATH = "../../resources/minecraft.ttf";
+	public static final String CSS_PATH = "../../resources/stylesheet.css";
+	public static final String UNLIT_TORCH_PATH = "resources/images/darktorch.png";
+	public static final String TORCH_PATH = "resources/images/torch.png";
+	public static final String KEY_PATH = "resources/images/key.png";
+	public static final String ONLINE_KEY_PATH = "resources/images/onlinekey.png";
+
+	//Game Credits
+	public static final float VERSION_NUMBER = 1.3f;
+	public static final String CREDITS = "Credits:\n"
+			+ "\nGraphics - Alexandru Blinda"
+			+ "\nPhysics/Audio - Alexandru Rosu"
+			+ "\nAI - Jokubas Liutkus"
+			+ "\nUI/Game Logic - Owen Jenkins"
+			+ "\nNetworking - Qiyang Li"
+			+ "\n\nFonts:\nCredit to 'PurePixel'"
+			+ "\n\nImages:\nSprites - Owen Jenkins\nMain Menu Background - From the TRaK2 Texture set\nby Georges 'TRaK' Grondin."
+			+ "\n\nButtons: Credit to 'Buch'\n[http://opengameart.org/users/buch]";
+
 }
