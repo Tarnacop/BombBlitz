@@ -40,6 +40,7 @@ public class Renderer {
 	private final Transformation transformation;
 	private Matrix4f projectionMatrix;
 	private Matrix4f modelMatrix;
+	
 	private TextItem hudTextItem;
 	private TextItem hudTextItemBig;
 
@@ -49,6 +50,7 @@ public class Renderer {
 	private boolean youWon;
 
 	private HashMap<String, TextureMesh> textureMeshes;
+	private int[][] mapMapping;
 
 	private float w_ratio;
 	private float h_ratio;
@@ -64,6 +66,15 @@ public class Renderer {
 		gameOver = false;
 		frontScreen = true;
 		gamePaused = false;
+		mapMapping = new int[13][13];
+		
+		for(int i = 0; i < mapMapping.length; i++) {
+			for(int j = 0; j < mapMapping[i].length; j++) {
+				
+				mapMapping[i][j] = 0;
+			}
+			
+		}
 	} // END OF CONSTRUCTOR
 
 	/**
@@ -157,15 +168,45 @@ public class Renderer {
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("softMesh", softMesh);
 
-		TextureMesh blastMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-				3 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
-				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
-		textureMeshes.put("blastMesh", blastMesh);
+//		TextureMesh blastMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+//				3 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
+//				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+//		textureMeshes.put("blastMesh1", blastMesh1);
 
 		TextureMesh holeMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				0 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("holeMesh", holeMesh);
+		
+		TextureMesh blastMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				0 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("blastMesh1", blastMesh1);
+		
+		TextureMesh blastMesh2 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				1 * Constants.SPRITESHEET_ELEM_WIDTH,  4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("blastMesh2", blastMesh2);
+		
+		TextureMesh blastMesh3 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				0 * Constants.SPRITESHEET_ELEM_WIDTH,  5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("blastMesh3", blastMesh3);
+
+		TextureMesh blastMesh4 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				1 * Constants.SPRITESHEET_ELEM_WIDTH,  5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("blastMesh4", blastMesh4);
+		
+		TextureMesh blastMesh5 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				0 * Constants.SPRITESHEET_ELEM_WIDTH,  6 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("blastMesh5", blastMesh5);
+		
+		TextureMesh blastMesh6 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
+				1 * Constants.SPRITESHEET_ELEM_WIDTH,  6 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
+		textureMeshes.put("blastMesh6", blastMesh6);
 
 		// Player 1
 		TextureMesh ingamePlayerMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
@@ -1039,17 +1080,84 @@ public class Renderer {
 
 				switch (blocks[i][j]) {
 
+
 				case BLANK:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("blankMesh").render();
+					
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("blankMesh").render();
+					}
 					break;
 				case SOFT:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("softMesh").render();
+
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("softMesh").render();
+					}
 					break;
 				case SOLID:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
@@ -1061,49 +1169,283 @@ public class Renderer {
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("blastMesh").render();
+					textureMeshes.get("blastMesh1").render();
+					mapMapping[i][j] = 1;
 					break;
 				case PLUS_SPEED:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("plusSpeedMesh").render();
+
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("plusSpeedMesh").render();
+					}
 					break;
 				case MINUS_SPEED:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("minusSpeedMesh").render();
+					
+
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("minusSpeedMesh").render();
+					}
 					break;
 				case PLUS_BOMB:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("plusBombMesh").render();
+					
+
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("plusBombMesh").render();
+					}
 					break;
 				case MINUS_BOMB:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("minusBombMesh").render();
+
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("minusBombMesh").render();
+					}
 					break;
 				case PLUS_RANGE:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("plusRangeMesh").render();
+
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("plusRangeMesh").render();
+					}
 					break;
 				case MINUS_RANGE:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("minusRangeMesh").render();
+
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("minusRangeMesh").render();
+					}
 					break;
 				case HOLE:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					textureMeshes.get("holeMesh").render();
+
+					if(mapMapping[i][j] > 12) {
+						
+						mapMapping[i][j] = 0;
+					}
+					
+					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2) {
+						
+						textureMeshes.get("blastMesh1").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 3 || mapMapping[i][j] == 4) {
+						
+						textureMeshes.get("blastMesh2").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+						
+						textureMeshes.get("blastMesh3").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8) {
+						
+						textureMeshes.get("blastMesh4").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 9 || mapMapping[i][j] == 10) {
+						
+						textureMeshes.get("blastMesh5").render();
+						mapMapping[i][j] ++;
+					} else if(mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+						
+						textureMeshes.get("blastMesh6").render();
+						mapMapping[i][j]++;
+					} else {
+							
+						textureMeshes.get("holeMesh").render();
+					}
 					break;
 				}
 			}
