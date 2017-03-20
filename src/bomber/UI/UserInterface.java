@@ -156,6 +156,8 @@ public class UserInterface extends Application implements ClientNetInterface {
 	private Button leaveRoomBtn;
 	private OnlineGame onlineGame;
 	private List<ClientServerPlayer> connectedPlayers;
+	private BorderPane tutorialMenu;
+	private Parent tutorialScene;
 
 	/**
 	 * Constructor to create a new UserInterface object and initialise fields.
@@ -256,8 +258,9 @@ public class UserInterface extends Application implements ClientNetInterface {
 	 */
 	private void initScenes() {
 
-		// Create the Borderpanes.
+		// Create the BorderPanes.
 		mainMenu = new BorderPane();
+		tutorialMenu = new BorderPane();
 		creditsMenu = new BorderPane();
 		roomMenu = new BorderPane();
 		connectMenu = new BorderPane();
@@ -269,11 +272,13 @@ public class UserInterface extends Application implements ClientNetInterface {
 		serverScene = createScene(serverMenu);
 		singleScene = createScene(singleMenu);
 		mainScene = createScene(mainMenu);
+		tutorialScene = createScene(tutorialMenu);
 		creditsScene = createScene(creditsMenu);
 		roomScene = createScene(roomMenu);
 
 		// Initialise each individual scene.
 		initMainScene();
+		initTutorialScene();
 		initCreditsScene();
 		initSingleScene();
 		initConnectScene();
@@ -304,9 +309,11 @@ public class UserInterface extends Application implements ClientNetInterface {
 				MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, singleScene);
 		Button multiPlayerBtn = createSceneButton("Multiplayer",
 				MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, mainScene, connectScene);
+		Button tutorialBtn = createSceneButton("Tutorial", MENU_BUTTON_WIDTH,
+				MENU_BUTTON_HEIGHT, mainScene, tutorialScene);
 		Button creditsBtn = createSceneButton("Credits", MENU_BUTTON_WIDTH,
 				MENU_BUTTON_HEIGHT, mainScene, creditsScene);
-
+		
 		// Create menu button to exit the game
 		Button exitBtn = createButton("Exit", MENU_BUTTON_WIDTH,
 				MENU_BUTTON_HEIGHT);
@@ -418,10 +425,53 @@ public class UserInterface extends Application implements ClientNetInterface {
 
 		// Add settings container and other menu buttons to the menu container.
 		menuVBox.getChildren().addAll(settingsVBox, singlePlayerBtn,
-				multiPlayerBtn, creditsBtn, exitBtn);
+				multiPlayerBtn, tutorialBtn, creditsBtn, exitBtn);
 
 		// Set the background of the scene.
 		setBackgroundPane(mainMenu, logoHBox);
+	}
+	
+	/**
+	 * Initialise the tutorial menu.
+	 */
+	private void initTutorialScene() {
+
+		// Create story image.
+//		Image storyImage = new Image(STORY_PATH);
+//		ImageView storyImageView = new ImageView(storyImage);
+//		storyImageView.getStyleClass().add("creditsbox");	
+//		
+		// Create tutorial image.
+		Image tutorialImage = new Image(TUTORIAL_PATH);
+		ImageView tutorialImageView = new ImageView(tutorialImage);
+		tutorialImageView.getStyleClass().add("creditsbox");
+		
+		//Create a container to hold the story image, tutorial image and back button.
+		VBox tutorialVBox = new VBox();
+		tutorialVBox.setAlignment(CENTER);
+		tutorialVBox.setSpacing(MEDIUM_PAD);
+		tutorialVBox.getChildren().addAll( //storyImageView,
+		tutorialImageView, createBackButton("Back", false));
+
+		//Set the background of the menu.
+		setBackgroundPane(tutorialMenu, tutorialVBox);
+	}
+	
+	/**
+	 * Initialise the credits menu.
+	 */
+	private void initCreditsScene() {
+
+		Label creditsLabel = createLabel(CREDITS, false, true);
+		creditsLabel.getStyleClass().add("creditsbox");
+		VBox creditsBox = new VBox();
+		creditsBox.setAlignment(CENTER);
+		creditsBox.setSpacing(MEDIUM_PAD);
+		creditsBox.getChildren().addAll(
+				createLabel("Version: " + VERSION_NUMBER, false, true),
+				creditsLabel, createBackButton("Back", false));
+
+		setBackgroundPane(creditsMenu, creditsBox);
 	}
 
 	/**
@@ -1023,20 +1073,6 @@ public class UserInterface extends Application implements ClientNetInterface {
 			rect.setY((MAP_Y_PADDING / 2) + 5 + yscalar * (pos.y / 64));
 			mapCanvas.getChildren().add(rect);
 		}
-	}
-
-	private void initCreditsScene() {
-
-		Label creditsLabel = createLabel(CREDITS, false, true);
-		creditsLabel.getStyleClass().add("creditsbox");
-		VBox creditsBox = new VBox();
-		creditsBox.setAlignment(CENTER);
-		creditsBox.setSpacing(MEDIUM_PAD);
-		creditsBox.getChildren().addAll(
-				createLabel("Version: " + VERSION_NUMBER, false, true),
-				creditsLabel, createBackButton("Back", false));
-
-		setBackgroundPane(creditsMenu, creditsBox);
 	}
 
 	private void fullScreen() {

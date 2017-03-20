@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import bomber.AI.GameAI;
 import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
 import bomber.networking.ClientServerPlayer;
@@ -55,7 +54,6 @@ public class OnlineGame implements GameInterface {
 			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
 			this.graphics.start();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

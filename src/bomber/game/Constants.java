@@ -166,6 +166,8 @@ public abstract class Constants
 	public static final String BOMB_PATH = "resources/images/bomb.png";
 	public static final String BACKGROUND_PATH = "resources/images/background.png";
 	public static final String LOGO_PATH = "resources/images/logo.png";
+	public static final String TUTORIAL_PATH = "resources/images/tutorial.png";
+	public static final String STORY_PATH = "resources/images/story.png";
 	public static final String FONT_PATH = "../../resources/minecraft.ttf";
 	public static final String CSS_PATH = "../../resources/stylesheet.css";
 	public static final String UNLIT_TORCH_PATH = "resources/images/darktorch.png";
