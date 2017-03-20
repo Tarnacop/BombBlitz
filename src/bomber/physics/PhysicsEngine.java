@@ -1,11 +1,11 @@
 package bomber.physics;
 
 import bomber.game.*;
+import bomber.game.Map;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.awt.geom.Rectangle2D;
+import java.util.*;
 
 /**
  * Manages the physics of the game
@@ -47,6 +47,68 @@ public class PhysicsEngine
 
         // update players
         gameState.getPlayers().forEach(p -> updatePlayer(p, milliseconds));
+
+        // update counter
+        int gameCounter = gameState.getGameCounter() + milliseconds;
+        gameState.setGameCounter(gameCounter);
+        if(gameCounter >= Constants.HOLES_SECOND_PHASE_BEGINNING)
+        {
+            int holeCounter = gameState.getHoleCounter() + milliseconds;
+            if(holeCounter >= Constants.HOLES_SECOND_PHASE_RANDOM_TIMER)
+            {
+                holeCounter = 0;
+                Random generator = new Random();
+                Block[][] gridMap = gameState.getMap().getGridMap();
+                LinkedList<Point> possibleHoleLocations = new LinkedList<>();
+                for(int x=0;x<gridMap.length;x++)
+                    for(int y=0;y<gridMap[0].length;y++)
+                        if(okToPutHole(new Point(x,y), gridMap[x][y], true))
+                            possibleHoleLocations.add(new Point(x,y));
+                if (!possibleHoleLocations.isEmpty())
+                {
+                    int randomIndex = generator.nextInt(possibleHoleLocations.size());
+                    gameState.getMap().setGridBlockAt(possibleHoleLocations.get(randomIndex), Block.HOLE);
+                }
+            }
+            gameState.setHoleCounter(holeCounter);
+        }
+        else if(gameCounter >= Constants.HOLES_FIRST_PHASE_BEGINNING)
+        {
+            int holeCounter = gameState.getHoleCounter() + milliseconds;
+            if(holeCounter >= Constants.HOLES_FIRST_PHASE_RANDOM_TIMER)
+            {
+                holeCounter = 0;
+                Random generator = new Random();
+                Block[][] gridMap = gameState.getMap().getGridMap();
+                LinkedList<Point> possibleHoleLocations = new LinkedList<>();
+                for(int x=0;x<gridMap.length;x++)
+                    for(int y=0;y<gridMap[0].length;y++)
+                        if(okToPutHole(new Point(x,y), gridMap[x][y], false))
+                            possibleHoleLocations.add(new Point(x,y));
+                if (!possibleHoleLocations.isEmpty())
+                {
+                    int randomIndex = generator.nextInt(possibleHoleLocations.size());
+                    gameState.getMap().setGridBlockAt(possibleHoleLocations.get(randomIndex), Block.HOLE);
+                }
+            }
+            gameState.setHoleCounter(holeCounter);
+        }
+    }
+
+    private boolean okToPutHole(Point blockPosition, Block block, boolean aggresive)
+    {
+        if (block == Block.HOLE || block==Block.SOFT || block==Block.SOLID || block==Block.BLAST)
+            return false;
+        if(aggresive)
+            return true;
+        Rectangle2D blockRect = new Rectangle(blockPosition.x*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, blockPosition.y*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, Constants.MAP_BLOCK_TO_GRID_MULTIPLIER);
+        for(Player player: gameState.getPlayers())
+        {
+            Rectangle2D playerRect = new Rectangle(player.getPos().x, player.getPos().y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            if (playerRect.intersects(blockRect))
+                return false;
+        }
+        return true;
     }
 
     /**

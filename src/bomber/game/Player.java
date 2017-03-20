@@ -75,7 +75,6 @@ public class Player {
 
 	public Point getGridPos() {
 
-		System.out.println(pos);
 		int x = pos.x / MAP_BLOCK_TO_GRID_MULTIPLIER;
 		int y = pos.y / MAP_BLOCK_TO_GRID_MULTIPLIER;
 		gridPos.setLocation(x, y);
