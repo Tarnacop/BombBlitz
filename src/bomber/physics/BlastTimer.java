@@ -1,10 +1,13 @@
-package bomber.game;
+package bomber.physics;
+
+import bomber.game.Block;
+import bomber.game.Constants;
 
 import java.awt.*;
 import java.util.Random;
 
 /**
- * Created by Alexandru Rosu on 18/03/2017.
+ * Keeps track of the explosion at a particular grid location
  */
 public class BlastTimer
 {
@@ -13,48 +16,77 @@ public class BlastTimer
     private final Block reveal;
     private int timer;
 
-    // Used when the block will reveal a powerup
-    public BlastTimer(Point location)
+    /**
+     * Constructs a timer for an explosion that will reveal a powerup
+     *
+     * @param location The grid point of the explosion
+     */
+    BlastTimer(Point location)
     {
         this.location = location;
         this.reveal = getRandomBlock();
         timer = Constants.EXPLOSION_LENGTH;
     }
 
-    // Used when the block will reveal some other block
-    public BlastTimer(Point location, Block reveal)
+    /**
+     * Constructs a timer for an explosion that will reveal a particular block
+     *
+     * @param location The grid point of the explosion
+     * @param reveal The block that will be revealed after the explosion
+     */
+    BlastTimer(Point location, Block reveal)
     {
         this.location = location;
         this.reveal = reveal;
         timer = Constants.EXPLOSION_LENGTH;
     }
 
-    public Point getLocation()
+    /**
+     * Gets the location of the explosion
+     *
+     * @return The point corresponding to the explosion
+     */
+    Point getLocation()
     {
         return location;
     }
 
-    public int getTimer()
-    {
-        return timer;
-    }
-
-    public void setTimer(int timer)
+    /**
+     * Sets the timer to a different amount
+     *
+     * @param timer The amount of milliseconds left until the explosion is cleared
+     */
+    void setTimer(int timer)
     {
         this.timer = timer;
     }
 
-    public void decreaseTimer(int milliseconds)
+    /**
+     * Decreases the timer by an amount of milliseconds
+     *
+     * @param milliseconds The amount of milliseconds
+     */
+    void decreaseTimer(int milliseconds)
     {
         timer-=milliseconds;
     }
 
-    public boolean isDone()
+    /**
+     * Checks whether the explosion should clear
+     *
+     * @return True if it should clear, false if not
+     */
+    boolean isDone()
     {
         return timer<=0;
     }
 
-    public Block getReveal()
+    /**
+     * Gets the block that will be revealed by the explosion
+     *
+     * @return A block to be put on the location
+     */
+    Block getReveal()
     {
         return reveal;
     }

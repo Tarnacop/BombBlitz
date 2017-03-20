@@ -1,6 +1,7 @@
 package bomber.game;
 
 import bomber.AI.GameAI;
+import bomber.physics.BlastTimer;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
