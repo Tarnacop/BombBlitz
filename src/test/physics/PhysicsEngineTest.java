@@ -352,4 +352,32 @@ public class PhysicsEngineTest
         assertEquals("The MINUS_SPEED powerup did not work", Constants.DEFAULT_PLAYER_SPEED, buddy.getSpeed(), 0);
     }
 
+    @Test
+    public void powerupGeneration()
+    {
+        buddy.setPos(centerForBombs);
+        buddy.setBombRange(2);
+        buddy.setLives(10000);
+        int nrOfPowerups = 0;
+        int i;
+
+        for(i=0; i<100; i++)
+        {
+            map.setGridBlockAt(new Point(3, 4), SOFT);
+            map.setGridBlockAt(new Point(3, 6), SOFT);
+            buddy.getKeyState().setBomb(true);
+            engine.update();
+            buddy.getKeyState().setBomb(false);
+            engine.update(Constants.DEFAULT_BOMB_TIME);
+            engine.update(Constants.EXPLOSION_LENGTH);
+            if(map.getGridBlockAt(3,4)!=BLANK)
+                nrOfPowerups++;
+            if(map.getGridBlockAt(3,6)!=BLANK)
+                nrOfPowerups++;
+        }
+
+        System.out.println("The power-up generation test got " + nrOfPowerups + " power-ups out of " + i*2 + " exploded blocks. This means " + (50.0*nrOfPowerups/i) + "%");
+
+    }
+
 }
