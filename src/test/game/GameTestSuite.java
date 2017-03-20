@@ -11,7 +11,8 @@ import org.junit.runners.Suite;
 	KeyboardStateTest.class,
 	KeyboardUpdaterTest.class,
 	PlayerTest.class,
-	MapTest.class
+	MapTest.class,
+	SettingsParserTest.class
 })
 
 
