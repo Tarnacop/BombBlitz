@@ -9,7 +9,6 @@ import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
 import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
-import bomber.networking.ClientServerPlayer;
 import bomber.physics.PhysicsEngine;
 import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
@@ -21,7 +20,6 @@ public class Game implements GameInterface {
 	private String playerName;
 	private Map map;
 	private HashMap<Response, Integer> controlScheme;
-	private Screen screen;
 	private PhysicsEngine physics;
 	private GameState gameState;
 	private KeyboardState keyState;

@@ -6,7 +6,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
-
 import static bomber.game.Constants.*;
 import static bomber.AI.AIDifficulty.*;
 import static bomber.game.Response.*;
@@ -559,7 +558,7 @@ public class UserInterface extends Application implements ClientNetInterface{
         centerBox.setSpacing(MEDIUM_PAD);
 
 		mapCanvas = new Pane();
-		mapCanvas.setMinHeight(MAP_CANVAS_WIDTH);
+		mapCanvas.setMinHeight(MAP_CANVAS_HEIGHT);
 		mapCanvas.setMinWidth(MAP_CANVAS_WIDTH);
 		aiDifficultyChoice = new ChoiceBox<>();
         centerBox.getChildren().addAll(createAiDifficultySelector(aiDifficultyChoice, false), createMapSelector(mapCanvas, false));
@@ -786,14 +785,14 @@ public class UserInterface extends Application implements ClientNetInterface{
 			Point pos = map.getSpawnPoints().get(x);
 			Rectangle rect = new Rectangle(10, 10);
 			if(x == 0){
-				rect.setFill(new ImagePattern(new Image("resources/images/playerspawnpoint.png")));
+				rect.setFill(new ImagePattern(new Image(PLAYER_SPAWN_PATH)));
 			}
 			else{
 				if(online){
-					rect.setFill(new ImagePattern(new Image("resources/images/playerspawnpoint.png")));
+					rect.setFill(new ImagePattern(new Image(PLAYER_SPAWN_PATH)));
 				}
 				else{
-					rect.setFill(new ImagePattern(new Image("resources/images/spawnpoint.png")));
+					rect.setFill(new ImagePattern(new Image(SPAWN_PATH)));
 				}
 			}
 			rect.setStroke(Color.BLACK);

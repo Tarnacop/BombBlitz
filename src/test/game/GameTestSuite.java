@@ -10,8 +10,8 @@ import org.junit.runners.Suite;
 	GameStateTest.class,
 	KeyboardStateTest.class,
 	KeyboardUpdaterTest.class,
-	PlayerTest.class
-	
+	PlayerTest.class,
+	MapTest.class
 })
 
 

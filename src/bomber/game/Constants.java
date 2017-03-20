@@ -167,7 +167,9 @@ public abstract class Constants
 	public static final String TORCH_PATH = "resources/images/torch.png";
 	public static final String KEY_PATH = "resources/images/key.png";
 	public static final String ONLINE_KEY_PATH = "resources/images/onlinekey.png";
-
+	public static final String PLAYER_SPAWN_PATH = "resources/images/playerspawnpoint.png";
+	public static final String SPAWN_PATH = "resources/images/spawnpoint.png";
+	
 	//Game Credits
 	public static final float VERSION_NUMBER = 1.3f;
 	public static final String CREDITS = "Credits:\n"

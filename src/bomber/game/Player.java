@@ -1,7 +1,7 @@
 package bomber.game;
 
 import java.awt.Point;
-
+import static bomber.game.Constants.*;
 import bomber.AI.AIDifficulty;
 
 public class Player {
@@ -14,7 +14,6 @@ public class Player {
 	private double speed;
 	private int bombRange;
 	private int maxNrOfBombs;
-	private final int scalar = 64;
 	private KeyboardState keyState;
 	private boolean isAlive;
 	private int invulnerability;
@@ -41,10 +40,6 @@ public class Player {
 
 	public void setPlayerID(int playerID) {
 		this.playerID = playerID;
-	}
-
-	public int getScalar() {
-		return scalar;
 	}
 
 	public void setGridPos(Point gridPos) {
@@ -80,18 +75,15 @@ public class Player {
 
 	public Point getGridPos() {
 
-		int x = pos.x / scalar;
-		int y = pos.y / scalar;
-		if (x % scalar > 32)
-			x++;
-		if (y % scalar > 32)
-			y++;
+		System.out.println(pos);
+		int x = pos.x / MAP_BLOCK_TO_GRID_MULTIPLIER;
+		int y = pos.y / MAP_BLOCK_TO_GRID_MULTIPLIER;
 		gridPos.setLocation(x, y);
 		return gridPos;
 	}
 
 	private void updatePos() {
-		this.gridPos.setLocation((pos.x / scalar), (pos.y / scalar));
+		this.gridPos.setLocation((pos.x / MAP_BLOCK_TO_GRID_MULTIPLIER), (pos.y / MAP_BLOCK_TO_GRID_MULTIPLIER));
 	}
 
 	public int getLives() {
