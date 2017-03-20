@@ -7,7 +7,6 @@ import org.junit.runners.Suite;
 
 @Suite.SuiteClasses({
 	BombTest.class,
-	ControlSchemeTest.class,
 	GameStateTest.class,
 	KeyboardStateTest.class,
 	KeyboardUpdaterTest.class,

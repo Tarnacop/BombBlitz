@@ -7,6 +7,7 @@ import test.physics.PhysicsEngineTest;
 import test.AI.AITestSuite;
 import test.game.GameTestSuite;
 import test.networking.NetworkingTestSuite;
+import test.UI.UITestSuite;
 
 @RunWith(Suite.class)
 
@@ -14,8 +15,8 @@ import test.networking.NetworkingTestSuite;
 	NetworkingTestSuite.class,
 	AITestSuite.class,
 	GameTestSuite.class,
-	PhysicsEngineTest.class
-	
+	PhysicsEngineTest.class,
+	UITestSuite.class
 })
 
 

@@ -42,6 +42,8 @@ public class GameState {
 			}
 		}
 		
+		System.out.println("LIVING HUMANS: " + livingHumans + ", LIVING AI: " + livingAis);
+		
 		if(livingHumans == 0){
 			
 			result = true;
