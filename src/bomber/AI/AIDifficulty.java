@@ -6,12 +6,12 @@ package bomber.AI;
  */
 public enum AIDifficulty {
 
-	/** The easy. */
-	EASY,
-	/** The medium. */
-	MEDIUM,
-	/** The hard. */
-	HARD,
-	/** The extreme. */
-	EXTREME 
+/** The easy. */
+EASY,
+/** The medium. */
+MEDIUM,
+/** The hard. */
+HARD,
+/** The extreme. */
+EXTREME
 }

@@ -12,17 +12,17 @@ import bomber.game.Player;
 
 /**
  * The Class AITemplate. Consists of main utility functions for AI to run.
- * 
+ *
  * @author Jokubas Liutkus
- * 
+ *
  */
 public abstract class AITemplate extends Thread {
 
-	/** The game AI. */
-	protected GameAI gameAI;
+/** The game AI. */
+protected GameAI gameAI;
 
-	/** The finder for finding the route. */
-	protected RouteFinder finder;
+/** The finder for finding the route. */
+protected RouteFinder finder;
 
 	/** The safety checker for AI. */
 	protected SafetyChecker safetyCh;
@@ -190,6 +190,9 @@ public abstract class AITemplate extends Thread {
 
 	}
 	
+	/**
+	 * Hang while the game is paused
+	 */
 	protected void pausedGame()
 	{
 		while(pause)
