@@ -1,4 +1,4 @@
-package bomber.networking;
+package test.networking;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -9,6 +9,11 @@ import java.util.Scanner;
 import bomber.game.Block;
 import bomber.game.KeyboardState;
 import bomber.game.Map;
+import bomber.networking.ClientServerLobbyRoom;
+import bomber.networking.ClientServerPlayer;
+import bomber.networking.ClientThread;
+import bomber.networking.ServerPacketEncoder;
+import bomber.networking.ClientPacketEncoder;
 
 public class TestClientMain {
 

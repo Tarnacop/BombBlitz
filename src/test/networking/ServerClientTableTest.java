@@ -48,9 +48,18 @@ public class ServerClientTableTest {
 		assertTrue(table.contains(0));
 		assertTrue(table.contains(new InetSocketAddress("1.1.1.1", 1111)));
 		assertTrue(table.contains("P1"));
+		assertTrue(table.contains(c));
 		assertTrue(table.contains(1));
 		assertTrue(table.contains(new InetSocketAddress("1.1.1.2", 1112)));
 		assertTrue(table.contains("P2"));
+		assertTrue(table.contains(c2));
+
+		assertNotNull(table.get("P1"));
+		assertNotNull(table.get("P2"));
+		assertNotNull(table.get(0));
+		assertNotNull(table.get(0));
+		assertNotNull(table.get(new InetSocketAddress("1.1.1.1", 1111)));
+		assertNotNull(table.get(new InetSocketAddress("1.1.1.2", 1112)));
 
 		table.remove(1);
 		assertFalse(table.contains(new InetSocketAddress("1.1.1.2", 1112)));
@@ -80,5 +89,9 @@ public class ServerClientTableTest {
 		assertEquals(0, table.size());
 		assertFalse(table.contains(new InetSocketAddress("1.1.1.1", 1111)));
 		assertFalse(table.contains("P1"));
+
+		assertEquals(table.size(), table.entrySet().size());
+		assertEquals(table.size(), table.entrySet2().size());
+		assertEquals(table.size(), table.entrySet3().size());
 	}
 }

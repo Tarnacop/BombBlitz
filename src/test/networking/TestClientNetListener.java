@@ -1,6 +1,11 @@
-package bomber.networking;
+package test.networking;
 
 import bomber.game.AudioEvent;
+import bomber.networking.ClientNetInterface;
+import bomber.networking.ClientServerAI;
+import bomber.networking.ClientServerPlayer;
+import bomber.networking.ClientServerRoom;
+import bomber.networking.ClientThread;
 
 public class TestClientNetListener implements ClientNetInterface {
 
