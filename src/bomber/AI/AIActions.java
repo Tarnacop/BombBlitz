@@ -5,7 +5,7 @@ package bomber.AI;
  * The Enum for AI Actions.
  * @author Jokubas Liutkus
  */
-public enum AIActions{
+public enum AIActions {
 
 /** The up. */
 UP,
@@ -16,7 +16,7 @@ LEFT,
 /** The right. */
 RIGHT,
 /** The bomb. */
-BOMB, 
+BOMB,
 /** The none. */
 NONE
 

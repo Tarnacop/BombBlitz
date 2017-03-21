@@ -108,7 +108,7 @@ public class SafetyChecker {
 	 *
 	 * @return the tiles affected by bombs
 	 */
-	public ArrayList<Point> getTilesAffectedByBombs() {
+	public ArrayList<Point> getTilesAffectedByBombs() {	
 		ArrayList<Point> points = new ArrayList<>();
 		List<Bomb> bombs = new ArrayList<>(state.getBombs());
 
