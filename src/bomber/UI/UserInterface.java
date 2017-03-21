@@ -1,17 +1,32 @@
 package bomber.UI;
 
+import static bomber.AI.AIDifficulty.EASY;
+import static bomber.AI.AIDifficulty.EXTREME;
+import static bomber.AI.AIDifficulty.HARD;
+import static bomber.AI.AIDifficulty.MEDIUM;
+import static bomber.game.Constants.*;
+import static bomber.game.Response.DOWN_MOVE;
+import static bomber.game.Response.LEFT_MOVE;
+import static bomber.game.Response.PAUSE_GAME;
+import static bomber.game.Response.PLACE_BOMB;
+import static bomber.game.Response.RIGHT_MOVE;
+import static bomber.game.Response.UP_MOVE;
+import static javafx.geometry.Orientation.VERTICAL;
+import static javafx.geometry.Pos.CENTER;
+import static javafx.geometry.Pos.CENTER_LEFT;
+import static javafx.geometry.Pos.TOP_LEFT;
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
-import static bomber.game.Constants.*;
-import static bomber.AI.AIDifficulty.*;
-import static bomber.game.Response.*;
-import static javafx.geometry.Pos.*;
-import static javafx.geometry.Orientation.*;
-import static javafx.scene.control.ScrollPane.ScrollBarPolicy.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -158,6 +173,11 @@ public class UserInterface extends Application implements ClientNetInterface {
 	private List<ClientServerPlayer> connectedPlayers;
 	private BorderPane tutorialMenu;
 	private Parent tutorialScene;
+	private CheckBox wasdBtn;
+	private ImageView currentTutorial;
+	private Image tutorialImage;
+	private Image wasdTutorialImage;
+	private boolean wasd;
 
 	/**
 	 * Constructor to create a new UserInterface object and initialise fields.
@@ -417,11 +437,22 @@ public class UserInterface extends Application implements ClientNetInterface {
 		fullScreenHBox.getChildren().addAll(
 				createLabel("Fullscreen ", false, false), fullScreenBtn);
 
+		// 'fullScreenBtn' - checkbox to set the game to fullscreen.
+		wasdBtn = new CheckBox();
+		wasdBtn.setOnAction(e -> toggleWasd());
+
+		// Create box to contain the fullscreen label and checkbox.
+		HBox wasdHBox = new HBox();
+		wasdHBox.setAlignment(CENTER);
+		wasdHBox.setSpacing(TINY_PAD);
+		wasdHBox.getChildren().addAll(
+		createLabel("WASD controls ", false, false), wasdBtn);
+
 		// Add settings options to the settings container.
 		settingsVBox.getChildren().addAll(
 				createBoundLabel(this.currentNameText, false, false),
 				createBoundLabel(this.playerName, false, false), nameText,
-				nameBtn, audioVBox, fullScreenHBox);
+				nameBtn, audioVBox, fullScreenHBox, wasdHBox);
 
 		// Add settings container and other menu buttons to the menu container.
 		menuVBox.getChildren().addAll(settingsVBox, singlePlayerBtn,
@@ -441,9 +472,11 @@ public class UserInterface extends Application implements ClientNetInterface {
 		ImageView storyImageView = new ImageView(storyImage);
 		storyImageView.getStyleClass().add("creditsbox");	
 		
-		// Create tutorial image.
-		Image tutorialImage = new Image(TUTORIAL_PATH);
-		ImageView tutorialImageView = new ImageView(tutorialImage);
+		tutorialImage = new Image(TUTORIAL_PATH);
+		wasdTutorialImage = new Image(WASD_TUTORIAL_PATH);
+		
+		//'currentTutorial' - Tutorial ImageView which can be changed later.
+		currentTutorial = new ImageView(tutorialImage);
 		
 		//Create a container to hold the story image and tutorial image.
 		HBox tutorialHBox = new HBox();
@@ -451,7 +484,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 		tutorialHBox.setSpacing(HUGE_PAD);
 		tutorialHBox.getStyleClass().add("creditsbox");
 		tutorialHBox.getChildren().addAll( 
-		storyImageView, tutorialImageView);
+		storyImageView, currentTutorial);
 		
 		//Create a container to hold the tutorial container and back button.
 		VBox infoVBox = new VBox();
@@ -1089,6 +1122,24 @@ public class UserInterface extends Application implements ClientNetInterface {
 			this.currentStage.setFullScreen(false);
 		}
 	}
+	
+	private void toggleWasd() {
+		if (wasdBtn.isSelected()) {
+			wasd = true;
+			currentTutorial.setImage(wasdTutorialImage);
+			controls.put(UP_MOVE, GLFW_KEY_W);
+			controls.put(DOWN_MOVE, GLFW_KEY_S);
+			controls.put(LEFT_MOVE, GLFW_KEY_A);
+			controls.put(RIGHT_MOVE, GLFW_KEY_D);
+		} else {
+			wasd = false;
+			currentTutorial.setImage(tutorialImage);
+			controls.put(UP_MOVE, GLFW_KEY_UP);
+			controls.put(DOWN_MOVE, GLFW_KEY_DOWN);
+			controls.put(LEFT_MOVE, GLFW_KEY_LEFT);
+			controls.put(RIGHT_MOVE, GLFW_KEY_RIGHT);
+		}
+	}
 
 	private void setMusic(float volume) {
 		if (muteMusicBtn.isSelected()) {
@@ -1696,7 +1747,8 @@ public class UserInterface extends Application implements ClientNetInterface {
 		new Game(this, mapCopy, playerName, controls, aiNum, this.aiDiff,
 				musicVolume, soundVolume, this.currentStage.isFullScreen(),
 				(int) this.currentStage.getWidth(),
-				(int) this.currentStage.getHeight());
+				(int) this.currentStage.getHeight(),
+				this.wasd);
 	}
 
 	@Override
