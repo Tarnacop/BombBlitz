@@ -48,7 +48,8 @@ public class Renderer {
 	private boolean frontScreen;
 	private boolean gamePaused;
 	private boolean youWon;
-
+	private boolean wasd;
+	
 	private HashMap<String, TextureMesh> textureMeshes;
 	private int[][] mapMapping;
 
@@ -59,13 +60,14 @@ public class Renderer {
 	/**
 	 * Create a Renderer object
 	 */
-	public Renderer() {
+	public Renderer(boolean wasd) {
 
 		transformation = new Transformation();
 		textureMeshes = new HashMap<String, TextureMesh>();
 		gameOver = false;
 		frontScreen = true;
 		gamePaused = false;
+		this.wasd = wasd;
 		mapMapping = new int[13][13];
 		
 		for(int i = 0; i < mapMapping.length; i++) {
@@ -151,7 +153,8 @@ public class Renderer {
 		Texture blast = new Texture("src/resources/images/blast.png");
 		Texture newspritesheet = new Texture("src/resources/images/newspritesheet.png");
 		Texture controls = new Texture("src/resources/images/controls.png");
-
+		Texture altcontrols = new Texture("src/resources/images/altcontrols.png");
+		
 		// Blocks
 		TextureMesh blankMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				0 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
@@ -751,6 +754,8 @@ public class Renderer {
 		TextureMesh controlsMesh = new TextureMesh(Constants.CONTROLS_WIDTH, Constants.CONTROLS_HEIGHT, controls);
 		textureMeshes.put("controlsMesh", controlsMesh);
 
+		TextureMesh altControlsMesh = new TextureMesh(Constants.CONTROLS_WIDTH, Constants.CONTROLS_HEIGHT, altcontrols);
+		textureMeshes.put("altControlsMesh", altControlsMesh);
 	} // END
 		// OF
 		// setupTextures
@@ -2124,12 +2129,19 @@ public class Renderer {
 		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
-
+		
 		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2);
 		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
-		textureMeshes.get("controlsMesh").render();
+		
+		if(!wasd) {
+		
+			textureMeshes.get("controlsMesh").render();
+		} else {
+			
+			textureMeshes.get("altControlsMesh").render();
+		}
 		textureShader.unbind();
 
 	} // END OF renderBeginningTextures METHOD
@@ -2162,7 +2174,7 @@ public class Renderer {
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 		hudTextItemBig.getMesh().render();
-
+		
 		seconds -= interval;
 
 		hudShader.unbind();
@@ -2196,8 +2208,14 @@ public class Renderer {
 		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
-		textureMeshes.get("controlsMesh").render();
-
+		
+		if(!wasd) {
+		
+			textureMeshes.get("controlsMesh").render();
+		} else {
+			
+			textureMeshes.get("altControlsMesh").render();
+		}
 		textureShader.unbind();
 	} // END OF renderPauseScreen METHOD
 

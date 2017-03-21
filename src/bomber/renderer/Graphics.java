@@ -37,7 +37,7 @@ public class Graphics implements Runnable {
 	 * @throws Exception
 	 */
 	public Graphics(String screenTitle, int screenWidth, int screenHeight, boolean vSync, GameInterface gameLogic,
-			boolean fullScreen, boolean wasd) throws Exception {
+			boolean fullScreen) throws Exception {
 
 		gameLoopThread = new Thread(this, "_THREAD_GAME_LOOP");
 		this.screen = new Screen(screenTitle, screenWidth, screenHeight, vSync, fullScreen);
