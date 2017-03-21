@@ -36,7 +36,7 @@ public class Game implements GameInterface {
 	private boolean fullScreen;
 
 	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum,
-			AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen, int width, int height) {
+			AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen, int width, int height, boolean wasd) {
 		this.aiNum = aiNum;
 		this.aiDiff = aiDiff;
 		this.ui = ui;
@@ -47,7 +47,7 @@ public class Game implements GameInterface {
 		this.pausePressed = false;
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
-		this.renderer = new Renderer();
+		this.renderer = new Renderer(wasd);
 		audio = new AudioManager();
 		audio.playMusic();
 

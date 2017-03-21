@@ -45,7 +45,7 @@ public class OnlineGame implements GameInterface {
 		this.bombPressed = false;
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
-		this.renderer = new Renderer();
+		this.renderer = new Renderer(false);
 		audio = new AudioManager();
 		audio.playMusic();
 
