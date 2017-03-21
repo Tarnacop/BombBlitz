@@ -1,7 +1,6 @@
 package bomber.audio;
 
 import bomber.game.AudioEvent;
-import org.newdawn.slick.openal.Audio;
 
 import javax.sound.sampled.FloatControl;
 import java.util.List;
