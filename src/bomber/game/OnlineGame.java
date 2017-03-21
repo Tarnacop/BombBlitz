@@ -51,7 +51,7 @@ public class OnlineGame implements GameInterface {
 
 		try {
 
-			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
+			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen, false);
 			this.graphics.start();
 		} catch (Exception e) {
 			e.printStackTrace();
