@@ -1,10 +1,9 @@
 package bomber.audio;
 
 import bomber.game.AudioEvent;
-import bomber.game.Constants;
+import org.newdawn.slick.openal.Audio;
 
 import javax.sound.sampled.FloatControl;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -19,13 +18,13 @@ public class AudioManager
     private static float musicVolume;
     private static float effectsVolume;
 
-    private final MusicPlayer music;
-    private final SoundEffectPlayer effects;
+    private static MusicPlayer music;
+    private static SoundEffectPlayer effects;
 
-    /**
-     * Constructs an audio manager
-     */
-    public AudioManager()
+    private AudioManager() {}
+
+
+    public static void init()
     {
         music = new MusicPlayer(musicVolume);
         effects = new SoundEffectPlayer(effectsVolume);
@@ -51,7 +50,10 @@ public class AudioManager
     public static void setMusicVolume(float percent)
     {
         if(isValidPercent(percent))
+        {
             musicVolume = percent;
+            music.setVolume(percent);
+        }
     }
 
     /**
@@ -62,8 +64,12 @@ public class AudioManager
      */
     public static void setEffectsVolume(float percent)
     {
+        System.out.println("effects volume set to " + percent);
         if(isValidPercent(percent))
+        {
             effectsVolume = percent;
+            effects.setVolume(percent);
+        }
     }
 
     /**
@@ -77,7 +83,9 @@ public class AudioManager
         if(isValidPercent(percent))
         {
             musicVolume = percent;
+            music.setVolume(percent);
             effectsVolume = percent;
+            effects.setVolume(percent);
         }
     }
 
@@ -104,17 +112,18 @@ public class AudioManager
     /**
      * Starts playing music, if not playing already
      */
-    public void playMusic()
+    public static void playMusic()
     {
-    	System.out.println("AudioManager Music " + musicVolume + " Sound " + effectsVolume);
-        if (!music.isAlive())
+        if (music.getState()==Thread.State.NEW)
             music.start();
+        else
+            music.replay();
     }
 
     /**
      * Pauses the music
      */
-    public void pauseMusic()
+    public static void pauseMusic()
     {
         music.pause();
     }
@@ -122,7 +131,7 @@ public class AudioManager
     /**
      * Unpauses the music
      */
-    public void unpauseMusic()
+    public static void unpauseMusic()
     {
         music.unpause();
     }
@@ -130,10 +139,11 @@ public class AudioManager
     /**
      * Stops all the sounds from playing. The sound effects cannot be restarted after this
      */
-    public void stopAudio()
+    public static void stopAudio()
     {
-        music.pause();
+        music.close();
         music.interrupt();
+        effects.close();
         effects.interrupt();
     }
 
@@ -142,7 +152,7 @@ public class AudioManager
      *
      * @param eventList The list of events to be played
      */
-    public void playEventList(List<AudioEvent> eventList)
+    public static void playEventList(List<AudioEvent> eventList)
     {
         eventList.forEach(effects::play);
         eventList.clear();
@@ -153,9 +163,8 @@ public class AudioManager
      */
     public static void playMenuItemSelected()
     {
-        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.MENU_SOUND_FILENAME);
-        effects.interrupt();
+        effects.play(AudioEvent.MENU_SOUND);
+
     }
 
     /**
@@ -163,9 +172,7 @@ public class AudioManager
      */
     public static void playGameOverWon()
     {
-        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.GAME_OVER_WON_FILENAME);
-        effects.interrupt();
+        effects.play(AudioEvent.GAME_OVER_WON);
     }
 
     /**
@@ -173,9 +180,7 @@ public class AudioManager
      */
     public static void playGameOverLost()
     {
-        SoundEffectPlayer effects = new SoundEffectPlayer(effectsVolume);
-        effects.playSound(Constants.GAME_OVER_LOST_FILENAME);
-        effects.interrupt();
+        effects.play(AudioEvent.GAME_OVER_LOST);
     }
 
     /**
@@ -201,136 +206,25 @@ public class AudioManager
         gainControl.setValue((float) (20 * Math.log10(linearVolume))); // linear formula; not so precise with little volume
     }
 
-    public boolean hasOpenedMusic()
+    public static boolean hasOpenedMusic()
     {
         return music!=null && music.hasOpened();
     }
 
-    public boolean isPlayingMusic()
+    public static boolean isPlayingMusic()
     {
         return music.isAlive();
     }
 
-    /*
-    public static void main(String[] args) throws InterruptedException
+    public static void main(String[] args) throws Exception
     {
-        AudioManager audioManager = new AudioManager();
-
-        System.out.println(audioManager.hasOpenedMusic());
-
-        audioManager.playMusic();
-
-
-
-        //audioManager.setVolume(100);
-
-        //AudioManager.playMenuItemSelected();
-
-
-        AudioManager.playGameOverWon();
-
-        TimeUnit.SECONDS.sleep(3);
-
-        AudioManager.playGameOverLost();
-
-        TimeUnit.SECONDS.sleep(3);
-
-
-
-        Scanner sc = new Scanner(System.in);
-
-        while(true)
-            audioManager.setVolume(sc.nextInt());
-
-
-        for (int i = 100000; i >= 0; i--)
-        {
-            try
-            {
-                audioManager.setVolume(2);
-                System.out.println(i);
-                TimeUnit.MILLISECONDS.sleep(10);
-
-            } catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-
-        try
-        {
-            TimeUnit.SECONDS.sleep(3);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-        audioManager.setVolume(50);
-        System.out.println(50);
-        try
-        {
-            TimeUnit.SECONDS.sleep(3);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-        audioManager.setVolume(25);
-        System.out.println(25);
-
-        try
-        {
-            TimeUnit.SECONDS.sleep(3);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-        List<AudioEvent> eventList = new ArrayList<>();
-        eventList.add(AudioEvent.EXPLOSION);
-
-        try
-        {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-
-        audioManager.setVolume(-80f);
-        //audioManager.playEventList(eventList);
-
-        try
-        {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-        //audioManager.pauseMusic();
-        //audioManager.setVolume(0f);
-
-        try
-        {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-        //audioManager.setVolume(0f);
-        //audioManager.unpauseMusic();
-
-        try
-        {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
+        AudioManager.init();
+        AudioManager.setVolume(50);
+        AudioManager.playMusic();
+        TimeUnit.SECONDS.sleep(1);
+        //AudioManager.pauseMusic();
+        AudioManager.playMusic();
+        TimeUnit.SECONDS.sleep(1);
     }
-    */
+
 }

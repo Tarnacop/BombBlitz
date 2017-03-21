@@ -24,7 +24,6 @@ public class OnlineGame implements GameInterface {
 	private Renderer renderer;
 	private boolean bombPressed;
 	private KeyboardInput input;
-	private AudioManager audio;
 	private UserInterface ui;
 	private ClientThread client;
 	private boolean fullScreen;
@@ -46,8 +45,7 @@ public class OnlineGame implements GameInterface {
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer(false);
-		audio = new AudioManager();
-		audio.playMusic();
+
 
 		try {
 
@@ -98,6 +96,8 @@ public class OnlineGame implements GameInterface {
 		}
 
 		this.ui.hide();
+
+		AudioManager.playMusic();
 	}
 
 	private float gameOverCounter = 0;
@@ -115,14 +115,14 @@ public class OnlineGame implements GameInterface {
 				if (this.player != null && this.player.isAlive()) {
 					renderer.displayGameOver(true);
 					if (playMusic) {
-						this.audio.stopAudio();
+						AudioManager.pauseMusic();
 						AudioManager.playGameOverWon();
 						playMusic = false;
 					}
 				} else {
 					renderer.displayGameOver(false);
 					if (playMusic) {
-						this.audio.stopAudio();
+						AudioManager.pauseMusic();
 						AudioManager.playGameOverLost();
 						playMusic = false;
 					}
@@ -136,7 +136,7 @@ public class OnlineGame implements GameInterface {
 			renderer.stopFrontScreen();
 			this.keyState.setBomb(false);
 			this.keyState.setMovement(Movement.NONE);
-			audio.playEventList(gameState.getAudioEvents());
+			AudioManager.playEventList(gameState.getAudioEvents());
 		}
 
 	}
@@ -160,11 +160,10 @@ public class OnlineGame implements GameInterface {
 
 	@Override
 	public void dispose() {
-
+		AudioManager.pauseMusic();
 		this.ui.show(this.fullScreen, true, this.gameEnded);
 		System.out.println("RETURNED TO MENU");
 		renderer.dispose();
-		audio.stopAudio();
 
 	}
 
