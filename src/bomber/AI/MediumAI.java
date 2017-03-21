@@ -101,10 +101,10 @@ public class MediumAI extends AITemplate {
 			}
 			// otherwise just generate a random goal and start full-filling it
 			else if (random.nextBoolean()) {
-				int x = random.nextInt(gameState.getMap().getGridMap().length);
-				int y = random.nextInt(gameState.getMap().getGridMap()[0].length);
-				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
-				performPlannedMoves(moves);
+			  int x = random.nextInt(gameState.getMap().getGridMap().length);
+        int y = random.nextInt(gameState.getMap().getGridMap()[0].length);
+        moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
+        performPlannedMoves(moves);
 			}
 			// else if there is an upgrade find the moves to it
 			else if (random.nextBoolean() && (moves = finder.findRouteToUpgrade()) != null) {

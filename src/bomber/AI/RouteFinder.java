@@ -537,7 +537,7 @@ public class RouteFinder {
 	 */
 	public LinkedList<AIActions> getPlanToEnemy(Point start, Point goal) {
 
-		// TODO finish not implemented
+
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
 		if (start == null || goal == null)
