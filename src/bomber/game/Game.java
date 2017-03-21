@@ -29,7 +29,6 @@ public class Game implements GameInterface {
 	private boolean pausePressed;
 	private KeyboardInput input;
 	private Player player;
-	private AudioManager audio;
 	private UserInterface ui;
 	private int aiNum;
 	private AIDifficulty aiDiff;
@@ -48,8 +47,6 @@ public class Game implements GameInterface {
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer(wasd);
-		audio = new AudioManager();
-		audio.playMusic();
 
 		try {
 
@@ -86,11 +83,15 @@ public class Game implements GameInterface {
 				// ai.begin();
 			}
 
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		this.ui.hide();
+
+		AudioManager.playMusic();
 	}
 
 	private float gameOverCounter = 0;
@@ -110,7 +111,7 @@ public class Game implements GameInterface {
 				if(this.player.isAlive()){
 					renderer.displayGameOver(true);
 					if(playMusic){
-						this.audio.stopAudio();
+						AudioManager.pauseMusic();
 						AudioManager.playGameOverWon();
 						playMusic = false;
 					}
@@ -118,7 +119,7 @@ public class Game implements GameInterface {
 				else{
 					renderer.displayGameOver(false);
 					if(playMusic){
-						this.audio.stopAudio();
+						AudioManager.pauseMusic();
 						AudioManager.playGameOverLost();
 						playMusic = false;
 					}
@@ -162,7 +163,7 @@ public class Game implements GameInterface {
 					}
 
 					this.physics.update((int) (interval * 1000));
-					audio.playEventList(gameState.getAudioEvents());
+					AudioManager.playEventList(gameState.getAudioEvents());
 				}
 			}
 		}
@@ -185,7 +186,7 @@ public class Game implements GameInterface {
 
 	@Override
 	public void dispose() {
-
+		AudioManager.pauseMusic();
 		this.ui.show(this.fullScreen, false, true);
 		System.out.println("RETURNED TO MENU");
 		for (Player player : this.gameState.getPlayers()) {
@@ -193,6 +194,5 @@ public class Game implements GameInterface {
 			player.setAlive(false);
 		}
 		renderer.dispose();
-		audio.stopAudio();
 	}
 }
