@@ -489,8 +489,8 @@ public class UserInterface extends Application implements ClientNetInterface {
 		//Create a container to hold the tutorial container and back button.
 		VBox infoVBox = new VBox();
 		infoVBox.setAlignment(CENTER);
-		infoVBox.setSpacing(MEDIUM_PAD);
-		infoVBox.setPadding(new Insets(0, MASSIVE_PAD, 0, MASSIVE_PAD));
+		infoVBox.setSpacing(SMALL_PAD);
+		infoVBox.setPadding(new Insets(0, LARGE_PAD, 0, LARGE_PAD));
 		infoVBox.getChildren().addAll(tutorialHBox, createBackButton("Back", false));
 
 		//Set the background of the menu.
