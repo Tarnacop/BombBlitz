@@ -75,7 +75,6 @@ public class AudioManager
      */
     public static void setEffectsVolume(float percent)
     {
-        System.out.println("effects volume set to " + percent);
         if (isValidPercent(percent))
         {
             effectsVolume = percent;
