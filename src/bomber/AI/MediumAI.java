@@ -53,7 +53,7 @@ public class MediumAI extends AITemplate {
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive() ) {
+		while (moves != null && !moves.isEmpty()  && gameAI.isAlive() ) {
 			pausedGame();
 			action = moves.removeFirst();
 			// if actions is bomb place it
@@ -62,7 +62,6 @@ public class MediumAI extends AITemplate {
 				try {
 					sleep(100);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 				}
 				gameAI.getKeyState().setBomb(false);
 			}
@@ -71,6 +70,7 @@ public class MediumAI extends AITemplate {
 				if (moves != null) {
 					while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive()) {
 						pausedGame();
+						if(safetyCh.inDanger()) return;
 					}
 				}
 			}
@@ -92,13 +92,31 @@ public class MediumAI extends AITemplate {
 		while (gameAI.isAlive()) {
 
 			pausedGame();
-			// if AI is in danger then find the escape route with 60%
-			// possibility
-			if (safetyCh.inDanger() && random.nextInt(10) < 6) {
-				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-				performMoves(moves, true);
+			// if AI is in danger then escape only with 70% possibility
+      if (safetyCh.inDanger() && random.nextInt(100) < 80) {
+        moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+        performMoves(moves, true);
 
-			}
+      }
+      // else if there is an upgrade find the moves to it
+      else if ( (moves = finder.findRouteToUpgrade()) != null) {
+
+        performMoves(moves, false);
+      }
+
+      // if enemy is in bomb range then place the bomb and go to the
+      // safe location with 30% possibility
+      else if (random.nextInt(100) < 30 && safetyCh.isEnemyInBombRange()) {
+        gameAI.getKeyState().setBomb(true);
+        moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
+        performMoves(moves, true);
+      }
+      // if enemy is accessible(no boxes are blocking the path) then
+      // find a route to it and make moves with 80% possibility
+      else if (random.nextInt(100) < 80 && (moves = getMovesToEnemy()) != null) {
+        performMoves(moves, false);
+      }
+      
 			// otherwise just generate a random goal and start full-filling it
 			else if (random.nextBoolean()) {
 				int x = random.nextInt(gameState.getMap().getGridMap().length);
@@ -106,25 +124,9 @@ public class MediumAI extends AITemplate {
 				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
 				performPlannedMoves(moves);
 			}
-			// else if there is an upgrade find the moves to it
-			else if (random.nextBoolean() && (moves = finder.findRouteToUpgrade()) != null) {
+			
 
-				performMoves(moves, false);
-			}
-
-			// if enemy is in bomb range then place the bomb and go to the
-			// safe location with 30% possibility
-			else if (random.nextInt(100) < 30 && safetyCh.isEnemyInBombRange()) {
-				gameAI.getKeyState().setBomb(true);
-				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-				performMoves(moves, true);
-			}
-
-			// if enemy is accessible(no boxes are blocking the path) then
-			// find a route to it and make moves with 40% possibility
-			else if (random.nextInt(100) < 40 && (moves = getMovesToEnemy()) != null) {
-				performMoves(moves, false);
-			}
+			
 			// if enemy is not in the range get the plan how to reach enemy and
 			// full-fill it
 			else if (random.nextBoolean()
@@ -132,7 +134,12 @@ public class MediumAI extends AITemplate {
 				performPlannedMoves(moves);
 			}
 			gameAI.getKeyState().setBomb(false);
-		}
+		} 
+		
+	  
+	  
+
+
 	}
 
 }

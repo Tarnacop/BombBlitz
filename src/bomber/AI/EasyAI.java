@@ -87,7 +87,7 @@ public class EasyAI extends AITemplate {
 	protected void move() {
 		LinkedList<AIActions> moves;
 		SecureRandom random = new SecureRandom();
-
+ 
 		while (gameAI.isAlive()) {
 
 			pausedGame();

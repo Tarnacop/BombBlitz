@@ -61,7 +61,6 @@ public class Graphics implements Runnable {
 		} finally {
 			
 			dispose();
-			System.out.println("DISPOSED");
 		}
 		
 	} // END OF run METHOD
