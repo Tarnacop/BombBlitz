@@ -234,7 +234,7 @@ public class AudioManager
      */
     public static boolean isPlayingMusic()
     {
-        return music.getState() == Thread.State.NEW;
+        return music.isAlive();
     }
 
 }
