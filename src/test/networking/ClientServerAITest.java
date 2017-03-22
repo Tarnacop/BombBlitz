@@ -9,7 +9,7 @@ import org.junit.Test;
 import bomber.AI.AIDifficulty;
 import bomber.networking.ClientServerAI;
 
-public class ClientServerAiTest {
+public class ClientServerAITest {
 	private ClientServerAI ai;
 	private ClientServerAI ai2;
 

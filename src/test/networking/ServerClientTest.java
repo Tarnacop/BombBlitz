@@ -38,7 +38,7 @@ public class ServerClientTest implements ClientNetInterface {
 	private boolean roomReceived;
 	private boolean gameStarted;
 	private boolean gameStateReceived;
-	private boolean gameEnded;
+	// private boolean gameEnded;
 
 	@Before
 	public void setUp() throws Exception {
@@ -595,7 +595,7 @@ public class ServerClientTest implements ClientNetInterface {
 
 	@Override
 	public void gameEnded() {
-		this.gameEnded = true;
+		// this.gameEnded = true;
 	}
 
 }
