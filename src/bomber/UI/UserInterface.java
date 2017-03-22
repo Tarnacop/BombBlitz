@@ -374,7 +374,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 		soundSlider.setValue(SettingsParser.getEffectsVolume());
 		soundSlider.setShowTickLabels(false);
 		soundSlider.setShowTickMarks(false);
-		soundSlider.setOnDragDone(e -> setSound(soundMuted ? 0
+		soundSlider.setOnMouseReleased(e -> setSound(soundMuted ? 0
 				: (float) soundSlider.getValue()));
 
 		// Set the volumes from the settings extracted from the SettingsParser.
@@ -1523,6 +1523,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 			Label playersLabel = createLabel("", true, true);
 			int[] playerids = room.getPlayerID();
 			playersLabel.setMinHeight(boxHeight / 2.2);
+			playersLabel.setMinWidth(boxHeight / 2.2);
 			for (ClientServerPlayer player : this.client.getPlayerList()) {
 				if (player.getID() == playerids[0]) {
 					playersLabel.setText(playersLabel.getText() + " + "
