@@ -40,7 +40,7 @@ public class Renderer {
 	private final Transformation transformation;
 	private Matrix4f projectionMatrix;
 	private Matrix4f modelMatrix;
-	
+
 	private TextItem hudTextItem;
 	private TextItem hudTextItemBig;
 
@@ -49,8 +49,11 @@ public class Renderer {
 	private boolean gamePaused;
 	private boolean youWon;
 	private boolean wasd;
-	
+
 	private HashMap<String, TextureMesh> textureMeshes;
+
+	// 2D array mapping the map block to a different texture
+	// Used for creating the blast animation
 	private int[][] mapMapping;
 
 	private float w_ratio;
@@ -69,15 +72,15 @@ public class Renderer {
 		gamePaused = false;
 		this.wasd = wasd;
 		mapMapping = new int[13][13];
-		
-		for(int i = 0; i < mapMapping.length; i++) {
-			for(int j = 0; j < mapMapping[i].length; j++) {
-				
+
+		for (int i = 0; i < mapMapping.length; i++) {
+			for (int j = 0; j < mapMapping[i].length; j++) {
+
 				mapMapping[i][j] = 0;
 			}
-			
+
 		}
-	} // END OF CONSTRUCTOR
+	}
 
 	/**
 	 * Initialise the renderer with the given screen
@@ -97,8 +100,7 @@ public class Renderer {
 		h_ratio = Constants.V_HEIGHT / screen.getHeight();
 
 		screen.setClearColour(0f, 0f, 0f, 0f);
-	} // END OF init METHOD
-		// Takes a state to render
+	}
 
 	/**
 	 * Setup the shaders for rendering textures
@@ -117,7 +119,7 @@ public class Renderer {
 		textureShader.createUniform("model");
 		textureShader.createUniform("texture_sampler");
 
-	} // END OF setupTextureShader METHOD
+	}
 
 	/**
 	 * Setup the shaders for rendering hud
@@ -135,7 +137,7 @@ public class Renderer {
 		hudShader.createUniform("colour");
 		hudShader.createUniform("texture_sampler");
 
-	} // END OF setupHudShader METHOD
+	}
 
 	/**
 	 * Setup the textures used for rendering
@@ -154,7 +156,7 @@ public class Renderer {
 		Texture newspritesheet = new Texture("src/resources/images/newspritesheet.png");
 		Texture controls = new Texture("src/resources/images/controls.png");
 		Texture altcontrols = new Texture("src/resources/images/altcontrols.png");
-		
+
 		// Blocks
 		TextureMesh blankMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				0 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
@@ -171,43 +173,38 @@ public class Renderer {
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("softMesh", softMesh);
 
-//		TextureMesh blastMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-//				3 * Constants.SPRITESHEET_ELEM_WIDTH, 0 * Constants.SPRITESHEET_ELEM_HEIGHT,
-//				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
-//		textureMeshes.put("blastMesh1", blastMesh1);
-
 		TextureMesh holeMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				0 * Constants.SPRITESHEET_ELEM_WIDTH, 2 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("holeMesh", holeMesh);
-		
+
 		TextureMesh blastMesh1 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
 				0 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blastMesh1", blastMesh1);
-		
+
 		TextureMesh blastMesh2 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-				1 * Constants.SPRITESHEET_ELEM_WIDTH,  4 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				1 * Constants.SPRITESHEET_ELEM_WIDTH, 4 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blastMesh2", blastMesh2);
-		
+
 		TextureMesh blastMesh3 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-				0 * Constants.SPRITESHEET_ELEM_WIDTH,  5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				0 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blastMesh3", blastMesh3);
 
 		TextureMesh blastMesh4 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-				1 * Constants.SPRITESHEET_ELEM_WIDTH,  5 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				1 * Constants.SPRITESHEET_ELEM_WIDTH, 5 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blastMesh4", blastMesh4);
-		
+
 		TextureMesh blastMesh5 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-				0 * Constants.SPRITESHEET_ELEM_WIDTH,  6 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				0 * Constants.SPRITESHEET_ELEM_WIDTH, 6 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blastMesh5", blastMesh5);
-		
+
 		TextureMesh blastMesh6 = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
-				1 * Constants.SPRITESHEET_ELEM_WIDTH,  6 * Constants.SPRITESHEET_ELEM_HEIGHT,
+				1 * Constants.SPRITESHEET_ELEM_WIDTH, 6 * Constants.SPRITESHEET_ELEM_HEIGHT,
 				Constants.SPRITESHEET_ELEM_WIDTH, Constants.SPRITESHEET_ELEM_HEIGHT, newspritesheet);
 		textureMeshes.put("blastMesh6", blastMesh6);
 
@@ -756,10 +753,7 @@ public class Renderer {
 
 		TextureMesh altControlsMesh = new TextureMesh(Constants.CONTROLS_WIDTH, Constants.CONTROLS_HEIGHT, altcontrols);
 		textureMeshes.put("altControlsMesh", altControlsMesh);
-	} // END
-		// OF
-		// setupTextures
-		// METHOD
+	}
 
 	/**
 	 * Setup the huds used for rendering
@@ -770,10 +764,10 @@ public class Renderer {
 
 		FontTexture hudFontTexture = new FontTexture("src/resources/minecraftbig.ttf", 25, Font.PLAIN);
 		hudTextItem = new TextItem("", hudFontTexture);
-		
+
 		hudFontTexture = new FontTexture("src/resources/minecraftbig.ttf", 35, Font.PLAIN);
 		hudTextItemBig = new TextItem("", hudFontTexture);
-	} // END OF setupHuds METHOD
+	}
 
 	/**
 	 * Render the given game state on the given screen
@@ -814,10 +808,10 @@ public class Renderer {
 			renderPauseTextures(screen, state);
 			renderPauseHud(screen, state);
 		}
-	} // END OF render METHOD
+	}
 
 	// -------------------------------------Game Screen
-	// Render--------------------------------------------------------------------
+	// Render--------------------------
 
 	/**
 	 * Render the textures of the given game state on the given screen
@@ -1085,43 +1079,42 @@ public class Renderer {
 
 				switch (blocks[i][j]) {
 
-
 				case BLANK:
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					
-					if(mapMapping[i][j] > 18) {
-						
+
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("blankMesh").render();
 					}
 					break;
@@ -1130,37 +1123,37 @@ public class Renderer {
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 
-					if(mapMapping[i][j] > 18) {
-						
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("softMesh").render();
 					}
 					break;
@@ -1182,37 +1175,37 @@ public class Renderer {
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 
-					if(mapMapping[i][j] > 18) {
-						
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("plusSpeedMesh").render();
 					}
 					break;
@@ -1220,39 +1213,38 @@ public class Renderer {
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					
 
-					if(mapMapping[i][j] > 18) {
-						
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("minusSpeedMesh").render();
 					}
 					break;
@@ -1260,39 +1252,38 @@ public class Renderer {
 					modelMatrix = transformation.getModelMatrix(i * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15,
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
-					
 
-					if(mapMapping[i][j] > 18) {
-						
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("plusBombMesh").render();
 					}
 					break;
@@ -1301,37 +1292,37 @@ public class Renderer {
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 
-					if(mapMapping[i][j] > 18) {
-						
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("minusBombMesh").render();
 					}
 					break;
@@ -1340,37 +1331,37 @@ public class Renderer {
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 
-					if(mapMapping[i][j] > 18) {
-						
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("plusRangeMesh").render();
 					}
 					break;
@@ -1379,37 +1370,37 @@ public class Renderer {
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 
-					if(mapMapping[i][j] > 18) {
-						
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("minusRangeMesh").render();
 					}
 					break;
@@ -1418,37 +1409,37 @@ public class Renderer {
 							j * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER + 15, 0f, 1f);
 					textureShader.setUniform("model", modelMatrix);
 
-					if(mapMapping[i][j] > 18) {
-						
+					if (mapMapping[i][j] > 18) {
+
 						mapMapping[i][j] = 0;
 					}
-					
-					if(mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
-						
+
+					if (mapMapping[i][j] == 1 || mapMapping[i][j] == 2 || mapMapping[i][j] == 3) {
+
 						textureMeshes.get("blastMesh1").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 5 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 5 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+
 						textureMeshes.get("blastMesh2").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 7 || mapMapping[i][j] == 8 || mapMapping[i][j] == 9) {
+
 						textureMeshes.get("blastMesh3").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 10 || mapMapping[i][j] == 11 || mapMapping[i][j] == 12) {
+
 						textureMeshes.get("blastMesh4").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 13 || mapMapping[i][j] == 14 || mapMapping[i][j] == 15) {
+
 						textureMeshes.get("blastMesh5").render();
-						mapMapping[i][j] ++;
-					} else if(mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
-						
+						mapMapping[i][j]++;
+					} else if (mapMapping[i][j] == 16 || mapMapping[i][j] == 17 || mapMapping[i][j] == 18) {
+
 						textureMeshes.get("blastMesh6").render();
 						mapMapping[i][j]++;
 					} else {
-							
+
 						textureMeshes.get("holeMesh").render();
 					}
 					break;
@@ -1656,7 +1647,7 @@ public class Renderer {
 								}
 							}
 						} else if (i == 2) {
-							
+
 							if (playerAnimationCounter < 5) {
 
 								if (player.getKeyState().getMovement() == Movement.RIGHT) {
@@ -1706,7 +1697,7 @@ public class Renderer {
 									textureMeshes.get("thirdDownPlayerMesh3").render();
 								}
 							}
-						} else if(i == 3) {
+						} else if (i == 3) {
 							if (playerAnimationCounter < 5) {
 
 								if (player.getKeyState().getMovement() == Movement.RIGHT) {
@@ -1756,7 +1747,7 @@ public class Renderer {
 									textureMeshes.get("fourthDownPlayerMesh3").render();
 								}
 							}
-							
+
 						}
 					} else {
 
@@ -1784,7 +1775,7 @@ public class Renderer {
 								textureMeshes.get("secondDeadPlayerMesh3").render();
 							}
 						} else if (i == 2) {
-							
+
 							if (playerAnimationCounter < 5) {
 
 								textureMeshes.get("thirdDeadPlayerMesh1").render();
@@ -1796,7 +1787,7 @@ public class Renderer {
 								textureMeshes.get("thirdDeadPlayerMesh3").render();
 							}
 						} else if (i == 3) {
-							
+
 							if (playerAnimationCounter < 5) {
 
 								textureMeshes.get("fourthDeadPlayerMesh1").render();
@@ -1820,7 +1811,7 @@ public class Renderer {
 		}
 
 		textureShader.unbind();
-	} // END OF renderGameTexture METHOD
+	}
 
 	/**
 	 * Render the huds of the given game state on the given screen
@@ -2025,9 +2016,9 @@ public class Renderer {
 
 		hudShader.unbind();
 
-	} // END OF renderGameHud METHOD
+	}
 
-	// -------------------------------------- Game Over Render
+	// --------------------------------- Game Over Render
 	// ----------------------------
 
 	/**
@@ -2054,7 +2045,7 @@ public class Renderer {
 
 		textureShader.unbind();
 
-	} // END OF renderGameOverTextures METHOD
+	}
 
 	/**
 	 * Render the huds of the game over screen of the given game state on the
@@ -2082,8 +2073,8 @@ public class Renderer {
 		hudTextItemBig.getMesh().render();
 
 		y += hudTextItemBig.getTextHeight();
-		if(youWon == true) {
-			
+		if (youWon == true) {
+
 			hudTextItemBig.setText("YOU WON");
 			x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItemBig.getTextWidth() / 2);
 			y += Constants.GENERAL_BOX_Y + hudTextItemBig.getTextHeight() / 2;
@@ -2093,21 +2084,21 @@ public class Renderer {
 			hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 			hudTextItemBig.getMesh().render();
 		} else {
-			
+
 			hudTextItemBig.setText("YOU LOST");
-			x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2- hudTextItemBig.getTextWidth() / 2);
+			x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - hudTextItemBig.getTextWidth() / 2);
 			modelMatrix = transformation.getModelMatrix(x, y, hudTextItemBig.getRotation(), hudTextItemBig.getScale());
 			hudShader.setUniform("projModelMatrix",
 					transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 			hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 			hudTextItemBig.getMesh().render();
 		}
-		
-		hudShader.unbind();
-	} // END OF renderGameOverHud METHOD
 
-	// -------------------------------------Front Screen
-	// Render------------------------------------------------------------------
+		hudShader.unbind();
+	}
+
+	// -----------------------------------Front Screen
+	// Render--------------------------
 
 	/**
 	 * Render the textures of the front screen on the given screen
@@ -2129,22 +2120,22 @@ public class Renderer {
 		modelMatrix = transformation.getModelMatrix(Constants.GENERAL_BOX_X, Constants.GENERAL_BOX_Y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
 		textureMeshes.get("generalBoxMesh").render();
-		
+
 		x = Constants.GENERAL_BOX_X + (Constants.GENERAL_BOX_WIDTH / 2 - Constants.CONTROLS_WIDTH / 2);
 		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
-		
-		if(!wasd) {
-		
+
+		if (!wasd) {
+
 			textureMeshes.get("controlsMesh").render();
 		} else {
-			
+
 			textureMeshes.get("altControlsMesh").render();
 		}
 		textureShader.unbind();
 
-	} // END OF renderBeginningTextures METHOD
+	}
 
 	/**
 	 * Render the huds of the front screen on the given screen
@@ -2174,14 +2165,14 @@ public class Renderer {
 				transformation.getOrtoProjectionModelMatrix(modelMatrix, projectionMatrix));
 		hudShader.setUniform("colour", Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE.getBlue());
 		hudTextItemBig.getMesh().render();
-		
+
 		seconds -= interval;
 
 		hudShader.unbind();
-	} // END OF renderBeginningHud METHOD
+	}
 
-	// -------------------------------------Front Screen
-	// Render------------------------------------------------------------------
+	// ----------------------------------Front Screen
+	// Render----------------------------------------------
 
 	/**
 	 * Render the textures of the pause screen on the given screen
@@ -2208,16 +2199,16 @@ public class Renderer {
 		float y = Constants.GENERAL_BOX_Y + (Constants.GENERAL_BOX_HEIGHT / 2 - Constants.CONTROLS_HEIGHT / 2);
 		modelMatrix = transformation.getModelMatrix(x, y, 0f, 1f);
 		textureShader.setUniform("model", modelMatrix);
-		
-		if(!wasd) {
-		
+
+		if (!wasd) {
+
 			textureMeshes.get("controlsMesh").render();
 		} else {
-			
+
 			textureMeshes.get("altControlsMesh").render();
 		}
 		textureShader.unbind();
-	} // END OF renderPauseScreen METHOD
+	}
 
 	/**
 	 * Render the huds of the pause screen on the given screen
@@ -2246,7 +2237,7 @@ public class Renderer {
 		hudTextItemBig.getMesh().render();
 
 		hudShader.unbind();
-	} // END OF renderPauseHud METHOD
+	}
 
 	/**
 	 * Stop the display of the front screen
@@ -2254,17 +2245,19 @@ public class Renderer {
 	public void stopFrontScreen() {
 
 		frontScreen = false;
-	} // END OF stopFrontScreen METHOD
+	}
 
 	/**
 	 * Display game over screen
-	 * @param youWon Boolean showing if this client won or lost
+	 * 
+	 * @param youWon
+	 *            Boolean showing if this client won or lost
 	 */
 	public void displayGameOver(boolean youWon) {
 
 		gameOver = true;
 		this.youWon = youWon;
-	} // END OF displayGameOver METHOD
+	}
 
 	/**
 	 * Display the pause screen
@@ -2272,7 +2265,7 @@ public class Renderer {
 	public void displayPauseScreen() {
 
 		gamePaused = true;
-	} // END OF displayPauseScreen METHOD
+	}
 
 	/**
 	 * Stop displaying the pause screen
@@ -2280,7 +2273,7 @@ public class Renderer {
 	public void stopPauseScreen() {
 
 		gamePaused = false;
-	} // END OF stopPauseScreen METHOD
+	}
 
 	/**
 	 * Dispose the renderer and all its resources
@@ -2302,6 +2295,6 @@ public class Renderer {
 			hudShader.dispose();
 		}
 		System.gc();
-	} // END OF dispose METHOD
+	}
 
-} // END OF Renderer CLASS
+}
