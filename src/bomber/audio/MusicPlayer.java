@@ -33,6 +33,7 @@ class MusicPlayer extends Thread
                 throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
             clip.open(inputStream);
+            inputStream.close();
             setVolume(volume);
 
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
@@ -46,7 +47,7 @@ class MusicPlayer extends Thread
      *
      * @param percent The volume percent, ranging from 0 to 100
      */
-    private void setVolume(float percent)
+    void setVolume(float percent)
     {
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
         AudioManager.setControlVolume(gainControl, percent);
@@ -76,6 +77,18 @@ class MusicPlayer extends Thread
     {
         clip.start();
         clip.loop(Integer.MAX_VALUE);
+    }
+
+    void replay()
+    {
+        clip.setFramePosition(0);
+        unpause();
+    }
+
+    void close()
+    {
+        clip.stop();
+        clip.close();
     }
 
     boolean hasOpened()

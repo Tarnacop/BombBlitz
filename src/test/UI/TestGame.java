@@ -1,23 +1,33 @@
-package bomber.game;
+package test.UI;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.lwjgl.glfw.GLFW.*;
+import static bomber.game.Block.BLANK;
+import static bomber.game.Block.SOLID;
+import static bomber.game.Response.*;
 import bomber.AI.AIDifficulty;
 import bomber.AI.GameAI;
-import bomber.UI.UserInterface;
 import bomber.audio.AudioManager;
+import bomber.game.Block;
+import bomber.game.GameState;
+import bomber.game.KeyboardInput;
+import bomber.game.KeyboardState;
+import bomber.game.Map;
+import bomber.game.Movement;
+import bomber.game.Player;
+import bomber.game.Response;
 import bomber.physics.PhysicsEngine;
 import bomber.renderer.Graphics;
 import bomber.renderer.Renderer;
 import bomber.renderer.Screen;
 import bomber.renderer.interfaces.GameInterface;
 
-public class Game implements GameInterface {
+public class TestGame implements GameInterface {
 
-	private String playerName;
 	private Map map;
 	private HashMap<Response, Integer> controlScheme;
 	private PhysicsEngine physics;
@@ -29,28 +39,33 @@ public class Game implements GameInterface {
 	private boolean pausePressed;
 	private KeyboardInput input;
 	private Player player;
-	private UserInterface ui;
-	private int aiNum;
-	private AIDifficulty aiDiff;
-	private boolean fullScreen;
+	private int aiNum = 0;
+	private AIDifficulty aiDiff = AIDifficulty.EASY;
 
-	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum,
-			AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen, int width, int height, boolean wasd) {
-		this.aiNum = aiNum;
-		this.aiDiff = aiDiff;
-		this.ui = ui;
-		this.map = map;
-		this.playerName = playerName;
+	public TestGame() {
+		HashMap<Response, Integer> controls = new HashMap<Response, Integer>();
+		controls.put(PLACE_BOMB, GLFW_KEY_SPACE);
+		controls.put(UP_MOVE, GLFW_KEY_UP);
+		controls.put(DOWN_MOVE, GLFW_KEY_DOWN);
+		controls.put(LEFT_MOVE, GLFW_KEY_LEFT);
+		controls.put(RIGHT_MOVE, GLFW_KEY_RIGHT);	
+		controls.put(PAUSE_GAME, GLFW_KEY_P);
+		
 		this.controlScheme = controls;
+		
+		Block[][] grid = new Block[][]{{SOLID, BLANK}, {BLANK, BLANK}};
+		List<Point> spawns = new ArrayList<Point>();
+		spawns.add(new Point(64,64));
+		this.map = new Map("TestMap", grid, spawns);
+		
 		this.bombPressed = false;
 		this.pausePressed = false;
-		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
-		this.renderer = new Renderer(wasd);
+		this.renderer = new Renderer(false);
 
 		try {
 
-			this.graphics = new Graphics("Bomb Blitz", width, height, false, this, fullScreen);
+			this.graphics = new Graphics("Test", 100, 100, false, this, false);
 			this.graphics.start();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -60,15 +75,12 @@ public class Game implements GameInterface {
 	@Override
 	public void init(Screen screen) {
 		try {
-			// System.out.println("Giving screen to renderer");
 			this.renderer.init(screen);
 
 			List<Point> spawns = this.map.getSpawnPoints();
 
-			this.player = new Player(this.playerName, new Point(spawns.get(0).x, spawns.get(0).y), 5, 300);
+			this.player = new Player("Test", new Point(spawns.get(0).x, spawns.get(0).y), 5, 300);
 			this.keyState = this.player.getKeyState();
-			// System.out.println("Ours: " + this.keyState.toString() + "
-			// Theirs: " + this.player.getKeyState().toString());
 			ArrayList<Player> list = new ArrayList<Player>();
 			list.add(this.player);
 
@@ -80,7 +92,6 @@ public class Game implements GameInterface {
 						this.aiDiff);
 				ai.setPlayerID(32);
 				list.add(ai);
-				// ai.begin();
 			}
 
 
@@ -88,8 +99,6 @@ public class Game implements GameInterface {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		this.ui.hide();
 
 		AudioManager.playMusic();
 	}
@@ -187,8 +196,6 @@ public class Game implements GameInterface {
 	@Override
 	public void dispose() {
 		AudioManager.pauseMusic();
-		this.ui.show(this.fullScreen, false, true);
-		System.out.println("RETURNED TO MENU");
 		for (Player player : this.gameState.getPlayers()) {
 
 			player.setAlive(false);
