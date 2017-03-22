@@ -10,9 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import bomber.AI.AIDifficulty;
-import bomber.game.Block;
 import bomber.game.KeyboardState;
-import bomber.game.Map;
 import bomber.game.Movement;
 import bomber.networking.ClientNetInterface;
 import bomber.networking.ClientServerRoom;
@@ -108,7 +106,7 @@ public class ServerClientTest implements ClientNetInterface {
 
 		try {
 			client.addAI();
-			client.addRoomMap(defaultMap());
+			client.addRoomMap(server.defaultMap());
 			client.createRoom("N", 4, 3);
 			client.disconnect();
 			client.getClientID();
@@ -348,7 +346,26 @@ public class ServerClientTest implements ClientNetInterface {
 				fail("Server did not detect the client is already in a room");
 			}
 
-			client.addRoomMap(defaultMap());
+			roomAccepted = false;
+			roomRejected = false;
+			client.createRoom("R0", 3, 5);
+			for (int i = 0; i < 2000; i++) {
+				Thread.sleep(1);
+				if (roomAccepted) {
+					fail("Client should not be able to create another room when it is already in a room");
+				} else if (alreadyInRoom) {
+					assertFalse(client.isInLobby());
+					assertFalse(client.isInGame());
+					assertTrue(client.isInRoom());
+					assertTrue(client.getRoomRejectedReason() > -1);
+					break;
+				}
+			}
+			if (!alreadyInRoom) {
+				fail("Server did not detect the client is already in a room");
+			}
+
+			client.addRoomMap(server.defaultMap());
 			client.setRoomName("Roooooooooooooooooooooooooooo");
 			client.setRoomMapID(-123);
 			client.setRoomMapID(133);
@@ -579,29 +596,6 @@ public class ServerClientTest implements ClientNetInterface {
 	@Override
 	public void gameEnded() {
 		this.gameEnded = true;
-	}
-
-	private Map defaultMap() {
-		Block[][] defaultGridMap = new Block[][] { { Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
-				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
-				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
-
-				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
-				{ Block.SOLID, Block.SOLID, Block.SOFT, Block.SOLID, Block.SOLID },
-				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-				{ Block.SOLID, Block.SOLID, Block.BLANK, Block.SOLID, Block.SOLID },
-
-				{ Block.SOLID, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOLID },
-				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
-				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.SOFT, Block.SOLID },
-				{ Block.SOLID, Block.SOFT, Block.BLANK, Block.SOFT, Block.SOLID },
-				{ Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID } };
-		Map defaultMap = new Map("default map", defaultGridMap, null);
-
-		return defaultMap;
 	}
 
 }

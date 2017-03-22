@@ -12,7 +12,7 @@ import bomber.game.GameState;
 import bomber.game.Player;
 
 /**
- * The Class SafetyChecker for checking safety of the moves and AI.
+ * Checking safety of the moves and AI.
  * 
  * @author Jokubas Liutkus
  */
@@ -38,7 +38,7 @@ public class SafetyChecker {
 	}
 
 	/**
-	 * Gets the map. getting the map from the game state
+	 * Getting the map from the game state
 	 *
 	 * @return the map
 	 */
@@ -108,7 +108,7 @@ public class SafetyChecker {
 	 *
 	 * @return the tiles affected by bombs
 	 */
-	public ArrayList<Point> getTilesAffectedByBombs() {
+	public ArrayList<Point> getTilesAffectedByBombs() {	
 		ArrayList<Point> points = new ArrayList<>();
 		List<Bomb> bombs = new ArrayList<>(state.getBombs());
 

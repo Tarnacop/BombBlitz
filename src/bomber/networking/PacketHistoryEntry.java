@@ -1,5 +1,11 @@
 package bomber.networking;
 
+/**
+ * Class representing packets that have been transmitted which requires
+ * retransmission if not acknowledged
+ * 
+ * @author Qiyang Li
+ */
 public class PacketHistoryEntry {
 	// the sequence number of the packet
 	private short sequence;

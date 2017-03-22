@@ -6,9 +6,8 @@ import java.util.LinkedList;
 
 import bomber.game.GameState;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class EasyAI.
+ * AI of easy difficulty.
  * 
  * @author Jokubas Liutkus
  */

@@ -21,6 +21,11 @@ import bomber.game.GameState;
 import bomber.game.KeyboardState;
 import bomber.game.Map;
 
+/**
+ * Thread for client networking
+ * 
+ * @author Qiyang Li
+ */
 public class ClientThread implements Runnable {
 	private final PrintStream printStream;
 

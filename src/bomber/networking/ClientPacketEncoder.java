@@ -17,9 +17,9 @@ import bomber.game.Movement;
 import bomber.game.Player;
 
 /**
- * 
  * Methods for encoding and decoding more complex packets for the client
- *
+ * 
+ * @author Qiyang Li
  */
 public class ClientPacketEncoder {
 
@@ -544,9 +544,6 @@ public class ClientPacketEncoder {
 		buffer.position(7 + 130 + 1 + 35 * numPlayer + 1 + 20 * numBomb);
 		short audioState = buffer.getShort();
 
-		/*
-		 * TODO Audio can cause OutOfMemoryError during game
-		 */
 		List<AudioEvent> audioEventList = new ArrayList<>(16);
 		if (BitArray.getBit(audioState, 0)) {
 			audioEventList.add(AudioEvent.PLACE_BOMB);
@@ -558,7 +555,7 @@ public class ClientPacketEncoder {
 			audioEventList.add(AudioEvent.PLAYER_DEATH);
 		}
 		if (BitArray.getBit(audioState, 3)) {
-			// TODO movement sound disabled due to client audio bug
+			// movement sound removed
 			// audioEventList.add(AudioEvent.MOVEMENT);
 		}
 		if (BitArray.getBit(audioState, 4)) {
@@ -706,7 +703,7 @@ public class ClientPacketEncoder {
 			audioEventList.add(AudioEvent.PLAYER_DEATH);
 		}
 		if (BitArray.getBit(audioState, 3)) {
-			// TODO movement sound disabled due to client audio bug
+			// movement sound removed
 			// audioEventList.add(AudioEvent.MOVEMENT);
 		}
 		if (BitArray.getBit(audioState, 4)) {

@@ -16,9 +16,9 @@ import bomber.game.Player;
 import bomber.physics.PhysicsEngine;
 
 /**
- * 
  * Server side representation of a game session in a room
  *
+ * @author Qiyang Li
  */
 public class ServerGame implements Runnable {
 	private GameState gameState;
@@ -353,19 +353,13 @@ public class ServerGame implements Runnable {
 			}
 
 			/*
-			 * TODO physics still does not check if there are duplicate audio
-			 * events in the audio event list, so we empty the audio event list
-			 * each time game state is updated
+			 * There is no audio subsystem on server side, so we empty the audio
+			 * event list each time game state is updated
 			 */
-			// System.out.println(gameState.getAudioEvents().size());
 			gameState.getAudioEvents().clear();
 
 			// update gameState
 			physics.update(interval);
-			/*
-			 * TODO physics is very likely to have
-			 * ArrayIndexOutOfBoundsException when tick rate is low
-			 */
 
 			// encode gameState
 			try {

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
  * Client side representation of a room which the player is currently in
- *
+ * 
+ * @author Qiyang Li
  */
 public class ClientServerRoom {
 	private int id;

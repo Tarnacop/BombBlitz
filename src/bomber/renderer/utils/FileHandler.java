@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 
 /**
  * Class to handle the loading of the shader programs
+ * 
  * @author Alexandru Blinda
  *
  */
@@ -15,12 +16,14 @@ public class FileHandler {
 
 	/**
 	 * Load the shader program from the given path and return it
-	 * @param path The given path
+	 * 
+	 * @param path
+	 *            The given path
 	 * @return The shader program returned
 	 * @throws Exception
 	 */
 	public static String loadShaderResource(String path) throws Exception {
-		
+
 		StringBuilder builder = new StringBuilder();
 
 		try (InputStream in = new FileInputStream(path);
@@ -39,4 +42,4 @@ public class FileHandler {
 		CharSequence source = builder.toString();
 		return source.toString();
 	}
-} // END OF FileHandler CLASS
+}

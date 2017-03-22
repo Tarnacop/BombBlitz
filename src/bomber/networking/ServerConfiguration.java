@@ -1,11 +1,16 @@
 package bomber.networking;
 
+/**
+ * Class representing the configuration of the server
+ * 
+ * @author Qiyang Li
+ */
 public class ServerConfiguration {
 	private String serverName = "Bomb Blitz Dedicated Server";
 
 	private final String gameName = "Bomb Blitz";
 
-	private final String version = "1.1";
+	private final String version = "1.3";
 
 	private long clientTimeOut;
 

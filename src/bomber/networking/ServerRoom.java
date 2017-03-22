@@ -10,9 +10,9 @@ import bomber.game.Block;
 import bomber.game.Map;
 
 /**
- * 
  * Server side representation of a room
  *
+ * @author Qiyang Li
  */
 public class ServerRoom {
 	// id of the room, uniqueness required
@@ -35,7 +35,6 @@ public class ServerRoom {
 	private List<Map> customMapList = new LinkedList<Map>();
 	// game session
 	private ServerGame game;
-	// TODO consistency between constructor, getter, setter and game's mapID
 
 	/**
 	 * Construct a room

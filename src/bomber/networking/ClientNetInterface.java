@@ -1,5 +1,10 @@
 package bomber.networking;
 
+/**
+ * Interface for client networking
+ * 
+ * @author Qiyang Li
+ */
 public interface ClientNetInterface {
 
 	/**

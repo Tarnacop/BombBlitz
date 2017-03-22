@@ -18,11 +18,10 @@ import bomber.game.GameState;
 import bomber.game.Player;
 
 /**
- * The Class RouteFinder.
+ * Finding different routes and planning.
  *
  * @author Jokubas Liutkus
  * 
- *         The Class RouteFinder. For finding different routes and planning.
  */
 public class RouteFinder {
 
@@ -537,7 +536,7 @@ public class RouteFinder {
 	 */
 	public LinkedList<AIActions> getPlanToEnemy(Point start, Point goal) {
 
-		// TODO finish not implemented
+
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
 		if (start == null || goal == null)

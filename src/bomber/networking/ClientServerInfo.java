@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 /**
  * Client side representation of (the state of) server
+ * 
+ * @author Qiyang Li
  */
 public class ClientServerInfo {
 	// socket address (IP:Port) of the server

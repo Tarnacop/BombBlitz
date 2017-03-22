@@ -28,6 +28,7 @@ import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
 /**
  * Class that handles and holds a texture
+ * 
  * @author Alexandru Blinda
  *
  */
@@ -39,7 +40,9 @@ public class Texture {
 
 	/**
 	 * Create a texture from a resource loaded from the given path
-	 * @param path The path of the resource
+	 * 
+	 * @param path
+	 *            The path of the resource
 	 * @throws Exception
 	 */
 	public Texture(String path) throws Exception {
@@ -85,11 +88,13 @@ public class Texture {
 		glGenerateMipmap(GL_TEXTURE_2D);
 		;
 
-	} // END OF CONSTRUCTOR
+	}
 
 	/**
 	 * Create a texture from an input stream
-	 * @param is The given input stream
+	 * 
+	 * @param is
+	 *            The given input stream
 	 * @throws Exception
 	 */
 	public Texture(InputStream is) throws Exception {
@@ -120,16 +125,17 @@ public class Texture {
 		// Generate Mipmap
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-	} // END OF CONSTRUCTOR
+	}
 
 	/**
 	 * Get the id of the texture
+	 * 
 	 * @return The id of the texture
 	 */
 	public int getTextureID() {
 
 		return textureID;
-	} // END OF getTextureID METHOD
+	}
 
 	/**
 	 * Dispose the texture
@@ -137,24 +143,26 @@ public class Texture {
 	public void dispose() {
 
 		glDeleteTextures(textureID);
-	} // END OF dispose METHOD
+	}
 
 	/**
 	 * Get the width of the texture
+	 * 
 	 * @return The width of the texture
 	 */
 	public int getWidth() {
 
 		return width;
-	} // END OF getWidth METHOD
+	}
 
 	/**
 	 * Get the height of the texture
+	 * 
 	 * @return The height of the texture
 	 */
 	public int getHeight() {
 
 		return height;
-	} // END OF getHeight METHOD
+	}
 
-} // END OF Texture CLASS
+}

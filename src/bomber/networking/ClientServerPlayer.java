@@ -1,9 +1,9 @@
 package bomber.networking;
 
 /**
- * 
  * Client side representation of human players connected to the server
- *
+ * 
+ * @author Qiyang Li
  */
 public class ClientServerPlayer {
 	private int id;

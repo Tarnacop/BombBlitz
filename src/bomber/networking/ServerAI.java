@@ -5,6 +5,8 @@ import bomber.AI.GameAI;
 
 /**
  * Server side representation of AI
+ * 
+ * @author Qiyang Li
  */
 public class ServerAI {
 
