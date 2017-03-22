@@ -242,8 +242,8 @@ public class PhysicsEngineTest
         assertEquals("Second explosion did not overlap correctly with the first one", HOLE, gridMap[3][2]);
         assertEquals("Second explosion did not overlap correctly with the first one", BLAST, gridMap[3][3]);
         assertEquals("Second explosion did not overlap correctly with the first one", BLAST, gridMap[3][4]);
-        assertEquals("Second explosion did not overlap correctly with the first one", BLAST, gridMap[3][5]);
-        assertEquals("Second explosion did not overlap correctly with the first one", BLAST, gridMap[3][6]);
+        assertEquals("Second explosion did not overlap correctly with the first one", BLAST, gridMap[3][5]); 
+        assertNotEquals("Second explosion did not overlap correctly with the first one", BLAST, gridMap[3][6]);
 
         engine.update(Constants.EXPLOSION_LENGTH-51); // E2 + 1949 = E1 + 2000
         gridMap = gameState.getMap().getGridMap();

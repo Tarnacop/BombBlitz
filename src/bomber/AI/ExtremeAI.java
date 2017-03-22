@@ -8,9 +8,8 @@ import java.util.stream.Collectors;
 import bomber.game.GameState;
 import bomber.game.Player;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class HardAI for making moves.
+ * AI of extreme difficulty.
  *
  * @author Jokubas Liutkus
  */

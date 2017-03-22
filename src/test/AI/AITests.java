@@ -26,17 +26,40 @@ import bomber.game.GameState;
 import bomber.game.Map;
 import bomber.game.Player;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AITests.
+ */
 public class AITests {
+	
+	/** The map. */
 	private Map map;
+	
+	/** The bombs. */
 	private List<Bomb> bombs;
+	
+	/** The players. */
 	private List<Player> players;
+	
+	/** The state. */
 	private GameState state;	
+	
+	/** The ai. */
 	private GameAI ai;
+	
+	/** The finder. */
 	private RouteFinder finder;
+	
+	/** The checker. */
 	private SafetyChecker checker;
 
 	
 	
+	/**
+	 * The up.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Before
 	public void setUp() throws Exception {
 		
@@ -89,6 +112,9 @@ public class AITests {
 	}
 	
 	
+	/**
+	 * A route finder test using A*
+	 */
 	@Test
 	public void AStarRouteFinderTest() {
 
@@ -123,6 +149,9 @@ public class AITests {
 	}
 	
 	
+	/**
+	 * Enemy check test.
+	 */
 	@Test
 	public void enemyCheckTest() {
 
@@ -176,6 +205,9 @@ public class AITests {
 		
 	}
 	
+	/**
+	 * Escape test finder.
+	 */
 	@Test
 	public void escapeTestFinder() {
 		
@@ -201,6 +233,9 @@ public class AITests {
 	}
 	
 	
+	/**
+	 * In danger check test.
+	 */
 	@Test
 	public void inDangerCheckTest() {
 		ai.setPos(new Point(2*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, 3*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
@@ -221,6 +256,9 @@ public class AITests {
 	}
 	
 	
+	/**
+	 * Move safety test.
+	 */
 	@Test
 	public void moveSafetyTest() {
 		
@@ -258,6 +296,9 @@ public class AITests {
 	}
 	
 	
+	/**
+	 * Nearest enemy test.
+	 */
 	@Test
 	public void nereastEnemyTest() {
 		ai.setPos(new Point(0,0));
@@ -285,6 +326,9 @@ public class AITests {
 	}
 	
 	
+	/**
+	 * Can put bomb and escape test.
+	 */
 	@Test
 	public void canPutBombAndEscapeTest()
 	{
@@ -312,6 +356,9 @@ public class AITests {
 	}
 
 	
+	/**
+	 * Checks if is enclosure test.
+	 */
 	@Test
 	public void isEnclosureTest()
 	{
