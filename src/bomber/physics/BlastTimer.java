@@ -8,6 +8,8 @@ import java.util.Random;
 
 /**
  * Keeps track of the explosion at a particular grid location
+ *
+ * @author Alexandru Rosu
  */
 public class BlastTimer
 {
