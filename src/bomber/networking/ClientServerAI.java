@@ -3,9 +3,9 @@ package bomber.networking;
 import bomber.AI.AIDifficulty;
 
 /**
- * 
  * Client side representation of AI players on the server
- *
+ * 
+ * @author Qiyang Li
  */
 public class ClientServerAI {
 

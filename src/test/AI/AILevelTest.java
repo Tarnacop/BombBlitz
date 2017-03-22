@@ -22,17 +22,44 @@ import bomber.game.Map;
 import bomber.game.Player;
 import bomber.physics.PhysicsEngine;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AILevelTest.
+ */
 public class AILevelTest{
 	
+	/** The map. */
 	private Map map;
+	
+	/** The bombs. */
 	private List<Bomb> bombs;
+	
+	/** The players. */
 	private List<Player> players;
+	
+	/** The state. */
 	private GameState state;	
+	
+	/** The ai. */
 	private Player ai;
+	
+	/** The finder. */
 	private RouteFinder finder;
+	
+	/** The checker. */
 	private SafetyChecker checker;
+	
+	/** The physics. */
 	private PhysicsEngine physics;
+	
+	/** The player. */
 	private Player player;
+	
+	/**
+	 * Sets the up.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Before
 	public void setUp() throws Exception
 	{
@@ -95,6 +122,11 @@ public class AILevelTest{
 
 	
 	
+	/**
+	 * Extreme AI test.
+	 *
+	 * @throws InterruptedException the interrupted exception
+	 */
 	@Test
 	public void extremeAITest() throws InterruptedException
 	{
@@ -129,8 +161,13 @@ public class AILevelTest{
 	}
 
 
+	/**
+	 * Medium AI test.
+	 *
+	 * @throws InterruptedException the interrupted exception
+	 */
 	@Test
-	public void mediumTest() throws InterruptedException
+	public void mediumAITest() throws InterruptedException
 	{
 		players.clear();
 		players.add(ai);
@@ -155,6 +192,11 @@ public class AILevelTest{
 		this.physics.update();
 	}
 	
+	/**
+	 * Hard AI test.
+	 *
+	 * @throws InterruptedException the interrupted exception
+	 */
 	@Test
 	public void hardAITest() throws InterruptedException
 	{
@@ -183,9 +225,14 @@ public class AILevelTest{
 		this.physics.update();
 	} 
 	
+	/**
+	 * Easy AI test.
+	 *
+	 * @throws InterruptedException the interrupted exception
+	 */
 	@Test
-	public void easyTest() throws InterruptedException
-	{
+	public void easyAITest() throws InterruptedException
+	{ 
 		players.clear();
 		players.add(ai);
 		player = new Player("name", new Point(13*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,13*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER),1,30000);
@@ -194,11 +241,7 @@ public class AILevelTest{
 		ai.setDifficulty(AIDifficulty.EASY);
 		ai.setPos(new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		ai.begin();
-		assertTrue(checker.inDanger());
-		while(checker.inDanger()){
-			Thread.sleep(10);
-			this.physics.update();
-		}
+
 	
 		int counter = 500;
 		while(counter>0)

@@ -29,7 +29,7 @@ public abstract class Constants
     public static final int POWERUP_PROBABILITY = 25;
     public static final int POSITIVE_POWERUP_PROBABILITY = 75;
     public static final int INVULNERABILITY_LENGTH = 2000;
-    public static final int EXPLOSION_LENGTH = 1;
+    public static final int EXPLOSION_LENGTH = 32;
     public static final int HOLES_FIRST_PHASE_BEGINNING = 120000;
 	public static final int HOLES_FIRST_PHASE_RANDOM_TIMER = 3000;
 	public static final int HOLES_SECOND_PHASE_BEGINNING = 180000;
@@ -37,15 +37,15 @@ public abstract class Constants
 
     // Audio files
     public static final String AUDIO_FILES_PATH = "/resources/sounds/";
-    public static final String MUSIC_FILENAME = "01_A_Night_Of_Dizzy_Spells.wav";
-    public static final String EXPLOSION_FILENAME = "sfx_exp_medium3.wav";
-    public static final String BOMB_PLACE_FILENAME = "sfx_sound_neutral6.wav";
-    public static final String MOVEMENT_FILENAME = "sfx_movement_footsteps1a.wav";
-    public static final String PLAYER_DEATH_FILENAME = "sfx_sounds_error1.wav";
-    public static final String POWERUP_FILENAME = "sfx_sounds_interaction24.wav";
-    public static final String MENU_SOUND_FILENAME = "271139_strange-dragoon_menu-select_converted.wav";
-    public static final String GAME_OVER_WON_FILENAME = "270333__littlerobotsoundfactory__jingle-win-00.wav";
-    public static final String GAME_OVER_LOST_FILENAME = "270329__littlerobotsoundfactory__jingle-lose-00.wav";
+    public static final String MUSIC_FILENAME = "music.wav";
+    public static final String EXPLOSION_FILENAME = "explosion.wav";
+    public static final String BOMB_PLACE_FILENAME = "place_bomb.wav";
+    public static final String MOVEMENT_FILENAME = "movement.wav";
+    public static final String PLAYER_DEATH_FILENAME = "death.wav";
+    public static final String POWERUP_FILENAME = "powerup.wav";
+    public static final String MENU_SOUND_FILENAME = "menu.wav";
+    public static final String GAME_OVER_WON_FILENAME = "win.wav";
+    public static final String GAME_OVER_LOST_FILENAME = "lose.wav";
 
     // Other files
     public static final String SETTING_XML_PATH = "src/resources/settings.xml";
@@ -167,6 +167,7 @@ public abstract class Constants
 	public static final String BACKGROUND_PATH = "resources/images/background.png";
 	public static final String LOGO_PATH = "resources/images/logo.png";
 	public static final String TUTORIAL_PATH = "resources/images/tutorial.png";
+	public static final String WASD_TUTORIAL_PATH = "resources/images/alttutorial.png";
 	public static final String STORY_PATH = "resources/images/story.png";
 	public static final String FONT_PATH = "../../resources/minecraft.ttf";
 	public static final String CSS_PATH = "../../resources/stylesheet.css";

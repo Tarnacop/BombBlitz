@@ -6,8 +6,9 @@ import bomber.game.GameState;
 import bomber.game.Player;
 
 /**
+ * Main AI player controller.
+ * 
  * @author Jokubas Liutkus 
- * The Class GameAI.
  */
 public class GameAI extends Player {
 

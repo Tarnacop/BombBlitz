@@ -18,19 +18,17 @@ import static org.junit.Assert.*;
 public class AudioManagerTest
 {
 
-    AudioManager manager;
-
     @Before
     public void setUp() throws Exception
     {
+        AudioManager.init();
         AudioManager.setVolume(0); // making sure the tests don't produce annoying sound
-        manager = new AudioManager();
     }
 
     @Test 
     public void Constructor() throws Exception
     {
-        assertTrue("Music clip was not initialised", manager.hasOpenedMusic());
+        assertTrue("Music clip was not initialised", AudioManager.hasOpenedMusic());
     }
 
     @Test
@@ -99,28 +97,28 @@ public class AudioManagerTest
     @Test
     public void playMusic() throws Exception
     {
-        assertFalse("Music started playing without calling the play method", manager.isPlayingMusic());
-        manager.playMusic();
-        assertTrue("Music did not start playing when play method was called", manager.isPlayingMusic());
+        assertFalse("Music started playing without calling the play method", AudioManager.isPlayingMusic());
+        AudioManager.playMusic();
+        assertTrue("Music did not start playing when play method was called", AudioManager.isPlayingMusic());
     }
 
     @Test
     public void pauseMusic() throws Exception
     {
         // Checking that music can be paused without errors
-        manager.playMusic();
-        manager.pauseMusic();
-        manager.pauseMusic();
+        AudioManager.playMusic();
+        AudioManager.pauseMusic();
+        AudioManager.pauseMusic();
     }
 
     @Test
     public void unpauseMusic() throws Exception
     {
         // Checking that music can be unpaused with no errors
-        manager.playMusic();
-        manager.pauseMusic();
-        manager.unpauseMusic();
-        manager.unpauseMusic();
+        AudioManager.playMusic();
+        AudioManager.pauseMusic();
+        AudioManager.unpauseMusic();
+        AudioManager.unpauseMusic();
     }
 
     @Test
@@ -128,11 +126,12 @@ public class AudioManagerTest
     {
         List<AudioEvent> list = new ArrayList<>();
         list.add(AudioEvent.EXPLOSION);
-        list.add(AudioEvent.MOVEMENT);
         list.add(AudioEvent.POWERUP);
         list.add(AudioEvent.PLAYER_DEATH);
-        list.add(AudioEvent.PLACE_BOMB); 
-        manager.playEventList(list); 
+
+        list.add(AudioEvent.PLACE_BOMB);
+        AudioManager.playEventList(list);
+
         assertTrue("EventList was not emptied after calling playEventList", list.isEmpty());
 
     }

@@ -1,8 +1,10 @@
 package bomber.AI;
 
 /**
+ * AI difficulty.
+ * 
  * @author Jokubas Liutkus
- * The Enum AIDifficulty.
+ * 
  */
 public enum AIDifficulty {
 

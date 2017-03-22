@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import bomber.game.GameState;
 
 /**
- * The Class MediumAI.
+ * AI of medium difficulty.
  * 
  * @author Jokubas Liutkus
  */
@@ -92,10 +92,11 @@ public class MediumAI extends AITemplate {
 		while (gameAI.isAlive()) {
 
 			pausedGame();
+
 			// if AI is in danger then escape only with 70% possibility
       if (safetyCh.inDanger() ) {
         moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
-        performMoves(moves, true);
+
 
       }
       // else if there is an upgrade find the moves to it
@@ -119,12 +120,12 @@ public class MediumAI extends AITemplate {
       
 			// otherwise just generate a random goal and start full-filling it
 			else if (random.nextBoolean()) {
-				int x = random.nextInt(gameState.getMap().getGridMap().length);
-				int y = random.nextInt(gameState.getMap().getGridMap()[0].length);
-				moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
-				performPlannedMoves(moves);
+			  int x = random.nextInt(gameState.getMap().getGridMap().length);
+        int y = random.nextInt(gameState.getMap().getGridMap()[0].length);
+        moves = finder.getPlanToEnemy(gameAI.getGridPos(), new Point(x, y));
+        performPlannedMoves(moves);
 			}
-			
+
 
 			
 			// if enemy is not in the range get the plan how to reach enemy and

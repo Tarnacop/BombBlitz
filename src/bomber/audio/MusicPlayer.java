@@ -9,7 +9,7 @@ import java.io.InputStream;
 
 /**
  * Plays music
- * Only to be used by <code>AudioManager</code>
+ * Only to be used by AudioManager
  *
  * @author Alexandru Rosu
  */
@@ -29,13 +29,15 @@ class MusicPlayer extends Thread
         {
             clip = AudioSystem.getClip();
             InputStream rawStream = Main.class.getResourceAsStream(Constants.AUDIO_FILES_PATH + Constants.MUSIC_FILENAME);
-            if(rawStream == null)
+            if (rawStream == null)
                 throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
             clip.open(inputStream);
+            inputStream.close();
             setVolume(volume);
 
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e)
+        {
             System.err.println("Could not load sound: " + Constants.AUDIO_FILES_PATH + Constants.MUSIC_FILENAME);
             e.printStackTrace();
         }
@@ -46,7 +48,7 @@ class MusicPlayer extends Thread
      *
      * @param percent The volume percent, ranging from 0 to 100
      */
-    private void setVolume(float percent)
+    void setVolume(float percent)
     {
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
         AudioManager.setControlVolume(gainControl, percent);
@@ -78,6 +80,29 @@ class MusicPlayer extends Thread
         clip.loop(Integer.MAX_VALUE);
     }
 
+    /**
+     * Starts playing the music from the beginning
+     */
+    void replay()
+    {
+        clip.setFramePosition(0);
+        unpause();
+    }
+
+    /**
+     * Closes the music and the file
+     */
+    void close()
+    {
+        clip.stop();
+        clip.close();
+    }
+
+    /**
+     * Checks if the music file is open
+     *
+     * @return Whether the file is opened
+     */
     boolean hasOpened()
     {
         return clip.isOpen();

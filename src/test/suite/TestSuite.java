@@ -18,7 +18,7 @@ import test.UI.UITestSuite;
 		AITestSuite.class,
 		GameTestSuite.class,
 		PhysicsEngineTest.class,
-		UITestSuite.class
+		//UITestSuite.class
 })
 
 

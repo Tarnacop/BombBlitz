@@ -25,6 +25,11 @@ import bomber.game.KeyboardState;
 import bomber.game.Map;
 import bomber.game.Maps;
 
+/**
+ * Thread for server networking
+ * 
+ * @author Qiyang Li
+ */
 public class ServerThread implements Runnable {
 	private final int port;
 
@@ -1144,7 +1149,13 @@ public class ServerThread implements Runnable {
 		}
 	}
 
-	private Map defaultMap() {
+	/**
+	 * Get the default map that will be used when the map list failed to
+	 * initialise
+	 * 
+	 * @return the default map
+	 */
+	public Map defaultMap() {
 		Block[][] defaultGridMap = new Block[][] { { Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
 				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
 				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
@@ -1167,10 +1178,26 @@ public class ServerThread implements Runnable {
 		return defaultMap;
 	}
 
+	/**
+	 * Send a packet without retransmission
+	 * 
+	 * @param packet
+	 *            the packet to be sent
+	 * @throws IOException
+	 */
 	public synchronized void sendPacket(DatagramPacket packet) throws IOException {
 		socket.send(packet);
 	}
 
+	/**
+	 * Send a packet without retransmission
+	 * 
+	 * @param packet
+	 *            the packet to be sent
+	 * @param type
+	 *            the type of the message in the packet
+	 * @throws IOException
+	 */
 	public synchronized void sendPacket(DatagramPacket packet, byte type) throws IOException {
 		ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
 		buffer.put(0, (byte) (type & (~ProtocolConstant.MSG_B_HASSEQUENCE)));
@@ -1178,7 +1205,19 @@ public class ServerThread implements Runnable {
 		socket.send(packet);
 	}
 
-	// Note: retransmission cannot work when recipient is not in client table
+	/**
+	 * Send a packet
+	 * 
+	 * @param packet
+	 *            the packet to be sent
+	 * @param type
+	 *            the type of the message in the packet
+	 * @param tryRetransmit
+	 *            true if retransmission for unacknowledged packet is required.
+	 *            Note that retransmission cannot work when recipient is not in
+	 *            client table
+	 * @throws IOException
+	 */
 	public synchronized void sendPacket(DatagramPacket packet, byte type, boolean tryRetransmit) throws IOException {
 		if (tryRetransmit) {
 			ServerClientInfo clientInfo = clientTable.get(packet.getSocketAddress());
@@ -1205,6 +1244,9 @@ public class ServerThread implements Runnable {
 		}
 	}
 
+	/**
+	 * Terminate the server
+	 */
 	public void exit() {
 		socket.close();
 	}

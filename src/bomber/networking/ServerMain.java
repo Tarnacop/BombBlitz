@@ -3,6 +3,11 @@ package bomber.networking;
 import java.net.SocketException;
 import java.util.Scanner;
 
+/**
+ * Main server class
+ * 
+ * @author Qiyang Li
+ */
 public class ServerMain {
 
 	public static void main(String[] args) {

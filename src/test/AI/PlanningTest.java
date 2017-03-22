@@ -15,14 +15,32 @@ import bomber.game.Block;
 import bomber.game.GameState;
 import bomber.game.Map;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PlanningTest.
+ */
 public class PlanningTest {
 
+	/** The map. */
 	private Map map;
+	
+	/** The state. */
 	private GameState state;	
+	
+	/** The ai. */
 	private GameAI ai;
+	
+	/** The finder. */
 	private RouteFinder finder;
+	
+	/** The checker. */
 	private SafetyChecker checker;
 	
+	/**
+	 * The set up.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Before
 	public void setUp() throws Exception {
 		
@@ -55,7 +73,7 @@ public class PlanningTest {
 				  {Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT,Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT, Block.SOFT},
 				  {Block.BLANK, Block.SOLID, Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID,Block.BLANK, Block.SOLID, Block.BLANK},
 				  {Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOFT, Block.BLANK}};	
-//		
+
 		map = new Map("",blocks,null);
 		state = new GameState(map, null);
 		ai = new GameAI("ai", new Point(12,0), 3, 10, state, AIDifficulty.HARD);
@@ -65,6 +83,9 @@ public class PlanningTest {
 	
 	}
 
+	/**
+	 * The planning test.
+	 */
 	@Test
 	public void test() {
 		assertEquals(28, finder.getPlanToEnemy(new Point(12,0), new Point(12,12)).size());
