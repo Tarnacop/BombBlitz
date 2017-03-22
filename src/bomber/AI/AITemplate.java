@@ -63,7 +63,7 @@ public abstract class AITemplate extends Thread {
 		move();
 		System.out.println("AI Stopped.");
 	}
-
+ 
 	/**
 	 * Updates the current AI position according to the particular move
 	 *
@@ -246,7 +246,9 @@ public abstract class AITemplate extends Thread {
 	protected abstract void performPlannedMoves(LinkedList<AIActions> moves);
 
 	/**
-	 * Main method for controlling what moves to make.
-	 */
-	protected abstract void move();
+
+   * Main method for controlling what moves to make.
+   */
+  protected abstract void move();
 }
+

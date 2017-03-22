@@ -157,8 +157,9 @@ public class Screen {
 
 		glfwSetInputMode(this.screenID, GLFW_STICKY_KEYS, GLFW_TRUE);
 
-		System.out.println("Initialized screen");
-	}
+
+	} 
+
 
 	/**
 	 * Set the clear colour using the red, green, blue and alpha values provided
