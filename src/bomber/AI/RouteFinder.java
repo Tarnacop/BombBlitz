@@ -18,11 +18,10 @@ import bomber.game.GameState;
 import bomber.game.Player;
 
 /**
- * The Class RouteFinder.
+ * Finding different routes and planning.
  *
  * @author Jokubas Liutkus
  * 
- *         The Class RouteFinder. For finding different routes and planning.
  */
 public class RouteFinder {
 

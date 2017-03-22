@@ -243,7 +243,7 @@ public class AILevelTest{
 	 */
 	@Test
 	public void easyAITest() throws InterruptedException
-	{
+	{ 
 		players.clear();
 		players.add(ai);
 		player = new Player("name", new Point(13*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,13*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER),1,30000);
@@ -252,12 +252,6 @@ public class AILevelTest{
 		ai.setDifficulty(AIDifficulty.EASY);
 		ai.setPos(new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		ai.begin();
-		assertTrue(checker.inDanger());
-		while(checker.inDanger()){
-			Thread.sleep(10);
-			this.physics.update();
-		}
-		assertFalse(checker.inDanger());	
 	
 		int counter = 500;
 		while(counter>0)

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import bomber.game.GameState;
 
 /**
- * The Class MediumAI.
+ * AI of medium difficulty.
  * 
  * @author Jokubas Liutkus
  */
@@ -92,9 +92,9 @@ public class MediumAI extends AITemplate {
 		while (gameAI.isAlive()) {
 
 			pausedGame();
-			// if AI is in danger then find the escape route with 60%
+			// if AI is in danger then find the escape route with 40%
 			// possibility
-			if (safetyCh.inDanger() && random.nextInt(10) < 6) {
+			if (safetyCh.inDanger() && random.nextInt(10) < 4) {
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
 				performMoves(moves, true);
 
@@ -111,7 +111,7 @@ public class MediumAI extends AITemplate {
 
 				performMoves(moves, false);
 			}
-
+ 
 			// if enemy is in bomb range then place the bomb and go to the
 			// safe location with 30% possibility
 			else if (random.nextInt(100) < 30 && safetyCh.isEnemyInBombRange()) {
