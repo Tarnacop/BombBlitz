@@ -1,5 +1,10 @@
 package bomber.networking;
 
+/**
+ * Class to change the bits in an integer
+ * 
+ * @author Qiyang Li
+ */
 public class BitArray {
 	/**
 	 * Get a bit from a long

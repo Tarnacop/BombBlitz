@@ -16,9 +16,9 @@ import bomber.game.Player;
 import bomber.physics.PhysicsEngine;
 
 /**
- * 
  * Server side representation of a game session in a room
  *
+ * @author Qiyang Li
  */
 public class ServerGame implements Runnable {
 	private GameState gameState;

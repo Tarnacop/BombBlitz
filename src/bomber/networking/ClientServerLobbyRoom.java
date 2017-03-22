@@ -1,9 +1,9 @@
 package bomber.networking;
 
 /**
- * 
  * Client side representation of rooms on the server lobby
- *
+ * 
+ * @author Qiyang Li
  */
 public class ClientServerLobbyRoom {
 	private int id;

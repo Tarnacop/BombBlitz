@@ -17,9 +17,9 @@ import bomber.game.Movement;
 import bomber.game.Player;
 
 /**
- * 
  * Methods for encoding and decoding more complex packets for the client
- *
+ * 
+ * @author Qiyang Li
  */
 public class ClientPacketEncoder {
 

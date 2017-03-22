@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 /**
  * Server side representation of (the state of) a client
+ * 
+ * @author Qiyang Li
  */
 public class ServerClientInfo {
 	// socket address (IP:Port) of the client, guaranteed to be unique

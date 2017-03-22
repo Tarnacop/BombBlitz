@@ -1,5 +1,10 @@
 package bomber.networking;
 
+/**
+ * Class containing constants used by the networking protocol
+ * 
+ * @author Qiyang Li
+ */
 public class ProtocolConstant {
 	// Protocol constants and documentation
 

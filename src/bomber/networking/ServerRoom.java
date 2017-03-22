@@ -10,9 +10,9 @@ import bomber.game.Block;
 import bomber.game.Map;
 
 /**
- * 
  * Server side representation of a room
  *
+ * @author Qiyang Li
  */
 public class ServerRoom {
 	// id of the room, uniqueness required

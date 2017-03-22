@@ -25,6 +25,11 @@ import bomber.game.KeyboardState;
 import bomber.game.Map;
 import bomber.game.Maps;
 
+/**
+ * Thread for server networking
+ * 
+ * @author Qiyang Li
+ */
 public class ServerThread implements Runnable {
 	private final int port;
 
@@ -1144,7 +1149,13 @@ public class ServerThread implements Runnable {
 		}
 	}
 
-	private Map defaultMap() {
+	/**
+	 * Get the default map that will be used when the map list failed to
+	 * initialise
+	 * 
+	 * @return the default map
+	 */
+	public Map defaultMap() {
 		Block[][] defaultGridMap = new Block[][] { { Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID, Block.SOLID },
 				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },
 				{ Block.SOLID, Block.BLANK, Block.BLANK, Block.BLANK, Block.SOLID },

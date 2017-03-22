@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * ServerRoomTable wraps two maps which map Integer(ID of room) and String(name
  * of room) to ServerClientInfo respectively
+ * 
+ * @author Qiyang Li
  */
 public class ServerRoomTable {
 	private ConcurrentHashMap<Integer, ServerRoom> idTable = new ConcurrentHashMap<Integer, ServerRoom>();

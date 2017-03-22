@@ -1,5 +1,10 @@
 package bomber.networking;
 
+/**
+ * Class representing the configuration of the server
+ * 
+ * @author Qiyang Li
+ */
 public class ServerConfiguration {
 	private String serverName = "Bomb Blitz Dedicated Server";
 
