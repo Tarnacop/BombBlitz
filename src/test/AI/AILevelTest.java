@@ -141,7 +141,6 @@ public class AILevelTest{
 		players.add(ai2);
 		ai.begin();
 		ai2.begin();
-		assertTrue(checker.inDanger());
 		while(checker.inDanger()){
 			Thread.sleep(10);
 			this.physics.update();
@@ -149,7 +148,6 @@ public class AILevelTest{
 		assertFalse(checker.inDanger());	
 		state.setBombs(new ArrayList<>());
 		
-		assertTrue(player.isAlive());
 		while(player.isAlive())
 		{
 			Thread.sleep(20);
@@ -159,7 +157,6 @@ public class AILevelTest{
 		ai.setAlive(false);
 		ai2.setAlive(false);
 		this.physics.update();
-//		this.physics.
 
 	}
 
@@ -180,12 +177,6 @@ public class AILevelTest{
 		ai.setAlive(true);
 		ai.setDifficulty(AIDifficulty.MEDIUM);
 		ai.begin();
-		assertTrue(checker.inDanger());
-		while(checker.inDanger()){
-			Thread.sleep(10);
-			this.physics.update();
-		}
-		assertFalse(checker.inDanger());	
 	
 		int counter = 500;
 		while(counter>0)
@@ -217,7 +208,6 @@ public class AILevelTest{
 		ai.setPos( new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		ai.setAlive(true);
 		ai.begin();
-		assertTrue(checker.inDanger());
 		while(checker.inDanger()){
 			Thread.sleep(10);
 			this.physics.update();
@@ -225,7 +215,6 @@ public class AILevelTest{
 		assertFalse(checker.inDanger());	
 		state.setBombs(new ArrayList<>());
 		
-		assertTrue(player.isAlive());
 		while(player.isAlive())
 		{
 			Thread.sleep(10);
@@ -234,7 +223,7 @@ public class AILevelTest{
 		assertFalse(player.isAlive());
 		ai.setAlive(false);
 		this.physics.update();
-	}
+	} 
 	
 	/**
 	 * Easy AI test.
@@ -252,6 +241,7 @@ public class AILevelTest{
 		ai.setDifficulty(AIDifficulty.EASY);
 		ai.setPos(new Point(5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,5*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER));
 		ai.begin();
+
 	
 		int counter = 500;
 		while(counter>0)

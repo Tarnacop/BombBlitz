@@ -217,7 +217,7 @@ public class RouteFinder {
 	 */
 	private LinkedList<AIActions> getMovesFromPoints(Node finish) {
 		LinkedList<AIActions> moves = new LinkedList<>();
-
+ 
 		while (finish.getParent() != null) {
 			int x = finish.getCoord().x;
 			int y = finish.getCoord().y;
@@ -535,7 +535,6 @@ public class RouteFinder {
 	 * @return the planned sequence of actions to enemy
 	 */
 	public LinkedList<AIActions> getPlanToEnemy(Point start, Point goal) {
-
 
 		PriorityQueue<Node> open = new PriorityQueue<>();
 		HashSet<Node> closed = new HashSet<>();
