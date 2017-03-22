@@ -5,7 +5,7 @@ import bomber.game.Constants;
 import bomber.renderer.interfaces.GameInterface;
 
 /**
- * Class that holds the Graphic Thread with all its features
+ * Class that holds the Graphic Thread with all its feature
  * 
  * @author Alexandru Blinda
  * 
@@ -43,7 +43,7 @@ public class Graphics implements Runnable {
 		this.screen = new Screen(screenTitle, screenWidth, screenHeight, vSync, fullScreen);
 		this.gameLogic = gameLogic;
 		timer = new Timer();
-	} // END OF CONSTRUCTOR
+	}
 
 	/**
 	 * Start the graphics
@@ -52,7 +52,7 @@ public class Graphics implements Runnable {
 
 		// Start the thread for the game engine loop
 		gameLoopThread.start();
-	} // END OF start METHOD
+	}
 
 	/**
 	 * Run the graphics
@@ -76,20 +76,19 @@ public class Graphics implements Runnable {
 			System.out.println("DISPOSED");
 		}
 
-	} // END OF run METHOD
+	}
 
 	/**
 	 * Initialise the graphics
 	 * 
 	 * @throws Exception
 	 */
-	// Initialize the game engine
 	private void init() throws Exception {
 
 		this.screen.init();
 		this.timer.init();
 		this.gameLogic.init(screen);
-	} // END OF init METHOD
+	}
 
 	/**
 	 * Update the game logic at the given interval
@@ -97,23 +96,21 @@ public class Graphics implements Runnable {
 	 * @param interval
 	 *            The interval at everything is updated
 	 */
-	// Update method
 	private void update(float interval) {
 
 		// Game logic gets updated
 		gameLogic.update(interval);
-	} // END OF update METHOD
+	}
 
 	/**
 	 * Render everything on the screen
 	 */
-	// Render method
 	private void render() {
 
 		// Render the renderer
 		gameLogic.render(screen);
 		screen.update();
-	} // END OF render METHOD
+	}
 
 	/**
 	 * The game loop responsible with calculating UPS and FPS
@@ -152,7 +149,7 @@ public class Graphics implements Runnable {
 				sync();
 			}
 		}
-	} // END OF gameLoop METHOD
+	}
 
 	/**
 	 * Synchronise everything if vSync is not on
@@ -174,7 +171,7 @@ public class Graphics implements Runnable {
 			}
 		}
 
-	} // END OF sync METHOD
+	}
 
 	/**
 	 * Listen for inputs from the game logic
@@ -182,8 +179,7 @@ public class Graphics implements Runnable {
 	public void input() {
 
 		gameLogic.input(screen);
-		;
-	} // END OF input METHOD
+	}
 
 	/**
 	 * Dispose the graphics and game logic
@@ -192,7 +188,7 @@ public class Graphics implements Runnable {
 
 		gameLogic.dispose();
 		glfwDestroyWindow(this.screen.getScreenID());
-	} // END OF dispose METHOD
+	}
 
 	/**
 	 * Get the screen of the graphics
@@ -202,5 +198,5 @@ public class Graphics implements Runnable {
 	public Screen getScreen() {
 
 		return this.screen;
-	} // END OF getScreeb METHOD
-} // END OF Application
+	}
+}

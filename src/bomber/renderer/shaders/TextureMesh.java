@@ -14,6 +14,7 @@ import org.lwjgl.system.MemoryUtil;
 // TextureMesh
 /**
  * Class that represents a TextureMesh handles the Texture rendering
+ * 
  * @author Alexandru Blinda
  *
  */
@@ -27,18 +28,30 @@ public class TextureMesh {
 	private final Texture texture;
 
 	/**
-	 * Create a TextureMesh with a width, height, x and y texture coordinates, colsNumber and rowsNumber and a Texture
-	 * This constructor is used especially for sprite sheet to draw exactly the portion of the texture needed
-	 * @param width The width of the drawn "object"
-	 * @param height The height of the drawn "object"
-	 * @param textX The starting x texture coordinate
-	 * @param textY The starting y texture coordinate
-	 * @param colsNumber The number of columns of the sprite sheet
-	 * @param rowsNumber The number of rows of the sprite sheet
-	 * @param texture The sprite sheet given as a texture
+	 * Create a TextureMesh with a width, height, x and y texture coordinates,
+	 * colsNumber and rowsNumber and a Texture
+	 * 
+	 * This constructor is used especially for sprite sheet to draw exactly the
+	 * portion of the texture needed
+	 * 
+	 * @param width
+	 *            The width of the drawn "object"
+	 * @param height
+	 *            The height of the drawn "object"
+	 * @param textX
+	 *            The starting x texture coordinate
+	 * @param textY
+	 *            The starting y texture coordinate
+	 * @param colsNumber
+	 *            The number of columns of the sprite sheet
+	 * @param rowsNumber
+	 *            The number of rows of the sprite sheet
+	 * @param texture
+	 *            The sprite sheet given as a texture
 	 */
-	public TextureMesh(float width, float height, float textX, float textY, float textWidth, float textHeight, Texture texture) {
-		
+	public TextureMesh(float width, float height, float textX, float textY, float textWidth, float textHeight,
+			Texture texture) {
+
 		int[] indices = new int[] { 0, 1, 3, 3, 1, 2, };
 		float[] positions = {
 				// V0
@@ -48,11 +61,10 @@ public class TextureMesh {
 				// V2
 				width, 0f,
 				// V3
-				width, height
-		};
+				width, height };
 
 		float[] textureCoords = new float[] {
-				
+
 				// For V0
 				textX, textY + textHeight,
 				// For V1
@@ -60,9 +72,8 @@ public class TextureMesh {
 				// For V2
 				textX + textWidth, textY,
 				// FOR V3
-				textX + textWidth, textY + textHeight
-		};
-		
+				textX + textWidth, textY + textHeight };
+
 		vao = new VertexArrayObject();
 		vbopos = new VertexBufferObject();
 		vbotexture = new VertexBufferObject();
@@ -124,17 +135,21 @@ public class TextureMesh {
 				MemoryUtil.memFree(indicesBuffer);
 			}
 		}
-		
-	} // END OF CONSTRUCTOR
-	
+
+	}
+
 	/**
 	 * Create a TextureMesh with a width, height and a texture
-	 * @param width The given width of the "object"
-	 * @param height The given height of the "object"
-	 * @param texture The given texture to be drawn
+	 * 
+	 * @param width
+	 *            The given width of the "object"
+	 * @param height
+	 *            The given height of the "object"
+	 * @param texture
+	 *            The given texture to be drawn
 	 */
 	public TextureMesh(float width, float height, Texture texture) {
-		
+
 		int[] indices = new int[] { 0, 1, 3, 3, 1, 2, };
 		float[] positions = {
 				// V0
@@ -144,11 +159,10 @@ public class TextureMesh {
 				// V2
 				width, 0f,
 				// V3
-				width, height
-		};
+				width, height };
 
 		float[] textureCoords = new float[] {
-				
+
 				// For V0
 				0f, 1f,
 				// For V1
@@ -156,9 +170,8 @@ public class TextureMesh {
 				// For V2
 				1f, 0f,
 				// FOR V3
-				1f, 1f
-		};
-		
+				1f, 1f };
+
 		vao = new VertexArrayObject();
 		vbopos = new VertexBufferObject();
 		vbotexture = new VertexBufferObject();
@@ -220,16 +233,23 @@ public class TextureMesh {
 				MemoryUtil.memFree(indicesBuffer);
 			}
 		}
-		
-	} // END OF CONSTRUCTOR
-	
+
+	}
+
 	/**
-	 * Create a TextureMesh with the positions of the vertexes, the texture coordinates and the indices and a given texture
+	 * Create a TextureMesh with the positions of the vertexes, the texture
+	 * coordinates and the indices and a given texture
+	 * 
 	 * Used only in special cases
-	 * @param positions A float array representing the given positions of each vertex
-	 * @param textureCoords A float array representing the given texture coordinates
-	 * @param indices An int array representing the indices of the vertexes
-	 * @param texture The texture to be drawn
+	 * 
+	 * @param positions
+	 *            A float array representing the given positions of each vertex
+	 * @param textureCoords
+	 *            A float array representing the given texture coordinates
+	 * @param indices
+	 *            An int array representing the indices of the vertexes
+	 * @param texture
+	 *            The texture to be drawn
 	 */
 	public TextureMesh(float[] positions, float[] textureCoords, int[] indices, Texture texture) {
 
@@ -294,32 +314,33 @@ public class TextureMesh {
 				MemoryUtil.memFree(indicesBuffer);
 			}
 		}
-	} // END OF CONSTRUCTOR
+	}
 
 	/**
 	 * Get the id of the vertex array object
+	 * 
 	 * @return The id of the vertex array object
 	 */
 	public int getVaoId() {
 
 		return vao.getVaoId();
-	} // END OF getVaoId METHOD
+	}
 
 	/**
 	 * Get the number of vertexes
+	 * 
 	 * @return The number of vertexes
 	 */
 	public int getVertexCount() {
 
 		return vertexCount;
-	} // END OF getVertexCount METHOD
+	}
 
 	/**
 	 * Render the mesh on the screen
 	 */
-	// Render the mesh
 	public void render() {
-		
+
 		// Activate first texture unit
 		glActiveTexture(GL_TEXTURE0);
 		// Bind the texture
@@ -338,9 +359,9 @@ public class TextureMesh {
 		glDisableVertexAttribArray(1);
 		glBindVertexArray(0);
 
-	} // END OF render METHOD
+	}
 
-	/** 
+	/**
 	 * Dispose the mesh
 	 */
 	public void dispose() {
@@ -363,34 +384,35 @@ public class TextureMesh {
 		vao.unbind();
 		vao.dispose();
 		texture.dispose();
-	} // END OF dispose METHOD
+	}
 
 	/**
 	 * Get the texture used in the mesh
+	 * 
 	 * @return The texture used in the mesh
- 	 */
+	 */
 	public Texture getTexture() {
-		
+
 		return texture;
 	} // END OF getTexture METHOD
-	
+
 	/**
 	 * Delete the vertex array object and vertex buffer objects used
 	 */
 	public void deleteBuffers() {
-		
+
 		glDisableVertexAttribArray(0);
-		
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
+
 		// Delete VBO's
 		vbopos.dispose();
 		vbotexture.dispose();
 		vboindices.dispose();
-		
+
 		// Delete the VAO
 		glBindVertexArray(0);
 		vao.dispose();
-	} // END OF deleteBuffers METHOD
-	
-} // END OF AuxMesh CLASS
+	}
+
+}

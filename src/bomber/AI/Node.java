@@ -4,8 +4,9 @@ import java.awt.Point;
 import java.util.Comparator;
 
 /**
+ * Helper for implementing A* algorithm.
+ * 
  * @author Jokubas Liutkus
- * The Class Node for implementing A* algorithm.
  */
 public class Node implements Comparator<Node>, Comparable<Node>{
 	

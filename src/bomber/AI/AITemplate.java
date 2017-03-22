@@ -4,32 +4,26 @@ import java.awt.Point;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import bomber.game.Constants;
 import bomber.game.GameState;
 import bomber.game.Movement;
 import bomber.game.Player;
 
 /**
- * The Class AITemplate. Consists of main utility functions for AI to run.
- *
+ * Framework for the AI to run.
+ * 
  * @author Jokubas Liutkus
- *
+ * 
  */
 public abstract class AITemplate extends Thread {
-
-/** The game AI. */
-protected GameAI gameAI;
-
-/** The finder for finding the route. */
-protected RouteFinder finder;
-
+	/** The game AI. */
+	protected GameAI gameAI;
+	/** The finder for finding the route. */
+	protected RouteFinder finder;
 	/** The safety checker for AI. */
 	protected SafetyChecker safetyCh;
-
 	/** The game state. */
 	protected GameState gameState;
-	
 	protected boolean pause = false;
 
 	/**
@@ -47,16 +41,14 @@ protected RouteFinder finder;
 		this.finder = new RouteFinder(gameState, ai, safetyCh);
 	}
 
-	public void pause()
-	{
+	public void pause() {
 		pause = true;
 	}
-	
-	public void update()
-	{
+
+	public void update() {
 		pause = false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -81,7 +73,6 @@ protected RouteFinder finder;
 	 */
 	protected Point updatedPos(AIActions move) {
 		Point aiPos = (Point) gameAI.getGridPos().clone();
-
 		switch (move) {
 		case UP:
 			aiPos.setLocation(aiPos.x, (aiPos.y - 1));
@@ -127,7 +118,6 @@ protected RouteFinder finder;
 		default:
 			break;
 		}
-
 		return m;
 	}
 
@@ -159,44 +149,32 @@ protected RouteFinder finder;
 	 *            the move to be made
 	 */
 	protected void makeSingleMove(AIActions move) {
-		//updated positions
+		// updated positions
 		Point updatedPosPixel = updatedPos(move);
 		Point updatedPos = new Point(updatedPosPixel);
-		
-		//sets the position to the pixel representation
+		// sets the position to the pixel representation
 		updatedPosPixel.setLocation(updatedPosPixel.x * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,
 				updatedPosPixel.y * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER);
-		
 		// sets the move to be made
 		gameAI.getKeyState().setMovement(FromAIMovesToGameMoves(move));
-		
 		// checking if the AI got stuck
 		int stuckChecker = 0;
-		
 		// waiting for the move to be mande
 		while (checkIfReachedDestination(gameAI.getPos(), updatedPosPixel) && gameAI.isAlive()
-				&& !safetyCh.isNextMoveBomb(updatedPos) && stuckChecker < 75 ) {
+				&& (!safetyCh.isNextMoveBomb(updatedPos)) && (stuckChecker < 75)) {
 			pausedGame();
 			stuckChecker++;
 			try {
 				sleep(10);
 			} catch (InterruptedException e) {
-				
 			}
 		}
-		
 		// setting keyboard back to normal
 		gameAI.getKeyState().setMovement(Movement.NONE);
-
 	}
-	
-	/**
-	 * Hang while the game is paused
-	 */
-	protected void pausedGame()
-	{
-		while(pause)
-		{
+
+	protected void pausedGame() {
+		while (pause) {
 			try {
 				sleep(50);
 			} catch (InterruptedException e) {
@@ -211,16 +189,14 @@ protected RouteFinder finder;
 	 * @return the moves to enemy
 	 */
 	protected LinkedList<AIActions> getMovesToEnemy() {
-
 		// find the route to the nearest enemy
 		// moves == null if there are soft block to the enemy
 		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemy());
 		if (moves != null)
 			return moves;
-
 		// else we loop through each enemy looking for the possible access
 		for (Player p : gameState.getPlayers()) {
-			if (!p.equals(gameAI) &&p.isAlive()) {
+			if (!p.equals(gameAI) && (p.isAlive())) {
 				moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
 				if (moves != null)
 					return moves;
@@ -235,7 +211,6 @@ protected RouteFinder finder;
 	 * @return the moves to enemy ignoring other AIs
 	 */
 	protected LinkedList<AIActions> getMovesToEnemyExcludeAIs() {
-
 		// find the route to the nearest enemy
 		// moves == null if there are soft block to the enemy
 		LinkedList<AIActions> moves = finder.findRoute(gameAI.getGridPos(), finder.getNearestEnemyExcludeAIs());
@@ -244,11 +219,9 @@ protected RouteFinder finder;
 		List<Player> players = gameState.getPlayers().stream().filter(p -> !(p instanceof GameAI) && p.isAlive())
 				.collect(Collectors.toList());
 		for (Player p : players) {
-
 			moves = finder.findRoute(gameAI.getGridPos(), p.getGridPos());
 			if (moves != null)
 				return moves;
-
 		}
 		return null;
 	}

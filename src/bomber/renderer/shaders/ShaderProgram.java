@@ -7,9 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
+/**
+ * Class that creates a Shader Program
+ * 
+ * @author Alexandru
+ *
+ */
 public class ShaderProgram {
 
 	private final int programID;
@@ -17,6 +22,11 @@ public class ShaderProgram {
 	private int fragmentShaderID;
 	private final Map<String, Integer> uniforms;
 
+	/**
+	 * Create a ShaderProgram object
+	 * 
+	 * @throws Exception
+	 */
 	public ShaderProgram() throws Exception {
 
 		programID = glCreateProgram();
@@ -27,21 +37,42 @@ public class ShaderProgram {
 
 		uniforms = new HashMap<>();
 
-	} // END OF CONSTRUCTOR
+	}
 
-	// Method to create a vertex shader
+	/**
+	 * Create a Vertex Shader with the given shader code
+	 * 
+	 * @param shaderCode
+	 *            The given shader code used for creating the vertex shader
+	 * @throws Exception
+	 */
 	public void createVertexShader(String shaderCode) throws Exception {
 
 		vertexShaderID = createShader(shaderCode, GL_VERTEX_SHADER);
-	} // END OF createVertexShader METHOD
+	}
 
-	// Method to create a fragment shader
+	/**
+	 * Create a Fragment Shader wit the given shader code
+	 * 
+	 * @param shaderCode
+	 *            The given shader code used for creating a fragment shader
+	 * @throws Exception
+	 */
 	public void createFragmentShader(String shaderCode) throws Exception {
 
 		fragmentShaderID = createShader(shaderCode, GL_FRAGMENT_SHADER);
-	} // END OF createFragmentShader METHOD
+	}
 
-	// Method to create the shaders given the shader code and type
+	/**
+	 * Create a shader given the shader code and shader type
+	 * 
+	 * @param shaderCode
+	 *            The given shader code
+	 * @param shaderType
+	 *            The given shader type
+	 * @return The shader id
+	 * @throws Exception
+	 */
 	private int createShader(String shaderCode, int shaderType) throws Exception {
 
 		int shaderID = glCreateShader(shaderType);
@@ -54,13 +85,16 @@ public class ShaderProgram {
 		glShaderSource(shaderID, shaderCode);
 		glCompileShader(shaderID);
 
-		
 		glAttachShader(programID, shaderID);
 
 		return shaderID;
-	} // END OF createShader METHOD
+	}
 
-	// Method to link the shaders to the program
+	/**
+	 * Method to link the shaders to the program
+	 * 
+	 * @throws Exception
+	 */
 	public void link() throws Exception {
 
 		glLinkProgram(programID);
@@ -87,20 +121,31 @@ public class ShaderProgram {
 			System.err.println("Warning validating Shader code: " + glGetProgramInfoLog(programID, 1024));
 		}
 
-	} // END OF link METHOD
+	}
 
-	// Method to bind openGL to the program
+	/**
+	 * Bind openGL to the program
+	 */
 	public void bind() {
 
 		glUseProgram(programID);
-	} // END OF bind METHOD
+	}
 
-	// Method to unbind openGL to the program
+	/**
+	 * Unbind openGL from the program
+	 */
 	public void unbind() {
 
 		glUseProgram(0);
-	} // END OF unbind METHOD
+	}
 
+	/**
+	 * Create a uniform with the given uniform name
+	 * 
+	 * @param uniformName
+	 *            The given uniform name
+	 * @throws Exception
+	 */
 	public void createUniform(String uniformName) throws Exception {
 
 		int location = glGetUniformLocation(programID, uniformName);
@@ -111,29 +156,59 @@ public class ShaderProgram {
 		}
 
 		uniforms.put(uniformName, location);
-	} // END OF createUniform METHOD
+	}
 
+	/**
+	 * Set a uniform with a given name to a given matrix value
+	 * 
+	 * @param uniformName
+	 *            The given name of the uniform
+	 * @param matrix
+	 *            The value as a matrix
+	 */
 	public void setUniform(String uniformName, Matrix4f matrix) {
 
 		try (MemoryStack stack = MemoryStack.stackPush()) {
-			
+
 			FloatBuffer dataBuffer = stack.mallocFloat(16);
 			matrix.get(dataBuffer);
 			glUniformMatrix4fv(uniforms.get(uniformName), false, dataBuffer);
 		}
-	} // END OF setUniform METHOD
-	
-	public void setUniform(String uniformName, int value) {
-		
-	    glUniform1i(uniforms.get(uniformName), value);
-	} // END OF setUniform METHOD
-	
-    public void setUniform(String uniformName, float x, float y, float z) {
-        
-    	glUniform3f(uniforms.get(uniformName), x, y, z);
-    }
+	}
 
-	// Method to dispose the resources
+	/**
+	 * Set a uniform with a given name to a given integer value
+	 * 
+	 * @param uniformName
+	 *            The given name of the uniform
+	 * @param matrix
+	 *            The value as an integer
+	 */
+	public void setUniform(String uniformName, int value) {
+
+		glUniform1i(uniforms.get(uniformName), value);
+	}
+
+	/**
+	 * Set a uniform with the given name to the given float values
+	 * 
+	 * @param uniformName
+	 *            The given name of the uniform
+	 * @param x
+	 *            The x value
+	 * @param y
+	 *            The y value
+	 * @param z
+	 *            The z value
+	 */
+	public void setUniform(String uniformName, float x, float y, float z) {
+
+		glUniform3f(uniforms.get(uniformName), x, y, z);
+	}
+
+	/**
+	 * Dispose the resources
+	 */
 	public void dispose() {
 
 		unbind();
@@ -141,5 +216,5 @@ public class ShaderProgram {
 
 			glDeleteProgram(programID);
 		}
-	} // END OF dispose METHOD
-} // END OF ShaderProgram
+	}
+}

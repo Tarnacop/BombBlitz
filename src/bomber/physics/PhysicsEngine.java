@@ -15,8 +15,8 @@ import java.util.*;
 public class PhysicsEngine
 {
 
-    private GameState gameState;
-    private HashMap<String, Boolean> okToPlaceBomb;
+    private final GameState gameState;
+    private final HashMap<String, Boolean> okToPlaceBomb;
 
     /**
      * Creates an engine using a GameState
@@ -27,13 +27,14 @@ public class PhysicsEngine
     {
         this.gameState = gameState;
         okToPlaceBomb = new HashMap<>();
-        gameState.getPlayers().forEach(player -> okToPlaceBomb.put(player.getName(), true));
+        gameState.getPlayers().forEach(player ->
+                okToPlaceBomb.put(player.getName(), true));
     }
 
     /**
      * Updates all the objects in the game world
      *
-     * @param milliseconds The amount of time in milliseconds from the last update
+     * @param milliseconds The time in milliseconds since the last update
      */
     public synchronized void update(int milliseconds)
     {
@@ -42,69 +43,88 @@ public class PhysicsEngine
 
         // update bombs
         ArrayList<Bomb> toBeDeleted = new ArrayList<>();
-        gameState.getBombs().forEach(b -> updateBomb(b, toBeDeleted, milliseconds));
+        gameState.getBombs().forEach(b ->
+                updateBomb(b, toBeDeleted, milliseconds));
         toBeDeleted.forEach(b -> gameState.getBombs().remove(b));
 
         // update players
-        gameState.getPlayers().forEach(p -> updatePlayer(p, milliseconds));
+        gameState.getPlayers().forEach(p ->
+                updatePlayer(p, milliseconds));
 
         // update counter
         int gameCounter = gameState.getGameCounter() + milliseconds;
         gameState.setGameCounter(gameCounter);
-        if(gameCounter >= Constants.HOLES_SECOND_PHASE_BEGINNING)
+        if (gameCounter >= Constants.HOLES_SECOND_PHASE_BEGINNING)
         {
             int holeCounter = gameState.getHoleCounter() + milliseconds;
-            if(holeCounter >= Constants.HOLES_SECOND_PHASE_RANDOM_TIMER)
+            if (holeCounter >= Constants.HOLES_SECOND_PHASE_RANDOM_TIMER)
             {
                 holeCounter = 0;
                 Random generator = new Random();
                 Block[][] gridMap = gameState.getMap().getGridMap();
                 LinkedList<Point> possibleHoleLocations = new LinkedList<>();
-                for(int x=0;x<gridMap.length;x++)
-                    for(int y=0;y<gridMap[0].length;y++)
-                        if(okToPutHole(new Point(x,y), gridMap[x][y], true))
-                            possibleHoleLocations.add(new Point(x,y));
+                for (int x = 0; x < gridMap.length; x++)
+                    for (int y = 0; y < gridMap[0].length; y++)
+                        if (okToPutHole(new Point(x, y), gridMap[x][y], true))
+                            possibleHoleLocations.add(new Point(x, y));
                 if (!possibleHoleLocations.isEmpty())
                 {
-                    int randomIndex = generator.nextInt(possibleHoleLocations.size());
-                    gameState.getMap().setGridBlockAt(possibleHoleLocations.get(randomIndex), Block.HOLE);
+                    int randomIndex = generator
+                            .nextInt(possibleHoleLocations.size());
+                    gameState.getMap().setGridBlockAt(
+                            possibleHoleLocations.get(randomIndex), Block.HOLE);
                 }
             }
             gameState.setHoleCounter(holeCounter);
-        }
-        else if(gameCounter >= Constants.HOLES_FIRST_PHASE_BEGINNING)
+        } else if (gameCounter >= Constants.HOLES_FIRST_PHASE_BEGINNING)
         {
             int holeCounter = gameState.getHoleCounter() + milliseconds;
-            if(holeCounter >= Constants.HOLES_FIRST_PHASE_RANDOM_TIMER)
+            if (holeCounter >= Constants.HOLES_FIRST_PHASE_RANDOM_TIMER)
             {
                 holeCounter = 0;
                 Random generator = new Random();
                 Block[][] gridMap = gameState.getMap().getGridMap();
                 LinkedList<Point> possibleHoleLocations = new LinkedList<>();
-                for(int x=0;x<gridMap.length;x++)
-                    for(int y=0;y<gridMap[0].length;y++)
-                        if(okToPutHole(new Point(x,y), gridMap[x][y], false))
-                            possibleHoleLocations.add(new Point(x,y));
+                for (int x = 0; x < gridMap.length; x++)
+                    for (int y = 0; y < gridMap[0].length; y++)
+                        if (okToPutHole(new Point(x, y), gridMap[x][y], false))
+                            possibleHoleLocations.add(new Point(x, y));
                 if (!possibleHoleLocations.isEmpty())
                 {
                     int randomIndex = generator.nextInt(possibleHoleLocations.size());
-                    gameState.getMap().setGridBlockAt(possibleHoleLocations.get(randomIndex), Block.HOLE);
+                    gameState.getMap().setGridBlockAt(
+                            possibleHoleLocations.get(randomIndex), Block.HOLE);
                 }
             }
             gameState.setHoleCounter(holeCounter);
         }
     }
 
-    private boolean okToPutHole(Point blockPosition, Block block, boolean aggresive)
+    /**
+     * Checks if a hole can be put in a particular location
+     *
+     * @param blockPosition The location to be checked
+     * @param block         The block that is in that location
+     * @param aggressive    Whether the hole can be put on players or not
+     * @return Whether the block can be considered for putting a hole there
+     */
+    private boolean okToPutHole(Point blockPosition, Block block, boolean aggressive)
     {
-        if (block == Block.HOLE || block==Block.SOFT || block==Block.SOLID || block==Block.BLAST)
+        if (block == Block.HOLE || block == Block.SOFT
+                || block == Block.SOLID || block == Block.BLAST)
             return false;
-        if(aggresive)
+        if (aggressive)
             return true;
-        Rectangle2D blockRect = new Rectangle(blockPosition.x*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, blockPosition.y*Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, Constants.MAP_BLOCK_TO_GRID_MULTIPLIER, Constants.MAP_BLOCK_TO_GRID_MULTIPLIER);
-        for(Player player: gameState.getPlayers())
+        Rectangle2D blockRect = new Rectangle(
+                blockPosition.x * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,
+                blockPosition.y * Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,
+                Constants.MAP_BLOCK_TO_GRID_MULTIPLIER,
+                Constants.MAP_BLOCK_TO_GRID_MULTIPLIER);
+        for (Player player : gameState.getPlayers())
         {
-            Rectangle2D playerRect = new Rectangle(player.getPos().x, player.getPos().y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            Rectangle2D playerRect = new Rectangle(
+                    player.getPos().x, player.getPos().y,
+                    Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
             if (playerRect.intersects(blockRect))
                 return false;
         }
@@ -120,9 +140,7 @@ public class PhysicsEngine
     }
 
 
-    // -----------------------------
     // Player update related methods
-    // -----------------------------
 
     /**
      * Updates a player
@@ -138,14 +156,13 @@ public class PhysicsEngine
 
         // Initialise data
         Point pos = player.getPos();
-        Point initialPos = new Point(pos);
 
         // Update invulnerability period
         int invulnerability = player.getInvulnerability();
-        if (invulnerability>0)
+        if (invulnerability > 0)
             player.setInvulnerability(Math.max(0, invulnerability - milliseconds));
 
-        // -------- Movement --------
+        // Movement
         Movement movement = player.getKeyState().getMovement();
         if (movement != Movement.NONE)
         {
@@ -180,10 +197,12 @@ public class PhysicsEngine
             assert (fromDirection != null);
 
             // Collision with bombs
-            Rectangle translatedPlayerRect = new Rectangle(pos.x, pos.y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+            Rectangle translatedPlayerRect =
+                    new Rectangle(pos.x, pos.y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
             for (Bomb bomb : gameState.getBombs())
             {
-                Rectangle bombRect = new Rectangle(bomb.getPos().x, bomb.getPos().y, Constants.BOMB_WIDTH, Constants.BOMB_HEIGHT);
+                Rectangle bombRect =
+                        new Rectangle(bomb.getPos().x, bomb.getPos().y, Constants.BOMB_WIDTH, Constants.BOMB_HEIGHT);
                 if (!bombRect.intersects(initialPlayerRect))
                     while (bombRect.intersects(translatedPlayerRect))
                     {
@@ -206,7 +225,7 @@ public class PhysicsEngine
 
         }
 
-        // -------- Planting bombs --------
+        // Planting bombs
         if (player.getKeyState().isBomb() && okToPlaceBomb.get(player.getName()))
         {
             int bombCount = 0;
@@ -223,8 +242,8 @@ public class PhysicsEngine
             okToPlaceBomb.put(player.getName(), true);
 
 
-        // -------- Damage --------
-        if (player.getInvulnerability()==0 && playerTouchesBlock(pos, Block.BLAST) != null)
+        // Damage
+        if (player.getInvulnerability() == 0 && playerTouchesBlock(pos, Block.BLAST) != null)
         {
             player.setInvulnerability(Constants.INVULNERABILITY_LENGTH);
             player.setLives(player.getLives() - 1);
@@ -234,7 +253,7 @@ public class PhysicsEngine
         }
 
         // Collision with holes
-        if(player.getInvulnerability()==0 && playerTouchesBlock(pos, Block.HOLE)!=null)
+        if (player.getInvulnerability() == 0 && playerTouchesBlock(pos, Block.HOLE) != null)
         {
             player.setLives(player.getLives() - 1);
             if (player.getLives() == 0)
@@ -243,7 +262,7 @@ public class PhysicsEngine
             player.setInvulnerability(Constants.INVULNERABILITY_LENGTH);
         }
 
-        // -------- Getting power-ups --------
+        // Getting power-ups
         Point powerup;
         while ((powerup = playerTouchesBlock(pos, Block.MINUS_BOMB)) != null)
         {
@@ -259,19 +278,21 @@ public class PhysicsEngine
         }
         while ((powerup = playerTouchesBlock(pos, Block.MINUS_RANGE)) != null)
         {
-            player.setBombRange(Math.max(Constants.MINIMUM_BOMB_RANGE, player.getBombRange() - Constants.BOMB_RANGE_CHANGE));
+            player.setBombRange(Math.max(Constants.MINIMUM_BOMB_RANGE,
+                    player.getBombRange() - Constants.BOMB_RANGE_CHANGE));
             gameState.getAudioEvents().add(AudioEvent.POWERUP);
             gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
         }
         while ((powerup = playerTouchesBlock(pos, Block.PLUS_RANGE)) != null)
         {
-            player.setBombRange(Math.min(Constants.MAXIMUM_BOMB_RANGE, player.getBombRange() + Constants.BOMB_RANGE_CHANGE));
+            player.setBombRange(Math.min(Constants.MAXIMUM_BOMB_RANGE,
+                    player.getBombRange() + Constants.BOMB_RANGE_CHANGE));
             gameState.getAudioEvents().add(AudioEvent.POWERUP);
             gameState.getMap().setGridBlockAt(powerup, Block.BLANK);
         }
         while ((powerup = playerTouchesBlock(pos, Block.MINUS_SPEED)) != null)
         {
-            if(player.getSpeed()==Constants.HIGH_PLAYER_SPEED)
+            if (player.getSpeed() == Constants.HIGH_PLAYER_SPEED)
                 player.setSpeed(Constants.DEFAULT_PLAYER_SPEED);
             else
                 player.setSpeed(Constants.LOW_PLAYER_SPEED);
@@ -280,7 +301,7 @@ public class PhysicsEngine
         }
         while ((powerup = playerTouchesBlock(pos, Block.PLUS_SPEED)) != null)
         {
-            if(player.getSpeed()==Constants.LOW_PLAYER_SPEED)
+            if (player.getSpeed() == Constants.LOW_PLAYER_SPEED)
                 player.setSpeed(Constants.DEFAULT_PLAYER_SPEED);
             else
                 player.setSpeed(Constants.HIGH_PLAYER_SPEED);
@@ -330,7 +351,8 @@ public class PhysicsEngine
      */
     private void plantBomb(Player player)
     {
-        Bomb bomb = new Bomb(player.getName(), getBombLocation(player.getPos()), Constants.DEFAULT_BOMB_TIME, player.getBombRange());
+        Bomb bomb = new Bomb(player.getName(), getBombLocation(player.getPos()),
+                Constants.DEFAULT_BOMB_TIME, player.getBombRange());
         bomb.setPlayerID(player.getPlayerID());
         gameState.getBombs().add(bomb);
         gameState.getAudioEvents().add(AudioEvent.PLACE_BOMB);
@@ -346,7 +368,8 @@ public class PhysicsEngine
     {
         int xOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_WIDTH) / 2;
         int YOffset = (Constants.MAP_BLOCK_TO_GRID_MULTIPLIER - Constants.BOMB_HEIGHT) / 2;
-        return new Point((playerPosition.x + Constants.PLAYER_WIDTH / 2) / 64 * 64 + xOffset, (playerPosition.y + Constants.PLAYER_HEIGHT / 2) / 64 * 64 + YOffset);
+        return new Point((playerPosition.x + Constants.PLAYER_WIDTH / 2) / 64 * 64 + xOffset,
+                (playerPosition.y + Constants.PLAYER_HEIGHT / 2) / 64 * 64 + YOffset);
     }
 
     /**
@@ -359,7 +382,8 @@ public class PhysicsEngine
     private void revertPosition(Point fromDirection, Point corner, Point playerPos)
     {
         Map map = gameState.getMap();
-        while (map.getPixelBlockAt(corner.x, corner.y) == Block.SOLID || map.getPixelBlockAt(corner.x, corner.y) == Block.SOFT)
+        while (map.getPixelBlockAt(corner.x, corner.y) == Block.SOLID ||
+                map.getPixelBlockAt(corner.x, corner.y) == Block.SOFT)
         {
             translatePoint(corner, fromDirection);
             translatePoint(playerPos, fromDirection);
@@ -367,9 +391,7 @@ public class PhysicsEngine
     }
 
 
-    // ---------------------------
     // Bomb update related methods
-    // ---------------------------
 
     /**
      * Updates a bomb
@@ -410,7 +432,8 @@ public class PhysicsEngine
             gameState.getBlastList().add(new BlastTimer(pos));
         else
         {
-            if (gameState.getMap().getGridBlockAt(x, y) == Block.HOLE)  // this can't be destroyed but does not stop the blast
+            if (gameState.getMap().getGridBlockAt(x, y) == Block.HOLE)
+                // this can't be destroyed but does not stop the blast
                 gameState.getBlastList().add(new BlastTimer(pos, Block.HOLE));
             else
                 updateBlastList(pos, Block.BLANK);
@@ -444,14 +467,15 @@ public class PhysicsEngine
     /**
      * Updates the blast list entry corresponding to a position.
      * If an entry is already there, it updates the timer. If not, it adds a new entry.
-     * @param position
-     * @param reveal
+     *
+     * @param position The position of the block
+     * @param reveal   The block that will be revealed
      */
     private void updateBlastList(Point position, Block reveal)
     {
         Optional<BlastTimer> blastTimer = gameState.getBlastList().stream()
                 .filter(timer -> timer.getLocation().equals(position)).findAny();
-        if(blastTimer.isPresent())
+        if (blastTimer.isPresent())
             blastTimer.get().setTimer(Constants.EXPLOSION_LENGTH);
         else
             gameState.getBlastList().add(new BlastTimer(position, reveal));
@@ -468,9 +492,8 @@ public class PhysicsEngine
         bomb.setTime(bomb.getTime() - milliseconds);
     }
 
-    // --------------------------
+
     // Map update related methods
-    // --------------------------
 
     /**
      * Updates the map

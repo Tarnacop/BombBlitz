@@ -6,9 +6,9 @@ import java.util.LinkedList;
 import bomber.game.GameState;
 
 /**
- * The Class AIManager.
+ * AI of hard difficulty.
  *
- * @author Jokubas Liutkus The Class AIManager for making moves.
+ * @author Jokubas Liutkus.
  */
 public class HardAI extends AITemplate {
 
