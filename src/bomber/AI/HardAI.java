@@ -103,7 +103,7 @@ public class HardAI extends AITemplate {
 			}
 
 			// if enemy is in bomb range then place the bomb and go to the
-			//// // safe location
+			// safe location
 			else if (safetyCh.isEnemyInBombRange()) {
 				gameAI.getKeyState().setBomb(true);
 				moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
@@ -116,7 +116,7 @@ public class HardAI extends AITemplate {
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy and
-			// fullfill it
+			// fulfill it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
 				performPlannedMoves(moves);
 			}
