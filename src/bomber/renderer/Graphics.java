@@ -1,15 +1,17 @@
+/**
+ * Graphics.java
+ * 
+ * @author Alexandru Blinda
+ * 
+ */
+
 package bomber.renderer;
 
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import bomber.game.Constants;
 import bomber.renderer.interfaces.GameInterface;
 
-/**
- * Class that holds the Graphic Thread with all its features
- * 
- * @author Alexandru Blinda
- * 
- */
+
 public class Graphics implements Runnable {
 
 	private final Thread gameLoopThread;

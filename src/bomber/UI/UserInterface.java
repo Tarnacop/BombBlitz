@@ -233,6 +233,9 @@ public class UserInterface extends Application implements ClientNetInterface {
 		this.windowWidth = screenWidth * SCREEN_WIDTH_SCALAR;
 		this.boxHeight = windowHeight / MENU_BOX_HEIGHT_SCALAR;
 		this.boxWidth = windowWidth / MENU_BOX_WIDTH_SCALAR;
+
+		// Initialise the audio manager
+		AudioManager.init();
 	}
 
 	/**
