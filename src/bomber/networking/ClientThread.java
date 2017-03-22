@@ -245,13 +245,6 @@ public class ClientThread implements Runnable {
 			ArrayList<PacketHistoryEntry> packetList = serverInfo.getPacketHistoryList();
 			for (PacketHistoryEntry f : packetList) {
 				if (f != null && !f.isAcked() && f.getRetransmissionCount() < maxRetransmitCount) {
-					/*
-					 * pClientf(
-					 * "retransmitTask: Retransmitting packet %d created at %d with length %d and retransmission count %d to server %s\n"
-					 * , f.getSequence(), f.getCreationTimeStamp(),
-					 * f.getPacketLength(),
-					 * f.getRetransmissionCountAndIncrement(), serverSockAddr);
-					 */
 					try {
 						sendPacket(new DatagramPacket(f.getPacketData(), f.getPacketLength(), serverSockAddr));
 					} catch (IOException e) {
@@ -449,12 +442,8 @@ public class ClientThread implements Runnable {
 				return;
 			}
 
-			// pClient("message type ACK");
-
 			for (PacketHistoryEntry e : serverInfo.getPacketHistoryList()) {
 				if (e != null && !e.isAcked() && e.getSequence() == recvByteBuffer.getShort(3)) {
-					// pClientf("setting ACK to true for packet %d to server
-					// %s\n", e.getSequence(), sockAddr);
 					e.setAcked(true);
 				}
 			}
@@ -720,8 +709,6 @@ public class ClientThread implements Runnable {
 			serverInfo.insertPacket(sequence, packet);
 
 			// send the packet
-			// pClientf("sending with sequence %d to %s\n", sequence,
-			// packet.getSocketAddress());
 			socket.send(packet);
 
 		} else {
@@ -734,13 +721,9 @@ public class ClientThread implements Runnable {
 	}
 
 	private void pClient(String string) {
-		printStream.println("Client: " + string);
+		// printStream.println("Client: " + string);
+		printStream.print("");
 	}
-
-	/*
-	 * private void pClientf(String string, Object... args) {
-	 * printStream.printf("Client: " + string, args); }
-	 */
 
 	private synchronized void setConnected(boolean isConnected) {
 		if (isConnected) {
