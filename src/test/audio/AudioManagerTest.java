@@ -27,7 +27,7 @@ public class AudioManagerTest
         manager = new AudioManager();
     }
 
-    @Test
+    @Test 
     public void Constructor() throws Exception
     {
         assertTrue("Music clip was not initialised", manager.hasOpenedMusic());
@@ -131,8 +131,8 @@ public class AudioManagerTest
         list.add(AudioEvent.MOVEMENT);
         list.add(AudioEvent.POWERUP);
         list.add(AudioEvent.PLAYER_DEATH);
-        list.add(AudioEvent.PLACE_BOMB);
-        manager.playEventList(list);
+        list.add(AudioEvent.PLACE_BOMB); 
+        manager.playEventList(list); 
         assertTrue("EventList was not emptied after calling playEventList", list.isEmpty());
 
     }

@@ -53,7 +53,7 @@ public class MediumAI extends AITemplate {
 	protected void performPlannedMoves(LinkedList<AIActions> moves) {
 		AIActions action;
 
-		while (moves != null && !moves.isEmpty()  && gameAI.isAlive() ) {
+		while (moves != null && !moves.isEmpty() &&  !safetyCh.isEnemyInBombRange()  && gameAI.isAlive() ) {
 			pausedGame();
 			action = moves.removeFirst();
 			// if actions is bomb place it
@@ -93,7 +93,7 @@ public class MediumAI extends AITemplate {
 
 			pausedGame();
 			// if AI is in danger then escape only with 70% possibility
-      if (safetyCh.inDanger() && random.nextInt(100) < 80) {
+      if (safetyCh.inDanger() ) {
         moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
         performMoves(moves, true);
 
