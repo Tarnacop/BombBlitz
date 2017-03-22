@@ -179,9 +179,9 @@ public class ProtocolConstant {
 	 * flag false)))
 	 */
 	/*
-	 * TODO currently packet index and max index are hard-coded to 0 and number
-	 * of players in this packet to total number of players, since we don't
-	 * expect to have the number of players one packet does not fit(32 players)
+	 * Currently packet index and max index are hard-coded to 0 and number of
+	 * players in this packet to total number of players, since we don't expect
+	 * to have the number of players one packet does not fit(32 players)
 	 */
 
 	public static final byte MSG_S_LOBBY_ROOMLIST = 0x48; // Bit set
@@ -194,7 +194,7 @@ public class ProtocolConstant {
 	 * number of human players + array of up to 4 4 byte human player id)
 	 */
 	/*
-	 * TODO max number of rooms is limited to 32 for the same reason above.
+	 * Max number of rooms is limited to 32 for the same reason above.
 	 * Additionally, we cannot have more rooms than players since each room must
 	 * have at least one player
 	 */

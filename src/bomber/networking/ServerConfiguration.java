@@ -5,7 +5,7 @@ public class ServerConfiguration {
 
 	private final String gameName = "Bomb Blitz";
 
-	private final String version = "1.1";
+	private final String version = "1.3";
 
 	private long clientTimeOut;
 

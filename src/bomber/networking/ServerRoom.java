@@ -35,7 +35,6 @@ public class ServerRoom {
 	private List<Map> customMapList = new LinkedList<Map>();
 	// game session
 	private ServerGame game;
-	// TODO consistency between constructor, getter, setter and game's mapID
 
 	/**
 	 * Construct a room

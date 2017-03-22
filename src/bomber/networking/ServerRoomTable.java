@@ -9,8 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * of room) to ServerClientInfo respectively
  */
 public class ServerRoomTable {
-	// private ConcurrentHashMap<String, ServerRoom> nameTable = new
-	// ConcurrentHashMap<String, ServerRoom>();
 	private ConcurrentHashMap<Integer, ServerRoom> idTable = new ConcurrentHashMap<Integer, ServerRoom>();
 	private final int maxTableSize;
 
@@ -163,17 +161,6 @@ public class ServerRoomTable {
 
 		return idTable.containsValue(room);
 	}
-
-	/**
-	 * Returns true if the table contains a room with the name
-	 * 
-	 * @param name
-	 *            the name of the room
-	 * @return true if the table contains the room
-	 */
-	// public boolean contains(String name) {
-	// return nameTable.containsKey(name);
-	// }
 
 	/**
 	 * Returns true if the table contains a room with the id
