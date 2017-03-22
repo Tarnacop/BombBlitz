@@ -12,14 +12,14 @@ import java.util.Map;
 
 /**
  * Plays sound effects
- * Only to be used by <code>AudioManager</code>
+ * Only to be used by AudioManager
  *
  * @author Alexandru Rosu
  */
 class SoundEffectPlayer extends Thread
 {
 
-    private HashMap<AudioEvent, Clip> soundClips;
+    private final HashMap<AudioEvent, Clip> soundClips;
 
     /**
      * Constructs a sound effect player
@@ -29,7 +29,7 @@ class SoundEffectPlayer extends Thread
     SoundEffectPlayer(float volume)
     {
         soundClips = new HashMap<>();
-        for(AudioEvent event: AudioEvent.values())
+        for (AudioEvent event : AudioEvent.values())
         {
             String fileName;
             switch (event)
@@ -64,7 +64,7 @@ class SoundEffectPlayer extends Thread
             {
                 Clip clip = AudioSystem.getClip();
                 InputStream rawStream = Main.class.getResourceAsStream(Constants.AUDIO_FILES_PATH + fileName);
-                if(rawStream == null)
+                if (rawStream == null)
                     throw new IOException();
                 AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
                 clip.open(inputStream);
@@ -72,7 +72,8 @@ class SoundEffectPlayer extends Thread
                 FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
                 AudioManager.setControlVolume(gainControl, volume);
                 soundClips.put(event, clip);
-            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e)
+            {
                 System.err.println("Could not load sound: " + Constants.AUDIO_FILES_PATH + fileName);
                 e.printStackTrace();
             }
@@ -87,13 +88,18 @@ class SoundEffectPlayer extends Thread
     void play(AudioEvent audioEvent)
     {
         soundClips.get(audioEvent).stop();
-        soundClips.get(audioEvent).setFramePosition( 0 );
+        soundClips.get(audioEvent).setFramePosition(0);
         soundClips.get(audioEvent).start();
     }
 
+    /**
+     * Sets the volume of the sound effects
+     *
+     * @param percent The volume percent, ranging from 0 to 100
+     */
     void setVolume(float percent)
     {
-        for(Map.Entry<AudioEvent, Clip> entry:soundClips.entrySet())
+        for (Map.Entry<AudioEvent, Clip> entry : soundClips.entrySet())
         {
             Clip clip = entry.getValue();
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
@@ -102,19 +108,12 @@ class SoundEffectPlayer extends Thread
 
     }
 
+    /**
+     * Closes all the files
+     */
     void close()
     {
-       soundClips.entrySet().forEach(entry -> entry.getValue().close());
+        soundClips.entrySet().forEach(entry -> entry.getValue().close());
     }
-
-//    /**
-//     * Sets a new value for volume
-//     *
-//     * @param percent The volume percent, ranging from 0 to 100
-//     */
-//    void setVolume(float percent)
-//    {
-//        this.volume = percent;
-//    }
 
 }

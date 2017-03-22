@@ -4,7 +4,6 @@ import bomber.game.AudioEvent;
 
 import javax.sound.sampled.FloatControl;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Manages all the sounds played by the game
@@ -20,9 +19,16 @@ public class AudioManager
     private static MusicPlayer music;
     private static SoundEffectPlayer effects;
 
-    private AudioManager() {}
+    /**
+     * This constructor is private because the class should not be instantiated
+     */
+    private AudioManager()
+    {
+    }
 
-
+    /**
+     * Initialises the manager
+     */
     public static void init()
     {
         music = new MusicPlayer(musicVolume);
@@ -30,6 +36,12 @@ public class AudioManager
         effects.start();
     }
 
+    /**
+     * Checks if a percent is valid. Issues a warning to System.err if not
+     *
+     * @param percent The percent value
+     * @return Whether the percent it is valid
+     */
     private static boolean isValidPercent(float percent)
     {
         if (percent > 100 || percent < 0)
@@ -48,7 +60,7 @@ public class AudioManager
      */
     public static void setMusicVolume(float percent)
     {
-        if(isValidPercent(percent))
+        if (isValidPercent(percent))
         {
             musicVolume = percent;
             music.setVolume(percent);
@@ -64,7 +76,7 @@ public class AudioManager
     public static void setEffectsVolume(float percent)
     {
         System.out.println("effects volume set to " + percent);
-        if(isValidPercent(percent))
+        if (isValidPercent(percent))
         {
             effectsVolume = percent;
             effects.setVolume(percent);
@@ -79,7 +91,7 @@ public class AudioManager
      */
     public static void setVolume(float percent)
     {
-        if(isValidPercent(percent))
+        if (isValidPercent(percent))
         {
             musicVolume = percent;
             music.setVolume(percent);
@@ -113,7 +125,7 @@ public class AudioManager
      */
     public static void playMusic()
     {
-        if (music.getState()==Thread.State.NEW)
+        if (music.getState() == Thread.State.NEW)
             music.start();
         else
             music.replay();
@@ -183,7 +195,7 @@ public class AudioManager
     }
 
     /**
-     * Changes the gain of a <code>Clip</code> according to the volume percent
+     * Changes the gain of a Clip according to the volume percent
      *
      * @param gainControl The MASTER_GAIN control of the <code>Clip</code>
      * @param volume      The volume percent, ranging from 0 to 100
@@ -198,32 +210,31 @@ public class AudioManager
         //System.out.println(linearMin + " -- " + linearVolume + " -- " + linearMax);
         //System.out.println(gainControl.getMinimum() + " -- " + (float)(20*Math.log10(linearVolume)) + " -- " + gainControl.getMaximum());
 
-        float min = gainControl.getMinimum();
-        float max = gainControl.getMaximum();
+        //float min = gainControl.getMinimum();
+        //float max = gainControl.getMaximum();
 
         //gainControl.setValue(min + (max-min)*volume/100); // db; decreases faster
         gainControl.setValue((float) (20 * Math.log10(linearVolume))); // linear formula; not so precise with little volume
     }
 
+    /**
+     * Checks if the music file has been opened
+     *
+     * @return Whether it has been opened or not
+     */
     public static boolean hasOpenedMusic()
     {
-        return music!=null && music.hasOpened();
+        return music != null && music.hasOpened();
     }
 
+    /**
+     * Checks if the music in playing
+     *
+     * @return Whether the music is playing
+     */
     public static boolean isPlayingMusic()
     {
-        return music.isAlive();
-    }
-
-    public static void main(String[] args) throws Exception
-    {
-        AudioManager.init();
-        AudioManager.setVolume(50);
-        AudioManager.playMusic();
-        TimeUnit.SECONDS.sleep(1);
-        //AudioManager.pauseMusic();
-        AudioManager.playMusic();
-        TimeUnit.SECONDS.sleep(1);
+        return music.getState() == Thread.State.NEW;
     }
 
 }
