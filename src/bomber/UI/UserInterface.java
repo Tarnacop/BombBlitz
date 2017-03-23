@@ -1609,9 +1609,11 @@ public class UserInterface extends Application implements ClientNetInterface {
 			List<ClientServerAI> ais = room.getAIPlayerList();
 			for (ClientServerAI ai : ais) {
 				try {
+					if(!client.isInGame()){
 					System.out.println("REQUESTING CHANGE AI: " + ai.getID()
 							+ " TO " + aiDiff);
 					client.setAIDifficulty(ai.getID(), aiDiff);
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
