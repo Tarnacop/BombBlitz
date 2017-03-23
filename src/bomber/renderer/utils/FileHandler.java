@@ -28,7 +28,7 @@ public class FileHandler {
 
 		try (InputStream in = new FileInputStream(path);
 
-				BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 
