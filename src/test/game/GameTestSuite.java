@@ -9,7 +9,6 @@ import org.junit.runners.Suite;
 	BombTest.class,
 	GameStateTest.class,
 	KeyboardStateTest.class,
-	KeyboardUpdaterTest.class,
 	PlayerTest.class,
 	MapTest.class,
 	SettingsParserTest.class
