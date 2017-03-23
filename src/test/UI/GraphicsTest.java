@@ -8,6 +8,7 @@ public class GraphicsTest {
 
 	@Test
 	public void test() {
+		@SuppressWarnings("unused")
 		GameInterface game = new TestGame();
 	}
 

@@ -1,12 +1,11 @@
 package bomber.renderer.utils;
 
-import bomber.game.main;
-
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import bomber.game.Main;
 
 /**
  * Class to handle the loading of the shader programs
@@ -28,7 +27,7 @@ public class FileHandler {
 
 		StringBuilder builder = new StringBuilder();
 
-		try (InputStream in = main.class.getResourceAsStream(path);
+		try (InputStream in = Main.class.getResourceAsStream(path);
 
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 

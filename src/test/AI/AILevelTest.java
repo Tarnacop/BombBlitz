@@ -43,9 +43,6 @@ public class AILevelTest{
 	/** The ai. */
 	private Player ai;
 	
-	/** The finder. */
-	private RouteFinder finder;
-	
 	/** The checker. */
 	private SafetyChecker checker;
 	
@@ -113,7 +110,7 @@ public class AILevelTest{
 //		player = new Player("name", new Point(12*scalar,12*scalar),1,30000, null );
 //		players.add(player);
 		checker = new SafetyChecker(state, (GameAI)ai);
-		finder = new RouteFinder(state, (GameAI)ai,checker);
+		new RouteFinder(state, (GameAI)ai,checker);
 
 		this.physics = new PhysicsEngine(state);	
 		state.setBombs(bombs);

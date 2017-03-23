@@ -192,6 +192,7 @@ public class PhysicsEngine
                     pos.translate(speed, 0);
                     fromDirection = new Point(-1, 0);
                     break;
+                default: break;
             }
 
             assert (fromDirection != null);

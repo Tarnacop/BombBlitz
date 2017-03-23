@@ -8,7 +8,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -17,7 +16,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 import bomber.game.Constants;
-import bomber.game.main;
+import bomber.game.Main;
 
 /**
  * Class to create the texture for a font
@@ -50,7 +49,7 @@ public class FontTexture {
 	 */
 	public FontTexture(String path, int size, int fontType) throws Exception {
 
-		this(Font.createFont(Font.TRUETYPE_FONT, main.class.getResourceAsStream(path))
+		this(Font.createFont(Font.TRUETYPE_FONT, Main.class.getResourceAsStream(path))
 						.deriveFont(fontType, size));
 
 	}
