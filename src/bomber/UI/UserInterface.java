@@ -146,8 +146,8 @@ import bomber.networking.ClientThread;
 
 /**
  *
- * @author Owen
- * @version 1.3
+ * @author Owen Jenkins
+ * @version 1.4
  * @since 2017-03-23
  *
  *        UserInterface class for "Bomb Blitz" Game Application (2017 Year 2

@@ -179,7 +179,7 @@ public abstract class Constants
 	public static final String SPAWN_PATH = "/images/spawnpoint.png";
 	
 	//Game Credits
-	public static final float VERSION_NUMBER = 1.3f;
+	public static final float VERSION_NUMBER = 1.4f;
 	public static final String CREDITS = "Credits:\n"
 			+ "\nGraphics - Alexandru Blinda"
 			+ "\nPhysics/Audio - Alexandru Rosu"
