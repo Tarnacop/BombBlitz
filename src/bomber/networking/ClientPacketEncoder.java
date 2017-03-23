@@ -346,8 +346,6 @@ public class ClientPacketEncoder {
 	 */
 	public static GameState decodeGameState(GameState gameState, byte[] src, int length) throws IOException {
 		if (gameState == null) {
-			// gameState = new GameState(new Map("map", new
-			// Block[gridMapWidth][gridMapHeight], null), null);
 			return decodeGameState(src, length);
 		}
 
@@ -448,58 +446,58 @@ public class ClientPacketEncoder {
 			while (playerList.size() < numPlayer) {
 				playerList.add(null);
 			}
-		}
-		for (int i = 0; i < numPlayer; i++) {
-			Player player;
-			synchronized (playerList) {
+
+			for (int i = 0; i < numPlayer; i++) {
+				Player player;
+
 				player = playerList.get(i);
 				if (player == null) {
 					player = new Player(null, new Point(0, 0), 3, 321);
 					playerList.set(i, player);
 				}
-			}
 
-			int id = buffer.getInt();
-			int posX = buffer.getInt();
-			int posY = buffer.getInt();
-			int lives = buffer.getInt();
-			double speed = buffer.getDouble();
-			int bombRange = buffer.getInt();
-			int maxBomb = buffer.getInt();
-			short keyState = buffer.getShort();
-			byte alive = buffer.get();
+				int id = buffer.getInt();
+				int posX = buffer.getInt();
+				int posY = buffer.getInt();
+				int lives = buffer.getInt();
+				double speed = buffer.getDouble();
+				int bombRange = buffer.getInt();
+				int maxBomb = buffer.getInt();
+				short keyState = buffer.getShort();
+				byte alive = buffer.get();
 
-			boolean isAlive = alive == 1;
-			KeyboardState k = player.getKeyState();
-			if (k == null) {
-				k = new KeyboardState();
-				player.setKeyState(k);
-			}
+				boolean isAlive = alive == 1;
+				KeyboardState k = player.getKeyState();
+				if (k == null) {
+					k = new KeyboardState();
+					player.setKeyState(k);
+				}
 
-			k.setMovement(Movement.NONE);
-			k.setBomb(false);
-			if (BitArray.getBit(keyState, 0)) {
 				k.setMovement(Movement.NONE);
-			} else if (BitArray.getBit(keyState, 1)) {
-				k.setMovement(Movement.UP);
-			} else if (BitArray.getBit(keyState, 2)) {
-				k.setMovement(Movement.DOWN);
-			} else if (BitArray.getBit(keyState, 3)) {
-				k.setMovement(Movement.LEFT);
-			} else if (BitArray.getBit(keyState, 4)) {
-				k.setMovement(Movement.RIGHT);
-			}
-			k.setBomb(BitArray.getBit(keyState, 5));
+				k.setBomb(false);
+				if (BitArray.getBit(keyState, 0)) {
+					k.setMovement(Movement.NONE);
+				} else if (BitArray.getBit(keyState, 1)) {
+					k.setMovement(Movement.UP);
+				} else if (BitArray.getBit(keyState, 2)) {
+					k.setMovement(Movement.DOWN);
+				} else if (BitArray.getBit(keyState, 3)) {
+					k.setMovement(Movement.LEFT);
+				} else if (BitArray.getBit(keyState, 4)) {
+					k.setMovement(Movement.RIGHT);
+				}
+				k.setBomb(BitArray.getBit(keyState, 5));
 
-			// player.setName("player " + id);
-			player.getPos().x = posX;
-			player.getPos().y = posY;
-			player.setLives(lives);
-			player.setSpeed(speed);
-			player.setPlayerID(id);
-			player.setBombRange(bombRange);
-			player.setMaxNrOfBombs(maxBomb);
-			player.setAlive(isAlive);
+				// player.setName("player " + id);
+				player.getPos().x = posX;
+				player.getPos().y = posY;
+				player.setLives(lives);
+				player.setSpeed(speed);
+				player.setPlayerID(id);
+				player.setBombRange(bombRange);
+				player.setMaxNrOfBombs(maxBomb);
+				player.setAlive(isAlive);
+			}
 		}
 
 		// Bombs
@@ -515,53 +513,55 @@ public class ClientPacketEncoder {
 			while (bombList.size() < numBomb) {
 				bombList.add(null);
 			}
-		}
-		for (int i = 0; i < numBomb; i++) {
-			Bomb bomb;
-			synchronized (bombList) {
-				bomb = bombList.get(i);
+
+			for (int i = 0; i < numBomb; i++) {
+				Bomb bomb = bombList.get(i);
 				if (bomb == null) {
 					bomb = new Bomb(null, new Point(0, 0), 0, 0);
 					bombList.set(i, bomb);
 				}
+
+				int playerID = buffer.getInt();
+				int posX = buffer.getInt();
+				int posY = buffer.getInt();
+				int time = buffer.getInt();
+				int radius = buffer.getInt();
+
+				// bomb.setPlayerName("bomb from " + playerID);
+				bomb.getPos().x = posX;
+				bomb.getPos().y = posY;
+				bomb.setTime(time);
+				bomb.setRadius(radius);
+				bomb.setPlayerID(playerID);
 			}
-
-			int playerID = buffer.getInt();
-			int posX = buffer.getInt();
-			int posY = buffer.getInt();
-			int time = buffer.getInt();
-			int radius = buffer.getInt();
-
-			// bomb.setPlayerName("bomb from " + playerID);
-			bomb.getPos().x = posX;
-			bomb.getPos().y = posY;
-			bomb.setTime(time);
-			bomb.setRadius(radius);
-			bomb.setPlayerID(playerID);
 		}
 
 		// Audio Events
 		buffer.position(7 + 130 + 1 + 35 * numPlayer + 1 + 20 * numBomb);
 		short audioState = buffer.getShort();
 
-		List<AudioEvent> audioEventList = new ArrayList<>(16);
-		if (BitArray.getBit(audioState, 0)) {
-			audioEventList.add(AudioEvent.PLACE_BOMB);
+		if (gameState.getAudioEvents() == null) {
+			gameState.setAudioEvents(new ArrayList<>(8));
 		}
-		if (BitArray.getBit(audioState, 1)) {
-			audioEventList.add(AudioEvent.EXPLOSION);
+		List<AudioEvent> audioEventList = gameState.getAudioEvents();
+		synchronized (audioEventList) {
+			if (BitArray.getBit(audioState, 0) && !audioEventList.contains(AudioEvent.PLACE_BOMB)) {
+				audioEventList.add(AudioEvent.PLACE_BOMB);
+			}
+			if (BitArray.getBit(audioState, 1) && !audioEventList.contains(AudioEvent.EXPLOSION)) {
+				audioEventList.add(AudioEvent.EXPLOSION);
+			}
+			if (BitArray.getBit(audioState, 2) && !audioEventList.contains(AudioEvent.PLAYER_DEATH)) {
+				audioEventList.add(AudioEvent.PLAYER_DEATH);
+			}
+			/*
+			 * if (BitArray.getBit(audioState, 3)) { // movement sound removed
+			 * // audioEventList.add(AudioEvent.MOVEMENT); }
+			 */
+			if (BitArray.getBit(audioState, 4) && !audioEventList.contains(AudioEvent.POWERUP)) {
+				audioEventList.add(AudioEvent.POWERUP);
+			}
 		}
-		if (BitArray.getBit(audioState, 2)) {
-			audioEventList.add(AudioEvent.PLAYER_DEATH);
-		}
-		if (BitArray.getBit(audioState, 3)) {
-			// movement sound removed
-			// audioEventList.add(AudioEvent.MOVEMENT);
-		}
-		if (BitArray.getBit(audioState, 4)) {
-			audioEventList.add(AudioEvent.POWERUP);
-		}
-		gameState.setAudioEvents(audioEventList);
 
 		return gameState;
 	}

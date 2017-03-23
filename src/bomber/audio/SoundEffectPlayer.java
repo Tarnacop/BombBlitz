@@ -2,7 +2,6 @@ package bomber.audio;
 
 import bomber.game.AudioEvent;
 import bomber.game.Constants;
-import sun.applet.Main;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;

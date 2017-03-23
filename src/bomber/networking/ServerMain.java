@@ -1,5 +1,6 @@
 package bomber.networking;
 
+import java.io.IOException;
 import java.net.SocketException;
 import java.util.Scanner;
 
@@ -15,8 +16,13 @@ public class ServerMain {
 		if (args.length > 0) {
 			port = Integer.parseInt(args[0]);
 		} else {
-			System.out.println("Usage: <port>");
-			System.exit(1);
+			try {
+				port = getPort();
+			} catch (IOException e) {
+				System.out.println(e);
+				System.out.println("Usage: <port>");
+				System.exit(1);
+			}
 		}
 
 		ServerConfiguration config = new ServerConfiguration();
@@ -100,5 +106,29 @@ public class ServerMain {
 		System.out.println("Type \"exit\" to terminate the server");
 		System.out.println("Type \"tickrate\" to show the tickrate of the server");
 		System.out.println("Type \"tickrate <tickrate>\" to set the tickrate");
+	}
+
+	@SuppressWarnings("resource")
+	private static int getPort() throws IOException {
+		int port = -1;
+
+		System.out.println("No port number specified in command line arguments");
+		System.out.println("Please type a port number in the range [1,65535] and press enter");
+		Scanner scanner = new Scanner(System.in);
+		if (scanner.hasNextLine()) {
+			try {
+				port = Integer.parseInt(scanner.nextLine());
+			} catch (NumberFormatException e) {
+				throw new IOException("Failed to parse port number");
+			}
+		} else {
+			throw new IOException("Failed to get port number");
+		}
+
+		if (port < 1 || port > 65535) {
+			throw new IOException("Invalid port number");
+		}
+
+		return port;
 	}
 }
