@@ -1418,7 +1418,7 @@ public class Renderer {
 
 						textureMeshes.get("blastMesh1").render();
 						mapMapping[i][j]++;
-					} else if (mapMapping[i][j] == 5 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
+					} else if (mapMapping[i][j] == 4 || mapMapping[i][j] == 5 || mapMapping[i][j] == 6) {
 
 						textureMeshes.get("blastMesh2").render();
 						mapMapping[i][j]++;
