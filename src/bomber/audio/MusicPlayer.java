@@ -4,6 +4,7 @@ import bomber.game.Constants;
 import sun.applet.Main;
 
 import javax.sound.sampled.*;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,7 +29,7 @@ class MusicPlayer extends Thread
         try
         {
             clip = AudioSystem.getClip();
-            InputStream rawStream = Main.class.getResourceAsStream(Constants.AUDIO_FILES_PATH + Constants.MUSIC_FILENAME);
+            InputStream rawStream = new BufferedInputStream(Main.class.getResourceAsStream(Constants.AUDIO_FILES_PATH + Constants.MUSIC_FILENAME));
             if (rawStream == null)
                 throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);

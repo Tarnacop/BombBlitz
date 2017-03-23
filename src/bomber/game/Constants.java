@@ -36,7 +36,7 @@ public abstract class Constants
 	public static final int HOLES_SECOND_PHASE_RANDOM_TIMER = 1000;
 
     // Audio files
-    public static final String AUDIO_FILES_PATH = "/resources/sounds/";
+    public static final String AUDIO_FILES_PATH = "/sounds/";
     public static final String MUSIC_FILENAME = "music.wav";
     public static final String EXPLOSION_FILENAME = "explosion.wav";
     public static final String BOMB_PLACE_FILENAME = "place_bomb.wav";
@@ -48,7 +48,7 @@ public abstract class Constants
     public static final String GAME_OVER_LOST_FILENAME = "lose.wav";
 
     // Other files
-    public static final String SETTING_XML_PATH = "src/resources/settings.xml";
+    public static final String SETTING_XML_PATH = "/settings.xml";
 
     // Default settings
     public static final float DEFAULT_VOLUME = 75;
@@ -163,20 +163,20 @@ public abstract class Constants
 	public static final float MAP_Y_PADDING = 50;
 	
 	//UI Files Paths
-	public static final String BOMB_PATH = "resources/images/bomb.png";
-	public static final String BACKGROUND_PATH = "resources/images/background.png";
-	public static final String LOGO_PATH = "resources/images/logo.png";
-	public static final String TUTORIAL_PATH = "resources/images/tutorial.png";
-	public static final String WASD_TUTORIAL_PATH = "resources/images/alttutorial.png";
-	public static final String STORY_PATH = "resources/images/story.png";
-	public static final String FONT_PATH = "../../resources/minecraft.ttf";
-	public static final String CSS_PATH = "../../resources/stylesheet.css";
-	public static final String UNLIT_TORCH_PATH = "resources/images/darktorch.png";
-	public static final String TORCH_PATH = "resources/images/torch.png";
-	public static final String KEY_PATH = "resources/images/key.png";
-	public static final String ONLINE_KEY_PATH = "resources/images/onlinekey.png";
-	public static final String PLAYER_SPAWN_PATH = "resources/images/playerspawnpoint.png";
-	public static final String SPAWN_PATH = "resources/images/spawnpoint.png";
+	public static final String BOMB_PATH = "/images/bomb.png";
+	public static final String BACKGROUND_PATH = "/images/background.png";
+	public static final String LOGO_PATH = "/images/logo.png";
+	public static final String TUTORIAL_PATH = "/images/tutorial.png";
+	public static final String WASD_TUTORIAL_PATH = "/images/alttutorial.png";
+	public static final String STORY_PATH = "/images/story.png";
+	public static final String FONT_PATH = "/minecraft.ttf";
+	public static final String CSS_PATH = "/stylesheet.css";
+	public static final String UNLIT_TORCH_PATH = "/images/darktorch.png";
+	public static final String TORCH_PATH = "/images/torch.png";
+	public static final String KEY_PATH = "/images/key.png";
+	public static final String ONLINE_KEY_PATH = "/images/onlinekey.png";
+	public static final String PLAYER_SPAWN_PATH = "/images/playerspawnpoint.png";
+	public static final String SPAWN_PATH = "/images/spawnpoint.png";
 	
 	//Game Credits
 	public static final float VERSION_NUMBER = 1.3f;

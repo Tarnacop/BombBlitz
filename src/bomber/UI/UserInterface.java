@@ -176,7 +176,9 @@ public class UserInterface extends Application implements ClientNetInterface {
 		SettingsParser.init();
 
 		// Resource management.
-		this.font = Font.loadFont(UserInterface.class.getResource(FONT_PATH)
+		//this.font = Font.loadFont(Thread.currentThread().getContextClassLoader().getResource(FONT_PATH)
+		//		.toExternalForm(), FONT_SIZE);
+		this.font = Font.loadFont(getClass().getResource(FONT_PATH)
 				.toExternalForm(), FONT_SIZE);
 		this.smallFont = Font.loadFont(
 				UserInterface.class.getResource(FONT_PATH).toExternalForm(),
@@ -1200,7 +1202,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 					break;
 				}
 				Rectangle rect = new Rectangle(xscalar, yscalar);
-				rect.setFill(new ImagePattern(new Image("resources/images/"
+				rect.setFill(new ImagePattern(new Image("/images/"
 						+ image + ".png")));
 
 				rect.setStroke(Color.BLACK);
