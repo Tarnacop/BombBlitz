@@ -111,8 +111,8 @@ public class Renderer {
 
 		textureShader = new ShaderProgram();
 
-		textureShader.createVertexShader(FileHandler.loadShaderResource("src/resources/shaders/texture_vertex.vs"));
-		textureShader.createFragmentShader(FileHandler.loadShaderResource("src/resources/shaders/texture_fragment.fs"));
+		textureShader.createVertexShader(FileHandler.loadShaderResource("/shaders/texture_vertex.vs"));
+		textureShader.createFragmentShader(FileHandler.loadShaderResource("/shaders/texture_fragment.fs"));
 		textureShader.link();
 
 		textureShader.createUniform("projection");
@@ -129,8 +129,8 @@ public class Renderer {
 	private void setupHudShader() throws Exception {
 
 		hudShader = new ShaderProgram();
-		hudShader.createVertexShader(FileHandler.loadShaderResource("src/resources/shaders/hud_vertex.vs"));
-		hudShader.createFragmentShader(FileHandler.loadShaderResource("src/resources/shaders/hud_fragment.fs"));
+		hudShader.createVertexShader(FileHandler.loadShaderResource("/shaders/hud_vertex.vs"));
+		hudShader.createFragmentShader(FileHandler.loadShaderResource("/shaders/hud_fragment.fs"));
 		hudShader.link();
 
 		hudShader.createUniform("projModelMatrix");
@@ -146,16 +146,17 @@ public class Renderer {
 	 */
 	private void setupTextures() throws Exception {
 
-		Texture background = new Texture("src/resources/images/gamebackground.png");
-		Texture box = new Texture("src/resources/images/mapbox.png");
-		Texture fancybox = new Texture("src/resources/images/fancybox.png");
-		Texture heart = new Texture("src/resources/images/heart.png");
-		Texture ingameBomb = new Texture("src/resources/images/bomb.png");
-		Texture boot = new Texture("src/resources/images/boot.png");
-		Texture blast = new Texture("src/resources/images/blast.png");
-		Texture newspritesheet = new Texture("src/resources/images/newspritesheet.png");
-		Texture controls = new Texture("src/resources/images/controls.png");
-		Texture altcontrols = new Texture("src/resources/images/altcontrols.png");
+
+		Texture background = new Texture(getClass().getResourceAsStream("/images/gamebackground.png"));
+		Texture box = new Texture(getClass().getResourceAsStream("/images/mapbox.png"));
+		Texture fancybox = new Texture(getClass().getResourceAsStream("/images/fancybox.png"));
+		Texture heart = new Texture(getClass().getResourceAsStream("/images/heart.png"));
+		Texture ingameBomb = new Texture(getClass().getResourceAsStream("/images/bomb.png"));
+		Texture boot = new Texture(getClass().getResourceAsStream("/images/boot.png"));
+		Texture blast = new Texture(getClass().getResourceAsStream("/images/blast.png"));
+		Texture newspritesheet = new Texture(getClass().getResourceAsStream("/images/newspritesheet.png"));
+		Texture controls = new Texture(getClass().getResourceAsStream("/images/controls.png"));
+		Texture altcontrols = new Texture(getClass().getResourceAsStream("/images/altcontrols.png"));
 
 		// Blocks
 		TextureMesh blankMesh = new TextureMesh(Constants.GENERAL_BLOCK_WIDTH, Constants.GENERAL_BLOCK_HEIGHT,
@@ -762,10 +763,10 @@ public class Renderer {
 	 */
 	private void setupHuds() throws Exception {
 
-		FontTexture hudFontTexture = new FontTexture("src/resources/minecraftbig.ttf", 25, Font.PLAIN);
+		FontTexture hudFontTexture = new FontTexture("/minecraftbig.ttf", 25, Font.PLAIN);
 		hudTextItem = new TextItem("", hudFontTexture);
 
-		hudFontTexture = new FontTexture("src/resources/minecraftbig.ttf", 35, Font.PLAIN);
+		hudFontTexture = new FontTexture("/minecraftbig.ttf", 35, Font.PLAIN);
 		hudTextItemBig = new TextItem("", hudFontTexture);
 	}
 
