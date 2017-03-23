@@ -89,7 +89,8 @@ public class SafetyChecker {
     return (newPosition.x >= getMap().length || newPosition.y >= getMap()[0].length
         || newPosition.x < 0 || newPosition.y < 0) ? false
             : (!positionSafety(newPosition)
-                && getMap()[newPosition.x][newPosition.y] != Block.BLAST);
+                && getMap()[newPosition.x][newPosition.y] != Block.BLAST &&
+                   getMap()[newPosition.x][newPosition.y] != Block.HOLE);
   }
 
   /**

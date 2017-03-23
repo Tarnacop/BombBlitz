@@ -43,7 +43,7 @@ public class ExtremeAI extends AITemplate {
       while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
         pausedGame();
         makeSingleMove(moves.removeFirst());
-      }
+      }  
     }
 
     // else move until the enemy is reachable, or the AI is in danger
