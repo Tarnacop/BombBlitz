@@ -18,7 +18,7 @@ public class ServerConfiguration {
 
 	private final long retransmitInterval;
 
-	private int tickRate;
+	private int tickRate = 60;
 
 	private int maxRetransmitCount;
 
@@ -93,14 +93,14 @@ public class ServerConfiguration {
 	/**
 	 * Construct a configuration for the server before running, with default
 	 * clientTimeOut 25 seconds, keepAliveInterval 10 seconds,
-	 * retransmitInterval 500 milliseconds, tickRate 30, maxRetransmitCount 10
+	 * retransmitInterval 500 milliseconds, tickRate 60, maxRetransmitCount 10
 	 * and maxPlayer 32
 	 */
 	public ServerConfiguration() {
 		this.clientTimeOut = 25;
 		this.keepAliveInterval = 10;
 		this.retransmitInterval = 500;
-		this.tickRate = 30;
+		this.tickRate = 60;
 		this.maxRetransmitCount = 10;
 		this.maxPlayer = 32;
 	}
@@ -164,11 +164,13 @@ public class ServerConfiguration {
 	 * Set the tick rate at which the game will run
 	 * 
 	 * @param tickRate
-	 *            the tick rate in the range [1,1000]
+	 *            the tick rate in the range [20,1000]
 	 */
 	public void setTickRate(int tickRate) {
-		if (tickRate < 1 || tickRate > 1000) {
-			this.tickRate = 30;
+		if (tickRate < 20) {
+			this.tickRate = 20;
+		} else if (tickRate > 1000) {
+			this.tickRate = 1000;
 		} else {
 			this.tickRate = tickRate;
 		}

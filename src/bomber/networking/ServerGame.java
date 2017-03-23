@@ -71,8 +71,8 @@ public class ServerGame implements Runnable {
 		this.playerList = playerList;
 		this.aiList = aiList;
 		this.tickRate = tickRate;
-		if (this.tickRate < 1) {
-			this.tickRate = 1;
+		if (this.tickRate < 20) {
+			this.tickRate = 20;
 		} else if (this.tickRate > 1000) {
 			this.tickRate = 1000;
 		}
