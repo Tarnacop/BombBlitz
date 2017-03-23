@@ -30,8 +30,10 @@ public class OnlineGame implements GameInterface {
 	private boolean gameEnded;
 	private String playerName;
 	private List<ClientServerPlayer> onlinePlayers;
+	private float musicVolume;
+	private float soundVolume;
 
-	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName,
+	public OnlineGame(UserInterface ui, ClientThread client, GameState gameState, String playerName, float musicVolume, float soundVolume,
 			List<ClientServerPlayer> onlinePlayers, HashMap<Response, Integer> controls, boolean fullScreen, int width,
 			int height) {
 
@@ -45,7 +47,9 @@ public class OnlineGame implements GameInterface {
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer(false);
-
+		this.mutePressed = false;
+		this.musicVolume = musicVolume;
+		this.soundVolume = soundVolume;
 
 		try {
 
@@ -103,6 +107,7 @@ public class OnlineGame implements GameInterface {
 	private float gameOverCounter = 0;
 	private boolean playMusic = true;
 	private Player player;
+	private boolean mutePressed;
 
 	@Override
 	public void update(float interval) {
@@ -150,6 +155,7 @@ public class OnlineGame implements GameInterface {
 	@Override
 	public void input(Screen screen) {
 
+		this.mutePressed = this.input.muteCheck(screen, this.keyState, this.controlScheme, this.mutePressed, this.musicVolume, this.soundVolume);
 		this.bombPressed = this.input.update(screen, this.keyState, this.controlScheme, this.bombPressed);
 		try {
 			this.client.sendMove(keyState);
@@ -161,7 +167,7 @@ public class OnlineGame implements GameInterface {
 	@Override
 	public void dispose() {
 		AudioManager.pauseMusic();
-		this.ui.show(this.fullScreen, true, this.gameEnded);
+		this.ui.show(this.fullScreen, this.keyState.isMuted(), true, this.gameEnded);
 		System.out.println("RETURNED TO MENU");
 		renderer.dispose();
 

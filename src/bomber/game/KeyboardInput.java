@@ -6,6 +6,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import java.util.HashMap;
 import java.util.Optional;
 
+import bomber.audio.AudioManager;
 import bomber.renderer.Screen;
 
 public class KeyboardInput {
@@ -13,6 +14,34 @@ public class KeyboardInput {
 	public KeyboardInput(){
 		
 	}
+	
+	public boolean muteCheck(Screen screen, KeyboardState keyState, HashMap<Response, Integer> controlScheme, boolean mutePressed, float musicVolume, float soundVolume){
+		int state = GLFW_RELEASE;
+		//check for pause
+				if(getKey(Response.MUTE_GAME, controlScheme).isPresent()){
+					state = screen.getKeyState(getKey(Response.MUTE_GAME, controlScheme).get());
+				}
+				if(state == GLFW_PRESS && !mutePressed){
+			
+				   if(keyState.isMuted()){
+					   keyState.setMuted(false);
+					   AudioManager.setMusicVolume(musicVolume);
+					   AudioManager.setEffectsVolume(soundVolume);
+				   }
+				   else{
+					   keyState.setMuted(true);
+					   AudioManager.setMusicVolume(0);
+					   AudioManager.setEffectsVolume(0);
+				   }
+				   state = GLFW_RELEASE;
+				   mutePressed = true;
+				}
+				else if(state == GLFW_RELEASE){
+					mutePressed = false;
+				}
+			return mutePressed;
+	}
+	
 	
 	public boolean pauseCheck(Screen screen, KeyboardState keyState, HashMap<Response, Integer> controlScheme, boolean pausePressed){
 		int state = GLFW_RELEASE;

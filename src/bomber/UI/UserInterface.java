@@ -5,28 +5,14 @@ import static bomber.AI.AIDifficulty.EXTREME;
 import static bomber.AI.AIDifficulty.HARD;
 import static bomber.AI.AIDifficulty.MEDIUM;
 import static bomber.game.Constants.*;
-import static bomber.game.Response.DOWN_MOVE;
-import static bomber.game.Response.LEFT_MOVE;
-import static bomber.game.Response.PAUSE_GAME;
-import static bomber.game.Response.PLACE_BOMB;
-import static bomber.game.Response.RIGHT_MOVE;
-import static bomber.game.Response.UP_MOVE;
+import static bomber.game.Response.*;
 import static javafx.geometry.Orientation.VERTICAL;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.geometry.Pos.TOP_LEFT;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.*;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -224,6 +210,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 		this.controls.put(LEFT_MOVE, GLFW_KEY_LEFT);
 		this.controls.put(RIGHT_MOVE, GLFW_KEY_RIGHT);
 		this.controls.put(PAUSE_GAME, GLFW_KEY_P);
+		this.controls.put(MUTE_GAME, GLFW_KEY_M);
 
 		// Get the monitor size.
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -1896,8 +1883,10 @@ public class UserInterface extends Application implements ClientNetInterface {
 								for (ClientServerAI ai : client.getRoom()
 										.getAIPlayerList()) {
 									try {
-										client.setAIDifficulty(ai.getID(),
+										if(!client.isInGame()){
+											client.setAIDifficulty(ai.getID(),
 												aiDiff);
+										}
 									} catch (IOException e) {
 										e.printStackTrace();
 									}
@@ -1968,8 +1957,17 @@ public class UserInterface extends Application implements ClientNetInterface {
 			public void run() {
 				GameState gameState = client.getGameState();
 				Platform.setImplicitExit(false);
+				
+				float musicVolume = 50;
+				musicVolume = muteMusicBtn.isSelected() ? 0 : (float) musicSlider
+						.getValue();
+
+				float soundVolume = 50;
+				soundVolume = muteSoundBtn.isSelected() ? 0 : (float) soundSlider
+						.getValue();
+				
 				onlineGame = new OnlineGame(ui, client, gameState, playerName
-						.get(), connectedPlayers, controls, currentStage
+						.get(), musicVolume, soundVolume, connectedPlayers, controls, currentStage
 						.isFullScreen(), (int) currentStage.getWidth(),
 						(int) currentStage.getHeight());
 			}
@@ -2009,11 +2007,14 @@ public class UserInterface extends Application implements ClientNetInterface {
 		});
 	}
 
-	public void show(boolean fullScreen, boolean online, boolean gameFinished) {
+	public void show(boolean fullScreen, boolean muted, boolean online, boolean gameFinished) {
 		Platform.runLater(new Runnable() {
 
 			@Override
 			public void run() {
+				System.out.println("muted=" + muted);
+				muteMusicBtn.setSelected(muted);
+				muteSoundBtn.setSelected(muted);
 				currentStage.setFullScreen(fullScreen);
 				currentStage.show();
 				Platform.setImplicitExit(true);

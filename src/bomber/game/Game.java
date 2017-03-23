@@ -33,6 +33,8 @@ public class Game implements GameInterface {
 	private int aiNum;
 	private AIDifficulty aiDiff;
 	private boolean fullScreen;
+	private float musicVolume;
+	private float soundVolume;
 
 	public Game(UserInterface ui, Map map, String playerName, HashMap<Response, Integer> controls, int aiNum,
 			AIDifficulty aiDiff, float musicVolume, float soundVolume, boolean fullScreen, int width, int height, boolean wasd) {
@@ -44,9 +46,12 @@ public class Game implements GameInterface {
 		this.controlScheme = controls;
 		this.bombPressed = false;
 		this.pausePressed = false;
+		this.mutePressed = false;
 		this.fullScreen = fullScreen;
 		this.input = new KeyboardInput();
 		this.renderer = new Renderer(wasd);
+		this.musicVolume = musicVolume;
+		this.soundVolume = soundVolume;
 
 		try {
 
@@ -99,6 +104,7 @@ public class Game implements GameInterface {
 	private boolean startAIs = true;
 	private boolean gamePaused = false;
 	private boolean playMusic = true;
+	private boolean mutePressed;
 	
 	@Override
 	public void update(float interval) {
@@ -180,6 +186,7 @@ public class Game implements GameInterface {
 
 		this.keyState.setBomb(false);
 		this.keyState.setMovement(Movement.NONE);
+		this.mutePressed = this.input.muteCheck(screen, this.keyState, this.controlScheme, this.mutePressed, this.musicVolume, this.soundVolume);
 		this.pausePressed = this.input.pauseCheck(screen, this.keyState, this.controlScheme, this.pausePressed);
 		this.bombPressed = this.input.update(screen, this.keyState, this.controlScheme, this.bombPressed);
 	}
@@ -187,7 +194,7 @@ public class Game implements GameInterface {
 	@Override
 	public void dispose() {
 		AudioManager.pauseMusic();
-		this.ui.show(this.fullScreen, false, true);
+		this.ui.show(this.fullScreen, this.keyState.isMuted(), false, true);
 		System.out.println("RETURNED TO MENU");
 		for (Player player : this.gameState.getPlayers()) {
 

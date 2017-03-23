@@ -5,6 +5,7 @@ public class KeyboardState {
 	private boolean bomb;			//true if the bomb key is pressed
 	private boolean pause;
 	private Movement movement;			//the current movement key pressed, default NONE
+	private boolean muted;
 	
 	public KeyboardState(){
 		
@@ -36,5 +37,13 @@ public class KeyboardState {
 	
 	public void setPaused(boolean paused){
 		this.pause = paused;
+	}
+
+	public boolean isMuted() {
+		return this.muted;
+	}
+	
+	public void setMuted(boolean muted){
+		this.muted = muted;
 	}
 }
