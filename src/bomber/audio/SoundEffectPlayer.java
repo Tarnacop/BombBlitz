@@ -2,7 +2,6 @@ package bomber.audio;
 
 import bomber.game.AudioEvent;
 import bomber.game.Constants;
-import sun.applet.Main;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
@@ -65,8 +64,6 @@ class SoundEffectPlayer extends Thread
             {
                 Clip clip = AudioSystem.getClip();
                 InputStream rawStream = new BufferedInputStream(getClass().getResourceAsStream(Constants.AUDIO_FILES_PATH + fileName));
-                if (rawStream == null)
-                    throw new IOException();
                 AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
                 clip.open(inputStream);
                 inputStream.close();

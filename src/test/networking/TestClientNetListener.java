@@ -116,6 +116,7 @@ public class TestClientNetListener implements ClientNetInterface {
 		for (AudioEvent a : client.getGameState().getAudioEvents()) {
 			System.out.print(a + " ");
 		}
+		client.getGameState().getAudioEvents().clear();
 		System.out.println();
 	}
 

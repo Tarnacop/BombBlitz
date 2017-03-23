@@ -30,8 +30,6 @@ class MusicPlayer extends Thread
         {
             clip = AudioSystem.getClip();
             InputStream rawStream = new BufferedInputStream(Main.class.getResourceAsStream(Constants.AUDIO_FILES_PATH + Constants.MUSIC_FILENAME));
-            if (rawStream == null)
-                throw new IOException();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(rawStream);
             clip.open(inputStream);
             inputStream.close();
