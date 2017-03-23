@@ -1,6 +1,7 @@
 package bomber.game;
 
 import java.awt.Point;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ public class MapsParser extends DefaultHandler {
 		SAXParser sp = spfac.newSAXParser();
 
 		// Finally, tell the parser to parse the input and notify the handler
-		sp.parse("src/resources/maps/maps.xml", this);
+		sp.parse(getClass().getResourceAsStream("/maps/maps.xml"), this);
 		
 //		for(Map bl: maps)
 //		{
