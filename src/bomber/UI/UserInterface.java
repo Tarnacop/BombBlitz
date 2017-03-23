@@ -246,9 +246,6 @@ public class UserInterface extends Application implements ClientNetInterface {
 		SettingsParser.init();
 
 		// Resource management.
-		// this.font =
-		// Font.loadFont(Thread.currentThread().getContextClassLoader().getResource(FONT_PATH)
-		// .toExternalForm(), FONT_SIZE);
 		this.font = Font.loadFont(getClass().getResource(FONT_PATH)
 				.toExternalForm(), FONT_SIZE);
 		this.smallFont = Font.loadFont(
