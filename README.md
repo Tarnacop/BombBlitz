@@ -37,13 +37,3 @@ port: 1234
 ### Jokubas Liutkus  
 ### Owen Jenkins  
 ### Qiyang Li  
-
-
-git checkout dev
-git merge physics
-```
-And always keep updated from the dev branch.
-Make sure you are in your paticular branch e.g. networking and do:
-```
-git merge dev
-```
