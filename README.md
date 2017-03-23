@@ -27,7 +27,7 @@ e.g. java ServerMain 1234
 ```
 
 #### Dedicated server for the game:
-serer name: sc.mtahost.co  
+server name: sc.mtahost.co  
 port: 1234  
 
 ---------------------------------------
