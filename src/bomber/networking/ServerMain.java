@@ -20,7 +20,6 @@ public class ServerMain {
 		}
 
 		ServerConfiguration config = new ServerConfiguration();
-		config.setTickRate(60);
 
 		ServerThread server = null;
 		try {
@@ -50,6 +49,10 @@ public class ServerMain {
 				} else if (cmds[0].equals("tickrate")) {
 
 					System.out.println(config.getTickRate());
+
+				} else if (cmds[0].equals("h")) {
+
+					pUsage();
 
 				} else {
 
@@ -90,6 +93,12 @@ public class ServerMain {
 	}
 
 	private static void pInvalid() {
-		System.out.println("Invalid command");
+		System.out.println("Invalid command, type \"h\" to list available commands");
+	}
+
+	private static void pUsage() {
+		System.out.println("Type \"exit\" to terminate the server");
+		System.out.println("Type \"tickrate\" to show the tickrate of the server");
+		System.out.println("Type \"tickrate <tickrate>\" to set the tickrate");
 	}
 }
