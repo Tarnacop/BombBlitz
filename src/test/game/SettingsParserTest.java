@@ -1,10 +1,13 @@
 package test.game;
 
 import bomber.game.Constants;
+import bomber.game.Main;
 import bomber.game.SettingsParser;
 import org.junit.Test;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +23,19 @@ public class SettingsParserTest
     public void init() throws Exception
     {
         System.out.println("A warning about settings.xml will be displayed. This is normal and should be ignored");
-        File file = new File(Constants.SETTING_XML_PATH);
+
+        String path = null;
+        final Class<?> referenceClass = Main.class;
+        final URL url =
+                referenceClass.getProtectionDomain().getCodeSource().getLocation();
+        try{
+            final File jarPath = new File(url.toURI()).getParentFile();
+            path = jarPath + "/settings.xml";
+        } catch(final URISyntaxException e){
+            e.printStackTrace();
+        }
+
+        File file = new File(path);
         file.delete();
 
         SettingsParser.init();
