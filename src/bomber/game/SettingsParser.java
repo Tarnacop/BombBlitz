@@ -150,6 +150,11 @@ public class SettingsParser
         }
     }
 
+    /**
+     * Gets the path of settings.xml
+     *
+     * @return The absolute path
+     */
     private static String getPath()
     {
         String path = null;
@@ -158,7 +163,6 @@ public class SettingsParser
                 referenceClass.getProtectionDomain().getCodeSource().getLocation();
         try{
             final File jarPath = new File(url.toURI()).getParentFile();
-            System.out.println(jarPath); // this is the path you want
             path = jarPath + "/settings.xml";
         } catch(final URISyntaxException e){
             e.printStackTrace();

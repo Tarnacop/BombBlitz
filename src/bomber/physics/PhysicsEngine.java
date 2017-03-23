@@ -200,16 +200,16 @@ public class PhysicsEngine
 
 
             // Collision with solid/soft blocks
-            revertPosition(fromDirection, new Point(pos), pos, speed); // check up-left corner
+            revertPosition(fromDirection, new Point(pos), pos); // check up-left corner
 
             Point upRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y);
-            revertPosition(fromDirection, upRightCorner, pos, speed);
+            revertPosition(fromDirection, upRightCorner, pos);
 
             Point downLeftCorner = new Point(pos.x, pos.y + Constants.PLAYER_HEIGHT);
-            revertPosition(fromDirection, downLeftCorner, pos, speed);
+            revertPosition(fromDirection, downLeftCorner, pos);
 
             Point downRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y + Constants.PLAYER_HEIGHT);
-            revertPosition(fromDirection, downRightCorner, pos, speed);
+            revertPosition(fromDirection, downRightCorner, pos);
 
 
             // Corner helping
@@ -429,7 +429,7 @@ public class PhysicsEngine
      * @param corner        The position of the corner
      * @param playerPos     The position of the player
      */
-    private void revertPosition(Point fromDirection, Point corner, Point playerPos, int speed)
+    private void revertPosition(Point fromDirection, Point corner, Point playerPos)
     {
         Map map = gameState.getMap();
         while (map.getPixelBlockAt(corner.x, corner.y) == Block.SOLID ||
@@ -440,32 +440,30 @@ public class PhysicsEngine
         }
     }
 
-    // TODO: javadoc this
-    private Point normalVector(Point vector)
-    {
-        if(vector.x==0)
-            return new Point(1, 0);
-        else
-            return new Point(0, 1);
-    }
-
-    // TODO: javadoc this
+    /**
+     * Checks if a location has only clear neighbours
+     *
+     * @param location The location
+     * @return Whether the neighbours are clear
+     */
     private boolean neighboursAreClear(Point location)
     {
-        if(pointIsClear(location.x, location.y) && pointIsClear(location.x+1, location.y) &&
-                pointIsClear(location.x-1, location.y) && pointIsClear(location.x, location.y+1) &&
-                pointIsClear(location.x, location.y-1))
-            return true;
-        return false;
+        return pointIsClear(location.x, location.y) && pointIsClear(location.x + 1, location.y) &&
+                pointIsClear(location.x - 1, location.y) && pointIsClear(location.x, location.y + 1) &&
+                pointIsClear(location.x, location.y - 1);
     }
 
-    // TODO: javadoc this
+    /**
+     * Checks if a location is clear (is not solid or soft)
+     *
+     * @param x The x coordinate of the location
+     * @param y The y coordinate of the location
+     * @return Whether the location is clear
+     */
     private boolean pointIsClear(int x, int y)
     {
-        if(gameState.getMap().getPixelBlockAt(x, y) != Block.SOLID &&
-                gameState.getMap().getPixelBlockAt(x, y) != Block.SOFT)
-            return true;
-        return false;
+        return gameState.getMap().getPixelBlockAt(x, y) != Block.SOLID &&
+                gameState.getMap().getPixelBlockAt(x, y) != Block.SOFT;
     }
 
 
