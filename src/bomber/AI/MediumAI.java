@@ -14,35 +14,42 @@ import bomber.game.GameState;
  */
 public class MediumAI extends AITemplate {
 
-	/**
-	 * Instantiates a new medium AI.
-	 *
-	 * @param ai
-	 *            the ai
-	 * @param gameState
-	 *            the game state
-	 */
-	public MediumAI(GameAI ai, GameState gameState) {
-		super(ai, gameState);
-	}
+  /**
+   * Instantiates a new medium AI.
+   *
+   * @param ai
+   *          the ai
+   * @param gameState
+   *          the game state
+   */
+  public MediumAI(GameAI ai, GameState gameState) {
+    super(ai, gameState);
+  }
 
-	/*
+  /*
    * (non-Javadoc)
    * 
    * @see bomber.AI.AITemplate#performMoves(java.util.LinkedList, boolean)
    */
   protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
-    if (inDanger)
-      while (moves != null && !moves.isEmpty() && gameAI.isAlive() ) {
+    // if in player is in danger then perform moves without any checks to
+    // get into safe location
+    if (inDanger) {
+      while (moves != null && !moves.isEmpty() && gameAI.isAlive()) {
         pausedGame();
         makeSingleMove(moves.removeFirst());
       }
-    else
-      while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
-          && !safetyCh.isEnemyInBombRange() && gameAI.isAlive()) {
+    } 
+    
+    // else move until the enemy is reachable, or the AI is in danger
+    else {
+      while (moves != null && !moves.isEmpty() && !safetyCh.inDanger()
+          && safetyCh.checkMoveSafety(moves.peek()) && !safetyCh.isEnemyInBombRange()
+          && gameAI.isAlive()) {
         pausedGame();
         makeSingleMove(moves.removeFirst());
       }
+    }
   }
 
   /*
@@ -53,7 +60,7 @@ public class MediumAI extends AITemplate {
   protected void performPlannedMoves(LinkedList<AIActions> moves) {
     AIActions action;
 
-    while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive() ) {
+    while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive()) {
       pausedGame();
       action = moves.removeFirst();
       // if actions is bomb place it
@@ -62,14 +69,14 @@ public class MediumAI extends AITemplate {
         try {
           sleep(100);
         } catch (InterruptedException e) {
-          
+
         }
         gameAI.getKeyState().setBomb(false);
       }
       // if action is none wait until the next move is safe
       else if (action == AIActions.NONE) {
         if (moves != null) {
-          while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive() ) {
+          while (!safetyCh.checkMoveSafety(moves.peek()) && gameAI.isAlive()) {
             pausedGame();
           }
         }
@@ -80,7 +87,6 @@ public class MediumAI extends AITemplate {
       }
     }
   }
-  
 
   /*
    * (non-Javadoc)
@@ -94,7 +100,7 @@ public class MediumAI extends AITemplate {
       pausedGame();
 
       // if AI is in danger then find the escape route
-      if (safetyCh.inDanger() && random.nextBoolean() ) {
+      if (safetyCh.inDanger() && random.nextBoolean()) {
         moves = finder.escapeFromExplotion((safetyCh.getTilesAffectedByBombs()));
         performMoves(moves, true);
 
@@ -116,16 +122,16 @@ public class MediumAI extends AITemplate {
 
       // if enemy is accessible(no boxes are blocking the path) then
       // find a route to it and make moves
-      else if ( (moves = getMovesToEnemy()) != null) {
+      else if ((moves = getMovesToEnemy()) != null) {
         performMoves(moves, false);
       }
       // if enemy is not in the range get the plan how to reach enemy and
       // fullfill it
-      else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), 
+      else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(),
           finder.getNearestEnemy())) != null && random.nextBoolean()) {
         performPlannedMoves(moves);
       }
-     
+
       // otherwise just generate a random goal and start fulfilling it
       else {
         int x = random.nextInt(gameState.getMap().getGridMap().length);
