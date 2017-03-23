@@ -78,7 +78,7 @@ import bomber.networking.ClientThread;
  *
  * @author Owen
  * @version 1.3
- * @since 2017-03-20
+ * @since 2017-03-23
  *
  *        UserInterface class for "Bomb Blitz" Game Application (2017 Year 2
  *        Team Project, Team B1). Contains all methods for creating the JavaFX
@@ -105,7 +105,6 @@ public class UserInterface extends Application implements ClientNetInterface {
 	private AIDifficulty aiDiff;
 	private List<Map> maps;
 	private Label enterLabel;
-	private VBox connectPane;
 	private ClientThread client;
 	private HBox roomsBox;
 	private FlowPane serverPlayersBox;
@@ -129,14 +128,14 @@ public class UserInterface extends Application implements ClientNetInterface {
 	private SimpleIntegerProperty roomNumber;
 	private boolean expectingRoomCreation;
 	private boolean expectingRoomJoin;
-	private FlowPane roomPlayersBox;
+	private FlowPane roomPlayersFlowPane;
 	private int humanPlayers;
 	private int aiPlayers;
 	private Pane mapCanvas;
 	private Pane onlineMapCanvas;
 	private ChoiceBox<String> aiDifficultyChoice;
-	private ChoiceBox<String> aiOnlineDifficultyChoice;
-	private VBox readyPane;
+	private ChoiceBox<String> onlineAiDifficultyChoice;
+	private VBox readyPlayersVBox;
 	private Button readyButton;
 	private Rectangle readyTorch;
 	private Slider musicSlider;
@@ -154,7 +153,6 @@ public class UserInterface extends Application implements ClientNetInterface {
 	private CheckBox rememberServerBtn;
 	private boolean gotServer;
 	protected boolean gameEnded;
-	private Button leaveRoomBtn;
 	private OnlineGame onlineGame;
 	private List<ClientServerPlayer> connectedPlayers;
 	private BorderPane tutorialMenu;
@@ -255,7 +253,6 @@ public class UserInterface extends Application implements ClientNetInterface {
 		initScenes();
 		primaryStage.setScene(new Scene(mainScene));
 		primaryStage.show();
-
 		primaryStage.getIcons().add(new Image(BOMB_PATH));
 
 		// If the stage is closed, disconnect from the server just in case.
@@ -462,6 +459,9 @@ public class UserInterface extends Application implements ClientNetInterface {
 		ImageView storyImageView = new ImageView(storyImage);
 		storyImageView.getStyleClass().add("creditsbox");	
 		
+		//Initialise the two alternate tutorial images.
+		//'tutorialImage' the arrow keys tutorial image
+		//'wasdTutorialImage' the WASD keys tutorial image
 		tutorialImage = new Image(TUTORIAL_PATH);
 		wasdTutorialImage = new Image(WASD_TUTORIAL_PATH);
 		
@@ -492,16 +492,20 @@ public class UserInterface extends Application implements ClientNetInterface {
 	 */
 	private void initCreditsScene() {
 
+		//Create the label to hold the game credits.
 		Label creditsLabel = createLabel(CREDITS, false, true);
 		creditsLabel.getStyleClass().add("creditsbox");
-		VBox creditsBox = new VBox();
-		creditsBox.setAlignment(CENTER);
-		creditsBox.setSpacing(MEDIUM_PAD);
-		creditsBox.getChildren().addAll(
+		
+		//Create a container to hold the credits and the back button
+		VBox creditsVBox = new VBox();
+		creditsVBox.setAlignment(CENTER);
+		creditsVBox.setSpacing(MEDIUM_PAD);
+		creditsVBox.getChildren().addAll(
 		createLabel("Version: " + VERSION_NUMBER, false, true),
 		creditsLabel, createBackButton("Back", false));
 
-		setBackgroundPane(creditsMenu, creditsBox);
+		//Set the background of the menu.
+		setBackgroundPane(creditsMenu, creditsVBox);
 	}
 
 	/**
@@ -509,115 +513,140 @@ public class UserInterface extends Application implements ClientNetInterface {
 	 */
 	private void initRoomScene() {
 
-		BorderPane roomBox = new BorderPane();
+		//Create container to hold the room elements
+		BorderPane roomBorderPane = new BorderPane();
 
-		leaveRoomBtn = createButton("Leave Room", LARGE_MENU_BUTTON_WIDTH,
+		//Create button to leave the current room.
+		Button leaveRoomBtn = createButton("Leave Room", LARGE_MENU_BUTTON_WIDTH,
 				MENU_BUTTON_HEIGHT);
 		leaveRoomBtn.setOnAction(e -> leaveRoom());
 
-		HBox centerBox = new HBox();
-		centerBox.setAlignment(CENTER);
-		centerBox.setSpacing(MEDIUM_PAD);
+		//Create a container to hold the central elements.
+		HBox centerHBox = new HBox();
+		centerHBox.setAlignment(CENTER);
+		centerHBox.setSpacing(MEDIUM_PAD);
 
+		//'onlineMapCanvas' - the map canvas used for online games.
 		onlineMapCanvas = new Pane();
 		onlineMapCanvas.setMinHeight(MAP_CANVAS_HEIGHT);
 		onlineMapCanvas.setMinWidth(MAP_CANVAS_WIDTH);
-		aiOnlineDifficultyChoice = new ChoiceBox<>();
-		centerBox.getChildren().addAll(
-				createAiDifficultySelector(aiOnlineDifficultyChoice, true),
+		
+		//'onlineAiDifficultyChoice' - the choicebox for changing the online AI difficulty.
+		onlineAiDifficultyChoice = new ChoiceBox<>();
+		centerHBox.getChildren().addAll(
+				createAiDifficultySelector(onlineAiDifficultyChoice, true),
 				createMapSelector(onlineMapCanvas, true));
 
-		HBox backBtnPane = new HBox();
-		backBtnPane.getChildren().add(leaveRoomBtn);
-		backBtnPane.setPadding(new Insets(MEDIUM_PAD, SMALL_PAD, MEDIUM_PAD,
+		//Create a container to hold the back button.
+		HBox backBtnHBox = new HBox();
+		backBtnHBox.getChildren().add(leaveRoomBtn);
+		backBtnHBox.setPadding(new Insets(MEDIUM_PAD, SMALL_PAD, MEDIUM_PAD,
 				SMALL_PAD));
 
 		Label playersTitle = createLabel("Online Players:", false, true);
 
-		roomPlayersBox = new FlowPane(VERTICAL);
-		roomPlayersBox.setVgap(TINY_PAD);
-		roomPlayersBox.setHgap(MEDIUM_PAD);
+		//Create the flowpane to contain the list of online players.
+		roomPlayersFlowPane = new FlowPane(VERTICAL);
+		roomPlayersFlowPane.setVgap(TINY_PAD);
+		roomPlayersFlowPane.setHgap(MEDIUM_PAD);
 
+		//Create a scrollpane to contain the flowpane in case it gets too big.
 		ScrollPane scrollPane = new ScrollPane();
 		scrollPane.setMaxHeight(boxHeight - MASSIVE_PAD);
 		scrollPane.setMinWidth(boxWidth + MASSIVE_PAD);
 		scrollPane.setVbarPolicy(AS_NEEDED);
-		scrollPane.setContent(roomPlayersBox);
+		scrollPane.setContent(roomPlayersFlowPane);
 
-		VBox playersListPane = new VBox();
-		playersListPane.getStyleClass().add("wideclearbox");
-		playersListPane.setSpacing(SMALL_PAD);
-		playersListPane.setMinWidth(boxWidth + MASSIVE_PAD);
-		playersListPane.getChildren().addAll(playersTitle, scrollPane);
+		//Create a container for the list of players with a title at the top.
+		VBox playersListVBox = new VBox();
+		playersListVBox.getStyleClass().add("wideclearbox");
+		playersListVBox.setSpacing(SMALL_PAD);
+		playersListVBox.setMinWidth(boxWidth + MASSIVE_PAD);
+		playersListVBox.getChildren().addAll(playersTitle, scrollPane);
 
+		//'readyTorch' - the torch turned on when the player has toggled ready to on.
 		readyTorch = new Rectangle();
 		readyTorch.setWidth(TORCH_WIDTH);
 		readyTorch.setHeight(TORCH_HEIGHT);
 		readyTorch.getStyleClass().add("mapbox");
 		readyTorch.setFill(new ImagePattern(new Image(UNLIT_TORCH_PATH)));
 
-		VBox readyBox = new VBox();
-		readyBox.getStyleClass().add("namebox");
-		readyBox.setSpacing(MEDIUM_PAD);
-		readyBox.setAlignment(CENTER);
-		readyBox.setMinWidth(boxHeight);
-		readyBox.setMinHeight(boxHeight);
-		readyBox.setMaxHeight(boxHeight);
+		//Create a container for the ready torch and ready button toggle.
+		VBox readyVBox = new VBox();
+		readyVBox.getStyleClass().add("namebox");
+		readyVBox.setSpacing(MEDIUM_PAD);
+		readyVBox.setAlignment(CENTER);
+		readyVBox.setMinWidth(boxHeight);
+		readyVBox.setMinHeight(boxHeight);
+		readyVBox.setMaxHeight(boxHeight);
 		readyButton = createButton("Not Ready", LARGE_MENU_BUTTON_WIDTH,
 				LARGE_MENU_BUTTON_HEIGHT);
 		readyButton.setOnAction(e -> ready());
 
+		//Create a container for the ready torch.
 		HBox torchBox = new HBox();
 		torchBox.setSpacing(SMALL_PAD);
 		torchBox.setAlignment(CENTER);
 		torchBox.getChildren().addAll(
 				createLabel("Click to\ntoggle Ready:", false, false),
 				readyTorch);
-		readyBox.getChildren().addAll(torchBox, readyButton);
+		readyVBox.getChildren().addAll(torchBox, readyButton);
 
-		readyPane = new VBox();
-		readyPane.getStyleClass().add("menubox");
-		readyPane.setSpacing(LITTLE_PAD);
-		readyPane.setAlignment(CENTER);
-		readyPane.setMinWidth(boxWidth + MEDIUM_PAD);
-		readyPane.setMinHeight(boxHeight);
-		readyPane.setMaxHeight(boxHeight);
-		readyPane.getChildren().add(
+		//'readyPlayersVBox' - container for the players in the room and their ready torches.
+		readyPlayersVBox = new VBox();
+		readyPlayersVBox.getStyleClass().add("menubox");
+		readyPlayersVBox.setSpacing(LITTLE_PAD);
+		readyPlayersVBox.setAlignment(CENTER);
+		readyPlayersVBox.setMinWidth(boxWidth + MEDIUM_PAD);
+		readyPlayersVBox.setMinHeight(boxHeight);
+		readyPlayersVBox.setMaxHeight(boxHeight);
+		readyPlayersVBox.getChildren().add(
 				createLabel("Game will begin when all\nplayers click ready!",
 						false, false));
 
-		HBox playersReadyBox = new HBox();
-		playersReadyBox.setAlignment(CENTER);
-		playersReadyBox.setSpacing(LARGE_PAD);
-		playersReadyBox.setPadding(new Insets(SMALL_PAD));
-		playersReadyBox.getChildren().addAll(playersListPane, readyPane,
-				readyBox);
+		//Create container for the lower level of room elements.
+		HBox bottomHBox = new HBox();
+		bottomHBox.setAlignment(CENTER);
+		bottomHBox.setSpacing(LARGE_PAD);
+		bottomHBox.setPadding(new Insets(SMALL_PAD));
+		bottomHBox.getChildren().addAll(playersListVBox, readyPlayersVBox,
+				readyVBox);
 
-		VBox centerPane = new VBox();
-		centerPane.setAlignment(CENTER);
-		centerPane.setSpacing(SMALL_PAD);
-		centerPane.getChildren().addAll(centerBox, playersReadyBox);
+		//Add all the room elements to a new container.
+		VBox centerVBox = new VBox();
+		centerVBox.setAlignment(CENTER);
+		centerVBox.setSpacing(SMALL_PAD);
+		centerVBox.getChildren().addAll(centerHBox, bottomHBox);
 
-		roomBox.setCenter(centerPane);
-		roomBox.setTop(backBtnPane);
+		//Set the room elements into the borderpane.
+		roomBorderPane.setCenter(centerVBox);
+		roomBorderPane.setTop(backBtnHBox);
 
-		setBackgroundPane(roomMenu, roomBox);
+		//Set the background of the menu.
+		setBackgroundPane(roomMenu, roomBorderPane);
 	}
 
+	/**
+	 * Initialise the scene when a player has connected to a server.
+	 */
 	private void initServerScene() {
 
+		//Create the button to disconnect from the server.
 		Button disconnectBtn = createBackButton("Disconnect", true);
 
-		HBox backBox = new HBox();
-		backBox.setAlignment(CENTER_LEFT);
-		backBox.setPadding(new Insets(MEDIUM_PAD, SMALL_PAD, MEDIUM_PAD,
+		//Create a container to hold the disconnect button.
+		HBox disconnectHBox = new HBox();
+		disconnectHBox.setAlignment(CENTER_LEFT);
+		disconnectHBox.setPadding(new Insets(MEDIUM_PAD, SMALL_PAD, MEDIUM_PAD,
 				SMALL_PAD));
-		backBox.getChildren().add(disconnectBtn);
+		disconnectHBox.getChildren().add(disconnectBtn);
 
+		//'createRoomBtn' - the button used to create a new room.
 		createRoomBtn = createButton("Create New Room",
 				LARGE_MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
 		createRoomBtn.setOnAction(e -> createRoom());
 
+		//create toggles and a label to change the capacity of a room to be created and display it.
 		Button upRoomNumToggle = new Button();
 		upRoomNumToggle.setPrefWidth(LARGE_PAD);
 		upRoomNumToggle.getStyleClass().add("aitoggleup");
@@ -632,41 +661,46 @@ public class UserInterface extends Application implements ClientNetInterface {
 		downRoomNumToggle.getStyleClass().add("aitoggledown");
 		downRoomNumToggle.setOnAction(e -> decrementRoomNum());
 
-		VBox roomNumBox = new VBox();
-		roomNumBox.setAlignment(CENTER);
-		roomNumBox.getStyleClass().add("nopadbox");
-		roomNumBox.maxHeightProperty().bind(
+		//Create a container to hold the toggle and a label.
+		VBox roomNumToggle = new VBox();
+		roomNumToggle.setAlignment(CENTER);
+		roomNumToggle.getStyleClass().add("nopadbox");
+		roomNumToggle.maxHeightProperty().bind(
 				upRoomNumToggle.heightProperty().add(
 						displayRoomNum.heightProperty().add(
 								downRoomNumToggle.heightProperty())));
-		roomNumBox.getChildren().addAll(upRoomNumToggle, displayRoomNum,
+		roomNumToggle.getChildren().addAll(upRoomNumToggle, displayRoomNum,
 				downRoomNumToggle);
 
 		Label roomNumLabel = createLabel("Room\nCapacity", false, false);
 
-		HBox roomNumPane = new HBox();
-		roomNumPane.setAlignment(CENTER);
-		roomNumPane.getStyleClass().add("namebox");
-		roomNumPane.setSpacing(MEDIUM_PAD);
-		roomNumPane.setMinWidth(PANE_WIDTH);
-		roomNumPane.getChildren().addAll(roomNumBox, roomNumLabel);
+		HBox roomNumHBox = new HBox();
+		roomNumHBox.setAlignment(CENTER);
+		roomNumHBox.getStyleClass().add("namebox");
+		roomNumHBox.setSpacing(MEDIUM_PAD);
+		roomNumHBox.setMinWidth(PANE_WIDTH);
+		roomNumHBox.getChildren().addAll(roomNumToggle, roomNumLabel);
 
+		//'roomNameField' - the text field to enter a name for the room to be created.
 		roomNameField = createTextField("Enter Name");
 
-		VBox roomNameBox = new VBox();
-		roomNameBox.setSpacing(SMALL_PAD);
-		roomNameBox.getStyleClass().add("namebox");
-		roomNameBox.setAlignment(CENTER);
-		roomNameBox.setMinWidth(THIN_PANE_WIDTH);
-		roomNameBox.getChildren().addAll(
+		//Create a container to hold the room name setter.
+		VBox roomNameVBox = new VBox();
+		roomNameVBox.setSpacing(SMALL_PAD);
+		roomNameVBox.getStyleClass().add("namebox");
+		roomNameVBox.setAlignment(CENTER);
+		roomNameVBox.setMinWidth(THIN_PANE_WIDTH);
+		roomNameVBox.getChildren().addAll(
 				createLabel("Room Name:", false, false), roomNameField);
 
-		VBox roomDisplay = new VBox();
-		roomDisplay.setSpacing(MEDIUM_PAD);
-		roomDisplay.setAlignment(CENTER);
-		roomDisplay.setMinWidth(THICK_PANE_WIDTH);
-		roomDisplay.getChildren().addAll(this.roomCreationLabel, createRoomBtn);
+		//Create a container to hold the room creation label and button
+		VBox roomDisplayVBox = new VBox();
+		roomDisplayVBox.setSpacing(MEDIUM_PAD);
+		roomDisplayVBox.setAlignment(CENTER);
+		roomDisplayVBox.setMinWidth(THICK_PANE_WIDTH);
+		roomDisplayVBox.getChildren().addAll(this.roomCreationLabel, createRoomBtn);
 
+		//Add some torches for decoration.
 		Rectangle torch1 = new Rectangle();
 		torch1.setWidth(SMALL_TORCH_WIDTH);
 		torch1.setHeight(SMALL_TORCH_HEIGHT);
@@ -677,24 +711,28 @@ public class UserInterface extends Application implements ClientNetInterface {
 		torch2.setHeight(SMALL_TORCH_HEIGHT);
 		torch2.setFill(new ImagePattern(new Image(TORCH_PATH)));
 
-		HBox createRoomPane = new HBox();
-		createRoomPane.setAlignment(CENTER);
-		createRoomPane.setSpacing(MEDIUM_PAD);
-		createRoomPane.getStyleClass().add("wideclearbox");
-		createRoomPane.maxWidthProperty().bind(
-				roomNumPane.widthProperty().add(
-						roomNameBox.widthProperty().add(
-								roomDisplay.widthProperty())));
-		createRoomPane.getChildren().addAll(torch1, roomNumPane, roomNameBox,
-				roomDisplay, torch2);
+		//Create a container to hold all the room creation elements.
+		HBox createRoomHBox = new HBox();
+		createRoomHBox.setAlignment(CENTER);
+		createRoomHBox.setSpacing(MEDIUM_PAD);
+		createRoomHBox.getStyleClass().add("wideclearbox");
+		createRoomHBox.maxWidthProperty().bind(
+				roomNumHBox.widthProperty().add(
+						roomNameVBox.widthProperty().add(
+								roomDisplayVBox.widthProperty())));
+		createRoomHBox.getChildren().addAll(torch1, roomNumHBox, roomNameVBox,
+				roomDisplayVBox, torch2);
 
+		//create label to display over the rooms
 		Label roomsTitle = createLabel(
-				"Rooms:								( Join or create a room to play a match! )",
+				"Rooms:											( Join or create a room to play a match! )",
 				false, true);
 
+		//'roomsBox' - container holding all the room displays on the server.
 		roomsBox = new HBox();
 		roomsBox.setSpacing(BIG_PAD);
 
+		//Create a scrollpane to hold the roomsBox in case it gets too big.
 		ScrollPane scrollRooms = new ScrollPane();
 		scrollRooms.setMinHeight(boxHeight + LARGE_PAD);
 		scrollRooms.setVbarPolicy(NEVER);
@@ -703,163 +741,218 @@ public class UserInterface extends Application implements ClientNetInterface {
 		scrollRooms.setFitToWidth(true);
 		scrollRooms.setContent(roomsBox);
 
-		VBox roomsListPane = new VBox();
-		roomsListPane.setSpacing(SMALL_PAD);
-		roomsListPane.setAlignment(TOP_LEFT);
-		roomsListPane.minHeightProperty().bind(
+		//Create a container for the scrollpane with a title.
+		VBox roomsListVBox = new VBox();
+		roomsListVBox.setSpacing(SMALL_PAD);
+		roomsListVBox.setAlignment(TOP_LEFT);
+		roomsListVBox.minHeightProperty().bind(
 				roomsTitle.minHeightProperty().add(
 						scrollRooms.minHeightProperty()));
-		roomsListPane.getChildren().addAll(roomsTitle, scrollRooms);
+		roomsListVBox.getChildren().addAll(roomsTitle, scrollRooms);
 
+		//Create a label for the online players.
 		Label playersTitle = createLabel("Online Players:", false, true);
 
+		//'serverPlayersBox' - container to hold all the player displays currently on the server.
 		serverPlayersBox = new FlowPane();
 		serverPlayersBox.setVgap(SMALL_PAD);
 		serverPlayersBox.setHgap(SMALL_PAD);
 		serverPlayersBox.setMinHeight(THIN_PANE_HEIGHT);
 
+		//Create a scrollpane to hold the serverPlayersBox in case it gets too big.
 		ScrollPane scrollPlayers = new ScrollPane();
 		scrollPlayers.setVbarPolicy(AS_NEEDED);
 		scrollPlayers.setContent(serverPlayersBox);
 
-		VBox playersListPane = new VBox();
-		playersListPane.setSpacing(SMALL_PAD);
-		playersListPane.getChildren().addAll(playersTitle, scrollPlayers);
-		playersListPane.minHeightProperty().bind(
+		//Create a container to hold the scrollpane with a title.
+		VBox playersListVBox = new VBox();
+		playersListVBox.setSpacing(SMALL_PAD);
+		playersListVBox.getChildren().addAll(playersTitle, scrollPlayers);
+		playersListVBox.minHeightProperty().bind(
 				playersTitle.minHeightProperty().add(
 						serverPlayersBox.minHeightProperty().add(HUGE_PAD)));
 
-		VBox roomsPlayersPane = new VBox();
-		roomsPlayersPane.setSpacing(BIG_PAD);
-		roomsPlayersPane.setAlignment(CENTER);
-		roomsPlayersPane.getChildren().addAll(roomsListPane, playersListPane);
-		BorderPane serverPane = new BorderPane();
-		VBox serverBox = new VBox();
-		serverBox.setSpacing(MEDIUM_PAD);
-		serverBox.setAlignment(CENTER);
-		roomsPlayersPane.getStyleClass().add("wideclearbox");
-		roomsPlayersPane.minHeightProperty().bind(
-				roomsListPane.minHeightProperty().add(
-						playersListPane.minHeightProperty().add(50)));
-		serverBox.minHeightProperty()
-				.bind(roomsPlayersPane.minHeightProperty());
-		serverBox.getChildren().addAll(createRoomPane, roomsPlayersPane);
-		serverPane.setTop(backBox);
-		serverPane.setPadding(new Insets(0, 20, 20, 20));
-		serverPane.setCenter(serverBox);
-		setBackgroundPane(serverMenu, serverPane);
+		//Create a container to hold all the rooms and player info on the server.
+		VBox roomsPlayersVBox = new VBox();
+		roomsPlayersVBox.setSpacing(BIG_PAD);
+		roomsPlayersVBox.setAlignment(CENTER);
+		roomsPlayersVBox.getChildren().addAll(roomsListVBox, playersListVBox);
+		
+		//Create a BorderPane containing a VBox to make the padding look nice.
+		BorderPane serverBorderPane = new BorderPane();
+		VBox serverVBox = new VBox();
+		serverVBox.setSpacing(MEDIUM_PAD);
+		serverVBox.setAlignment(CENTER);
+		roomsPlayersVBox.getStyleClass().add("wideclearbox");
+		roomsPlayersVBox.minHeightProperty().bind(
+				roomsListVBox.minHeightProperty().add(
+						playersListVBox.minHeightProperty().add(50)));
+		serverVBox.minHeightProperty()
+				.bind(roomsPlayersVBox.minHeightProperty());
+		serverVBox.getChildren().addAll(createRoomHBox, roomsPlayersVBox);
+		serverBorderPane.setTop(disconnectHBox);
+		serverBorderPane.setPadding(new Insets(0, MEDIUM_PAD, MEDIUM_PAD, MEDIUM_PAD));
+		serverBorderPane.setCenter(serverVBox);
+		
+		//Set the background of the menu.
+		setBackgroundPane(serverMenu, serverBorderPane);
 	}
 
-	private void decrementRoomNum() {
-		if (roomNumber.get() > 2)
-			roomNumber.set(roomNumber.get() - 1);
-	}
-
-	private void incrementRoomNum() {
-		if (roomNumber.get() < 4)
-			roomNumber.set(roomNumber.get() + 1);
-	}
-
+	/**
+	 * Initialise the menu for the user connecting to a server.
+	 */
 	private void initConnectScene() {
 
+		//'enterLabel' - label displaying information about connecting to the server.
 		enterLabel = createLabel("Enter Server Details:", false, false);
 
-		HBox ipBox = new HBox();
-
+		//'ipText' - textfield to get the ip address.
 		ipText = createTextField("IP Address");
 		ipText.setMinWidth(200);
+		
+		//'portNum' - textfield to get the port number.
 		portNum = createTextField("Port Number");
 		portNum.setMinWidth(200);
+		
+		//check if the last user wanted us to remember the server details, if so add them here.
 		gotServer = (!SettingsParser.getServerPort().equals(""))
 				&& (!SettingsParser.getServerIp().equals(""));
 		if (gotServer) {
 			ipText.setText(SettingsParser.getServerIp());
 			portNum.setText(SettingsParser.getServerPort());
 		}
-		ipBox.setSpacing(SMALL_PAD);
-		ipBox.setPrefSize(THIN_PANE_WIDTH, TINY_PANE_HEIGHT);
-		ipBox.setAlignment(CENTER);
-		ipBox.getChildren().addAll(ipText, createLabel(":", false, false),
+
+		//Create a container to hold the ip and port number fields.
+		HBox serverHBox = new HBox();
+		serverHBox.setSpacing(SMALL_PAD);
+		serverHBox.setPrefSize(THIN_PANE_WIDTH, TINY_PANE_HEIGHT);
+		serverHBox.setAlignment(CENTER);
+		serverHBox.getChildren().addAll(ipText, createLabel(":", false, false),
 				portNum);
 
+		//'connectBtn' - button to attempt a connection to the server.
 		connectBtn = createButton("Connect", HUGE_MENU_BUTTON_WIDTH,
 				LARGE_MENU_BUTTON_HEIGHT);
 		connectBtn.setOnAction(e -> connect());
 
+		//Create a button to cancel connection and go back.
 		Button backBtn = createBackButton("Cancel", false);
 
+		//'rememberServerBtn' - checkbox for remembering server details.
 		rememberServerBtn = new CheckBox();
 		rememberServerBtn.setSelected(gotServer);
 
-		HBox rememberServerBox = new HBox();
-		rememberServerBox.setSpacing(SMALL_PAD);
-		rememberServerBox.setAlignment(CENTER);
-		rememberServerBox.getChildren().addAll(
+		//Create container to hold the checkbox and label.
+		HBox rememberServerHBox = new HBox();
+		rememberServerHBox.setSpacing(SMALL_PAD);
+		rememberServerHBox.setAlignment(CENTER);
+		rememberServerHBox.getChildren().addAll(
 				createLabel("Remember Details", false, false),
 				rememberServerBtn);
 
-		VBox connectBox = new VBox();
-		connectBox.setSpacing(MEDIUM_PAD);
-		connectBox.setAlignment(CENTER);
-		connectBox.maxWidthProperty().bind(ipBox.widthProperty().add(BIG_PAD));
-		connectBox.getStyleClass().add("connectbox");
-		connectBox.getChildren().addAll(enterLabel, ipBox, rememberServerBox,
+		//Create container to hold all the connection menu elements.
+		VBox connectVBox = new VBox();
+		connectVBox.setSpacing(MEDIUM_PAD);
+		connectVBox.setAlignment(CENTER);
+		connectVBox.maxWidthProperty().bind(serverHBox.widthProperty().add(BIG_PAD));
+		connectVBox.getStyleClass().add("connectbox");
+		connectVBox.getChildren().addAll(enterLabel, serverHBox, rememberServerHBox,
 				connectBtn);
 
-		connectPane = new VBox();
+		//Create container to hold all the elements and the back button.
+		VBox connectPane = new VBox();
 		connectPane.setAlignment(CENTER);
 		connectPane.setSpacing(BIG_PAD);
-		connectPane.getChildren().addAll(connectBox, backBtn);
+		connectPane.getChildren().addAll(connectVBox, backBtn);
 
+		//Set the menu background.
 		setBackgroundPane(connectMenu, connectPane);
 	}
 
+	/**
+	 * Initialise the menu for single player mode.
+	 */
 	private void initSingleScene() {
 
+		//Create a borderpane to hold the single player elements.
 		BorderPane singleBox = new BorderPane();
 
+		//Create button to start the game.
 		Button startBtn = createButton("Start Game",
 				LARGE_MENU_BUTTON_WIDTH * 1.5, LARGE_MENU_BUTTON_HEIGHT * 1.5);
-
-		HBox startBtnPane = new HBox();
-		startBtnPane.setPadding(new Insets(0, 0, SMALL_PAD, 0));
-		startBtnPane.setAlignment(CENTER);
-		startBtnPane.getChildren().add(startBtn);
 		startBtn.setOnAction(e -> beginGame(this.map,
 				this.playerName.getValue(), this.controls, this.aiNumber.get()));
 
+		//Create a container to hold the start button.
+		HBox startBtnHBox = new HBox();
+		startBtnHBox.setPadding(new Insets(0, 0, SMALL_PAD, 0));
+		startBtnHBox.setAlignment(CENTER);
+		startBtnHBox.getChildren().add(startBtn);
+		
+		//Create a back button.
 		Button backBtn = createBackButton("Back", false);
 
-		HBox centerBox = new HBox();
-		centerBox.setAlignment(CENTER);
-		centerBox.setSpacing(MEDIUM_PAD);
+		//Create a container to hold the central elements.
+		HBox centerHBox = new HBox();
+		centerHBox.setAlignment(CENTER);
+		centerHBox.setSpacing(MEDIUM_PAD);
 
+		//'mapCanvas' - the canvas to draw the offline map on.
 		mapCanvas = new Pane();
 		mapCanvas.setMinHeight(MAP_CANVAS_HEIGHT);
 		mapCanvas.setMinWidth(MAP_CANVAS_WIDTH);
+		
+		//'aiDifficultyChoice' - the offline choicebox for ai difficulty selection.
 		aiDifficultyChoice = new ChoiceBox<>();
-		centerBox.getChildren().addAll(
+		centerHBox.getChildren().addAll(
 				createAiDifficultySelector(aiDifficultyChoice, false),
 				createMapSelector(mapCanvas, false));
 
-		VBox centerPane = new VBox();
-		centerPane.setSpacing(HUGE_PAD);
-		centerPane.setAlignment(CENTER);
-		centerPane.getChildren().addAll(centerBox, startBtnPane);
+		//Create container to hold the central elements and start button.
+		VBox centerVBox = new VBox();
+		centerVBox.setSpacing(HUGE_PAD);
+		centerVBox.setAlignment(CENTER);
+		centerVBox.getChildren().addAll(centerHBox, startBtnHBox);
 
-		HBox backBtnPane = new HBox();
-		backBtnPane.getChildren().add(backBtn);
-		backBtnPane.setPadding(new Insets(SMALL_PAD));
+		//Create container to hold the back button.
+		HBox bacnBtnHBox = new HBox();
+		bacnBtnHBox.getChildren().add(backBtn);
+		bacnBtnHBox.setPadding(new Insets(SMALL_PAD));
 
-		singleBox.setCenter(centerPane);
-		singleBox.setTop(backBtnPane);
+		//Set the elements in the single player menu borderpane.
+		singleBox.setCenter(centerVBox);
+		singleBox.setTop(bacnBtnHBox);
 
+		//Set the menu background.
 		setBackgroundPane(singleMenu, singleBox);
 	}
 
+	/**
+	 * Decrement the capacity of an online room to be created (range 2-4).
+	 */
+	private void decrementRoomNum() {
+		if (roomNumber.get() > 2)
+			roomNumber.set(roomNumber.get() - 1);
+	}
+
+	/**
+	 * Increment the capacity of an online room to be created (range 2-4).
+	 */
+	private void incrementRoomNum() {
+		if (roomNumber.get() < 4)
+			roomNumber.set(roomNumber.get() + 1);
+	}
+	
+	/**
+	 * Initialise a choice box to become an AI Difficulty selector in its own VBox.
+	 * @param selector the choice box
+	 * @param online whether it needs to interact with the client
+	 * @return the VBox containing the AI Difficulty Selector elements
+	 */
 	private VBox createAiDifficultySelector(ChoiceBox<String> selector,
 			boolean online) {
 
+		//Create a toggle for increasing and decreasing the number of AI, with a display label
 		Button upAiToggle = new Button();
 		upAiToggle.setPrefWidth(TOGGLE_WIDTH);
 		upAiToggle.getStyleClass().add("aitoggleup");
@@ -876,30 +969,37 @@ public class UserInterface extends Application implements ClientNetInterface {
 		downAiToggle.setOnAction(online ? e -> decrementOnlineAi()
 				: e -> decrementAi());
 
-		VBox aiBox = new VBox();
-		aiBox.setAlignment(CENTER);
-		aiBox.getStyleClass().add("nopadbox");
-		aiBox.maxHeightProperty().bind(
+		//Create a container to hold the toggle.
+		VBox aiToggle = new VBox();
+		aiToggle.setAlignment(CENTER);
+		aiToggle.getStyleClass().add("nopadbox");
+		aiToggle.maxHeightProperty().bind(
 				upAiToggle.heightProperty().add(
 						displayAi.heightProperty().add(
 								downAiToggle.heightProperty())));
-		aiBox.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
+		aiToggle.getChildren().addAll(upAiToggle, displayAi, downAiToggle);
 
+		//Create a label for the toggle.
 		Label aiLabel = createLabel("Number of\nAI Players", false, false);
 
-		HBox aiPane = new HBox();
-		aiPane.setAlignment(CENTER);
-		aiPane.getStyleClass().add("namebox");
-		aiPane.setSpacing(MEDIUM_PAD);
-		aiPane.getChildren().addAll(aiBox, aiLabel);
+		//Create a container to hold the AI number elements.
+		HBox aiNumberHBox = new HBox();
+		aiNumberHBox.setAlignment(CENTER);
+		aiNumberHBox.getStyleClass().add("namebox");
+		aiNumberHBox.setSpacing(MEDIUM_PAD);
+		aiNumberHBox.getChildren().addAll(aiToggle, aiLabel);
+		
+		//Create a label with information about the level of AI difficulty.
 		Label aiExplanation = createLabel(
 				"AI players will seek\nto destroy you.", true, true);
 		aiExplanation.setFont(smallFont);
 		aiExplanation.setAlignment(CENTER);
 		double width = boxWidth * 0.7;
 		aiExplanation.setPrefWidth(width);
+		
+		//Add the relevant options to the selector
 		selector.setTooltip(new Tooltip("Change AI Difficulty"));
-		selector.setPrefHeight(50);
+		selector.setPrefHeight(BIG_PAD + SMALL_PAD);
 		selector.setPrefWidth(width);
 		selector.getStyleClass().add("textfield");
 		selector.getItems().addAll("Easy", "Medium", "Hard", "Extreme");
@@ -909,14 +1009,11 @@ public class UserInterface extends Application implements ClientNetInterface {
 					@Override
 					public void changed(ObservableValue<? extends String> ob,
 							String oldValue, String newValue) {
-						System.out.println("CHANGED: " + oldValue + " -> "
-								+ newValue);
 						switch (newValue) {
 						case "Easy":
 							aiDiff = EASY;
 							aiExplanation
 									.setText("AI players will move\nrandomly.");
-
 							break;
 						case "Medium":
 							aiDiff = MEDIUM;
@@ -936,46 +1033,61 @@ public class UserInterface extends Application implements ClientNetInterface {
 					}
 				});
 
-		VBox aiDiffBox = new VBox();
-		aiDiffBox.setAlignment(CENTER);
-		aiDiffBox.getStyleClass().add("namebox");
-		aiDiffBox.setSpacing(MEDIUM_PAD);
-		aiDiffBox.getChildren().addAll(
+		//Create a container for the selector and the explanation
+		VBox aiDiffVBox = new VBox();
+		aiDiffVBox.setAlignment(CENTER);
+		aiDiffVBox.getStyleClass().add("namebox");
+		aiDiffVBox.setSpacing(MEDIUM_PAD);
+		aiDiffVBox.getChildren().addAll(
 				createLabel("AI Difficulty:", false, false), selector,
 				aiExplanation);
-		aiDiffBox.setMinHeight(boxHeight / 2);
+		aiDiffVBox.setMinHeight(boxHeight / 2);
 
+		//Create a container for all the elements.
 		VBox aiContainer = new VBox();
 		aiContainer.setAlignment(CENTER);
 		aiContainer.getStyleClass().add("menubox");
 		aiContainer.setSpacing(MEDIUM_PAD);
-		aiContainer.getChildren().addAll(aiPane, aiDiffBox);
+		aiContainer.getChildren().addAll(aiNumberHBox, aiDiffVBox);
 
-		VBox aiPad = new VBox();
-		aiPad.setAlignment(CENTER);
-		aiPad.getChildren().add(aiContainer);
+		//Create a container to pad the elements within.
+		VBox aiDifficultySelector = new VBox();
+		aiDifficultySelector.setAlignment(CENTER);
+		aiDifficultySelector.getChildren().add(aiContainer);
 
-		return aiPad;
-
+		return aiDifficultySelector;
 	}
 
+	/**
+	 * Initialise a map canvas to become a map selector.
+	 * @param mapCanvas the canvas to use
+	 * @param online whether this will need to interact with the client
+	 * @return the VBox containing all the map selection elements
+	 */
 	private VBox createMapSelector(Pane mapCanvas, boolean online) {
 
+		//Create a container to hold the key and canvas. 
 		VBox mapContainer = new VBox();
 		mapContainer.getStyleClass().add("mapbox");
 		mapContainer.setAlignment(CENTER);
+		
+		//Create the map name label.
 		Label mapNameLabel = createBoundLabel(this.mapName, false, true);
 		mapNameLabel.getStyleClass().add("maplabel");
+		
+		//Create the key image.
 		Image keyImage;
 		keyImage = new Image(online ? ONLINE_KEY_PATH : KEY_PATH);
 		ImageView mapKey = new ImageView(keyImage);
 
+		//Create a container for the current map name.
 		VBox currentPane = new VBox();
 		currentPane.setAlignment(CENTER);
 		currentPane.setSpacing(SMALL_PAD);
 		currentPane.getChildren().addAll(
 				createLabel("Current Map:", false, true), mapNameLabel);
 
+		//Create a container for the current map name info and the key.
 		HBox keyPane = new HBox();
 		keyPane.setAlignment(CENTER);
 		keyPane.setSpacing(BIG_PAD);
@@ -984,6 +1096,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 
 		mapContainer.getChildren().addAll(keyPane, mapCanvas);
 
+		//Create the toggles for the map
 		Button rightMapToggle = new Button();
 		rightMapToggle.getStyleClass().add("maptoggleright");
 		rightMapToggle.setPrefWidth(MAP_TOGGLE_WIDTH);
@@ -998,6 +1111,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 		leftMapToggle.setOnAction(online ? e -> decrementOnlineMap()
 				: e -> decrementMap());
 
+		//Create a container for the toggles and the map info display.
 		HBox mapPane = new HBox();
 		mapPane.setAlignment(CENTER);
 		mapPane.getChildren().addAll(leftMapToggle, mapContainer,
@@ -1006,19 +1120,28 @@ public class UserInterface extends Application implements ClientNetInterface {
 		rightMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
 		leftMapToggle.maxHeightProperty().bind(mapPane.heightProperty());
 
+		//Create a container to pad the map elements inside.
 		VBox mapPad = new VBox();
 		mapPad.setAlignment(CENTER);
 		mapPad.getChildren().add(mapPane);
 		drawMap(mapCanvas, online);
+		
 		return mapPad;
 	}
 
+	/**
+	 * Draw the current map onto a map canvas.
+	 * @param mapCanvas the map canvas to draw on.
+	 * @param online if we have to interact with the client or not
+	 */
 	private void drawMap(Pane mapCanvas, boolean online) {
 
 		double height = MAP_CANVAS_HEIGHT;
 		double width = online ? ONLINE_MAP_CANVAS_WIDTH : MAP_CANVAS_WIDTH;
 
 		mapCanvas.getChildren().clear();
+
+		//Create the torches for decoration.
 		Rectangle torch1 = new Rectangle();
 		torch1.setWidth(SMALL_TORCH_WIDTH);
 		torch1.setHeight(SMALL_TORCH_HEIGHT);
@@ -1049,6 +1172,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 
 		mapCanvas.getChildren().addAll(torch1, torch2, torch3, torch4);
 
+		//For every block in the gridmap, draw a rectangle on the canvas with the appropriate texture.
 		double canvasWidth = width - MAP_X_PADDING;
 		double canvasHeight = height - MAP_Y_PADDING;
 		Block[][] gridMap = this.map.getGridMap();
@@ -1086,6 +1210,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 			}
 		}
 
+		//Draw each of the spawn points. If offline, draw all except the first as AI spawn points.
 		for (int x = 0; x < map.getSpawnPoints().size(); x++) {
 			Point pos = map.getSpawnPoints().get(x);
 			Rectangle rect = new Rectangle(10, 10);
@@ -1105,6 +1230,9 @@ public class UserInterface extends Application implements ClientNetInterface {
 		}
 	}
 
+	/**
+	 * Toggle the stage to fullscreen or not.
+	 */
 	private void fullScreen() {
 		if (fullScreenBtn.isSelected()) {
 			this.currentStage.setFullScreen(true);
@@ -1113,6 +1241,9 @@ public class UserInterface extends Application implements ClientNetInterface {
 		}
 	}
 	
+	/**
+	 * Toggle WASD controls.
+	 */
 	private void toggleWasd() {
 		if (wasdBtn.isSelected()) {
 			wasd = true;
@@ -1131,6 +1262,10 @@ public class UserInterface extends Application implements ClientNetInterface {
 		}
 	}
 
+	/**
+	 * Set the music volume.
+	 * @param volume the new volume
+	 */
 	private void setMusic(float volume) {
 		if (muteMusicBtn.isSelected()) {
 			musicMuted = true;
@@ -1144,6 +1279,10 @@ public class UserInterface extends Application implements ClientNetInterface {
 		SettingsParser.storeSettings();
 	}
 
+	/**
+	 * Set the sound effects volume. 
+	 * @param volume the new volume
+	 */
 	private void setSound(float volume) {
 
 		if (muteSoundBtn.isSelected()) {
@@ -1158,7 +1297,14 @@ public class UserInterface extends Application implements ClientNetInterface {
 		SettingsParser.storeSettings();
 	}
 
+	/**
+	 * Set the background image of the content to the menu background image.
+	 * @param pane the background of the menu
+	 * @param content the content to be displayed over the background
+	 */
 	private void setBackgroundPane(BorderPane pane, Node content) {
+		
+		//Create the image for the background.
 		Image mainImage = new Image(BACKGROUND_PATH);
 		ImageView mainImageView = new ImageView(mainImage);
 		Pane imagePane = new Pane();
@@ -1166,20 +1312,39 @@ public class UserInterface extends Application implements ClientNetInterface {
 		imagePane.setPrefSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		mainImageView.fitWidthProperty().bind(imagePane.widthProperty());
 		mainImageView.fitHeightProperty().bind(imagePane.heightProperty());
+		
+		//Stack the content on the background.
 		StackPane background = new StackPane();
 		background.setAlignment(CENTER);
 		background.getChildren().add(imagePane);
 		background.getChildren().add(content);
+		
+		//Set the stacked elements onto the borderpane.
 		pane.setCenter(background);
 	}
 
+	/**
+	 * Create a scene parent (allows for switching scenes when fullscreen).
+	 * @param menu the menu to be the child of this parent
+	 * @return the parent
+	 */
 	private Parent createScene(Parent menu) {
 		BorderPane scene = new BorderPane();
 		scene.setCenter(menu);
+		
+		//Add our stylesheet as well
 		scene.getStylesheets().add(css);
+		
 		return scene;
 	}
 
+	/**
+	 * Create a label.
+	 * @param text the label text
+	 * @param shaded true if the label should be shaded
+	 * @param white true if the text should be white, otherwise it will be black
+	 * @return the new label
+	 */
 	private Label createLabel(String text, boolean shaded, boolean white) {
 		Label label = new Label(text);
 		label.setFont(font);
@@ -1192,6 +1357,11 @@ public class UserInterface extends Application implements ClientNetInterface {
 		return label;
 	}
 
+	/**
+	 * Create a text field.
+	 * @param defaultText the prompt text to display
+	 * @return the new text field
+	 */
 	private TextField createTextField(String defaultText) {
 		TextField text = new TextField();
 		text.setPromptText(defaultText);
@@ -1201,6 +1371,13 @@ public class UserInterface extends Application implements ClientNetInterface {
 		return text;
 	}
 
+	/**
+	 * Create a bound label.
+	 * @param property the property to bind to.
+	 * @param shaded if true, label will be shaded
+	 * @param white if true, text will be white, otherwise it will be black
+	 * @return the new bound label
+	 */
 	private Label createBoundLabel(SimpleIntegerProperty property,
 			boolean shaded, boolean white) {
 		Label label = new Label();
@@ -1213,6 +1390,13 @@ public class UserInterface extends Application implements ClientNetInterface {
 		return label;
 	}
 
+	/**
+	 * Create a bound label.
+	 * @param property the property to bind to
+	 * @param shaded if true, label will be shaded
+	 * @param white if true, text will be white, otherwise it will be black
+	 * @return the new bound label
+	 */
 	private Label createBoundLabel(SimpleStringProperty property,
 			boolean shaded, boolean white) {
 		Label label = new Label();
@@ -1225,6 +1409,13 @@ public class UserInterface extends Application implements ClientNetInterface {
 		return label;
 	}
 
+	/**
+	 * Create a button.
+	 * @param label the button text
+	 * @param width the width of the button
+	 * @param height the height of the button
+	 * @return the new button
+	 */
 	private Button createButton(String label, double width, double height) {
 		Button button = new Button(label);
 		button.setFont(font);
@@ -1236,6 +1427,12 @@ public class UserInterface extends Application implements ClientNetInterface {
 		return button;
 	}
 
+	/**
+	 * Create a back button.
+	 * @param label the button text
+	 * @param online true if the button needs to disconnect too
+	 * @return the new back button
+	 */
 	private Button createBackButton(String label, boolean online) {
 		Button button = new Button(label);
 		button.setFont(font);
@@ -1248,6 +1445,15 @@ public class UserInterface extends Application implements ClientNetInterface {
 		return button;
 	}
 
+	/**
+	 * Create a scene traversal button.
+	 * @param label the button text
+	 * @param width the width of the button
+	 * @param height the height of the button
+	 * @param currentScene the current scene
+	 * @param nextScene the scene to advance to
+	 * @return the new button
+	 */
 	private Button createSceneButton(String label, double width, double height,
 			Parent currentScene, Parent nextScene) {
 		Button button = new Button(label);
@@ -1261,6 +1467,9 @@ public class UserInterface extends Application implements ClientNetInterface {
 		return button;
 	}
 
+	/**
+	 * Make a button click noise.
+	 */
 	public void beep() {
 		AudioManager.playMenuItemSelected();
 	}
@@ -1570,12 +1779,12 @@ public class UserInterface extends Application implements ClientNetInterface {
 		connectedPlayers = this.client.getPlayerList();
 
 		this.serverPlayersBox.getChildren().clear();
-		this.roomPlayersBox.getChildren().clear();
+		this.roomPlayersFlowPane.getChildren().clear();
 
 		for (ClientServerPlayer player : connectedPlayers) {
 			this.serverPlayersBox.getChildren().add(
 					createLabel("- Player: " + player.getName(), true, true));
-			this.roomPlayersBox.getChildren().add(
+			this.roomPlayersFlowPane.getChildren().add(
 					createLabel("- Player: " + player.getName(), true, true));
 		}
 
@@ -1584,8 +1793,8 @@ public class UserInterface extends Application implements ClientNetInterface {
 			aiNumber.set(room.getAIPlayerNumber());
 			this.map = this.maps.get(room.getMapID());
 			this.mapName.set(this.map.getName());
-			readyPane.getChildren().clear();
-			readyPane.getChildren().add(
+			readyPlayersVBox.getChildren().clear();
+			readyPlayersVBox.getChildren().add(
 					createLabel(
 							"Game will begin when all\nplayers click ready!",
 							false, false));
@@ -1603,7 +1812,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 				playerName.setPrefWidth(MENU_BUTTON_WIDTH);
 				playerBox.getChildren().addAll(playerName, torch);
 				if (!player.getName().equals(this.playerName.get())) {
-					readyPane.getChildren().add(playerBox);
+					readyPlayersVBox.getChildren().add(playerBox);
 				}
 			}
 			List<ClientServerAI> ais = room.getAIPlayerList();
@@ -1640,7 +1849,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 					aiDiff = EXTREME;
 					break;
 				}
-				aiOnlineDifficultyChoice.getSelectionModel().select(index);
+				onlineAiDifficultyChoice.getSelectionModel().select(index);
 			}
 			try {
 				if (room.getAIPlayerNumber() + room.getHumanPlayerNumber() > room
@@ -1872,7 +2081,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 					expectingRoomJoin = false;
 				}
 
-				aiOnlineDifficultyChoice.getSelectionModel()
+				onlineAiDifficultyChoice.getSelectionModel()
 						.selectedItemProperty()
 						.addListener(new ChangeListener<String>() {
 							@Override
