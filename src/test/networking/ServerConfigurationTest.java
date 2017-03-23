@@ -35,7 +35,7 @@ public class ServerConfigurationTest {
 		assertEquals(500, config.getRetransmitInterval());
 
 		config.setTickRate(-1);
-		assertEquals(30, config.getTickRate());
+		assertEquals(20, config.getTickRate());
 		config.setTickRate(33);
 		assertEquals(33, config.getTickRate());
 
