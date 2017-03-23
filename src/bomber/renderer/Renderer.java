@@ -118,7 +118,6 @@ public class Renderer {
 		textureShader.createUniform("projection");
 		textureShader.createUniform("model");
 		textureShader.createUniform("texture_sampler");
-
 	}
 
 	/**
