@@ -196,6 +196,58 @@ public class PhysicsEngine
 
             assert (fromDirection != null);
 
+
+
+            // Collision with solid/soft blocks
+            revertPosition(fromDirection, new Point(pos), pos, speed); // check up-left corner
+
+            Point upRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y);
+            revertPosition(fromDirection, upRightCorner, pos, speed);
+
+            Point downLeftCorner = new Point(pos.x, pos.y + Constants.PLAYER_HEIGHT);
+            revertPosition(fromDirection, downLeftCorner, pos, speed);
+
+            Point downRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y + Constants.PLAYER_HEIGHT);
+            revertPosition(fromDirection, downRightCorner, pos, speed);
+
+
+            // Corner helping
+            Point initialPosition = new Point(pos);
+
+            switch (movement)
+            {
+                case UP:
+                    if(neighboursAreClear(pos) && !neighboursAreClear(upRightCorner))
+                        pos.translate(-speed, 0);
+                    else if(!neighboursAreClear(pos) && neighboursAreClear(upRightCorner))
+                        pos.translate(speed, 0);
+                    break;
+                case DOWN:
+                    if(neighboursAreClear(downLeftCorner) && !neighboursAreClear(downRightCorner))
+                        pos.translate(-speed, 0);
+                    else if(!neighboursAreClear(downLeftCorner) && neighboursAreClear(downRightCorner))
+                        pos.translate(speed, 0);
+                    break;
+                case LEFT:
+                    if(neighboursAreClear(pos) && !neighboursAreClear(downLeftCorner))
+                        pos.translate(0, -speed);
+                    else if(!neighboursAreClear(pos) && neighboursAreClear(downLeftCorner))
+                        pos.translate(0, speed);
+                    break;
+                case RIGHT:
+                    if(neighboursAreClear(upRightCorner) && !neighboursAreClear(downRightCorner))
+                        pos.translate(0, -speed);
+                    else if(!neighboursAreClear(upRightCorner) && neighboursAreClear(downRightCorner))
+                        pos.translate(0, speed);
+                    break;
+                case NONE:
+                    break;
+            }
+
+            boolean cornerHelping = false;
+            if(!initialPosition.equals(pos))
+                cornerHelping = true;
+
             // Collision with bombs
             Rectangle translatedPlayerRect =
                     new Rectangle(pos.x, pos.y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
@@ -204,24 +256,21 @@ public class PhysicsEngine
                 Rectangle bombRect =
                         new Rectangle(bomb.getPos().x, bomb.getPos().y, Constants.BOMB_WIDTH, Constants.BOMB_HEIGHT);
                 if (!bombRect.intersects(initialPlayerRect))
+                {
+                    if (cornerHelping && bombRect.intersects(translatedPlayerRect))
+                    {
+                        pos.move(initialPosition.x, initialPosition.y);
+                        translatedPlayerRect =
+                                new Rectangle(pos.x, pos.y, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+                    }
+
                     while (bombRect.intersects(translatedPlayerRect))
                     {
                         translatedPlayerRect.translate(fromDirection.x, fromDirection.y);
                         translatePoint(pos, fromDirection);
                     }
+                }
             }
-
-            // Collision with solid/soft blocks
-            revertPosition(fromDirection, new Point(pos), pos); // check up-left corner
-
-            Point upRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y);
-            revertPosition(fromDirection, upRightCorner, pos);
-
-            Point downLeftCorner = new Point(pos.x, pos.y + Constants.PLAYER_HEIGHT);
-            revertPosition(fromDirection, downLeftCorner, pos);
-
-            Point downRightCorner = new Point(pos.x + Constants.PLAYER_WIDTH, pos.y + Constants.PLAYER_HEIGHT);
-            revertPosition(fromDirection, downRightCorner, pos);
 
         }
 
@@ -379,7 +428,7 @@ public class PhysicsEngine
      * @param corner        The position of the corner
      * @param playerPos     The position of the player
      */
-    private void revertPosition(Point fromDirection, Point corner, Point playerPos)
+    private void revertPosition(Point fromDirection, Point corner, Point playerPos, int speed)
     {
         Map map = gameState.getMap();
         while (map.getPixelBlockAt(corner.x, corner.y) == Block.SOLID ||
@@ -388,6 +437,34 @@ public class PhysicsEngine
             translatePoint(corner, fromDirection);
             translatePoint(playerPos, fromDirection);
         }
+    }
+
+    // TODO: javadoc this
+    private Point normalVector(Point vector)
+    {
+        if(vector.x==0)
+            return new Point(1, 0);
+        else
+            return new Point(0, 1);
+    }
+
+    // TODO: javadoc this
+    private boolean neighboursAreClear(Point location)
+    {
+        if(pointIsClear(location.x, location.y) && pointIsClear(location.x+1, location.y) &&
+                pointIsClear(location.x-1, location.y) && pointIsClear(location.x, location.y+1) &&
+                pointIsClear(location.x, location.y-1))
+            return true;
+        return false;
+    }
+
+    // TODO: javadoc this
+    private boolean pointIsClear(int x, int y)
+    {
+        if(gameState.getMap().getPixelBlockAt(x, y) != Block.SOLID &&
+                gameState.getMap().getPixelBlockAt(x, y) != Block.SOFT)
+            return true;
+        return false;
     }
 
 
