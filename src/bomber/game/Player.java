@@ -1,9 +1,20 @@
 package bomber.game;
 
+import static bomber.game.Constants.MAP_BLOCK_TO_GRID_MULTIPLIER;
+
 import java.awt.Point;
-import static bomber.game.Constants.*;
+
 import bomber.AI.AIDifficulty;
 
+/**
+*
+* @author Owen Jenkins
+* @version 1.4
+* @since 2017-03-23
+* 
+*        Map class for "Bomb Blitz" Game Application (2017 Year 2 Team Project,
+*        Team B1). Represents a map in the game.
+*/
 public class Player {
 
 	private int playerID;

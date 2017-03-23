@@ -18,6 +18,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 
 /**
@@ -54,7 +56,7 @@ public class SettingsParser
 
         try
         {
-            document = builder.parse(new File(Constants.SETTING_XML_PATH));
+            document = builder.parse(new File(getPath()));
             document.getDocumentElement().normalize();
         } catch (SAXException e)
         {
@@ -135,7 +137,10 @@ public class SettingsParser
             e1.printStackTrace();
         }
         DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(new File(Constants.SETTING_XML_PATH));
+
+        String path = getPath();
+
+        StreamResult result = new StreamResult(new File(path));
         try
         {
             transformer.transform(source, result);
@@ -143,6 +148,22 @@ public class SettingsParser
         {
             e1.printStackTrace();
         }
+    }
+
+    private static String getPath()
+    {
+        String path = null;
+        final Class<?> referenceClass = main.class;
+        final URL url =
+                referenceClass.getProtectionDomain().getCodeSource().getLocation();
+        try{
+            final File jarPath = new File(url.toURI()).getParentFile();
+            System.out.println(jarPath); // this is the path you want
+            path = jarPath + "/settings.xml";
+        } catch(final URISyntaxException e){
+            e.printStackTrace();
+        }
+        return path;
     }
 
     /**
