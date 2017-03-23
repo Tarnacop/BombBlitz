@@ -1,5 +1,7 @@
 package bomber.renderer.utils;
 
+import bomber.game.main;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,9 +28,10 @@ public class FileHandler {
 
 		StringBuilder builder = new StringBuilder();
 
-		try (InputStream in = new FileInputStream(path);
+		try (InputStream in = main.class.getResourceAsStream(path);
 
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+
 			String line;
 			while ((line = reader.readLine()) != null) {
 

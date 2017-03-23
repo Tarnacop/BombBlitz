@@ -17,6 +17,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 import bomber.game.Constants;
+import bomber.game.main;
 
 /**
  * Class to create the texture for a font
@@ -49,7 +50,9 @@ public class FontTexture {
 	 */
 	public FontTexture(String path, int size, int fontType) throws Exception {
 
-		this(Font.createFont(Font.TRUETYPE_FONT, new File(path)).deriveFont(fontType, size));
+		this(Font.createFont(Font.TRUETYPE_FONT, main.class.getResourceAsStream(path))
+						.deriveFont(fontType, size));
+
 	}
 
 	/**
