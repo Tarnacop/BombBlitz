@@ -30,17 +30,23 @@ public class HardAI extends AITemplate {
 	 * @see bomber.AI.AITemplate#performMoves(java.util.LinkedList, boolean)
 	 */
 	protected void performMoves(LinkedList<AIActions> moves, boolean inDanger) {
-		if (inDanger)
+	  // if in player is in danger then perform moves without any checks to
+    // get into safe location
+		if (inDanger){
 			while (moves != null && !moves.isEmpty() && gameAI.isAlive() ) {
 				pausedGame();
 				makeSingleMove(moves.removeFirst());
 			}
-		else
+		}
+		
+    // else move until the enemy is reachable, or the AI is in danger
+		else{
 			while (moves != null && !moves.isEmpty() && !safetyCh.inDanger() && safetyCh.checkMoveSafety(moves.peek())
 					&& !safetyCh.isEnemyInBombRange() && gameAI.isAlive()) {
 				pausedGame();
 				makeSingleMove(moves.removeFirst());
 			}
+		}
 	}
 
 	/*
@@ -54,16 +60,17 @@ public class HardAI extends AITemplate {
 		while (moves != null && !moves.isEmpty() && getMovesToEnemy() == null && gameAI.isAlive() ) {
 			pausedGame();
 			action = moves.removeFirst();
+			
 			// if actions is bomb place it
 			if (action == AIActions.BOMB) {
 				gameAI.getKeyState().setBomb(true);
 				try {
 					sleep(100);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 				}
 				gameAI.getKeyState().setBomb(false);
 			}
+			
 			// if action is none wait until the next move is safe
 			else if (action == AIActions.NONE) {
 				if (moves != null) {
@@ -116,7 +123,7 @@ public class HardAI extends AITemplate {
 				performMoves(moves, false);
 			}
 			// if enemy is not in the range get the plan how to reach enemy and
-			// fulfill it
+			// fulfil it
 			else if ((moves = finder.getPlanToEnemy(gameAI.getGridPos(), finder.getNearestEnemy())) != null) {
 				performPlannedMoves(moves);
 			}
