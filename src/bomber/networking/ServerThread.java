@@ -1248,6 +1248,7 @@ public class ServerThread implements Runnable {
 	 * Terminate the server
 	 */
 	public void exit() {
+		pServer("Closing the socket");
 		socket.close();
 	}
 
