@@ -1888,6 +1888,7 @@ public class UserInterface extends Application implements ClientNetInterface {
 			// Create a room display from its constituent elements.
 			VBox roomContainer = new VBox();
 			roomContainer.setMaxHeight(boxHeight * 0.7);
+			roomContainer.setMinWidth(boxWidth/1.5);
 			roomContainer.setSpacing(TINY_PAD);
 			roomContainer.setAlignment(CENTER);
 			roomContainer.getStyleClass().add("namebox");
