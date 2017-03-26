@@ -2590,6 +2590,8 @@ public class UserInterface extends Application implements ClientNetInterface {
 				enterLabel
 						.setText("Enter Server Details:\n( Timed out trying to connect!\nMake sure server is running. )");
 				resetButton(connectBtn, "Connect", e -> connect());
+				client.exit();
+				client = null;
 				expectingConnection = false;
 			}
 
