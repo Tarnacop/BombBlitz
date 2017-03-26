@@ -226,6 +226,9 @@ public class ServerClientTest implements ClientNetInterface {
 				fail("Server did not detect that the client has already connected");
 			}
 
+			client.sendMove(new KeyboardState());
+			client.addAI();
+
 			client.updatePlayerList();
 			client.updateRoomList();
 			for (int i = 0; i < 2000; i++) {
@@ -254,6 +257,8 @@ public class ServerClientTest implements ClientNetInterface {
 			if (!notInRoom) {
 				fail("Server did not detect the client is already not in room");
 			}
+
+			client.sendMove(new KeyboardState());
 
 			client.joinRoom(13);
 			for (int i = 0; i < 2000; i++) {
@@ -308,7 +313,7 @@ public class ServerClientTest implements ClientNetInterface {
 			roomAccepted = false;
 			roomRejected = false;
 
-			client.createRoom("R0", 3, 5);
+			client.createRoom("R0", 9, -5);
 			for (int i = 0; i < 2000; i++) {
 				Thread.sleep(1);
 				if (roomAccepted) {

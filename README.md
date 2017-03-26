@@ -6,14 +6,12 @@
 
 #### 2. In your IDE create the project with the name 'b1'.  
 
-#### 3. Install LWJGL 3  
-Follow the instructions on the webpage:  
-https://github.com/LWJGL/lwjgl3-wiki/wiki/1.2.-Install  
-
-#### 4. Add PNGDecoder to your build path.  
+#### 3. Add necessary jars to the build path  
 In the project go to the 'lib'->'jars' folder  
-In 'jars' folder find 'PNGDecoder.jar' (last one in the list)  
-Add 'PNGDecoder.jar' to your build path  
+Add all the jars in this folder to build path
+
+#### 4. Mark the resources folder as source 
+From your IDE, mark the resources folder as a source  
 
 #### 5. You are set up and ready to play!
 
