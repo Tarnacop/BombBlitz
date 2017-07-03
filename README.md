@@ -2,6 +2,16 @@
 
 ## Running the game:
 
+### Option 1 - Using the binaries provided
+
+#### 1. Go to releases
+#### 2. Download `BombBlitz.zip` from the latest release
+#### 3. Open the archive and run either: 
+  - `/BombBlitz/BombBlitz.jar` to run the game
+  - `/Server/Server.jar` to run the server
+
+### Option 2 - From the source code
+
 #### 1. Clone the project into your IDE(Eclipse, IntelliJ, NetBeans) workspace.  
 
 #### 2. In your IDE create the project with the name 'b1'.  
